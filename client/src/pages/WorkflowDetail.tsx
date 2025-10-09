@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
@@ -163,6 +164,14 @@ export default function WorkflowDetail() {
                   score={tfaAssessment.score || 0} 
                   sections={sectionScores} 
                 />
+                {tfaAssessment.comments && (
+                  <Card className="p-6">
+                    <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-tfa-comments">
+                      {tfaAssessment.comments}
+                    </p>
+                  </Card>
+                )}
                 <ShareableLinkCard
                   workflowId={workflowId}
                   companyName={company?.name || ''}
