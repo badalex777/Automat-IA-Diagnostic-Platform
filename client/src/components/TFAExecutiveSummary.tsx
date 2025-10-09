@@ -8,8 +8,10 @@ import {
   TrendingUp, 
   Shield, 
   Clock,
-  Target
+  Target,
+  Zap
 } from "lucide-react";
+import { TFA_QUESTIONS } from "@shared/tfaQuestions";
 
 interface SectionScore {
   name: string;
@@ -20,6 +22,7 @@ interface SectionScore {
 interface TFAExecutiveSummaryProps {
   score: number;
   sections: SectionScore[];
+  responses: Record<string, string>;
 }
 
 interface RecommendationResult {
@@ -30,72 +33,307 @@ interface RecommendationResult {
   timeframe: string;
 }
 
-const getRecommendation = (score: number, weakSections: SectionScore[]): RecommendationResult => {
-  const criticalWeaknesses = weakSections.filter(s => s.score < 1.5).length;
-  const highWeaknesses = weakSections.filter(s => s.score >= 1.5 && s.score < 2.5).length;
+interface SectionInsight {
+  name: string;
+  score: number;
+  category: 'strength' | 'opportunity' | 'risk' | 'critical';
+  specificIssues: string[];
+  recommendations: string[];
+}
+
+// Analyze specific responses for each section to generate insights
+const analyzeSectionResponses = (
+  sectionName: string, 
+  sectionScore: number,
+  responses: Record<string, string>
+): SectionInsight => {
+  const sectionQuestions = TFA_QUESTIONS.filter(q => q.section === sectionName);
+  const specificIssues: string[] = [];
+  const recommendations: string[] = [];
   
-  // Not Recommended: Score too low OR multiple critical weaknesses
-  if (score < 40 || criticalWeaknesses >= 2) {
+  // Analyze each question response
+  sectionQuestions.forEach(question => {
+    const responseValue = responses[question.id.toString()];
+    if (!responseValue) return;
+    
+    const selectedOption = question.options.find(opt => opt.value === responseValue);
+    if (!selectedOption) return;
+    
+    const score = selectedOption.score;
+    
+    // Critical issues (score 1-2)
+    if (score <= 2) {
+      specificIssues.push(`${question.question.split(':')[0]}: ${selectedOption.label}`);
+      
+      // Generate context-specific recommendations based on the question
+      if (question.id === 1) { // Deployment model
+        recommendations.push("Develop cloud migration strategy or hybrid integration approach");
+      } else if (question.id === 2) { // API availability
+        recommendations.push("Invest in API development or consider RPA for UI automation");
+      } else if (question.id === 3) { // System access
+        recommendations.push("Work with IT to enable service account access and programmatic authentication");
+      } else if (question.id === 4) { // Data structure
+        recommendations.push("Implement data standardization and ETL preprocessing pipeline");
+      } else if (question.id === 5) { // Data quality
+        recommendations.push("Deploy data validation rules and quality monitoring before automation");
+      } else if (question.id === 6) { // Data availability
+        recommendations.push("Begin collecting training data; consider starting with rule-based approach initially");
+      } else if (question.id === 7) { // Integration complexity
+        recommendations.push("Break down integration into phases; prioritize core system connections");
+      } else if (question.id === 8) { // System compatibility
+        recommendations.push("Evaluate middleware platforms (MuleSoft, Zapier) or custom integration layer");
+      } else if (question.id === 9) { // Authentication
+        recommendations.push("Simplify auth flow or allocate extra time for complex credential management");
+      } else if (question.id === 10) { // Data sensitivity
+        recommendations.push("Engage security/compliance team early; plan for data encryption and access controls");
+      } else if (question.id === 11) { // Compliance
+        recommendations.push("Complete compliance review and security assessment before proceeding");
+      } else if (question.id === 12) { // Security approval
+        recommendations.push("Start security review process immediately; parallelize with design phase");
+      } else if (question.id === 13) { // Process definition
+        recommendations.push("Document current process in detail; map decision trees and exceptions");
+      } else if (question.id === 14) { // Process changes
+        recommendations.push("Stabilize process or build flexibility into automation logic");
+      } else if (question.id === 15) { // Business sponsorship
+        recommendations.push("Secure executive sponsor; develop business case to gain leadership support");
+      } else if (question.id === 16) { // Technical ownership
+        recommendations.push("Assign dedicated technical lead with clear responsibilities and allocated time");
+      }
+    }
+    
+    // Mid-range optimization opportunities (score 3-4)
+    else if (score >= 3 && score <= 4) {
+      if (question.id === 1 && score === 3) {
+        recommendations.push("Leverage hybrid architecture; prioritize cloud-based components for new development");
+      } else if (question.id === 2 && score === 3) {
+        recommendations.push("Expand API coverage for critical functions; document workarounds for limited areas");
+      } else if (question.id === 4 && score === 3) {
+        recommendations.push("Apply data transformation layer; consider semi-structured data parsing tools");
+      } else if (question.id === 5 && score === 4) {
+        recommendations.push("Add validation checkpoints; monitor data quality metrics post-implementation");
+      } else if (question.id === 7 && score === 4) {
+        recommendations.push("Use integration patterns to simplify two-system connection");
+      } else if (question.id === 13 && score === 4) {
+        recommendations.push("Review edge cases with process owners; enhance documentation with examples");
+      }
+    }
+  });
+  
+  // Determine category
+  let category: 'strength' | 'opportunity' | 'risk' | 'critical';
+  if (sectionScore >= 4.0) category = 'strength';
+  else if (sectionScore >= 2.5 && sectionScore < 4.0) category = 'opportunity';
+  else if (sectionScore >= 1.5 && sectionScore < 2.5) category = 'risk';
+  else category = 'critical';
+  
+  return {
+    name: sectionName,
+    score: sectionScore,
+    category,
+    specificIssues,
+    recommendations
+  };
+};
+
+const getRecommendation = (
+  score: number, 
+  insights: SectionInsight[]
+): RecommendationResult => {
+  const critical = insights.filter(i => i.category === 'critical');
+  const risks = insights.filter(i => i.category === 'risk');
+  const opportunities = insights.filter(i => i.category === 'opportunity');
+  const strengths = insights.filter(i => i.category === 'strength');
+  
+  // Build comprehensive reasoning
+  let reasoning = '';
+  
+  // Not Recommended: Multiple critical issues or very low score
+  if (critical.length >= 2 || score < 40) {
+    const criticalAreas = critical.map(c => c.name).join(', ');
+    reasoning = `Multiple fundamental barriers in ${criticalAreas || 'core areas'} prevent successful automation. `;
+    reasoning += `With ${critical.length + risks.length} areas requiring significant remediation, focus on foundational improvements first. `;
+    reasoning += strengths.length > 0 
+      ? `While ${strengths.map(s => s.name).join(' and ')} show promise, critical gaps must be addressed before proceeding.`
+      : 'Current infrastructure and process maturity are insufficient for automation ROI.';
+    
     return {
       decision: 'Not Recommended',
       variant: 'destructive',
       icon: XCircle,
-      reasoning: 'Fundamental issues prevent successful automation at this time. Focus on process improvement and infrastructure development first.',
+      reasoning,
       timeframe: '3-6 months of foundational work before re-assessment'
     };
   }
   
-  // Proceed: High score AND no critical weaknesses
-  if (score >= 75 && criticalWeaknesses === 0) {
+  // Proceed: High score with strong foundation
+  if (score >= 75 && critical.length === 0 && risks.length <= 1) {
+    reasoning = `Strong feasibility across ${strengths.length} key dimension${strengths.length > 1 ? 's' : ''}: ${strengths.map(s => s.name).join(', ')}. `;
+    if (opportunities.length > 0) {
+      reasoning += `Minor optimizations in ${opportunities.map(o => o.name).join(', ')} can be addressed during implementation. `;
+    }
+    reasoning += 'Technical foundation, data quality, and organizational readiness support immediate automation planning.';
+    
     return {
       decision: 'Proceed',
       variant: 'default',
       icon: CheckCircle2,
-      reasoning: 'Strong feasibility across all dimensions. Workflow is well-positioned for automation with minimal preparation required.',
+      reasoning,
       timeframe: 'Ready for immediate planning and implementation'
     };
   }
   
-  // Proceed with Caution: Everything else (moderate scores, some weaknesses, but viable)
-  if (score >= 60 && criticalWeaknesses === 0) {
+  // Proceed with Caution: Moderate score, manageable risks
+  if (score >= 60 && critical.length === 0) {
+    reasoning = `Viable automation opportunity with ${risks.length + opportunities.length} areas requiring attention. `;
+    if (strengths.length > 0) {
+      reasoning += `Strong ${strengths.map(s => s.name).join(' and ')} provide solid foundation. `;
+    }
+    if (risks.length > 0) {
+      reasoning += `Address ${risks.map(r => r.name).join(', ')} gaps before full implementation. `;
+    }
+    reasoning += opportunities.length > 0
+      ? `Optimize ${opportunities.map(o => o.name).join(', ')} during planning phase for better outcomes.`
+      : 'Remediation timeline is manageable with focused preparation.';
+    
+    const prepWeeks = risks.length * 2 + opportunities.length;
     return {
       decision: 'Proceed with Caution',
       variant: 'secondary',
       icon: AlertTriangle,
-      reasoning: 'Moderate feasibility with some gaps. Address identified weaknesses during implementation planning phase.',
-      timeframe: '2-4 weeks preparation before automation development'
+      reasoning,
+      timeframe: `${prepWeeks}-${prepWeeks + 4} weeks preparation before automation development`
     };
   }
   
-  // Proceed with Caution: Lower scores or 1 critical weakness but still viable
+  // Proceed with Caution: Lower scores but still viable
+  reasoning = `Feasibility score of ${score}/100 indicates significant preparation required. `;
+  reasoning += critical.length === 1 
+    ? `Critical issue in ${critical[0].name} must be resolved first. `
+    : `${risks.length} risk area${risks.length > 1 ? 's' : ''} need remediation: ${risks.map(r => r.name).join(', ')}. `;
+  if (strengths.length > 0) {
+    reasoning += `Leverage strengths in ${strengths.map(s => s.name).join(', ')} for early wins and momentum. `;
+  }
+  reasoning += 'Automation remains viable but requires substantial groundwork and risk mitigation planning.';
+  
+  const totalWeeks = critical.length * 8 + risks.length * 4 + opportunities.length * 2;
   return {
     decision: 'Proceed with Caution',
     variant: 'secondary',
     icon: AlertTriangle,
-    reasoning: 'Feasibility concerns exist but automation remains viable. Significant preparation and remediation required before proceeding.',
-    timeframe: '4-8 weeks preparation before automation development'
+    reasoning,
+    timeframe: `${totalWeeks}-${totalWeeks + 4} weeks preparation before automation development`
   };
 };
 
-export default function TFAExecutiveSummary({ score, sections }: TFAExecutiveSummaryProps) {
-  const weakSections = sections.filter(s => s.score < 2.5);
-  const strongSections = sections.filter(s => s.score >= 4.0);
-  const recommendation = getRecommendation(score, weakSections);
+const generateActionPlan = (
+  decision: string,
+  insights: SectionInsight[],
+  score: number
+): string[] => {
+  const critical = insights.filter(i => i.category === 'critical');
+  const risks = insights.filter(i => i.category === 'risk');
+  const opportunities = insights.filter(i => i.category === 'opportunity');
+  const strengths = insights.filter(i => i.category === 'strength');
+  
+  const actions: string[] = [];
+  
+  if (decision === 'Proceed') {
+    actions.push(`Initiate solution design focusing on ${strengths.map(s => s.name).join(' and ')} as primary automation targets`);
+    
+    if (opportunities.length > 0) {
+      const topOpportunity = opportunities[0];
+      actions.push(`Optimize ${topOpportunity.name}: ${topOpportunity.recommendations[0] || 'Enhance current capabilities during implementation'}`);
+    } else {
+      actions.push('Build proof-of-concept for highest-impact workflow components');
+    }
+    
+    actions.push('Develop phased implementation roadmap with quick wins in first 30 days');
+    
+    if (insights.some(i => i.name === 'Security/Compliance' && i.score < 4.5)) {
+      actions.push('Begin security review in parallel to avoid delays in deployment phase');
+    }
+  }
+  
+  else if (decision === 'Proceed with Caution') {
+    // Address critical first
+    if (critical.length > 0) {
+      const topCritical = critical[0];
+      actions.push(`PRIORITY: Resolve ${topCritical.name} gap - ${topCritical.recommendations[0] || 'Focus on critical remediation'}`);
+    }
+    
+    // Address top risks
+    if (risks.length > 0) {
+      const topRisk = risks[0];
+      actions.push(`Address ${topRisk.name} weakness: ${topRisk.recommendations[0] || 'Implement improvement plan'}`);
+    }
+    
+    // Leverage strengths
+    if (strengths.length > 0) {
+      actions.push(`Pilot automation in strong area (${strengths[0].name}) to build confidence and demonstrate value`);
+    } else if (opportunities.length > 0) {
+      actions.push(`Start with ${opportunities[0].name} optimization to create foundation for automation`);
+    }
+    
+    // Re-assessment
+    const allWeaknesses = [...critical, ...risks];
+    if (allWeaknesses.length > 2) {
+      actions.push(`Remediate remaining ${allWeaknesses.length - 1} gap${allWeaknesses.length > 2 ? 's' : ''}, then re-assess feasibility before full implementation`);
+    } else {
+      actions.push('Re-validate technical feasibility after remediation work completes');
+    }
+    
+    // Risk mitigation
+    actions.push('Develop contingency plans for identified risks; establish success metrics and monitoring');
+  }
+  
+  else { // Not Recommended
+    actions.push('Halt automation planning; focus resources on foundational improvements');
+    
+    // Address critical gaps
+    critical.forEach(c => {
+      if (actions.length < 4 && c.recommendations[0]) {
+        actions.push(`${c.name}: ${c.recommendations[0]}`);
+      }
+    });
+    
+    // Fill with top risks if needed
+    if (actions.length < 3) {
+      risks.forEach(r => {
+        if (actions.length < 4 && r.recommendations[0]) {
+          actions.push(`${r.name}: ${r.recommendations[0]}`);
+        }
+      });
+    }
+    
+    // Add re-assessment
+    if (actions.length < 4) {
+      actions.push('Schedule re-assessment after completing critical remediation work (3-6 months)');
+    }
+  }
+  
+  return actions.slice(0, 4);
+};
+
+export default function TFAExecutiveSummary({ score, sections, responses }: TFAExecutiveSummaryProps) {
+  // Generate deep insights for each section
+  const insights = sections.map(section => 
+    analyzeSectionResponses(section.name, section.score, responses)
+  );
+  
+  const recommendation = getRecommendation(score, insights);
+  const actionPlan = generateActionPlan(recommendation.decision, insights, score);
   const RecommendationIcon = recommendation.icon;
   
-  // Calculate key metrics
+  // Categorize insights
+  const strengths = insights.filter(i => i.category === 'strength');
+  const opportunities = insights.filter(i => i.category === 'opportunity');
+  const risks = insights.filter(i => i.category === 'risk');
+  const critical = insights.filter(i => i.category === 'critical');
+  
+  // Calculate metrics
   const avgScore = sections.reduce((sum, s) => sum + s.score, 0) / sections.length;
   const consistency = Math.max(...sections.map(s => s.score)) - Math.min(...sections.map(s => s.score));
   const isBalanced = consistency < 2.0;
-  
-  // Identify top risks
-  const risks = [
-    ...weakSections.slice(0, 3).map(s => ({
-      area: s.name,
-      severity: s.score < 1.5 ? 'High' : 'Medium',
-      impact: `${s.weight}% of total score`
-    })),
-  ];
 
   return (
     <Card className="p-6 border-2">
@@ -132,43 +370,70 @@ export default function TFAExecutiveSummary({ score, sections }: TFAExecutiveSum
           </div>
         </Alert>
 
-        {/* Key Findings */}
+        {/* Key Findings - Enhanced with all categories */}
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="p-4 bg-muted/50">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-4 w-4 text-chart-2" />
-              <h4 className="font-semibold text-sm">Strengths</h4>
+              <h4 className="font-semibold text-sm">Strengths & Opportunities</h4>
             </div>
-            {strongSections.length > 0 ? (
+            {strengths.length > 0 || opportunities.length > 0 ? (
               <ul className="space-y-2 text-sm">
-                {strongSections.map(s => (
+                {strengths.map(s => (
                   <li key={s.name} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-3 w-3 text-chart-2" />
-                    <span>{s.name} ({s.score.toFixed(1)}/5.0)</span>
+                    <CheckCircle2 className="h-3 w-3 text-chart-2 flex-shrink-0" />
+                    <span><strong>{s.name}</strong> ({s.score.toFixed(1)}/5.0)</span>
+                  </li>
+                ))}
+                {opportunities.map(o => (
+                  <li key={o.name} className="flex items-start gap-2">
+                    <Zap className="h-3 w-3 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <span><strong>{o.name}</strong> ({o.score.toFixed(1)}/5.0)</span>
+                      {o.recommendations[0] && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{o.recommendations[0]}</p>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">No sections scored above 4.0</p>
+              <p className="text-sm text-muted-foreground">All sections require improvement</p>
             )}
           </Card>
 
           <Card className="p-4 bg-muted/50">
             <div className="flex items-center gap-2 mb-3">
               <Shield className="h-4 w-4 text-destructive" />
-              <h4 className="font-semibold text-sm">Risk Factors</h4>
+              <h4 className="font-semibold text-sm">Risks & Critical Issues</h4>
             </div>
-            {risks.length > 0 ? (
+            {critical.length > 0 || risks.length > 0 ? (
               <ul className="space-y-2 text-sm">
-                {risks.map((risk, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <AlertTriangle className="h-3 w-3 text-destructive mt-0.5" />
+                {critical.map(c => (
+                  <li key={c.name} className="flex items-start gap-2">
+                    <XCircle className="h-3 w-3 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
-                      <span className="font-medium">{risk.area}:</span>{' '}
-                      <Badge variant={risk.severity === 'High' ? 'destructive' : 'secondary'} className="text-xs ml-1">
-                        {risk.severity}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground mt-0.5">{risk.impact}</p>
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">{c.name}</span>
+                        <Badge variant="destructive" className="text-xs">Critical</Badge>
+                      </div>
+                      {c.specificIssues[0] && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{c.specificIssues[0]}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+                {risks.map(r => (
+                  <li key={r.name} className="flex items-start gap-2">
+                    <AlertTriangle className="h-3 w-3 text-orange-600 dark:text-orange-500 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium">{r.name}</span>
+                        <Badge variant="secondary" className="text-xs">Risk</Badge>
+                      </div>
+                      {r.specificIssues[0] && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{r.specificIssues[0]}</p>
+                      )}
                     </div>
                   </li>
                 ))}
@@ -179,69 +444,19 @@ export default function TFAExecutiveSummary({ score, sections }: TFAExecutiveSum
           </Card>
         </div>
 
-        {/* Prioritized Actions */}
+        {/* Prioritized Actions - Now fully dynamic */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Target className="h-4 w-4" />
             <h4 className="font-semibold">Prioritized Action Plan</h4>
           </div>
           <div className="space-y-2">
-            {recommendation.decision === 'Proceed' && (
-              <>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">1.</span>
-                  <p>Initiate automation planning and solution design phase</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">2.</span>
-                  <p>Build proof-of-concept focusing on highest-value sections</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">3.</span>
-                  <p>Develop implementation roadmap with phased rollout strategy</p>
-                </div>
-              </>
-            )}
-            {recommendation.decision === 'Proceed with Caution' && (
-              <>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">1.</span>
-                  <p>Address {weakSections.length} identified weakness{weakSections.length > 1 ? 'es' : ''} following remediation roadmap</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">2.</span>
-                  <p>Consider pilot automation in strong areas ({strongSections.length > 0 ? strongSections[0].name : 'best performing section'})</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">3.</span>
-                  <p>Re-assess feasibility after remediation efforts complete</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">4.</span>
-                  <p>Develop risk mitigation strategies for implementation phase</p>
-                </div>
-              </>
-            )}
-            {recommendation.decision === 'Not Recommended' && (
-              <>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">1.</span>
-                  <p>Halt automation planning and focus on foundational improvements</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">2.</span>
-                  <p>Implement manual process optimization to improve efficiency</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">3.</span>
-                  <p>Address critical gaps: {weakSections.filter(s => s.score < 1.5).map(s => s.name).join(', ')}</p>
-                </div>
-                <div className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                  <span className="font-bold text-primary">4.</span>
-                  <p>Schedule re-assessment in {recommendation.timeframe.toLowerCase()}</p>
-                </div>
-              </>
-            )}
+            {actionPlan.map((action, index) => (
+              <div key={index} className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
+                <span className="font-bold text-primary">{index + 1}.</span>
+                <p>{action}</p>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -251,12 +466,9 @@ export default function TFAExecutiveSummary({ score, sections }: TFAExecutiveSum
           <AlertDescription>
             <p className="text-sm">
               <strong>Estimated Timeline:</strong> {recommendation.timeframe}
-              {weakSections.length > 0 && (
+              {(critical.length > 0 || risks.length > 0) && (
                 <span className="ml-2 text-muted-foreground">
-                  (includes {weakSections.reduce((sum, s) => {
-                    const effort = s.score < 1.5 ? 8 : s.score < 2.0 ? 4 : 2;
-                    return sum + effort;
-                  }, 0)} weeks remediation)
+                  (includes {critical.length * 8 + risks.length * 4 + opportunities.length * 2} weeks remediation)
                 </span>
               )}
             </p>

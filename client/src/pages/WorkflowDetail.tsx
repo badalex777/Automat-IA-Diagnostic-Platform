@@ -166,6 +166,7 @@ export default function WorkflowDetail() {
                 <TFAExecutiveSummary
                   score={tfaAssessment.score || 0}
                   sections={sectionScores}
+                  responses={tfaAssessment.responses as Record<string, string>}
                 />
                 <TFAScoreDisplay 
                   score={tfaAssessment.score || 0} 
