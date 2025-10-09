@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { tfaSections } from "@shared/tfaQuestions";
 import type { TFAAssessment, Workflow, Company } from "@shared/schema";
 
@@ -24,7 +24,7 @@ export default function TFAForm() {
   const [currentSection, setCurrentSection] = useState(0);
 
   const { data: tfaData, isLoading, error } = useQuery<TFAData>({
-    queryKey: [`/api/tfa/${shareableLink}`],
+    queryKey: [`/api/tfa/shareable/${shareableLink}`],
     enabled: !!shareableLink,
   });
 
@@ -45,9 +45,13 @@ export default function TFAForm() {
 
   const submitMutation = useMutation({
     mutationFn: async (responses: Record<string, string>) => {
-      return await apiRequest('POST', `/api/tfa/${shareableLink}/submit`, { responses });
+      return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, { responses });
     },
     onSuccess: () => {
+      // Invalidate TFA queries to refresh data
+      if (tfaData?.workflow?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${tfaData.workflow.id}/tfa`] });
+      }
       toast({
         title: "Assessment submitted",
         description: "Your technical feasibility assessment has been submitted successfully.",

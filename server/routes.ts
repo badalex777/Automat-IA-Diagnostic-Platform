@@ -263,6 +263,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/tfa/shareable/:shareableId/submit", async (req, res) => {
+    try {
+      const validatedData = tfaResponsesSchema.parse(req.body);
+      const { responses } = validatedData;
+
+      // Get assessment by shareableId
+      const assessment = await storage.getTFAByShareableId(req.params.shareableId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Validate all questions are answered
+      const allQuestionIds = TFA_QUESTIONS.map(q => q.id.toString());
+      const answeredIds = Object.keys(responses);
+      const missingQuestions = allQuestionIds.filter(id => !answeredIds.includes(id));
+      
+      if (missingQuestions.length > 0) {
+        return res.status(400).json({ 
+          error: "All questions must be answered before submission",
+          missingQuestions,
+        });
+      }
+
+      // Validate each response matches valid option values
+      for (const [questionId, value] of Object.entries(responses)) {
+        const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
+        if (!question) {
+          return res.status(400).json({ error: `Invalid question ID: ${questionId}` });
+        }
+        
+        const validValues = question.options.map(opt => opt.value);
+        if (!validValues.includes(value)) {
+          return res.status(400).json({ 
+            error: `Invalid response value "${value}" for question ${questionId}. Must be one of: ${validValues.join(', ')}`
+          });
+        }
+      }
+
+      // Calculate final score
+      const score = calculateTFAScore(responses);
+      const sectionScores = calculateSectionScores(responses);
+
+      // Update TFA with responses and mark as complete
+      await storage.updateTFAResponses(assessment.id, responses, score);
+      const updatedAssessment = await storage.completeTFA(assessment.id, score);
+      
+      if (!updatedAssessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Update workflow status
+      await storage.updateWorkflowStatus(updatedAssessment.workflowId, "tfa_readiness");
+
+      res.json({ 
+        assessment: updatedAssessment, 
+        score,
+        sectionScores,
+      });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.post("/api/tfa/:id/submit", async (req, res) => {
     try {
       const validatedData = tfaResponsesSchema.parse(req.body);

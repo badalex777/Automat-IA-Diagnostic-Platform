@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,9 +7,10 @@ import { ChevronLeft, Plus } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { queryClient } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Workflow } from "@shared/schema";
+import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -48,6 +49,30 @@ export default function CompanyDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workflowsError]);
 
+  const createWorkflowMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string }) => {
+      const res = await apiRequest('POST', '/api/workflows', {
+        ...data,
+        companyId,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
+      toast({
+        title: "Workflow created",
+        description: "The workflow has been successfully added.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating workflow",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const completedWorkflows = workflows.filter(w => w.status === 'completed');
   const matrixData = completedWorkflows.map(w => ({
     id: w.id,
@@ -78,10 +103,9 @@ export default function CompanyDetail() {
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <Button data-testid="button-create-workflow">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Workflow
-              </Button>
+              <CreateWorkflowDialog 
+                onSubmit={(data) => createWorkflowMutation.mutate(data)}
+              />
             </div>
           </div>
         </div>

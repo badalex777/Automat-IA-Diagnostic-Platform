@@ -53,9 +53,10 @@ Preferred communication style: Simple, everyday language.
 - Zod integration for runtime validation via drizzle-zod
 
 **Current Implementation**
-- In-memory storage layer (MemStorage) as development placeholder
-- Interface-based storage abstraction (IStorage) for easy database integration
-- Basic user schema established; workflow/assessment schemas to be implemented
+- PostgreSQL database with Drizzle ORM (fully migrated from in-memory storage)
+- Database storage layer (DBStorage) with complete CRUD operations
+- All schemas implemented: Companies, Workflows, TFA Assessments, Business Impact
+- Shareable link system with nanoid-generated unique identifiers
 
 **API Design**
 - RESTful API pattern with /api prefix for all backend routes
@@ -63,25 +64,27 @@ Preferred communication style: Simple, everyday language.
 - Express middleware for request logging, error handling, and CORS
 - Session management ready via connect-pg-simple (PostgreSQL session store)
 
-### Data Model (To Be Implemented)
+### Data Model (Implemented)
 
 **Core Entities**
 1. **Companies** - Client organizations with industry and contact information
 2. **Workflows** - Specific business processes within companies requiring AI assessment
-3. **TFA Assessments** - Technical Feasibility Assessment with weighted scoring across categories:
-   - System Environment (deployment, APIs, data access)
-   - Data Quality (availability, structure, volume)
-   - Integration capabilities
-   - Security & compliance requirements
-   - Process stability
-   - Stakeholder ownership
-4. **Readiness Rubrics** - Implementation readiness evaluation
+   - Status tracking: tfa_only → tfa_readiness → readiness_impact → complete
+3. **TFA Assessments** - Technical Feasibility Assessment with weighted scoring across 6 categories:
+   - System Environment (20%) - deployment, APIs, data access  
+   - Data Quality (25%) - availability, structure, volume
+   - Integration Feasibility (25%) - system compatibility, authentication
+   - Security/Compliance (15%) - data sensitivity, compliance requirements
+   - Process Stability (10%) - change frequency, documentation
+   - Ownership (5%) - business sponsorship, technical ownership
+4. **Readiness Rubrics** - Implementation readiness evaluation (To Be Implemented)
 5. **Business Impact** - ROI calculations (time savings, FTE equivalents, annual benefits, payback period)
 
-**Scoring System**
-- Weighted section scoring (1-5 scale) aggregated to overall feasibility score
-- Feasibility bands: High (75+), Moderate (50-74), Low (<50)
-- Business impact matrix: Impact vs. Effort visualization
+**TFA Scoring System**
+- 21 questions with weighted scoring (1-5 scale) across 6 sections
+- Automated score calculation: weighted average normalized to 0-100
+- Feasibility bands: Low (0-49), Moderate (50-74), High (75-100)
+- Shareable link system for external respondents to complete assessments
 
 ### External Dependencies
 
@@ -119,3 +122,38 @@ Preferred communication style: Simple, everyday language.
 - `vite.config.ts` - Build configuration with path aliases (@, @shared, @assets)
 - `tailwind.config.ts` - Design system tokens and theme configuration
 - `components.json` - Shadcn/ui configuration for component generation
+
+## Recent Changes (Last Updated: 2025-10-09)
+
+### Completed Features
+
+**TFA Assessment System (Fully Implemented)**
+- ✅ Complete backend API with CRUD operations for companies, workflows, TFA assessments, and business impact
+- ✅ Database integration with PostgreSQL and Drizzle ORM
+- ✅ Shareable link system for external respondents:
+  - POST `/api/tfa` generates assessment with unique nanoid shareable ID
+  - GET `/api/tfa/shareable/:shareableId` fetches assessment data with company/workflow context
+  - POST `/api/tfa/shareable/:shareableId/submit` processes responses and calculates scores
+- ✅ Automated TFA scoring: 21 questions across 6 weighted sections → normalized 0-100 score
+- ✅ Frontend pages: Dashboard, CompanyDetail, WorkflowDetail, TFAForm with full React Query integration
+- ✅ React Query cache invalidation for real-time score updates after submission
+- ✅ Error handling with destructive-bordered alerts for all query failures
+
+**Fixed Issues**
+- ✅ Shareable link routing: Added dedicated `/api/tfa/shareable/:shareableId` endpoints
+- ✅ Score display bug: Fixed React Query cache with staleTime: 0 to ensure fresh data on page load
+- ✅ Cache invalidation: Added query invalidation after TFA submission
+- ✅ Import error: Added queryClient import to TFAForm.tsx
+
+### Pending Implementation
+
+**Readiness Rubric Module**
+- [ ] Schema definition for readiness assessment
+- [ ] Backend API routes for readiness CRUD
+- [ ] Frontend UI for readiness rubric evaluation
+- [ ] Integration with workflow status progression
+
+**Business Impact Enhancements**
+- [ ] Opportunity matrix visualization (scatter plot)
+- [ ] Per-company aggregated view of all workflows
+- [ ] ROI calculation refinements
