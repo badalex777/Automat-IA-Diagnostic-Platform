@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
+import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
 import TFAWeaknessAnalysis from "@/components/TFAWeaknessAnalysis";
@@ -162,6 +163,10 @@ export default function WorkflowDetail() {
               <p className="text-muted-foreground">Loading TFA assessment...</p>
             ) : tfaAssessment ? (
               <>
+                <TFAExecutiveSummary
+                  score={tfaAssessment.score || 0}
+                  sections={sectionScores}
+                />
                 <TFAScoreDisplay 
                   score={tfaAssessment.score || 0} 
                   sections={sectionScores} 
