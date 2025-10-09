@@ -161,7 +161,7 @@ export default function WorkflowDetail() {
               </div>
             ) : tfaLoading ? (
               <p className="text-muted-foreground">Loading TFA assessment...</p>
-            ) : tfaAssessment ? (
+            ) : tfaAssessment?.completedAt ? (
               <>
                 <TFAExecutiveSummary
                   score={tfaAssessment.score || 0}
@@ -187,9 +187,33 @@ export default function WorkflowDetail() {
                   workflowTitle={workflow?.name || ''}
                 />
               </>
+            ) : tfaAssessment ? (
+              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-waiting-tfa">
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-2">Waiting for TFA Results</h3>
+                  <p className="text-muted-foreground mb-6">
+                    The assessment link has been created but hasn't been submitted yet.
+                  </p>
+                  <ShareableLinkCard
+                    workflowId={workflowId}
+                    companyName={company?.name || ''}
+                    workflowTitle={workflow?.name || ''}
+                  />
+                </div>
+              </div>
             ) : (
-              <div className="bg-card rounded-lg border border-card-border p-6">
-                <p className="text-muted-foreground">No TFA assessment yet. Generate a shareable link to begin.</p>
+              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-no-tfa">
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-2">No TFA Assessment Yet</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Generate a shareable link below to begin the technical feasibility assessment.
+                  </p>
+                  <ShareableLinkCard
+                    workflowId={workflowId}
+                    companyName={company?.name || ''}
+                    workflowTitle={workflow?.name || ''}
+                  />
+                </div>
               </div>
             )}
           </TabsContent>
