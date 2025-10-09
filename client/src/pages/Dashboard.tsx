@@ -23,7 +23,8 @@ export default function Dashboard() {
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   const createCompanyMutation = useMutation({
     mutationFn: async (data: { name: string; industry: string; contact?: string }) => {
