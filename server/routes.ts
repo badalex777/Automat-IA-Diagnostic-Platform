@@ -1,15 +1,399 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./db-storage";
+import { 
+  insertCompanySchema,
+  updateCompanySchema,
+  insertWorkflowSchema,
+  updateWorkflowSchema,
+  insertTFAAssessmentSchema,
+  tfaResponsesSchema,
+  insertBusinessImpactSchema,
+  updateBusinessImpactSchema,
+} from "@shared/schema";
+import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  // Companies
+  app.get("/api/companies", async (req, res) => {
+    try {
+      const companies = await storage.getAllCompanies();
+      res.json(companies);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  app.get("/api/companies/:id", async (req, res) => {
+    try {
+      const company = await storage.getCompany(req.params.id);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/companies", async (req, res) => {
+    try {
+      const validatedData = insertCompanySchema.parse(req.body);
+      const company = await storage.createCompany(validatedData);
+      res.status(201).json(company);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/companies/:id", async (req, res) => {
+    try {
+      const validatedData = updateCompanySchema.parse(req.body);
+      
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const company = await storage.updateCompany(req.params.id, validatedData);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.json(company);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/companies/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteCompany(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Workflows
+  app.get("/api/companies/:companyId/workflows", async (req, res) => {
+    try {
+      const workflows = await storage.getWorkflowsByCompany(req.params.companyId);
+      res.json(workflows);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/workflows/:id", async (req, res) => {
+    try {
+      const workflow = await storage.getWorkflow(req.params.id);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+      res.json(workflow);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/workflows", async (req, res) => {
+    try {
+      const validatedData = insertWorkflowSchema.parse(req.body);
+      const workflow = await storage.createWorkflow(validatedData);
+      
+      // Auto-create TFA assessment with shareable link
+      const assessment = await storage.createTFAAssessment({
+        workflowId: workflow.id,
+        responses: {},
+      });
+
+      res.status(201).json({ workflow, assessment });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/workflows/:id", async (req, res) => {
+    try {
+      const validatedData = updateWorkflowSchema.parse(req.body);
+
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const workflow = await storage.updateWorkflow(req.params.id, validatedData);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+      res.json(workflow);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/workflows/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteWorkflow(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // TFA Assessments
+  app.get("/api/tfa/questions", (req, res) => {
+    res.json({ questions: TFA_QUESTIONS });
+  });
+
+  app.post("/api/tfa", async (req, res) => {
+    try {
+      const validatedData = insertTFAAssessmentSchema.parse(req.body);
+      const assessment = await storage.createTFAAssessment(validatedData);
+      res.status(201).json(assessment);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/tfa/:id", async (req, res) => {
+    try {
+      const assessment = await storage.getTFAAssessment(req.params.id);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+      res.json(assessment);
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/tfa/shareable/:shareableId", async (req, res) => {
+    try {
+      const assessment = await storage.getTFAByShareableId(req.params.shareableId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+      
+      const workflow = await storage.getWorkflow(assessment.workflowId);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+
+      const company = await storage.getCompany(workflow.companyId);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      res.json({
+        assessment,
+        workflow,
+        company,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/workflows/:workflowId/tfa", async (req, res) => {
+    try {
+      const assessment = await storage.getTFAByWorkflowId(req.params.workflowId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+      res.json(assessment);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/tfa/:id/responses", async (req, res) => {
+    try {
+      const validatedData = tfaResponsesSchema.parse(req.body);
+      const { responses } = validatedData;
+
+      // Validate each response matches valid option values
+      for (const [questionId, value] of Object.entries(responses)) {
+        const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
+        if (!question) {
+          return res.status(400).json({ error: `Invalid question ID: ${questionId}` });
+        }
+        
+        const validValues = question.options.map(opt => opt.value);
+        if (!validValues.includes(value)) {
+          return res.status(400).json({ 
+            error: `Invalid response value "${value}" for question ${questionId}. Must be one of: ${validValues.join(', ')}`
+          });
+        }
+      }
+
+      // Calculate score based on responses
+      const score = calculateTFAScore(responses);
+      
+      const assessment = await storage.updateTFAResponses(req.params.id, responses, score);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      res.json(assessment);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/tfa/:id/submit", async (req, res) => {
+    try {
+      const validatedData = tfaResponsesSchema.parse(req.body);
+      const { responses } = validatedData;
+
+      // Validate all questions are answered
+      const allQuestionIds = TFA_QUESTIONS.map(q => q.id.toString());
+      const answeredIds = Object.keys(responses);
+      const missingQuestions = allQuestionIds.filter(id => !answeredIds.includes(id));
+      
+      if (missingQuestions.length > 0) {
+        return res.status(400).json({ 
+          error: "All questions must be answered before submission",
+          missingQuestions,
+        });
+      }
+
+      // Validate each response matches valid option values
+      for (const [questionId, value] of Object.entries(responses)) {
+        const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
+        if (!question) {
+          return res.status(400).json({ error: `Invalid question ID: ${questionId}` });
+        }
+        
+        const validValues = question.options.map(opt => opt.value);
+        if (!validValues.includes(value)) {
+          return res.status(400).json({ 
+            error: `Invalid response value "${value}" for question ${questionId}. Must be one of: ${validValues.join(', ')}`
+          });
+        }
+      }
+
+      // Calculate final score
+      const score = calculateTFAScore(responses);
+      const sectionScores = calculateSectionScores(responses);
+
+      // Update TFA with responses and mark as complete
+      await storage.updateTFAResponses(req.params.id, responses, score);
+      const assessment = await storage.completeTFA(req.params.id, score);
+      
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Update workflow status
+      await storage.updateWorkflowStatus(assessment.workflowId, "tfa_readiness");
+
+      res.json({ 
+        assessment, 
+        score,
+        sectionScores,
+      });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/tfa/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteTFAAssessment(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Business Impact
+  app.get("/api/workflows/:workflowId/business-impact", async (req, res) => {
+    try {
+      const impact = await storage.getBusinessImpact(req.params.workflowId);
+      res.json(impact || null);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/workflows/:workflowId/business-impact", async (req, res) => {
+    try {
+      const validatedData = insertBusinessImpactSchema.parse({
+        ...req.body,
+        workflowId: req.params.workflowId,
+      });
+      const impact = await storage.createBusinessImpact(validatedData);
+      res.status(201).json(impact);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/workflows/:workflowId/business-impact", async (req, res) => {
+    try {
+      const validatedData = updateBusinessImpactSchema.parse(req.body);
+
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const impact = await storage.updateBusinessImpact(req.params.workflowId, validatedData);
+      if (!impact) {
+        return res.status(404).json({ error: "Business impact not found" });
+      }
+      res.json(impact);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/workflows/:workflowId/business-impact", async (req, res) => {
+    try {
+      const success = await storage.deleteBusinessImpact(req.params.workflowId);
+      if (!success) {
+        return res.status(404).json({ error: "Business impact not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
   const httpServer = createServer(app);
-
   return httpServer;
 }

@@ -33,6 +33,16 @@ export class DbStorage implements IStorage {
     return newCompany;
   }
 
+  async updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined> {
+    const [updated] = await db.update(companies).set(data).where(eq(companies.id, id)).returning();
+    return updated;
+  }
+
+  async deleteCompany(id: string): Promise<boolean> {
+    const result = await db.delete(companies).where(eq(companies.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
   // Workflows
   async getWorkflow(id: string): Promise<Workflow | undefined> {
     const [workflow] = await db.select().from(workflows).where(eq(workflows.id, id));
@@ -48,9 +58,19 @@ export class DbStorage implements IStorage {
     return newWorkflow;
   }
 
+  async updateWorkflow(id: string, data: Partial<InsertWorkflow>): Promise<Workflow | undefined> {
+    const [updated] = await db.update(workflows).set(data).where(eq(workflows.id, id)).returning();
+    return updated;
+  }
+
   async updateWorkflowStatus(id: string, status: string): Promise<Workflow | undefined> {
     const [updated] = await db.update(workflows).set({ status }).where(eq(workflows.id, id)).returning();
     return updated;
+  }
+
+  async deleteWorkflow(id: string): Promise<boolean> {
+    const result = await db.delete(workflows).where(eq(workflows.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // TFA Assessments
@@ -112,6 +132,11 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
+  async deleteTFAAssessment(id: string): Promise<boolean> {
+    const result = await db.delete(tfaAssessments).where(eq(tfaAssessments.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
   // Business Impact
   async getBusinessImpact(workflowId: string): Promise<BusinessImpact | undefined> {
     const [impact] = await db.select().from(businessImpact).where(eq(businessImpact.workflowId, workflowId));
@@ -129,6 +154,11 @@ export class DbStorage implements IStorage {
       .where(eq(businessImpact.workflowId, workflowId))
       .returning();
     return updated;
+  }
+
+  async deleteBusinessImpact(workflowId: string): Promise<boolean> {
+    const result = await db.delete(businessImpact).where(eq(businessImpact.workflowId, workflowId));
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 }
 

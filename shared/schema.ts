@@ -11,6 +11,8 @@ export const companies = pgTable("companies", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const workflowStatusEnum = ["tfa_only", "tfa_pending", "tfa_readiness", "impact_pending", "completed"] as const;
+
 export const workflows = pgTable("workflows", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => companies.id, { onDelete: 'cascade' }),
@@ -55,10 +57,16 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
   createdAt: true,
 });
 
+export const updateCompanySchema = insertCompanySchema.partial();
+
 export const insertWorkflowSchema = createInsertSchema(workflows).omit({
   id: true,
   createdAt: true,
+}).extend({
+  status: z.enum(workflowStatusEnum).optional(),
 });
+
+export const updateWorkflowSchema = insertWorkflowSchema.partial();
 
 export const insertTFAAssessmentSchema = createInsertSchema(tfaAssessments).omit({
   id: true,
@@ -66,10 +74,16 @@ export const insertTFAAssessmentSchema = createInsertSchema(tfaAssessments).omit
   createdAt: true,
 });
 
+export const tfaResponsesSchema = z.object({
+  responses: z.record(z.string(), z.string()),
+});
+
 export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omit({
   id: true,
   createdAt: true,
 });
+
+export const updateBusinessImpactSchema = insertBusinessImpactSchema.omit({ workflowId: true }).partial();
 
 // Select types
 export type Company = typeof companies.$inferSelect;
