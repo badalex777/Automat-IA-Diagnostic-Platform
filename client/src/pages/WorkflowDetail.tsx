@@ -31,6 +31,7 @@ export default function WorkflowDetail() {
   const { data: tfaAssessment, isLoading: tfaLoading, error: tfaError } = useQuery<TFAAssessment>({
     queryKey: [`/api/workflows/${workflowId}/tfa`],
     enabled: !!workflowId,
+    refetchOnWindowFocus: true,
   });
 
   const { data: businessImpact, isLoading: impactLoading, error: impactError } = useQuery<BusinessImpact>({
