@@ -1,19 +1,50 @@
-import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { Company } from "@shared/schema";
 import CompanyCard from "@/components/CompanyCard";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-//todo: remove mock functionality
-const mockCompanies = [
-  { id: '1', name: 'TechCorp Solutions', industry: 'Technology', workflowCount: 12, completedCount: 8 },
-  { id: '2', name: 'Financial Services Inc', industry: 'Finance', workflowCount: 5, completedCount: 5 },
-  { id: '3', name: 'Healthcare Plus', industry: 'Healthcare', workflowCount: 8, completedCount: 2 },
-  { id: '4', name: 'Manufacturing Co', industry: 'Manufacturing', workflowCount: 15, completedCount: 6 },
-  { id: '5', name: 'Retail Group', industry: 'Retail', workflowCount: 10, completedCount: 0 },
-];
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
-  const [companies] = useState(mockCompanies);
+  const { toast } = useToast();
+  
+  const { data: companies = [], isLoading, error } = useQuery<Company[]>({
+    queryKey: ['/api/companies'],
+  });
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error loading companies",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
+  const createCompanyMutation = useMutation({
+    mutationFn: async (data: { name: string; industry: string; contact?: string }) => {
+      const res = await apiRequest('POST', '/api/companies', data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+      toast({
+        title: "Company created",
+        description: "The company has been successfully added.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,7 +57,9 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <CreateCompanyDialog />
+              <CreateCompanyDialog 
+                onSubmit={(data) => createCompanyMutation.mutate(data)}
+              />
             </div>
           </div>
         </div>
@@ -38,17 +71,41 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground">{companies.length} companies registered</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {companies.map((company) => (
-            <CompanyCard key={company.id} {...company} />
-          ))}
-        </div>
-
-        {companies.length === 0 && (
+        {error ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No companies yet</p>
-            <CreateCompanyDialog />
+            <p className="text-destructive mb-4">Failed to load companies</p>
+            <Button variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/companies'] })} data-testid="button-retry">
+              Retry
+            </Button>
           </div>
+        ) : isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading companies...</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {companies.map((company) => (
+                <CompanyCard 
+                  key={company.id} 
+                  id={company.id}
+                  name={company.name}
+                  industry={company.industry}
+                  workflowCount={0}
+                  completedCount={0}
+                />
+              ))}
+            </div>
+
+            {companies.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground mb-4">No companies yet</p>
+                <CreateCompanyDialog 
+                  onSubmit={(data) => createCompanyMutation.mutate(data)}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
