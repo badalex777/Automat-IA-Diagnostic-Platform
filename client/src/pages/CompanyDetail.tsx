@@ -1,9 +1,10 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, Search } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -16,6 +17,7 @@ export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
   const companyId = params?.id || '';
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -73,6 +75,11 @@ export default function CompanyDetail() {
     },
   });
 
+  const filteredWorkflows = workflows.filter(workflow =>
+    workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (workflow.description && workflow.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   const completedWorkflows = workflows.filter(w => w.status === 'completed');
   const matrixData = completedWorkflows.map(w => ({
     id: w.id,
@@ -119,13 +126,28 @@ export default function CompanyDetail() {
           </TabsList>
 
           <TabsContent value="workflows" className="space-y-4">
+            {workflows.length > 0 && (
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search workflows..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                  data-testid="input-search-workflows"
+                />
+              </div>
+            )}
             <div className="bg-card rounded-lg border border-card-border p-6">
               {workflowsLoading ? (
                 <p className="text-muted-foreground text-center py-4">Loading workflows...</p>
               ) : workflows.length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">No workflows yet. Create one to get started.</p>
+              ) : filteredWorkflows.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">No workflows match your search.</p>
               ) : (
-                workflows.map((workflow) => (
+                filteredWorkflows.map((workflow) => (
                   <WorkflowListItem key={workflow.id} {...workflow} companyId={companyId} />
                 ))
               )}

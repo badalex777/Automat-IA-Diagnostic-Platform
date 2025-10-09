@@ -1,15 +1,18 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Company } from "@shared/schema";
 import CompanyCard from "@/components/CompanyCard";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
   
   const { data: companies = [], isLoading, error } = useQuery<Company[]>({
     queryKey: ['/api/companies'],
@@ -47,6 +50,11 @@ export default function Dashboard() {
     },
   });
 
+  const filteredCompanies = companies.filter(company => 
+    company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    company.industry.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border">
@@ -67,9 +75,24 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-1">All Companies</h2>
-          <p className="text-sm text-muted-foreground">{companies.length} companies registered</p>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold mb-1">All Companies</h2>
+            <p className="text-sm text-muted-foreground">
+              {filteredCompanies.length} {filteredCompanies.length !== companies.length ? `of ${companies.length}` : ''} companies
+            </p>
+          </div>
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search companies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+              data-testid="input-search-companies"
+            />
+          </div>
         </div>
 
         {error ? (
@@ -86,7 +109,7 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {companies.map((company) => (
+              {filteredCompanies.map((company) => (
                 <CompanyCard 
                   key={company.id} 
                   id={company.id}
@@ -97,6 +120,12 @@ export default function Dashboard() {
                 />
               ))}
             </div>
+
+            {filteredCompanies.length === 0 && companies.length > 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No companies match your search</p>
+              </div>
+            )}
 
             {companies.length === 0 && (
               <div className="text-center py-12">
