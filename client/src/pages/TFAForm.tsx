@@ -1,49 +1,96 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { tfaSections } from "@shared/tfaQuestions";
+import type { TFAAssessment, Workflow, Company } from "@shared/schema";
 
-//todo: remove mock functionality
-const mockQuestions = [
-  {
-    section: 'System Environment',
-    weight: 20,
-    questions: [
-      {
-        id: 1,
-        question: 'Deployment model: How are the main systems for this workflow deployed?',
-        weight: 5,
-        options: [
-          { value: '1', label: 'Legacy on-prem only', description: 'Very Low Feasibility / Major Limitation' },
-          { value: '2', label: 'Mostly on-prem, some cloud', description: 'Low Feasibility / Several Limitations' },
-          { value: '3', label: 'Mixed/hybrid', description: 'Moderate Feasibility / Some Workarounds Possible' },
-          { value: '4', label: 'Mostly cloud SaaS', description: 'Good Feasibility / Minor Constraints' },
-          { value: '5', label: 'Modern cloud SaaS only', description: 'Excellent Feasibility / Fully Ready' },
-        ],
-      },
-    ],
-  },
-];
+interface TFAData {
+  assessment: TFAAssessment;
+  workflow: Workflow;
+  company: Company;
+}
 
 export default function TFAForm() {
-  const [, params] = useRoute("/tfa/:workflowId");
+  const [, params] = useRoute("/tfa/:shareableLink");
+  const shareableLink = params?.shareableLink || '';
+  const { toast } = useToast();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentSection, setCurrentSection] = useState(0);
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const companyName = searchParams.get('company') || 'Company Name';
-  const workflowTitle = searchParams.get('workflow') || 'Workflow Title';
+  const { data: tfaData, isLoading, error } = useQuery<TFAData>({
+    queryKey: [`/api/tfa/${shareableLink}`],
+    enabled: !!shareableLink,
+  });
 
-  const totalQuestions = mockQuestions.reduce((acc, section) => acc + section.questions.length, 0);
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error loading assessment",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
+
+  const totalQuestions = tfaSections.reduce((acc, section) => acc + section.questions.length, 0);
   const answeredQuestions = Object.keys(answers).length;
   const progress = (answeredQuestions / totalQuestions) * 100;
 
+  const submitMutation = useMutation({
+    mutationFn: async (responses: Record<string, string>) => {
+      return await apiRequest('POST', `/api/tfa/${shareableLink}/submit`, { responses });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Assessment submitted",
+        description: "Your technical feasibility assessment has been submitted successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Submission failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSubmit = () => {
-    console.log('TFA submitted:', answers);
+    if (answeredQuestions < totalQuestions) {
+      toast({
+        title: "Incomplete assessment",
+        description: "Please answer all questions before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    submitMutation.mutate(answers);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading assessment...</p>
+      </div>
+    );
+  }
+
+  if (!tfaData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Assessment not found</p>
+      </div>
+    );
+  }
+
+  const { company, workflow } = tfaData;
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +99,7 @@ export default function TFAForm() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">Technical Feasibility Assessment</h1>
-              <p className="text-sm text-muted-foreground mt-1">{companyName} • {workflowTitle}</p>
+              <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
             </div>
             <ThemeToggle />
           </div>
@@ -67,8 +114,17 @@ export default function TFAForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold" data-testid="text-section-title">
+            Section {currentSection + 1}: {tfaSections[currentSection].section}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Weight: {tfaSections[currentSection].weight}% of total score
+          </p>
+        </div>
+        
         <div className="space-y-8">
-          {mockQuestions[currentSection].questions.map((q) => (
+          {tfaSections[currentSection].questions.map((q) => (
             <TFAQuestionCard
               key={q.id}
               questionNumber={q.id}
@@ -81,12 +137,31 @@ export default function TFAForm() {
           ))}
         </div>
 
-        <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-border">
-          <Button variant="outline" data-testid="button-save-draft">
-            Save Draft
-          </Button>
-          <Button onClick={handleSubmit} data-testid="button-submit-tfa">
-            Submit Assessment
+        <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
+          <div className="flex gap-3">
+            <Button 
+              variant="outline" 
+              disabled={currentSection === 0}
+              onClick={() => setCurrentSection(prev => prev - 1)}
+              data-testid="button-previous-section"
+            >
+              Previous Section
+            </Button>
+            <Button 
+              variant="outline" 
+              disabled={currentSection === tfaSections.length - 1}
+              onClick={() => setCurrentSection(prev => prev + 1)}
+              data-testid="button-next-section"
+            >
+              Next Section
+            </Button>
+          </div>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={submitMutation.isPending}
+            data-testid="button-submit-tfa"
+          >
+            {submitMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
           </Button>
         </div>
       </div>
