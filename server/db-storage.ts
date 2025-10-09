@@ -115,10 +115,13 @@ export class DbStorage implements IStorage {
     throw new Error('Failed to generate unique shareable ID after maximum attempts');
   }
 
-  async updateTFAResponses(id: string, responses: Record<string, string>, score?: number): Promise<TFAAssessment | undefined> {
+  async updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
     if (score !== undefined) {
       updateData.score = score;
+    }
+    if (comments !== undefined) {
+      updateData.comments = comments;
     }
     const [updated] = await db.update(tfaAssessments).set(updateData).where(eq(tfaAssessments.id, id)).returning();
     return updated;

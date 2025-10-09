@@ -29,6 +29,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
   shareableId: varchar("shareable_id").notNull().unique(),
   responses: jsonb("responses").default({}),
+  comments: text("comments"),
   score: integer("score"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -76,6 +77,7 @@ export const insertTFAAssessmentSchema = createInsertSchema(tfaAssessments).omit
 
 export const tfaResponsesSchema = z.object({
   responses: z.record(z.string(), z.string()),
+  comments: z.string().optional(),
 });
 
 export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omit({

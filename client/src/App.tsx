@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import CompanyDetail from "@/pages/CompanyDetail";
 import WorkflowDetail from "@/pages/WorkflowDetail";
 import TFAForm from "@/pages/TFAForm";
+import TFAThankYou from "@/pages/TFAThankYou";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,7 +17,8 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/company/:id" component={CompanyDetail} />
       <Route path="/company/:companyId/workflow/:workflowId" component={WorkflowDetail} />
-      <Route path="/tfa/:workflowId" component={TFAForm} />
+      <Route path="/tfa/:shareableLink/thank-you" component={TFAThankYou} />
+      <Route path="/tfa/:shareableLink" component={TFAForm} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -30,7 +30,7 @@ export interface IStorage {
   getTFAByShareableId(shareableId: string): Promise<TFAAssessment | undefined>;
   getTFAByWorkflowId(workflowId: string): Promise<TFAAssessment | undefined>;
   createTFAAssessment(assessment: InsertTFAAssessment): Promise<TFAAssessment>;
-  updateTFAResponses(id: string, responses: Record<string, string>, score?: number): Promise<TFAAssessment | undefined>;
+  updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string): Promise<TFAAssessment | undefined>;
   completeTFA(id: string, score: number): Promise<TFAAssessment | undefined>;
   deleteTFAAssessment(id: string): Promise<boolean>;
   
