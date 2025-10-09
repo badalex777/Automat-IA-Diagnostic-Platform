@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { useRoute, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
@@ -7,20 +8,107 @@ import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useToast } from "@/hooks/use-toast";
+import type { Workflow, Company, TFAAssessment, BusinessImpact } from "@shared/schema";
+import { tfaSections as allSections } from "@shared/tfaQuestions";
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
-  const companyId = params?.companyId || '1';
-  const workflowId = params?.workflowId || '1';
+  const companyId = params?.companyId || '';
+  const workflowId = params?.workflowId || '';
+  const { toast } = useToast();
 
-  const tfaSections = [
-    { name: 'System Environment', score: 4.2, weight: 20 },
-    { name: 'Data Quality', score: 3.8, weight: 25 },
-    { name: 'Integration', score: 4.0, weight: 25 },
-    { name: 'Security', score: 3.5, weight: 15 },
-    { name: 'Process Stability', score: 4.5, weight: 10 },
-    { name: 'Ownership', score: 4.0, weight: 5 },
-  ];
+  const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
+    queryKey: [`/api/companies/${companyId}`],
+    enabled: !!companyId,
+  });
+
+  const { data: workflow, isLoading: workflowLoading, error: workflowError } = useQuery<Workflow>({
+    queryKey: [`/api/workflows/${workflowId}`],
+    enabled: !!workflowId,
+  });
+
+  const { data: tfaAssessment, isLoading: tfaLoading, error: tfaError } = useQuery<TFAAssessment>({
+    queryKey: [`/api/workflows/${workflowId}/tfa`],
+    enabled: !!workflowId,
+  });
+
+  const { data: businessImpact, isLoading: impactLoading, error: impactError } = useQuery<BusinessImpact>({
+    queryKey: [`/api/workflows/${workflowId}/business-impact`],
+    enabled: !!workflowId,
+  });
+
+  useEffect(() => {
+    if (companyError) {
+      toast({
+        title: "Error loading company",
+        description: companyError.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyError]);
+
+  useEffect(() => {
+    if (workflowError) {
+      toast({
+        title: "Error loading workflow",
+        description: workflowError.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflowError]);
+
+  useEffect(() => {
+    if (tfaError) {
+      toast({
+        title: "Error loading TFA assessment",
+        description: tfaError.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tfaError]);
+
+  useEffect(() => {
+    if (impactError) {
+      toast({
+        title: "Error loading business impact",
+        description: impactError.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [impactError]);
+
+  const calculateSectionScores = () => {
+    if (!tfaAssessment?.responses) return [];
+    
+    return allSections.map(section => {
+      const sectionQuestions = section.questions;
+      const sectionResponses = sectionQuestions.filter(q => 
+        tfaAssessment.responses[q.id.toString()]
+      );
+      
+      const totalWeight = sectionQuestions.reduce((acc, q) => acc + q.weight, 0);
+      const weightedScore = sectionQuestions.reduce((acc, q) => {
+        const response = tfaAssessment.responses[q.id.toString()];
+        if (!response) return acc;
+        return acc + (parseInt(response) * q.weight);
+      }, 0);
+      
+      const score = totalWeight > 0 ? (weightedScore / totalWeight) : 0;
+      
+      return {
+        name: section.section,
+        score: parseFloat(score.toFixed(1)),
+        weight: section.weight,
+      };
+    });
+  };
+
+  const sectionScores = calculateSectionScores();
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,8 +122,12 @@ export default function WorkflowDetail() {
           </Link>
           <div className="flex items-center justify-between w-full">
             <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">Invoice Processing Automation</h1>
-              <p className="text-sm text-muted-foreground mt-1">TechCorp Solutions • Complete</p>
+              <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">
+                {workflowError ? 'Error loading workflow' : workflowLoading ? 'Loading...' : workflow?.name || 'Unknown Workflow'}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {companyError ? 'Error loading company' : company?.name || (companyLoading ? 'Loading...' : 'Unknown')} • {workflow?.status || 'pending'}
+              </p>
             </div>
             <ThemeToggle />
           </div>
@@ -43,6 +135,13 @@ export default function WorkflowDetail() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {(companyError || workflowError) && (
+          <div className="bg-card rounded-lg border border-destructive p-6 mb-6">
+            <p className="text-destructive font-semibold mb-2">Error Loading Data</p>
+            {companyError && <p className="text-sm text-destructive">Company: {companyError.message}</p>}
+            {workflowError && <p className="text-sm text-destructive">Workflow: {workflowError.message}</p>}
+          </div>
+        )}
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
@@ -51,12 +150,29 @@ export default function WorkflowDetail() {
           </TabsList>
 
           <TabsContent value="tfa" className="space-y-6">
-            <TFAScoreDisplay score={82} sections={tfaSections} />
-            <ShareableLinkCard
-              workflowId={workflowId}
-              companyName="TechCorp Solutions"
-              workflowTitle="Invoice Processing Automation"
-            />
+            {tfaError ? (
+              <div className="bg-card rounded-lg border border-destructive p-6">
+                <p className="text-destructive">Error loading TFA assessment: {tfaError.message}</p>
+              </div>
+            ) : tfaLoading ? (
+              <p className="text-muted-foreground">Loading TFA assessment...</p>
+            ) : tfaAssessment ? (
+              <>
+                <TFAScoreDisplay 
+                  score={tfaAssessment.score || 0} 
+                  sections={sectionScores} 
+                />
+                <ShareableLinkCard
+                  workflowId={workflowId}
+                  companyName={company?.name || ''}
+                  workflowTitle={workflow?.name || ''}
+                />
+              </>
+            ) : (
+              <div className="bg-card rounded-lg border border-card-border p-6">
+                <p className="text-muted-foreground">No TFA assessment yet. Generate a shareable link to begin.</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="readiness" className="space-y-6">
@@ -69,7 +185,18 @@ export default function WorkflowDetail() {
           </TabsContent>
 
           <TabsContent value="impact" className="space-y-6">
-            <BusinessImpactForm />
+            {impactError ? (
+              <div className="bg-card rounded-lg border border-destructive p-6">
+                <p className="text-destructive">Error loading business impact: {impactError.message}</p>
+              </div>
+            ) : impactLoading ? (
+              <p className="text-muted-foreground">Loading business impact...</p>
+            ) : (
+              <BusinessImpactForm 
+                workflowId={workflowId}
+                initialData={businessImpact || undefined}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>

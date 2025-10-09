@@ -1,39 +1,75 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-
-interface BusinessImpactData {
-  hoursPerWeek: string;
-  hoursPerYear: string;
-  fteEquivalent: string;
-  annualBenefits: string;
-  roiPercentage: string;
-  paybackMonths: string;
-}
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { BusinessImpact } from "@shared/schema";
 
 interface BusinessImpactFormProps {
-  onSubmit?: (data: BusinessImpactData) => void;
+  workflowId: string;
+  initialData?: BusinessImpact;
 }
 
-export default function BusinessImpactForm({ onSubmit }: BusinessImpactFormProps) {
-  const [formData, setFormData] = useState<BusinessImpactData>({
-    hoursPerWeek: '',
-    hoursPerYear: '',
-    fteEquivalent: '',
-    annualBenefits: '',
-    roiPercentage: '',
-    paybackMonths: '',
+export default function BusinessImpactForm({ workflowId, initialData }: BusinessImpactFormProps) {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    hoursPerWeek: initialData?.hoursPerWeek?.toString() || '',
+    hoursPerYear: initialData?.hoursPerYear?.toString() || '',
+    fteEquivalent: initialData?.fteEquivalent?.toString() || '',
+    annualBenefits: initialData?.annualBenefits?.toString() || '',
+    roiPercentage: initialData?.roiPercentage?.toString() || '',
+    paybackMonths: initialData?.paybackMonths?.toString() || '',
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        hoursPerWeek: initialData.hoursPerWeek?.toString() || '',
+        hoursPerYear: initialData.hoursPerYear?.toString() || '',
+        fteEquivalent: initialData.fteEquivalent?.toString() || '',
+        annualBenefits: initialData.annualBenefits?.toString() || '',
+        roiPercentage: initialData.roiPercentage?.toString() || '',
+        paybackMonths: initialData.paybackMonths?.toString() || '',
+      });
+    }
+  }, [initialData]);
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest('POST', `/api/workflows/${workflowId}/business-impact`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/business-impact`] });
+      toast({
+        title: "Business impact saved",
+        description: "The business impact data has been successfully saved.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error saving business impact",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Business Impact submitted:', formData);
-    onSubmit?.(formData);
+    saveMutation.mutate({
+      hoursPerWeek: parseFloat(formData.hoursPerWeek) || 0,
+      hoursPerYear: parseFloat(formData.hoursPerYear) || 0,
+      fteEquivalent: parseFloat(formData.fteEquivalent) || 0,
+      annualBenefits: parseFloat(formData.annualBenefits) || 0,
+      roiPercentage: parseFloat(formData.roiPercentage) || 0,
+      paybackMonths: parseFloat(formData.paybackMonths) || 0,
+    });
   };
 
-  const handleChange = (field: keyof BusinessImpactData, value: string) => {
+  const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -128,8 +164,12 @@ export default function BusinessImpactForm({ onSubmit }: BusinessImpactFormProps
         <Button type="button" variant="outline" data-testid="button-cancel">
           Cancel
         </Button>
-        <Button type="submit" data-testid="button-save-impact">
-          Save Business Impact
+        <Button 
+          type="submit" 
+          disabled={saveMutation.isPending}
+          data-testid="button-save-impact"
+        >
+          {saveMutation.isPending ? 'Saving...' : 'Save Business Impact'}
         </Button>
       </div>
     </form>

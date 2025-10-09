@@ -290,3 +290,10 @@ export function calculateSectionScores(responses: Record<string, string>) {
 
   return sectionScores;
 }
+
+// Group questions by section for frontend use
+export const tfaSections = TFA_SECTIONS.map(section => ({
+  section: section.name,
+  weight: section.weight,
+  questions: TFA_QUESTIONS.filter(q => q.section === section.name)
+}));
