@@ -1,38 +1,36 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { 
+  type Company, 
+  type InsertCompany,
+  type Workflow,
+  type InsertWorkflow,
+  type TFAAssessment,
+  type InsertTFAAssessment,
+  type BusinessImpact,
+  type InsertBusinessImpact,
+} from "@shared/schema";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // Companies
+  getCompany(id: string): Promise<Company | undefined>;
+  getAllCompanies(): Promise<Company[]>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  
+  // Workflows
+  getWorkflow(id: string): Promise<Workflow | undefined>;
+  getWorkflowsByCompany(companyId: string): Promise<Workflow[]>;
+  createWorkflow(workflow: InsertWorkflow): Promise<Workflow>;
+  updateWorkflowStatus(id: string, status: string): Promise<Workflow | undefined>;
+  
+  // TFA Assessments
+  getTFAAssessment(id: string): Promise<TFAAssessment | undefined>;
+  getTFAByShareableId(shareableId: string): Promise<TFAAssessment | undefined>;
+  getTFAByWorkflowId(workflowId: string): Promise<TFAAssessment | undefined>;
+  createTFAAssessment(assessment: InsertTFAAssessment): Promise<TFAAssessment>;
+  updateTFAResponses(id: string, responses: Record<string, string>, score?: number): Promise<TFAAssessment | undefined>;
+  completeTFA(id: string, score: number): Promise<TFAAssessment | undefined>;
+  
+  // Business Impact
+  getBusinessImpact(workflowId: string): Promise<BusinessImpact | undefined>;
+  createBusinessImpact(impact: InsertBusinessImpact): Promise<BusinessImpact>;
+  updateBusinessImpact(workflowId: string, impact: Partial<InsertBusinessImpact>): Promise<BusinessImpact | undefined>;
 }
-
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
-  }
-
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
-  }
-}
-
-export const storage = new MemStorage();
