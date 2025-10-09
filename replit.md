@@ -83,8 +83,9 @@ Preferred communication style: Simple, everyday language.
 **TFA Scoring System**
 - 21 questions with weighted scoring (1-5 scale) across 6 sections
 - Automated score calculation: weighted average normalized to 0-100
-- Feasibility bands: Low (0-49), Moderate (50-74), High (75-100)
+- Feasibility bands: Very High (>90), High (80-90), Moderate (60-80), Low (40-60), Very Low (<40)
 - Shareable link system for external respondents to complete assessments
+- Open-ended comments field for qualitative feedback
 
 ### External Dependencies
 
@@ -95,7 +96,7 @@ Preferred communication style: Simple, everyday language.
 
 **UI Component Libraries**
 - @radix-ui/* - 20+ accessible component primitives (dialogs, dropdowns, tabs, etc.)
-- recharts - Charting library for opportunity matrix scatter plots and data visualization
+- recharts - Charting library for radar charts, pie charts, and data visualization
 - embla-carousel - Touch-friendly carousel component
 - cmdk - Command palette component
 - date-fns - Date manipulation and formatting
@@ -127,23 +128,42 @@ Preferred communication style: Simple, everyday language.
 
 ### Completed Features
 
-**TFA Assessment System (Fully Implemented)**
+**Enhanced TFA Layer 1 Analysis System (Fully Implemented)**
+- ✅ **Auto-refresh mechanism**: TFA scores update automatically when returning to WorkflowDetail tab via `refetchOnWindowFocus: true`
+- ✅ **Assessment Notes display**: Open-ended comments from TFA submissions shown in dedicated card
+- ✅ **Visual Analytics**: 
+  - Radar chart showing section score profile (0-5 scale)
+  - Pie chart displaying weight distribution across sections
+  - Tabbed interface for clean presentation using Recharts
+- ✅ **Enhanced Score Interpretation**: 5-tier feasibility system with icons, descriptions, and recommendations
+  - Very High (>90%): Ready for immediate implementation
+  - High (80-90%): Strong feasibility, minor preparation needed
+  - Moderate (60-80%): Viable with 2-4 weeks prep
+  - Low (40-60%): Significant challenges, 4-8 weeks remediation
+  - Very Low (<40%): Not recommended, 3-6 months foundational work
+- ✅ **Detailed Weakness Analysis**:
+  - Priority ranking (Critical <1.5, High 1.5-2.0, Medium 2.0-2.5)
+  - Root cause identification per weakness type
+  - 4-5 specific mitigation strategies per weak section
+  - Effort estimation (Critical: 4-8w, High: 2-4w, Medium: 1-2w)
+  - Automated total remediation timeline calculation
+- ✅ **Layer 1 Executive Summary**:
+  - Go/No-Go recommendation engine with decision logic
+  - Key findings dashboard (Strengths vs Risk Factors)
+  - Prioritized action plans (3-4 steps) based on recommendation
+  - Timeline estimates including remediation effort
+  - Balance metrics and consistency analysis
+
+**Previous TFA Features**
 - ✅ Complete backend API with CRUD operations for companies, workflows, TFA assessments, and business impact
 - ✅ Database integration with PostgreSQL and Drizzle ORM
-- ✅ Shareable link system for external respondents:
-  - POST `/api/tfa` generates assessment with unique nanoid shareable ID
-  - GET `/api/tfa/shareable/:shareableId` fetches assessment data with company/workflow context
-  - POST `/api/tfa/shareable/:shareableId/submit` processes responses and calculates scores
+- ✅ Shareable link system for external respondents
 - ✅ Automated TFA scoring: 21 questions across 6 weighted sections → normalized 0-100 score
 - ✅ Frontend pages: Dashboard, CompanyDetail, WorkflowDetail, TFAForm with full React Query integration
-- ✅ React Query cache invalidation for real-time score updates after submission
-- ✅ Error handling with destructive-bordered alerts for all query failures
-
-**Fixed Issues**
-- ✅ Shareable link routing: Added dedicated `/api/tfa/shareable/:shareableId` endpoints
-- ✅ Score display bug: Fixed React Query cache with staleTime: 0 to ensure fresh data on page load
-- ✅ Cache invalidation: Added query invalidation after TFA submission
-- ✅ Import error: Added queryClient import to TFAForm.tsx
+- ✅ Search/filter functionality for companies and workflows
+- ✅ Delete functionality with confirmation dialogs and cache invalidation
+- ✅ TFA form enhancements: workflow description, disclaimers, Previous/Next navigation, auto-scroll, comments field
+- ✅ Thank you confirmation page after TFA submission
 
 ### Pending Implementation
 
@@ -157,3 +177,6 @@ Preferred communication style: Simple, everyday language.
 - [ ] Opportunity matrix visualization (scatter plot)
 - [ ] Per-company aggregated view of all workflows
 - [ ] ROI calculation refinements
+
+**Additional Features**
+- [ ] Company reordering with drag-and-drop or manual sort controls
