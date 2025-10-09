@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, Plus } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 //todo: remove mock functionality
 const mockWorkflows = [
@@ -41,10 +42,13 @@ export default function CompanyDetail() {
               <h1 className="text-2xl font-semibold" data-testid="text-company-name">TechCorp Solutions</h1>
               <p className="text-sm text-muted-foreground mt-1">Technology • 12 workflows</p>
             </div>
-            <Button data-testid="button-create-workflow">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Workflow
-            </Button>
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <Button data-testid="button-create-workflow">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Workflow
+              </Button>
+            </div>
           </div>
         </div>
       </div>

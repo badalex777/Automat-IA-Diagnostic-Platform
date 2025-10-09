@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
@@ -31,9 +32,12 @@ export default function WorkflowDetail() {
               Back to Company
             </Button>
           </Link>
-          <div>
-            <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">Invoice Processing Automation</h1>
-            <p className="text-sm text-muted-foreground mt-1">TechCorp Solutions • Complete</p>
+          <div className="flex items-center justify-between w-full">
+            <div>
+              <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">Invoice Processing Automation</h1>
+              <p className="text-sm text-muted-foreground mt-1">TechCorp Solutions • Complete</p>
+            </div>
+            <ThemeToggle />
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 //todo: remove mock functionality
 const mockQuestions = [
@@ -48,9 +49,12 @@ export default function TFAForm() {
     <div className="min-h-screen bg-background">
       <div className="border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="mb-4">
-            <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">Technical Feasibility Assessment</h1>
-            <p className="text-sm text-muted-foreground mt-1">{companyName} • {workflowTitle}</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">Technical Feasibility Assessment</h1>
+              <p className="text-sm text-muted-foreground mt-1">{companyName} • {workflowTitle}</p>
+            </div>
+            <ThemeToggle />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">

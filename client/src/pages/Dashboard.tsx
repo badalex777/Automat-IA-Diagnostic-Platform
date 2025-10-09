@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CompanyCard from "@/components/CompanyCard";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 //todo: remove mock functionality
 const mockCompanies = [
@@ -23,7 +24,10 @@ export default function Dashboard() {
               <h1 className="text-2xl font-semibold" data-testid="text-page-title">Automat-IA Diagnostic Platform</h1>
               <p className="text-sm text-muted-foreground mt-1">Manage AI implementation diagnostics across all companies</p>
             </div>
-            <CreateCompanyDialog />
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <CreateCompanyDialog />
+            </div>
           </div>
         </div>
       </div>
