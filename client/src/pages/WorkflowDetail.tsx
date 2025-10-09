@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
+import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -164,6 +165,7 @@ export default function WorkflowDetail() {
                   score={tfaAssessment.score || 0} 
                   sections={sectionScores} 
                 />
+                <TFAVisualAnalytics sections={sectionScores} />
                 {tfaAssessment.comments && (
                   <Card className="p-6">
                     <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>
