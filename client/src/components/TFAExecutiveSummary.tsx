@@ -275,19 +275,22 @@ const generateActionPlan = (
   const actions: string[] = [];
   
   if (decision === 'Proceed') {
-    actions.push(`Initiate solution design focusing on ${strengths.map(s => s.name).join(' and ')} as primary automation targets`);
+    // High scores = workflow is ready for automation implementation
+    actions.push('Engage development team to begin detailed automation analysis and solution architecture');
     
     if (opportunities.length > 0) {
       const topOpportunity = opportunities[0];  // Already sorted by weight
-      actions.push(`Optimize ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Enhance current capabilities during implementation'}`);
+      actions.push(`Optimize ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Enhance capabilities during implementation'}`);
     } else {
-      actions.push('Build proof-of-concept for highest-impact workflow components');
+      actions.push('Build proof-of-concept to validate automation approach with real workflow data');
     }
     
-    actions.push('Develop phased implementation roadmap with quick wins in first 30 days');
+    actions.push('Develop phased implementation roadmap with initial deliverables in 4-6 weeks');
     
     if (insights.some(i => i.name === 'Security/Compliance' && i.score < 4.5)) {
-      actions.push('Begin security review in parallel to avoid delays in deployment phase');
+      actions.push('Initiate security review in parallel to streamline deployment approval');
+    } else {
+      actions.push('Begin sprint planning and resource allocation for automation development');
     }
   }
   
