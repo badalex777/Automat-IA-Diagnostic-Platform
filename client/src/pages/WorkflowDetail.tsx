@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Pencil, Check, X } from "lucide-react";
 import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
@@ -13,6 +14,7 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact } from "@shared/schema";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 
@@ -21,6 +23,8 @@ export default function WorkflowDetail() {
   const companyId = params?.companyId || '';
   const workflowId = params?.workflowId || '';
   const { toast } = useToast();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -113,6 +117,48 @@ export default function WorkflowDetail() {
     });
   };
 
+  const updateWorkflowMutation = useMutation({
+    mutationFn: async (data: { name: string }) => {
+      const res = await apiRequest('PATCH', `/api/workflows/${workflowId}`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
+      toast({
+        title: "Workflow renamed",
+        description: "The workflow name has been successfully updated.",
+      });
+      setIsEditingName(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error renaming workflow",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStartEdit = () => {
+    setEditedName(workflow?.name || '');
+    setIsEditingName(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (updateWorkflowMutation.isPending) return; // Prevent double submission
+    if (editedName.trim() && editedName !== workflow?.name) {
+      updateWorkflowMutation.mutate({ name: editedName.trim() });
+    } else {
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setEditedName('');
+  };
+
   const sectionScores = calculateSectionScores();
 
   return (
@@ -126,10 +172,58 @@ export default function WorkflowDetail() {
             </Button>
           </Link>
           <div className="flex items-center justify-between w-full">
-            <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">
-                {workflowError ? 'Error loading workflow' : workflowLoading ? 'Loading...' : workflow?.name || 'Unknown Workflow'}
-              </h1>
+            <div className="flex-1">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveEdit();
+                      if (e.key === 'Escape') handleCancelEdit();
+                    }}
+                    className="text-2xl font-semibold h-auto py-1 max-w-md"
+                    autoFocus
+                    data-testid="input-edit-workflow-name"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleSaveEdit}
+                    disabled={updateWorkflowMutation.isPending}
+                    data-testid="button-save-workflow-name"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleCancelEdit}
+                    disabled={updateWorkflowMutation.isPending}
+                    data-testid="button-cancel-edit-workflow-name"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">
+                    {workflowError ? 'Error loading workflow' : workflowLoading ? 'Loading...' : workflow?.name || 'Unknown Workflow'}
+                  </h1>
+                  {!workflowLoading && workflow && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={handleStartEdit}
+                      className="h-8 w-8"
+                      data-testid="button-edit-workflow-name"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
               <p className="text-sm text-muted-foreground mt-1">
                 {companyError ? 'Error loading company' : company?.name || (companyLoading ? 'Loading...' : 'Unknown')} • {workflow?.status || 'pending'}
               </p>

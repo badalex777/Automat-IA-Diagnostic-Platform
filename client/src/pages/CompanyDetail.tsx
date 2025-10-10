@@ -4,7 +4,7 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, Search, Pencil, Check, X } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -18,6 +18,8 @@ export default function CompanyDetail() {
   const companyId = params?.id || '';
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -75,6 +77,48 @@ export default function CompanyDetail() {
     },
   });
 
+  const updateCompanyMutation = useMutation({
+    mutationFn: async (data: { name: string }) => {
+      const res = await apiRequest('PATCH', `/api/companies/${companyId}`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+      toast({
+        title: "Company renamed",
+        description: "The company name has been successfully updated.",
+      });
+      setIsEditingName(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error renaming company",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStartEdit = () => {
+    setEditedName(company?.name || '');
+    setIsEditingName(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (updateCompanyMutation.isPending) return; // Prevent double submission
+    if (editedName.trim() && editedName !== company?.name) {
+      updateCompanyMutation.mutate({ name: editedName.trim() });
+    } else {
+      setIsEditingName(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingName(false);
+    setEditedName('');
+  };
+
   const filteredWorkflows = workflows.filter(workflow =>
     workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (workflow.description && workflow.description.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -100,10 +144,58 @@ export default function CompanyDetail() {
             </Button>
           </Link>
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-company-name">
-                {companyLoading ? 'Loading...' : company?.name || 'Unknown Company'}
-              </h1>
+            <div className="flex-1">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={editedName}
+                    onChange={(e) => setEditedName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSaveEdit();
+                      if (e.key === 'Escape') handleCancelEdit();
+                    }}
+                    className="text-2xl font-semibold h-auto py-1 max-w-md"
+                    autoFocus
+                    data-testid="input-edit-company-name"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleSaveEdit}
+                    disabled={updateCompanyMutation.isPending}
+                    data-testid="button-save-company-name"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={handleCancelEdit}
+                    disabled={updateCompanyMutation.isPending}
+                    data-testid="button-cancel-edit-company-name"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold" data-testid="text-company-name">
+                    {companyLoading ? 'Loading...' : company?.name || 'Unknown Company'}
+                  </h1>
+                  {!companyLoading && company && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={handleStartEdit}
+                      className="h-8 w-8"
+                      data-testid="button-edit-company-name"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
               <p className="text-sm text-muted-foreground mt-1">
                 {company?.industry || 'Unknown'} • {workflows.length} workflows
               </p>
