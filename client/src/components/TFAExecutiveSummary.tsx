@@ -36,15 +36,18 @@ interface RecommendationResult {
 interface SectionInsight {
   name: string;
   score: number;
+  weight: number;  // Section weight for prioritization
   category: 'strength' | 'opportunity' | 'risk' | 'critical';
   specificIssues: string[];
   recommendations: string[];
+  weightedSeverity: number;  // weight × severity for prioritization
 }
 
 // Analyze specific responses for each section to generate insights
 const analyzeSectionResponses = (
   sectionName: string, 
   sectionScore: number,
+  sectionWeight: number,
   responses: Record<string, string>
 ): SectionInsight => {
   const sectionQuestions = TFA_QUESTIONS.filter(q => q.section === sectionName);
@@ -129,12 +132,18 @@ const analyzeSectionResponses = (
   else if (sectionScore >= 1.5 && sectionScore < 2.5) category = 'risk';
   else category = 'critical';
   
+  // Calculate weighted severity: weight × (5 - score) so higher weight + lower score = higher priority
+  // This ensures Integration (25%) and Data Quality (25%) issues are prioritized
+  const weightedSeverity = sectionWeight * (5 - sectionScore);
+  
   return {
     name: sectionName,
     score: sectionScore,
+    weight: sectionWeight,
     category,
     specificIssues,
-    recommendations
+    recommendations,
+    weightedSeverity
   };
 };
 
@@ -142,18 +151,28 @@ const getRecommendation = (
   score: number, 
   insights: SectionInsight[]
 ): RecommendationResult => {
-  const critical = insights.filter(i => i.category === 'critical');
-  const risks = insights.filter(i => i.category === 'risk');
-  const opportunities = insights.filter(i => i.category === 'opportunity');
-  const strengths = insights.filter(i => i.category === 'strength');
+  // Filter and sort by weighted severity (weight × (5 - score)) for true prioritization
+  const critical = insights.filter(i => i.category === 'critical').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const risks = insights.filter(i => i.category === 'risk').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const opportunities = insights.filter(i => i.category === 'opportunity').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const strengths = insights.filter(i => i.category === 'strength').sort((a, b) => b.weight - a.weight);
+  
+  // Check for high-severity critical/risk issues (weighted severity > threshold)
+  const highSeverityCritical = critical.filter(c => c.weightedSeverity >= 40);  // High weight × low score
+  const highSeverityRisks = risks.filter(r => r.weightedSeverity >= 30);
   
   // Build comprehensive reasoning
   let reasoning = '';
   
-  // Not Recommended: Multiple critical issues or very low score
-  if (critical.length >= 2 || score < 40) {
-    const criticalAreas = critical.map(c => c.name).join(', ');
-    reasoning = `Multiple fundamental barriers in ${criticalAreas || 'core areas'} prevent successful automation. `;
+  // Not Recommended: High-severity critical issues OR multiple critical issues
+  if (highSeverityCritical.length > 0 || critical.length >= 2 || score < 40) {
+    if (highSeverityCritical.length > 0) {
+      const criticalHeavy = highSeverityCritical.map(c => `${c.name} (${c.weight}% weight)`).join(', ');
+      reasoning = `Critical issues in high-impact areas (${criticalHeavy}) create fundamental barriers to automation. `;
+    } else {
+      const criticalAreas = critical.map(c => c.name).join(', ');
+      reasoning = `Multiple fundamental barriers in ${criticalAreas || 'core areas'} prevent successful automation. `;
+    }
     reasoning += `With ${critical.length + risks.length} areas requiring significant remediation, focus on foundational improvements first. `;
     reasoning += strengths.length > 0 
       ? `While ${strengths.map(s => s.name).join(' and ')} show promise, critical gaps must be addressed before proceeding.`
@@ -192,13 +211,20 @@ const getRecommendation = (
       reasoning += `Strong ${strengths.map(s => s.name).join(' and ')} provide solid foundation. `;
     }
     if (risks.length > 0) {
-      reasoning += `Address ${risks.map(r => r.name).join(', ')} gaps before full implementation. `;
+      // Prioritize high-severity risks in messaging
+      if (highSeverityRisks.length > 0) {
+        const heavyRisks = highSeverityRisks.map(r => `${r.name} (${r.weight}% weight)`).join(', ');
+        reasoning += `Priority focus on high-impact areas: ${heavyRisks}. `;
+      } else {
+        reasoning += `Address ${risks.map(r => r.name).join(', ')} gaps before full implementation. `;
+      }
     }
     reasoning += opportunities.length > 0
       ? `Optimize ${opportunities.map(o => o.name).join(', ')} during planning phase for better outcomes.`
       : 'Remediation timeline is manageable with focused preparation.';
     
-    const prepWeeks = risks.length * 2 + opportunities.length;
+    // Calculate prep time weighted by severity
+    const prepWeeks = highSeverityRisks.length * 4 + risks.length * 2 + opportunities.length;
     return {
       decision: 'Proceed with Caution',
       variant: 'secondary',
@@ -210,15 +236,22 @@ const getRecommendation = (
   
   // Proceed with Caution: Lower scores but still viable
   reasoning = `Feasibility score of ${score}/100 indicates significant preparation required. `;
-  reasoning += critical.length === 1 
-    ? `Critical issue in ${critical[0].name} must be resolved first. `
-    : `${risks.length} risk area${risks.length > 1 ? 's' : ''} need remediation: ${risks.map(r => r.name).join(', ')}. `;
+  if (critical.length === 1) {
+    const c = critical[0];
+    reasoning += `Critical issue in ${c.name} (${c.weight}% weight) must be resolved first. `;
+  } else if (risks.length > 0) {
+    const topRisks = risks.slice(0, 2).map(r => `${r.name} (${r.weight}%)`).join(', ');
+    reasoning += `${risks.length} risk area${risks.length > 1 ? 's' : ''} need remediation, prioritizing: ${topRisks}. `;
+  }
   if (strengths.length > 0) {
     reasoning += `Leverage strengths in ${strengths.map(s => s.name).join(', ')} for early wins and momentum. `;
   }
   reasoning += 'Automation remains viable but requires substantial groundwork and risk mitigation planning.';
   
-  const totalWeeks = critical.length * 8 + risks.length * 4 + opportunities.length * 2;
+  // Weight remediation time by section importance  
+  const criticalWeeks = critical.reduce((sum, c) => sum + (c.weight / 5), 0);
+  const riskWeeks = risks.reduce((sum, r) => sum + (r.weight / 10), 0);
+  const totalWeeks = Math.round(criticalWeeks + riskWeeks + opportunities.length);
   return {
     decision: 'Proceed with Caution',
     variant: 'secondary',
@@ -233,10 +266,11 @@ const generateActionPlan = (
   insights: SectionInsight[],
   score: number
 ): string[] => {
-  const critical = insights.filter(i => i.category === 'critical');
-  const risks = insights.filter(i => i.category === 'risk');
-  const opportunities = insights.filter(i => i.category === 'opportunity');
-  const strengths = insights.filter(i => i.category === 'strength');
+  // Sort all categories by weighted severity (weight × (5 - score)) for true prioritization
+  const critical = insights.filter(i => i.category === 'critical').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const risks = insights.filter(i => i.category === 'risk').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const opportunities = insights.filter(i => i.category === 'opportunity').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
+  const strengths = insights.filter(i => i.category === 'strength').sort((a, b) => b.weight - a.weight);
   
   const actions: string[] = [];
   
@@ -244,8 +278,8 @@ const generateActionPlan = (
     actions.push(`Initiate solution design focusing on ${strengths.map(s => s.name).join(' and ')} as primary automation targets`);
     
     if (opportunities.length > 0) {
-      const topOpportunity = opportunities[0];
-      actions.push(`Optimize ${topOpportunity.name}: ${topOpportunity.recommendations[0] || 'Enhance current capabilities during implementation'}`);
+      const topOpportunity = opportunities[0];  // Already sorted by weight
+      actions.push(`Optimize ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Enhance current capabilities during implementation'}`);
     } else {
       actions.push('Build proof-of-concept for highest-impact workflow components');
     }
@@ -258,52 +292,51 @@ const generateActionPlan = (
   }
   
   else if (decision === 'Proceed with Caution') {
-    // Address critical first
+    // Prioritize critical gaps by weight
     if (critical.length > 0) {
-      const topCritical = critical[0];
-      actions.push(`PRIORITY: Resolve ${topCritical.name} gap - ${topCritical.recommendations[0] || 'Focus on critical remediation'}`);
+      const topCritical = critical[0];  // Highest weight critical issue
+      actions.push(`PRIORITY (${topCritical.weight}% weight): Resolve ${topCritical.name} gap - ${topCritical.recommendations[0] || 'Focus on critical remediation'}`);
     }
     
-    // Address top risks
+    // Address highest-weight risks
     if (risks.length > 0) {
-      const topRisk = risks[0];
-      actions.push(`Address ${topRisk.name} weakness: ${topRisk.recommendations[0] || 'Implement improvement plan'}`);
+      const topRisk = risks[0];  // Highest weight risk
+      actions.push(`Address ${topRisk.name} (${topRisk.weight}%): ${topRisk.recommendations[0] || 'Implement improvement plan'}`);
     }
     
-    // Leverage strengths
+    // Leverage highest-weight strengths
     if (strengths.length > 0) {
-      actions.push(`Pilot automation in strong area (${strengths[0].name}) to build confidence and demonstrate value`);
+      const topStrength = strengths[0];  // Highest weight strength
+      actions.push(`Pilot automation in strong area (${topStrength.name}, ${topStrength.weight}%) to build confidence and demonstrate value`);
     } else if (opportunities.length > 0) {
       actions.push(`Start with ${opportunities[0].name} optimization to create foundation for automation`);
     }
     
-    // Re-assessment
-    const allWeaknesses = [...critical, ...risks];
+    // Re-assessment with weighted severity context
+    const allWeaknesses = [...critical, ...risks].sort((a, b) => b.weightedSeverity - a.weightedSeverity);
     if (allWeaknesses.length > 2) {
-      actions.push(`Remediate remaining ${allWeaknesses.length - 1} gap${allWeaknesses.length > 2 ? 's' : ''}, then re-assess feasibility before full implementation`);
+      const nextPriority = allWeaknesses[1];  // Second highest weighted severity weakness
+      actions.push(`Next: ${nextPriority.name} (${nextPriority.weight}%), then re-assess feasibility before full implementation`);
     } else {
       actions.push('Re-validate technical feasibility after remediation work completes');
     }
-    
-    // Risk mitigation
-    actions.push('Develop contingency plans for identified risks; establish success metrics and monitoring');
   }
   
-  else { // Not Recommended
+  else { // Not Recommended  
     actions.push('Halt automation planning; focus resources on foundational improvements');
     
-    // Address critical gaps
+    // Address critical gaps in weight order (highest impact first)
     critical.forEach(c => {
       if (actions.length < 4 && c.recommendations[0]) {
-        actions.push(`${c.name}: ${c.recommendations[0]}`);
+        actions.push(`${c.name} (${c.weight}%): ${c.recommendations[0]}`);
       }
     });
     
-    // Fill with top risks if needed
+    // Fill with top risks by weight if needed
     if (actions.length < 3) {
       risks.forEach(r => {
         if (actions.length < 4 && r.recommendations[0]) {
-          actions.push(`${r.name}: ${r.recommendations[0]}`);
+          actions.push(`${r.name} (${r.weight}%): ${r.recommendations[0]}`);
         }
       });
     }
@@ -318,9 +351,9 @@ const generateActionPlan = (
 };
 
 export default function TFAExecutiveSummary({ score, sections, responses }: TFAExecutiveSummaryProps) {
-  // Generate deep insights for each section
+  // Generate deep insights for each section with weight-based prioritization
   const insights = sections.map(section => 
-    analyzeSectionResponses(section.name, section.score, responses)
+    analyzeSectionResponses(section.name, section.score, section.weight, responses)
   );
   
   const recommendation = getRecommendation(score, insights);
