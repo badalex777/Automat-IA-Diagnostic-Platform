@@ -327,9 +327,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const score = calculateTFAScore(responses);
       const sectionScores = calculateSectionScores(responses);
 
-      // Update TFA with responses, comments, and mark as complete
+      // Update TFA with responses and mark as complete with all data in one operation
       await storage.updateTFAResponses(assessment.id, responses, score, comments);
-      const updatedAssessment = await storage.completeTFA(assessment.id, score);
+      const updatedAssessment = await storage.completeTFA(assessment.id, score, comments);
       
       if (!updatedAssessment) {
         return res.status(404).json({ error: "Assessment not found" });

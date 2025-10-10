@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { db } from "./db";
 import { 
@@ -85,7 +85,11 @@ export class DbStorage implements IStorage {
   }
 
   async getTFAByWorkflowId(workflowId: string): Promise<TFAAssessment | undefined> {
-    const [assessment] = await db.select().from(tfaAssessments).where(eq(tfaAssessments.workflowId, workflowId));
+    const [assessment] = await db.select()
+      .from(tfaAssessments)
+      .where(eq(tfaAssessments.workflowId, workflowId))
+      .orderBy(sql`${tfaAssessments.completedAt} DESC NULLS LAST`)
+      .limit(1);
     return assessment;
   }
 
@@ -127,9 +131,13 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
-  async completeTFA(id: string, score: number): Promise<TFAAssessment | undefined> {
+  async completeTFA(id: string, score: number, comments?: string): Promise<TFAAssessment | undefined> {
+    const updateData: any = { score, completedAt: new Date() };
+    if (comments !== undefined) {
+      updateData.comments = comments;
+    }
     const [updated] = await db.update(tfaAssessments)
-      .set({ score, completedAt: new Date() })
+      .set(updateData)
       .where(eq(tfaAssessments.id, id))
       .returning();
     return updated;
