@@ -115,8 +115,8 @@ export default function Dashboard() {
                   id={company.id}
                   name={company.name}
                   industry={company.industry}
-                  workflowCount={0}
-                  completedCount={0}
+                  workflowCount={(company as any).workflowCount || 0}
+                  completedCount={(company as any).completedCount || 0}
                 />
               ))}
             </div>

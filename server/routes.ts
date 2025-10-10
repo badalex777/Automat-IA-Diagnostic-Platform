@@ -18,7 +18,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/companies", async (req, res) => {
     try {
       const companies = await storage.getAllCompanies();
-      res.json(companies);
+      
+      // Get workflow counts for each company
+      const companiesWithCounts = await Promise.all(
+        companies.map(async (company) => {
+          const workflows = await storage.getWorkflowsByCompany(company.id);
+          
+          // Count completed workflows (those with completed TFA)
+          const completedCount = await Promise.all(
+            workflows.map(async (workflow) => {
+              const tfa = await storage.getTFAByWorkflowId(workflow.id);
+              return tfa?.completedAt ? 1 : 0;
+            })
+          ).then(counts => counts.reduce((sum: number, count: number) => sum + count, 0));
+          
+          return {
+            ...company,
+            workflowCount: workflows.length,
+            completedCount,
+          };
+        })
+      );
+      
+      res.json(companiesWithCounts);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
