@@ -61,6 +61,9 @@ const analyzeSectionResponses = (
     
     const score = selectedOption.score;
     
+    // Skip "Don't Know" responses (score is null)
+    if (score === null) return;
+    
     // Critical issues (score 1-2)
     if (score <= 2) {
       specificIssues.push(`${question.question.split(':')[0]}: ${selectedOption.label}`);
