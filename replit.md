@@ -81,11 +81,12 @@ Preferred communication style: Simple, everyday language.
 5. **Business Impact** - ROI calculations (time savings, FTE equivalents, annual benefits, payback period)
 
 **TFA Scoring System**
-- 21 questions with weighted scoring (1-5 scale) across 6 sections
+- 24 questions with weighted scoring (1-5 scale) across 6 sections
 - Automated score calculation: weighted average normalized to 0-100
 - Feasibility bands: Very High (>90), High (80-90), Moderate (60-80), Low (40-60), Very Low (<40)
 - Shareable link system for external respondents to complete assessments
 - Open-ended comments field for qualitative feedback
+- "Don't Know" responses (value 0, score null) excluded from calculations
 
 ### External Dependencies
 
@@ -124,9 +125,24 @@ Preferred communication style: Simple, everyday language.
 - `tailwind.config.ts` - Design system tokens and theme configuration
 - `components.json` - Shadcn/ui configuration for component generation
 
-## Recent Changes (Last Updated: 2025-10-09)
+## Recent Changes (Last Updated: 2025-10-10)
 
 ### Completed Features
+
+**TFA Expansion to 24 Questions (2025-10-10)**
+- ✅ **Expanded Question Set**: Increased from 16 to 24 questions across all sections:
+  - System Environment (20%): 3 → 5 questions (added performance monitoring, system monitoring)
+  - Data Quality (25%): 3 → 5 questions (added data consistency, validation processes)
+  - Integration Feasibility (25%): 3 → 5 questions (added rate limit handling, error handling)
+  - Security/Compliance (15%): 3 → 4 questions (added data retention policies)
+  - Process Stability (10%): 2 → 3 questions (added exception handling documentation)
+  - Ownership (5%): 2 questions (unchanged)
+- ✅ **Weight Rebalancing**: Maintained aggregate weight targets (20/25/25/15/10/5) with balanced distribution within sections
+- ✅ **Bug Fixes**:
+  - Fixed comments persistence: `completeTFA()` now correctly accepts and saves comments parameter
+  - Fixed assessment retrieval: `getTFAByWorkflowId()` now returns most recently completed assessment using `ORDER BY completedAt DESC NULLS LAST`
+  - Prevents stale assessments from displaying when multiple shareable links are regenerated
+- ✅ **End-to-End Testing**: All 24 questions, scoring, weighted prioritization, radar charts, and comments verified working
 
 **Enhanced TFA Layer 1 Analysis System (Fully Implemented)**
 - ✅ **Auto-refresh mechanism**: TFA scores update automatically when returning to WorkflowDetail tab via `refetchOnWindowFocus: true`
@@ -158,7 +174,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ Complete backend API with CRUD operations for companies, workflows, TFA assessments, and business impact
 - ✅ Database integration with PostgreSQL and Drizzle ORM
 - ✅ Shareable link system for external respondents
-- ✅ Automated TFA scoring: 21 questions across 6 weighted sections → normalized 0-100 score
+- ✅ Automated TFA scoring: 24 questions across 6 weighted sections → normalized 0-100 score
 - ✅ Frontend pages: Dashboard, CompanyDetail, WorkflowDetail, TFAForm with full React Query integration
 - ✅ Search/filter functionality for companies and workflows
 - ✅ Delete functionality with confirmation dialogs and cache invalidation
