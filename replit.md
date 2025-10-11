@@ -20,11 +20,11 @@ The backend is built with Express.js and TypeScript, utilizing ESM modules. Data
 
 ### Data Model
 
-The core entities include Companies (client organizations), Workflows (business processes within companies), TFA Assessments (technical feasibility with weighted scoring across 6 categories: System Environment, Data Quality, Integration Feasibility, Security/Compliance, Process Stability, Ownership), Readiness Rubrics (planned), and Business Impact (ROI calculations). TFA assessments include a 24-question weighted scoring system (0-100 score), feasibility bands (Very High, High, Moderate, Low, Very Low), shareable links, and open-ended comments. The system also tracks initial respondents and multiple response sources to audit knowledge gaps.
+The core entities include Companies (client organizations), Workflows (business processes within companies), TFA Assessments (technical feasibility with weighted scoring across 4 technical categories: System Environment 25%, Data Quality 30%, Integration Feasibility 30%, Security/Compliance 15%), Readiness Rubrics (planned), and Business Impact (ROI calculations). TFA assessments include a 21-question weighted scoring system (0-100 score), feasibility bands (Very High, High, Moderate, Low, Very Low), shareable links, and open-ended comments. The system also tracks initial respondents and multiple response sources to audit knowledge gaps. Process-related assessments (Process Stability, Ownership) have been moved to future End-User forms.
 
 ### Feature Specifications
 
-- **TFA Survey**: Collects responses to 24 questions, detects "Don't Know" answers, and collects "gap metadata" (why the question couldn't be answered, who might know).
+- **TFA Survey**: Collects responses to 21 questions across 4 technical sections (System Environment: 6q, Data Quality: 5q, Integration Feasibility: 6q, Security/Compliance: 4q), detects "Don't Know" answers, and collects "gap metadata" (why the question couldn't be answered, who might know).
 - **Gap Resolution**: Consultants can fill knowledge gaps, with an audit trail of who provided the information and why.
 - **TFA Analysis**: Provides auto-updating scores, assessment notes, visual analytics (radar and pie charts), a 5-tier feasibility interpretation with recommendations, detailed weakness analysis with priority ranking and mitigation strategies, and a Layer 1 Executive Summary with Go/No-Go recommendations and action plans.
 - **Workflow Progression**: Workflows track status from tfa_only → tfa_readiness → readiness_impact → complete.
