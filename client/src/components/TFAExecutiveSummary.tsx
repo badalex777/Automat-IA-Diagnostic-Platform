@@ -200,7 +200,7 @@ const getRecommendation = (
       variant: 'default',
       icon: CheckCircle2,
       reasoning,
-      timeframe: 'Ready for immediate planning and implementation'
+      timeframe: 'Technically feasible - ready for readiness rubric evaluation'
     };
   }
   
@@ -257,7 +257,7 @@ const getRecommendation = (
     variant: 'secondary',
     icon: AlertTriangle,
     reasoning,
-    timeframe: `${totalWeeks}-${totalWeeks + 4} weeks preparation before automation development`
+    timeframe: `${totalWeeks}-${totalWeeks + 4} weeks technical remediation required before feasibility`
   };
 };
 
@@ -275,78 +275,78 @@ const generateActionPlan = (
   const actions: string[] = [];
   
   if (decision === 'Proceed') {
-    // High scores = workflow is ready for automation implementation
-    actions.push('Engage development team to begin detailed automation analysis and solution architecture');
+    // High scores = technically feasible, ready for next assessment phase
+    actions.push('Technical feasibility confirmed - proceed to implementation readiness evaluation');
     
     if (opportunities.length > 0) {
       const topOpportunity = opportunities[0];  // Already sorted by weight
-      actions.push(`Optimize ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Enhance capabilities during implementation'}`);
+      actions.push(`Minor optimization opportunity in ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Can be addressed in next phase'}`);
     } else {
-      actions.push('Build proof-of-concept to validate automation approach with real workflow data');
+      actions.push('All technical criteria meet automation requirements');
     }
     
-    actions.push('Develop phased implementation roadmap with initial deliverables in 4-6 weeks');
+    actions.push('Document technical architecture and data flows for readiness assessment');
     
     if (insights.some(i => i.name === 'Security/Compliance' && i.score < 4.5)) {
-      actions.push('Initiate security review in parallel to streamline deployment approval');
+      actions.push('Include security/compliance review in next phase planning');
     } else {
-      actions.push('Begin sprint planning and resource allocation for automation development');
+      actions.push('Strong technical foundation across all evaluation criteria');
     }
   }
   
   else if (decision === 'Proceed with Caution') {
-    // Prioritize critical gaps by weight
+    // Prioritize technical gaps by weight
     if (critical.length > 0) {
       const topCritical = critical[0];  // Highest weight critical issue
-      actions.push(`PRIORITY (${topCritical.weight}% weight): Resolve ${topCritical.name} gap - ${topCritical.recommendations[0] || 'Focus on critical remediation'}`);
+      actions.push(`PRIORITY (${topCritical.weight}% weight): ${topCritical.name} requires immediate attention - ${topCritical.recommendations[0] || 'Critical technical gap'}`);
     }
     
-    // Address highest-weight risks
+    // Address highest-weight technical risks
     if (risks.length > 0) {
       const topRisk = risks[0];  // Highest weight risk
-      actions.push(`Address ${topRisk.name} (${topRisk.weight}%): ${topRisk.recommendations[0] || 'Implement improvement plan'}`);
+      actions.push(`Technical risk in ${topRisk.name} (${topRisk.weight}%): ${topRisk.recommendations[0] || 'Requires technical remediation'}`);
     }
     
-    // Leverage highest-weight strengths
+    // Note strengths
     if (strengths.length > 0) {
       const topStrength = strengths[0];  // Highest weight strength
-      actions.push(`Pilot automation in strong area (${topStrength.name}, ${topStrength.weight}%) to build confidence and demonstrate value`);
+      actions.push(`Strong technical foundation in ${topStrength.name} (${topStrength.weight}%) supports partial feasibility`);
     } else if (opportunities.length > 0) {
-      actions.push(`Start with ${opportunities[0].name} optimization to create foundation for automation`);
+      actions.push(`${opportunities[0].name} shows potential but needs optimization`);
     }
     
     // Re-assessment with weighted severity context
     const allWeaknesses = [...critical, ...risks].sort((a, b) => b.weightedSeverity - a.weightedSeverity);
     if (allWeaknesses.length > 2) {
       const nextPriority = allWeaknesses[1];  // Second highest weighted severity weakness
-      actions.push(`Next: ${nextPriority.name} (${nextPriority.weight}%), then re-assess feasibility before full implementation`);
+      actions.push(`Next: Resolve ${nextPriority.name} (${nextPriority.weight}%) gap, then re-assess technical feasibility`);
     } else {
-      actions.push('Re-validate technical feasibility after remediation work completes');
+      actions.push('Re-evaluate technical feasibility after addressing identified gaps');
     }
   }
   
   else { // Not Recommended  
-    actions.push('Halt automation planning; focus resources on foundational improvements');
+    actions.push('Technical feasibility assessment: NOT RECOMMENDED for automation at this time');
     
-    // Address critical gaps in weight order (highest impact first)
+    // Address critical technical gaps in weight order (highest impact first)
     critical.forEach(c => {
       if (actions.length < 4 && c.recommendations[0]) {
-        actions.push(`${c.name} (${c.weight}%): ${c.recommendations[0]}`);
+        actions.push(`${c.name} (${c.weight}% weight): ${c.recommendations[0]}`);
       }
     });
     
-    // Fill with top risks by weight if needed
+    // Fill with top technical risks by weight if needed
     if (actions.length < 3) {
       risks.forEach(r => {
         if (actions.length < 4 && r.recommendations[0]) {
-          actions.push(`${r.name} (${r.weight}%): ${r.recommendations[0]}`);
+          actions.push(`${r.name} (${r.weight}% weight): ${r.recommendations[0]}`);
         }
       });
     }
     
-    // Add re-assessment
+    // Add re-assessment guidance
     if (actions.length < 4) {
-      actions.push('Schedule re-assessment after completing critical remediation work (3-6 months)');
+      actions.push('Re-assess technical feasibility after addressing critical gaps');
     }
   }
   

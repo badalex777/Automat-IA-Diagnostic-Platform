@@ -270,6 +270,7 @@ export default function WorkflowDetail() {
                     workflowId={workflowId}
                     gaps={gaps}
                     initialRespondent={tfaAssessment.initialRespondent || undefined}
+                    gapMetadata={tfaAssessment.gapMetadata as Record<string, { why: string; whoMightKnow: string }> | undefined}
                   />
                 ) : (
                   <>

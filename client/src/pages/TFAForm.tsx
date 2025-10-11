@@ -30,6 +30,7 @@ export default function TFAForm() {
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
+  const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
 
   const { data: tfaData, isLoading, error } = useQuery<TFAData>({
     queryKey: [`/api/tfa/shareable/${shareableLink}`],
@@ -51,7 +52,12 @@ export default function TFAForm() {
   const progress = (answeredQuestions / totalQuestions) * 100;
 
   const submitMutation = useMutation({
-    mutationFn: async (data: { responses: Record<string, string>; comments?: string; initialRespondent?: string }) => {
+    mutationFn: async (data: { 
+      responses: Record<string, string>; 
+      comments?: string; 
+      initialRespondent?: string;
+      gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
+    }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
     },
     onSuccess: () => {
@@ -86,10 +92,33 @@ export default function TFAForm() {
       });
       return;
     }
+    
+    // Check if gaps exist and require gap details
+    const gapsExist = Object.values(answers).some(v => v === "0");
+    if (gapsExist) {
+      const gapQuestionIds = Object.entries(answers)
+        .filter(([, value]) => value === "0")
+        .map(([id]) => id);
+      
+      const missingGapDetails = gapQuestionIds.some(id => 
+        !gapDetails[id] || !gapDetails[id].why.trim() || !gapDetails[id].whoMightKnow.trim()
+      );
+      
+      if (missingGapDetails) {
+        toast({
+          title: "Gap details required",
+          description: "Please provide why you couldn't answer and who might know for all 'Don't Know' questions.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
     submitMutation.mutate({ 
       responses: answers, 
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
+      gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
 
@@ -115,7 +144,23 @@ export default function TFAForm() {
   }
 
   const { company, workflow } = tfaData;
-  const isLastSection = currentSection === tfaSections.length;
+  
+  // Determine if we have knowledge gaps
+  const hasKnowledgeGaps = Object.values(answers).some(v => v === "0");
+  const gapQuestions = hasKnowledgeGaps 
+    ? Object.entries(answers)
+        .filter(([, value]) => value === "0")
+        .map(([id]) => {
+          const allQuestions = tfaSections.flatMap(s => s.questions);
+          return allQuestions.find(q => q.id.toString() === id);
+        })
+        .filter(Boolean)
+    : [];
+  
+  // Section flow: 0-5 (questions) → 6 (gap details if exists) → 7/6 (final comments)
+  const totalSections = tfaSections.length + (hasKnowledgeGaps ? 1 : 0) + 1; // questions + gap details (conditional) + comments
+  const isGapDetailsSection = hasKnowledgeGaps && currentSection === tfaSections.length;
+  const isFinalCommentsSection = currentSection === totalSections - 1;
 
   return (
     <div className="min-h-screen bg-background">
@@ -172,7 +217,7 @@ export default function TFAForm() {
           </div>
         )}
 
-        {!isLastSection ? (
+        {currentSection < tfaSections.length ? (
           <>
             <div className="mb-6">
               <h2 className="text-xl font-semibold" data-testid="text-section-title">
@@ -197,7 +242,75 @@ export default function TFAForm() {
               ))}
             </div>
           </>
-        ) : (
+        ) : isGapDetailsSection ? (
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold">Knowledge Gap Details</h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                You selected "Don't Know/Not Sure" for {gapQuestions.length} question{gapQuestions.length > 1 ? 's' : ''}. 
+                Please help us understand why and who might have this information.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {gapQuestions.map((q) => {
+                if (!q) return null;
+                const questionId = q.id.toString();
+                return (
+                  <div key={questionId} className="p-4 border border-border rounded-lg space-y-4">
+                    <div className="font-medium text-sm">
+                      Question {q.id}: {q.question}
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <Label htmlFor={`gap-why-${questionId}`}>
+                          Why couldn't you answer this question? *
+                        </Label>
+                        <Textarea
+                          id={`gap-why-${questionId}`}
+                          placeholder="e.g., I don't have access to this system, This is managed by another department..."
+                          value={gapDetails[questionId]?.why || ''}
+                          onChange={(e) => setGapDetails({
+                            ...gapDetails,
+                            [questionId]: {
+                              ...gapDetails[questionId],
+                              why: e.target.value,
+                              whoMightKnow: gapDetails[questionId]?.whoMightKnow || '',
+                            }
+                          })}
+                          className="mt-2 min-h-[80px]"
+                          data-testid={`input-gap-why-${questionId}`}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`gap-who-${questionId}`}>
+                          Who might be able to provide this information? *
+                        </Label>
+                        <Input
+                          id={`gap-who-${questionId}`}
+                          placeholder="e.g., John Smith - IT Manager, Data Analytics Team..."
+                          value={gapDetails[questionId]?.whoMightKnow || ''}
+                          onChange={(e) => setGapDetails({
+                            ...gapDetails,
+                            [questionId]: {
+                              ...gapDetails[questionId],
+                              why: gapDetails[questionId]?.why || '',
+                              whoMightKnow: e.target.value,
+                            }
+                          })}
+                          className="mt-2"
+                          data-testid={`input-gap-who-${questionId}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : isFinalCommentsSection ? (
           <div className="space-y-6">
             {!respondentName.trim() && (
               <div className="p-4 bg-muted/50 rounded-lg border border-border">
@@ -214,24 +327,6 @@ export default function TFAForm() {
                   Please enter your name before submitting the assessment.
                 </p>
               </div>
-            )}
-            {Object.values(answers).some(v => v === "0") && (
-              <Alert variant="default" className="border-2 border-primary">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  <p className="font-semibold mb-2">Important: Questions marked "Don't Know/Not Sure"</p>
-                  <p className="text-sm">
-                    You selected "Don't Know/Not Sure" for some questions. In the comments below, please:
-                  </p>
-                  <ul className="list-disc list-inside text-sm mt-2 space-y-1">
-                    <li>Explain why you couldn't answer those specific questions</li>
-                    <li>Suggest who in your organization might have this information (name, role, department)</li>
-                  </ul>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    This helps us gather accurate data from the right sources for a complete assessment.
-                  </p>
-                </AlertDescription>
-              </Alert>
             )}
             <div>
               <h2 className="text-xl font-semibold mb-2">Additional Comments</h2>
@@ -251,7 +346,7 @@ export default function TFAForm() {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
           <Button 
@@ -263,7 +358,7 @@ export default function TFAForm() {
             Previous
           </Button>
           <div className="flex gap-3">
-            {!isLastSection ? (
+            {!isFinalCommentsSection ? (
               <Button 
                 onClick={() => handleSectionChange(currentSection + 1)}
                 data-testid="button-next-section"

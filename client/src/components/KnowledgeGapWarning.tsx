@@ -24,6 +24,7 @@ interface KnowledgeGapWarningProps {
   workflowId: string;
   gaps: KnowledgeGap[];
   initialRespondent?: string;
+  gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
 }
 
 interface GapFormData {
@@ -36,10 +37,27 @@ export default function KnowledgeGapWarning({
   assessmentId, 
   workflowId,
   gaps, 
-  initialRespondent 
+  initialRespondent,
+  gapMetadata = {}
 }: KnowledgeGapWarningProps) {
   const { toast } = useToast();
-  const [gapResponses, setGapResponses] = useState<Record<string, GapFormData>>({});
+  
+  // Initialize gapResponses with whoMightKnow from gapMetadata as answeredBy
+  const [gapResponses, setGapResponses] = useState<Record<string, GapFormData>>(() => {
+    const initial: Record<string, GapFormData> = {};
+    gaps.forEach(gap => {
+      const questionId = gap.questionId.toString();
+      const metadata = gapMetadata[questionId];
+      if (metadata) {
+        initial[questionId] = {
+          value: '',
+          answeredBy: metadata.whoMightKnow || '', // Pre-fill with whoMightKnow
+          reason: metadata.why || '', // We'll show this as read-only
+        };
+      }
+    });
+    return initial;
+  });
   
   const groupedGaps = groupGapsBySection(gaps);
 
@@ -65,26 +83,29 @@ export default function KnowledgeGapWarning({
   });
 
   const handleGapUpdate = (questionId: string, field: keyof GapFormData, value: string) => {
-    setGapResponses(prev => ({
-      ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        [field]: value,
-      },
-    }));
+    setGapResponses(prev => {
+      const currentData = prev[questionId] || { value: '', answeredBy: '', reason: '' };
+      return {
+        ...prev,
+        [questionId]: {
+          ...currentData,
+          [field]: value,
+        },
+      };
+    });
   };
 
   const handleSubmit = () => {
-    // Validate all gaps have complete information
+    // Validate all gaps have answer and answeredBy (reason is optional for additional context)
     const allGapsFilled = gaps.every(gap => {
       const response = gapResponses[gap.questionId.toString()];
-      return response?.value && response?.value !== "0" && response?.answeredBy && response?.reason;
+      return response?.value && response?.value !== "0" && response?.answeredBy;
     });
 
     if (!allGapsFilled) {
       toast({
         title: "Incomplete information",
-        description: "Please fill all fields for each unanswered question.",
+        description: "Please select an answer and specify who provided it for each question.",
         variant: "destructive",
       });
       return;
@@ -137,6 +158,16 @@ export default function KnowledgeGapWarning({
                   <p className="text-sm font-medium mb-4">{gap.question}</p>
                   
                   <div className="grid gap-4">
+                    {/* Show "why" from initial respondent as read-only context */}
+                    {gapMetadata[gap.questionId.toString()]?.why && (
+                      <div className="p-3 bg-muted/50 rounded-md border border-border">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          Why {initialRespondent || 'the respondent'} couldn't answer:
+                        </p>
+                        <p className="text-sm">{gapMetadata[gap.questionId.toString()].why}</p>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       <Label htmlFor={`answer-${gap.questionId}`}>Answer *</Label>
                       <Select
@@ -157,7 +188,14 @@ export default function KnowledgeGapWarning({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor={`answered-by-${gap.questionId}`}>Answered by (Name & Role) *</Label>
+                      <Label htmlFor={`answered-by-${gap.questionId}`}>
+                        Answered by (Name & Role) *
+                        {gapMetadata[gap.questionId.toString()]?.whoMightKnow && (
+                          <span className="text-xs text-muted-foreground ml-2">
+                            (Suggested: {gapMetadata[gap.questionId.toString()].whoMightKnow})
+                          </span>
+                        )}
+                      </Label>
                       <Input
                         id={`answered-by-${gap.questionId}`}
                         placeholder="e.g., John Smith - IT Manager"
@@ -168,10 +206,10 @@ export default function KnowledgeGapWarning({
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor={`reason-${gap.questionId}`}>Why couldn't the original respondent answer? *</Label>
+                      <Label htmlFor={`reason-${gap.questionId}`}>Additional context or reason (Optional)</Label>
                       <Textarea
                         id={`reason-${gap.questionId}`}
-                        placeholder="e.g., This information is managed by the IT department"
+                        placeholder="e.g., Confirmed with IT department, This aligns with system documentation..."
                         value={gapResponses[gap.questionId.toString()]?.reason || ""}
                         onChange={(e) => handleGapUpdate(gap.questionId.toString(), 'reason', e.target.value)}
                         className="min-h-[60px]"
