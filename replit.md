@@ -125,9 +125,38 @@ Preferred communication style: Simple, everyday language.
 - `tailwind.config.ts` - Design system tokens and theme configuration
 - `components.json` - Shadcn/ui configuration for component generation
 
-## Recent Changes (Last Updated: 2025-10-10)
+## Recent Changes (Last Updated: 2025-10-11)
 
 ### Completed Features
+
+**Knowledge Gap Detection and Multi-Source Audit Trail System (2025-10-11)**
+- ✅ **Database Schema Enhancement**: Added `initialRespondent` (text) and `responseSources` (JSONB) fields to tfaAssessments table for comprehensive audit trail
+- ✅ **Knowledge Gap Detection**: Created utility functions to detect "Don't Know" responses (value "0"), group gaps by section, and block results display until resolved
+- ✅ **Enhanced TFA Form**:
+  - Added mandatory "Your Name" field to track initial respondent
+  - Displays on both first section and final section (if empty) for better UX
+  - Prominent alert when "Don't Know" responses detected, urging user to explain why and suggest technical contacts
+  - Validates respondent name before submission
+- ✅ **Knowledge Gap Warning Component**:
+  - Displays when assessment has unresolved gaps instead of showing inaccurate results
+  - Shows count of unanswered questions and initial respondent name
+  - Lists gaps grouped by section with full question context
+  - Form to fill each gap: answer selection (excludes "Don't Know"), "Answered by" field, reason for gap
+  - Server-side validation with `.min(1)` on answeredBy and reason fields
+- ✅ **Gap Resolution Backend**:
+  - PATCH /api/tfa/:id/fill-gaps endpoint accepts gap responses with audit trail
+  - Validates no "Don't Know" values allowed when filling gaps
+  - Merges responses into responseSources with timestamps
+  - Recalculates TFA score with filled gaps
+  - Full React Query cache invalidation flow
+- ✅ **Response Sources Disclaimer Component**:
+  - Displays at top of TFA results when multi-source data exists
+  - Shows initial respondent prominently
+  - Groups additional sources by person with questions answered and reasons
+  - Professional audit trail presentation for accountability
+- ✅ **Action Plan Prioritization**: Verified weightedSeverity sorting (weight × (5-score) descending) ensures highest-impact issues appear first
+- ✅ **End-to-End Testing**: Complete flow verified from submission with gaps → warning display → gap resolution with audit trail → results with disclaimer
+- ✅ **Radio Button Fix**: Moved data-testid to actual RadioGroupItem element for better test automation compatibility
 
 **TFA Expansion to 24 Questions (2025-10-10)**
 - ✅ **Expanded Question Set**: Increased from 16 to 24 questions across all sections:
