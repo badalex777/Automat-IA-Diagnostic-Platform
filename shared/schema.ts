@@ -33,6 +33,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   score: integer("score"),
   initialRespondent: text("initial_respondent"),
   responseSources: jsonb("response_sources").default({}),
+  gapMetadata: jsonb("gap_metadata").default({}),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
@@ -81,6 +82,10 @@ export const tfaResponsesSchema = z.object({
   responses: z.record(z.string(), z.string()),
   comments: z.string().optional(),
   initialRespondent: z.string().optional(),
+  gapMetadata: z.record(z.string(), z.object({
+    why: z.string(),
+    whoMightKnow: z.string(),
+  })).optional(),
 });
 
 export const fillGapsSchema = z.object({
