@@ -373,3 +373,195 @@ export function calculateSectionScores(responses: Record<string, string>): Array
     };
   });
 }
+
+// Score-specific recommendations for each question
+export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = {
+  // Q1: Deployment model
+  1: {
+    1: "CRITICAL: Legacy on-premises infrastructure severely limits AI integration. Recommendation: Initiate cloud migration assessment for target systems. Consider hybrid cloud architecture or cloud-native API gateway to enable modern integrations without full migration.",
+    2: "WARNING: Limited cloud adoption restricts automation capabilities. Recommendation: Identify quick-win systems to migrate to cloud or implement cloud connectivity layers (VPN, Direct Connect). Evaluate hybrid integration platforms like MuleSoft or Azure Integration Services.",
+    3: "MODERATE: Hybrid environment provides some flexibility but adds complexity. Recommendation: Standardize integration patterns across on-prem and cloud. Implement unified API management to simplify connectivity. Document which systems are cloud-ready for prioritization.",
+    4: "GOOD: Mostly cloud-based infrastructure supports AI implementation well. Recommendation: Leverage existing SaaS connectors and native APIs. Migrate remaining legacy systems or implement abstraction layers to maintain cloud-first approach.",
+    5: "EXCELLENT: Full cloud deployment maximizes automation potential. Recommendation: Utilize native cloud AI services (AWS SageMaker, Azure AI, Google Vertex). Implement serverless architectures for scalability. Focus on optimizing API consumption and cost management."
+  },
+  
+  // Q2: API availability
+  2: {
+    1: "CRITICAL: No API access blocks automated integration. Recommendation: Evaluate RPA (UiPath, Automation Anywhere) for screen automation as interim solution. Pressure vendors for API roadmap or consider system replacement. Assess feasibility of database-level integration with IT approval.",
+    2: "WARNING: Limited API coverage creates integration gaps. Recommendation: Document all available endpoints and identify gaps. Negotiate with vendors for REST API access. Consider hybrid approach: APIs where available, RPA for gaps. Budget for custom connector development.",
+    3: "MODERATE: Partial API coverage requires workarounds. Recommendation: Prioritize workflows using existing APIs. Create abstraction layer to normalize legacy and modern endpoints. Plan API expansion roadmap with vendors. Implement API documentation and governance.",
+    4: "GOOD: Strong API foundation enables smooth integration. Recommendation: Build comprehensive API catalog with usage examples. Implement API monitoring and rate limit tracking. Create reusable integration templates. Focus on security and error handling best practices.",
+    5: "EXCELLENT: Full API ecosystem accelerates implementation. Recommendation: Leverage webhooks for real-time automation. Implement GraphQL if complex data queries needed. Use API-first AI platforms. Focus on optimizing payload size and response times for performance."
+  },
+  
+  // Q3: System access
+  3: {
+    1: "CRITICAL: UI-only access severely limits automation options. Recommendation: Urgently evaluate RPA tools for attended/unattended automation. Engage IT security to explore service account provisioning. Consider cloud-based alternatives with better programmatic access.",
+    2: "WARNING: Database-only access creates security and maintenance risks. Recommendation: Request vendor support for application-level APIs. If unavailable, implement secure database integration with read-only accounts, change data capture (CDC), and strict auditing. Avoid direct writes.",
+    3: "MODERATE: Workaround-based access is fragile and maintenance-heavy. Recommendation: Document RPA scripts thoroughly with change management process. Plan transition to proper APIs. Implement robust error handling and monitoring for script failures. Consider API-first platform migration.",
+    4: "GOOD: Programmatic access via service accounts works well. Recommendation: Implement OAuth 2.0 or API key rotation policies. Use secret management tools (Azure Key Vault, AWS Secrets Manager). Document authentication flows. Set up monitoring for token expiration and access issues.",
+    5: "EXCELLENT: Native automation support is ideal. Recommendation: Leverage vendor SDKs and libraries for faster development. Implement CI/CD pipelines for automated deployment. Use infrastructure-as-code for reproducible environments. Focus on optimization and advanced features."
+  },
+  
+  // Q4: System performance
+  4: {
+    1: "CRITICAL: Poor performance will cause automation failures and timeouts. Recommendation: Implement aggressive timeout/retry logic with exponential backoff. Schedule automation during off-peak hours. Pressure IT/vendors for infrastructure upgrades. Consider caching strategies to reduce API calls.",
+    2: "WARNING: Unreliable performance requires defensive programming. Recommendation: Build circuit breaker patterns to prevent cascade failures. Implement request queuing with rate limiting. Monitor performance trends to predict outages. Establish SLA requirements with vendors.",
+    3: "MODERATE: Acceptable performance but plan for edge cases. Recommendation: Implement moderate timeout values (10-15 seconds). Use async processing where possible. Monitor 95th percentile response times. Create performance benchmarks and alert on degradation.",
+    4: "GOOD: Reliable performance supports standard automation patterns. Recommendation: Implement standard timeout values (5-7 seconds). Focus on optimizing batch operations. Use connection pooling and keep-alive. Monitor for anomalies and capacity planning.",
+    5: "EXCELLENT: High performance enables advanced real-time automation. Recommendation: Leverage low latency for real-time processing and streaming. Implement webhooks instead of polling. Focus on minimizing payload sizes. Use CDN and edge computing where applicable for global deployment."
+  },
+  
+  // Q5: Monitoring capabilities
+  5: {
+    1: "CRITICAL: Blind automation is extremely risky. Recommendation: Immediately implement application-level logging (Winston, Serilog, Log4j). Use structured logging (JSON) for parsing. Deploy log aggregation tool (ELK, Splunk, CloudWatch). Create basic dashboards before proceeding.",
+    2: "WARNING: Limited visibility hampers debugging. Recommendation: Centralize logs using cloud services (CloudWatch, Azure Monitor, Google Cloud Logging). Implement correlation IDs for tracing. Create alerts for critical errors. Build basic operational dashboards.",
+    3: "MODERATE: Basic monitoring exists but needs enhancement. Recommendation: Implement distributed tracing (Jaeger, Zipkin) for multi-system workflows. Add business metrics beyond technical logs. Create runbooks for common error patterns. Improve alert signal-to-noise ratio.",
+    4: "GOOD: Solid monitoring foundation in place. Recommendation: Enhance with AI/ML anomaly detection. Implement proactive alerting based on trends. Create executive dashboards for business KPIs. Integrate with incident management (PagerDuty, Opsgenie).",
+    5: "EXCELLENT: Advanced observability enables proactive management. Recommendation: Leverage monitoring for predictive analytics and capacity planning. Implement AIOps for automated remediation. Create detailed SLA reports. Use observability data for continuous optimization."
+  },
+  
+  // Q6: Backup and disaster recovery
+  6: {
+    1: "CRITICAL: No backup puts business at catastrophic risk. Recommendation: Immediately implement automated daily backups with offsite storage. Use cloud backup services (AWS Backup, Azure Backup) for reliability. Test restore procedures monthly. This is a blocker - do not proceed without backups.",
+    2: "WARNING: Inadequate backup creates unacceptable risk. Recommendation: Increase backup frequency to at least daily. Implement point-in-time recovery capability. Reduce RTO to under 4 hours. Store backups in separate geographic region. Create and test disaster recovery runbook.",
+    3: "MODERATE: Basic backup exists but enhance for automation. Recommendation: Implement hourly or continuous backups for critical data. Add automated restore testing. Document RTO/RPO requirements. Create failover procedures for automation workflows.",
+    4: "GOOD: Robust backup supports business continuity. Recommendation: Implement automated failover testing. Create geo-redundant backup strategy. Use backup data for dev/test environments. Monitor backup success rates and storage costs.",
+    5: "EXCELLENT: Enterprise DR enables high availability. Recommendation: Leverage active-active or active-passive failover for zero-downtime. Implement automated disaster recovery drills. Use backups for compliance and audit trails. Focus on cost optimization and retention policies."
+  },
+  
+  // Q7: Data structure
+  7: {
+    1: "CRITICAL: Unstructured data requires heavy AI/NLP investment. Recommendation: Implement document AI (Azure Form Recognizer, AWS Textract, Google Document AI) for extraction. Plan for 70-80% accuracy initially. Budget significant time for training/validation. Consider human-in-the-loop workflows.",
+    2: "WARNING: Document processing needs robust handling. Recommendation: Use OCR with template matching for common formats. Implement confidence scoring and manual review queues. Standardize document formats where possible. Build validation rules to catch extraction errors.",
+    3: "MODERATE: Semi-structured data needs normalization. Recommendation: Create data mapping templates for common variations. Implement validation rules to enforce consistency. Build data quality dashboards. Consider master data management (MDM) for key entities.",
+    4: "GOOD: Structured data simplifies processing. Recommendation: Leverage existing schema for validation and transformation. Implement data contracts with upstream/downstream systems. Focus on handling edge cases and null values. Monitor for schema changes.",
+    5: "EXCELLENT: Clean structured data accelerates implementation. Recommendation: Use schema-based validation for zero-touch processing. Implement automated data quality checks. Focus on performance optimization and parallel processing. Build comprehensive data lineage tracking."
+  },
+  
+  // Q8: Data quality
+  8: {
+    1: "CRITICAL: High error rates will cause automation failures. Recommendation: Implement aggressive data cleansing pipeline before automation. Build comprehensive validation rules with reject queues. Establish data quality metrics and improvement targets. Consider data quality tools (Talend, Informatica).",
+    2: "WARNING: Frequent errors require robust error handling. Recommendation: Build multi-layer validation (syntax, business rules, cross-field). Implement fuzzy matching for common errors. Create data quality scorecards by source. Engage data owners to improve upstream quality.",
+    3: "MODERATE: Manageable quality but needs validation. Recommendation: Implement standard validation framework with configurable rules. Create data quality monitoring dashboards. Build automated correction for common issues. Track quality trends and set improvement goals.",
+    4: "GOOD: Quality data supports reliable automation. Recommendation: Maintain data quality with ongoing monitoring and alerting. Implement anomaly detection for quality degradation. Use AI for advanced validation patterns. Focus on edge cases and rare errors.",
+    5: "EXCELLENT: High-quality data enables straight-through processing. Recommendation: Leverage quality for zero-touch automation. Implement predictive quality monitoring. Use data profiling for continuous improvement. Focus on maintaining quality as volume scales."
+  },
+  
+  // Q9: Data availability
+  9: {
+    1: "CRITICAL: Insufficient data blocks ML/AI training. Recommendation: DO NOT pursue complex AI/ML initially. Use rule-based automation instead. Plan 6-12 month data collection period. Consider synthetic data generation or transfer learning from similar domains. Start with simple heuristics.",
+    2: "WARNING: Limited data restricts ML model accuracy. Recommendation: Use simple models (decision trees, linear regression) that work with smaller datasets. Implement active learning to optimize labeling efforts. Consider data augmentation techniques. Plan for iterative model improvement as data grows.",
+    3: "MODERATE: Sufficient data for basic ML models. Recommendation: Start with classical ML algorithms before deep learning. Implement cross-validation to maximize limited data. Use feature engineering to extract maximum value. Monitor model performance and retrain as more data accumulates.",
+    4: "GOOD: Strong dataset enables robust ML models. Recommendation: Leverage data for ensemble models and advanced techniques. Implement automated model retraining pipelines. Use A/B testing for model improvements. Build comprehensive training/validation/test splits.",
+    5: "EXCELLENT: Rich historical data accelerates AI implementation. Recommendation: Leverage deep learning and transformer models. Implement automated feature engineering and hyperparameter tuning. Build real-time model updating. Use data for advanced analytics and predictions."
+  },
+  
+  // Q10: Data consistency
+  10: {
+    1: "CRITICAL: Data chaos requires major standardization effort. Recommendation: Implement master data management (MDM) platform. Create canonical data model and mapping rules for all sources. Build data transformation layer. Establish data governance committee and standards.",
+    2: "WARNING: Inconsistency creates integration complexity. Recommendation: Document all format variations and create mapping dictionary. Implement data normalization layer. Use data quality tools for standardization. Create data steward role to enforce consistency.",
+    3: "MODERATE: Some standardization exists, build upon it. Recommendation: Extend existing standards to cover edge cases. Implement automated format detection and conversion. Create data catalog with lineage tracking. Monitor for new inconsistencies.",
+    4: "GOOD: Well-defined standards simplify integration. Recommendation: Maintain standards with automated validation. Implement change management for schema updates. Use API contracts to enforce consistency. Focus on handling minor variations gracefully.",
+    5: "EXCELLENT: Single source of truth is ideal. Recommendation: Leverage consistency for zero-transformation integration. Implement real-time data quality monitoring. Use canonical model for all integrations. Focus on maintaining standards as systems evolve."
+  },
+  
+  // Q11: Data validation
+  11: {
+    1: "CRITICAL: No validation creates data corruption risk. Recommendation: Immediately implement comprehensive validation framework. Build multi-tier validation: format, business rules, referential integrity. Create reject/quarantine queues. Implement detailed error logging. This is a must-have before automation.",
+    2: "WARNING: Basic validation is insufficient for automation. Recommendation: Enhance validation with business rule engine. Implement cross-field validation and referential checks. Add retry logic with exponential backoff. Create validation metrics dashboard.",
+    3: "MODERATE: Standard validation needs enhancement. Recommendation: Implement advanced validation patterns (regex, range checks, lookup validation). Add data quality scoring. Create automated correction for common errors. Build validation rule versioning.",
+    4: "GOOD: Strong validation supports reliable automation. Recommendation: Enhance with ML-based validation for anomaly detection. Implement real-time validation feedback. Create comprehensive error categorization. Build self-healing capabilities for known error patterns.",
+    5: "EXCELLENT: Robust validation framework is production-ready. Recommendation: Leverage validation for data quality insights and trend analysis. Implement predictive validation to prevent errors. Use validation metrics for SLA reporting. Focus on performance optimization for high-volume processing."
+  },
+  
+  // Q12: Integration complexity
+  12: {
+    1: "CRITICAL: 10+ systems create extreme integration risk. Recommendation: Phase implementation - start with 2-3 core systems. Use integration platform (MuleSoft, Dell Boomi) for centralized management. Create integration architecture blueprint. Build comprehensive error handling and compensation logic.",
+    2: "WARNING: Multiple systems require careful orchestration. Recommendation: Map complete data flow across all 6-9 systems. Implement integration hub pattern. Use workflow orchestration (Airflow, Azure Logic Apps). Create detailed integration testing strategy.",
+    3: "MODERATE: 3-5 systems are manageable with planning. Recommendation: Design integration sequence to minimize dependencies. Implement retry and idempotency patterns. Use message queues for decoupling. Create integration monitoring dashboard.",
+    4: "GOOD: Simple integration is low risk. Recommendation: Implement direct API integration with standard error handling. Use connection pooling and caching. Monitor integration health and performance. Build comprehensive integration tests.",
+    5: "EXCELLENT: Single system minimizes integration risk. Recommendation: Leverage platform-native automation features. Focus on optimizing performance and user experience. Implement advanced platform-specific features. Build comprehensive test coverage."
+  },
+  
+  // Q13: System compatibility
+  13: {
+    1: "CRITICAL: Proprietary systems require custom development. Recommendation: Budget 3-6 months for custom connector development. Evaluate specialist integration vendors. Consider replacing systems with modern alternatives. Build abstraction layer to isolate proprietary logic.",
+    2: "WARNING: Custom coding slows implementation significantly. Recommendation: Allocate development resources for integration layer. Consider iPaaS platforms with developer tools. Document all custom code thoroughly. Implement automated testing for custom integrations.",
+    3: "MODERATE: Mixed compatibility requires selective custom work. Recommendation: Use pre-built connectors where available. Develop custom adapters for unsupported systems. Implement standard integration patterns. Create reusable connector library.",
+    4: "GOOD: Standard connectors accelerate implementation. Recommendation: Leverage existing connectors and community libraries. Focus on configuration over customization. Implement connector health monitoring. Build connector governance and versioning.",
+    5: "EXCELLENT: Native integrations minimize development effort. Recommendation: Utilize drag-and-drop integration builders (Zapier, Make). Implement rapid prototyping. Focus on business logic over integration code. Leverage pre-built templates and workflows."
+  },
+  
+  // Q14: Authentication
+  14: {
+    1: "CRITICAL: Complex auth is major implementation barrier. Recommendation: Engage security team early for auth strategy. Document complete authentication flow. Implement secure credential storage (vault). Consider RPA with credential management if APIs unavailable. Budget extra time for auth complexity.",
+    2: "WARNING: Multi-factor auth complicates automation. Recommendation: Negotiate with security team for service account exemptions. Implement secure token refresh logic. Use certificate-based auth where possible. Create comprehensive auth failure handling.",
+    3: "MODERATE: Standard SSO is manageable. Recommendation: Implement OAuth 2.0 client credentials flow. Use token caching to minimize auth calls. Create auth abstraction layer. Monitor token expiration and refresh proactively.",
+    4: "GOOD: Standard OAuth simplifies implementation. Recommendation: Leverage existing OAuth libraries and SDKs. Implement secure token storage and rotation. Build comprehensive auth error handling. Monitor auth performance and failures.",
+    5: "EXCELLENT: Simple API keys accelerate implementation. Recommendation: Implement key rotation policies for security. Use environment variables and secret management. Create key usage monitoring. Focus on securing keys in deployment pipelines."
+  },
+  
+  // Q15: API rate limits
+  15: {
+    1: "CRITICAL: Severe limits block high-volume automation. Recommendation: Implement aggressive request queuing and throttling. Negotiate higher rate limits with vendors. Consider batch processing during off-peak hours. Evaluate alternative vendors with better limits. Use caching extensively.",
+    2: "WARNING: Significant restrictions require careful management. Recommendation: Implement rate limit tracking and backoff logic. Use Redis for distributed rate limiting. Create request prioritization logic. Monitor usage to stay within limits. Consider upgrading to higher tiers.",
+    3: "MODERATE: Standard limits are manageable with planning. Recommendation: Implement rate limit headers monitoring. Use adaptive throttling based on remaining quota. Create rate limit dashboard. Build request batching where possible.",
+    4: "GOOD: Generous limits support normal operations. Recommendation: Implement basic rate limit awareness. Monitor usage trends for capacity planning. Use rate limit buffer (stay at 80% max). Build alerts for approaching limits.",
+    5: "EXCELLENT: No limits enable maximum throughput. Recommendation: Focus on optimizing request efficiency over rate limits. Implement parallel processing for performance. Monitor system capacity instead of rate limits. Design for future scalability."
+  },
+  
+  // Q16: Error handling
+  16: {
+    1: "CRITICAL: No error handling guarantees failures. Recommendation: Immediately implement comprehensive try-catch blocks. Build error logging and alerting. Implement manual intervention queues. Create incident response procedures. This must be addressed before production.",
+    2: "WARNING: Basic error handling is insufficient. Recommendation: Implement retry logic with exponential backoff. Add error categorization (transient, permanent). Create dead letter queues. Build error notification system. Develop comprehensive error recovery procedures.",
+    3: "MODERATE: Some error handling exists, enhance it. Recommendation: Implement circuit breaker patterns to prevent cascade failures. Add error correlation and root cause analysis. Create automated recovery for common errors. Build error trends dashboard.",
+    4: "GOOD: Robust error handling supports reliability. Recommendation: Enhance with automated remediation for known patterns. Implement sophisticated retry strategies (exponential backoff, jitter). Add error prediction based on patterns. Focus on reducing MTTR.",
+    5: "EXCELLENT: Advanced error handling is production-grade. Recommendation: Leverage error patterns for proactive monitoring. Implement chaos engineering to test resilience. Use error data for system improvements. Focus on self-healing and autonomous recovery."
+  },
+  
+  // Q17: API versioning and stability
+  17: {
+    1: "CRITICAL: Unstable APIs create maintenance nightmare. Recommendation: Pin to specific API versions if available. Implement comprehensive integration tests to detect breaking changes. Create API change monitoring. Build abstraction layer to isolate API changes. Pressure vendors for stability commitment.",
+    2: "WARNING: Poor version management requires defensive coding. Recommendation: Implement API version detection and adaptation logic. Build comprehensive regression testing. Create change notification monitoring. Negotiate better deprecation policies with vendors.",
+    3: "MODERATE: Moderate stability requires monitoring. Recommendation: Subscribe to API change notifications. Implement version compatibility checks. Build automated testing for version changes. Create version migration procedures.",
+    4: "GOOD: Good version control provides stability. Recommendation: Track API versions in use. Implement gradual version migration strategy. Build version compatibility matrix. Monitor deprecation timelines proactively.",
+    5: "EXCELLENT: Enterprise stability enables long-term planning. Recommendation: Leverage long-term support for stable implementations. Implement version governance and planning. Focus on feature optimization over compatibility. Use stable platform for innovation."
+  },
+  
+  // Q18: Data sensitivity
+  18: {
+    1: "CRITICAL: Highly sensitive data requires extensive security. Recommendation: Implement end-to-end encryption (at rest and in transit). Use data masking/tokenization for non-production environments. Conduct security audit before implementation. Ensure HIPAA/PCI compliance. Implement comprehensive audit logging.",
+    2: "WARNING: Sensitive data needs strong security controls. Recommendation: Implement field-level encryption for PII. Use role-based access control (RBAC). Create data classification and handling procedures. Implement data loss prevention (DLP) tools. Regular security reviews required.",
+    3: "MODERATE: Standard security measures required. Recommendation: Implement encryption in transit (TLS 1.2+). Use secure credential management. Implement access logging and monitoring. Create data retention policies. Conduct periodic security assessments.",
+    4: "GOOD: Low sensitivity reduces compliance burden. Recommendation: Implement standard security best practices. Use encrypted connections. Implement basic access controls. Monitor for security anomalies. Focus on operational security.",
+    5: "EXCELLENT: Public data minimizes security requirements. Recommendation: Implement basic authentication and access logging. Focus on availability over confidentiality. Use standard cloud security. Optimize for performance and cost over security overhead."
+  },
+  
+  // Q19: Compliance requirements
+  19: {
+    1: "CRITICAL: Strict compliance requires specialized expertise. Recommendation: Engage compliance/legal team immediately. Hire compliance consultant if needed. Implement BAA (Business Associate Agreement) for HIPAA. Use compliant cloud regions. Conduct regular compliance audits. Budget 6-12 months for compliance certification.",
+    2: "WARNING: High compliance needs careful planning. Recommendation: Document compliance requirements and controls. Implement audit trails for all data access. Create compliance monitoring dashboard. Engage compliance team for review and approval. Plan for annual audits.",
+    3: "MODERATE: Standard compliance is manageable. Recommendation: Implement GDPR-compliant data processing (consent, right to deletion). Create privacy policy and terms. Implement data subject request procedures. Conduct annual privacy review.",
+    4: "GOOD: Basic compliance follows standard practices. Recommendation: Document internal policies and adherence. Implement standard security controls. Create compliance checklist. Conduct periodic self-assessments.",
+    5: "EXCELLENT: Minimal compliance accelerates implementation. Recommendation: Implement business-standard security and privacy. Focus on operational efficiency. Document practices for governance. Maintain general best practices."
+  },
+  
+  // Q20: Security approval
+  20: {
+    1: "CRITICAL: 6+ month approval delays implementation significantly. Recommendation: Start security review process immediately - this is on critical path. Prepare comprehensive security documentation. Consider POC in isolated environment while approval pending. Engage CISO office early. Budget timeline accordingly.",
+    2: "WARNING: Long approval requires early planning. Recommendation: Initiate security review in parallel with development. Prepare vendor security assessments. Complete security questionnaires proactively. Schedule regular check-ins with security team. Plan for multiple review cycles.",
+    3: "MODERATE: Standard review fits normal timelines. Recommendation: Submit security review request early in project. Prepare standard documentation (architecture diagram, data flow, security controls). Respond promptly to security questions. Build security review time into project plan.",
+    4: "GOOD: Quick review supports agile delivery. Recommendation: Follow standard security review process. Prepare lightweight documentation. Leverage pre-approved vendor lists where possible. Maintain good relationship with security team.",
+    5: "EXCELLENT: Fast approval enables rapid deployment. Recommendation: Leverage self-service approval processes. Use pre-approved vendors and platforms. Focus on delivery speed. Maintain compliance with security standards for continued self-service access."
+  },
+  
+  // Q21: Data retention
+  21: {
+    1: "CRITICAL: Long-term retention adds complexity and cost. Recommendation: Implement compliant archival system (AWS Glacier, Azure Archive). Create automated retention policy enforcement. Implement legal hold capabilities. Plan for e-discovery requirements. Budget for long-term storage costs. Ensure tamper-proof audit logs.",
+    2: "WARNING: Significant retention requires planning. Recommendation: Implement tiered storage strategy (hot/warm/cold). Create automated archival workflows. Document retention policy and procedures. Implement data lifecycle management. Plan for retrieval processes.",
+    3: "MODERATE: Standard retention is manageable. Recommendation: Implement automated data retention policies. Create deletion workflows for expired data. Document retention periods by data type. Implement backup and archival strategy. Monitor storage costs.",
+    4: "GOOD: Short retention simplifies management. Recommendation: Implement time-based deletion policies. Create data lifecycle automation. Monitor retention compliance. Focus on operational efficiency over long-term archival.",
+    5: "EXCELLENT: Minimal retention reduces overhead. Recommendation: Implement aggressive data cleanup policies. Focus on minimizing storage costs. Use ephemeral data patterns where possible. Optimize for performance over retention."
+  }
+};
