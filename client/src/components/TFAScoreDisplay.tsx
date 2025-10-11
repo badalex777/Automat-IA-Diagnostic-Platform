@@ -64,12 +64,10 @@ export default function TFAScoreDisplay({ score, sections }: TFAScoreDisplayProp
 
   const getImprovementSuggestion = (sectionName: string) => {
     const suggestions: Record<string, string> = {
-      "Data Structure": "Improve data organization and standardization. Ensure consistent formats and eliminate manual data entry where possible.",
-      "Process Definition": "Document and standardize process steps. Create clear workflows and decision trees.",
-      "Volume & Frequency": "Establish regular processing schedules and document volume patterns for better automation planning.",
-      "Exception Handling": "Define exception scenarios and create structured handling procedures.",
-      "System Access": "Ensure proper API access and system integration capabilities are available.",
-      "Stakeholder Buy-in": "Engage stakeholders early and demonstrate automation value through pilot projects."
+      "System Environment": "Upgrade infrastructure to cloud-based systems, enable API access, establish programmatic authentication, and implement monitoring and backup systems.",
+      "Data Quality": "Standardize data formats, implement validation rules, collect historical data for training, and establish data governance policies.",
+      "Integration Feasibility": "Simplify integration landscape, evaluate modern integration platforms, streamline authentication, implement robust error handling and retry logic.",
+      "Security/Compliance": "Engage compliance team early, select pre-approved vendors, accelerate security approval cycles, and design retention policies into architecture."
     };
     return suggestions[sectionName] || "Review and strengthen this area before proceeding with automation.";
   };

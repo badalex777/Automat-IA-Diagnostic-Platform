@@ -26,94 +26,73 @@ const getWeaknessDetails = (sectionName: string, score: number): WeaknessDetail 
   const isHigh = score >= 1.5 && score < 2.0;
   
   const weaknessMap: Record<string, Omit<WeaknessDetail, 'priority' | 'estimatedEffort'>> = {
-    "Data Structure": {
+    "System Environment": {
       rootCauses: [
-        "Inconsistent data formats across systems",
-        "High degree of manual data entry",
-        "Lack of standardized data fields",
-        "Poor data quality and validation"
+        "Legacy on-premises infrastructure with limited cloud integration",
+        "APIs unavailable or poorly documented",
+        "Programmatic access restricted to manual UI interactions",
+        "System performance issues with frequent timeouts or failures",
+        "Insufficient monitoring and logging capabilities",
+        "Inadequate backup and disaster recovery systems"
       ],
       mitigations: [
-        "Implement data standardization protocols and master data management",
-        "Create data validation rules and automated quality checks",
-        "Establish data governance policies with clear ownership",
-        "Build data cleaning and normalization pipelines",
-        "Consider API integration to eliminate manual entry"
+        "Evaluate cloud migration strategy or hybrid infrastructure approach",
+        "Work with vendors to enable REST API access or consider RPA for UI automation",
+        "Establish service accounts and API keys for programmatic access",
+        "Implement performance monitoring and identify bottlenecks",
+        "Deploy centralized logging and alerting infrastructure",
+        "Establish automated backup procedures and test recovery protocols"
       ]
     },
-    "Process Definition": {
+    "Data Quality": {
       rootCauses: [
-        "Undocumented or poorly documented workflows",
-        "Process variations across teams or individuals",
-        "Unclear decision criteria and business rules",
-        "Lack of process ownership"
+        "Unstructured or inconsistent data formats across systems",
+        "High error rates with frequent missing or invalid fields",
+        "Insufficient historical data for pattern recognition",
+        "Data inconsistency across sources and time periods",
+        "Weak or absent data validation rules"
       ],
       mitigations: [
-        "Conduct process mining and documentation workshops",
-        "Create standardized SOPs (Standard Operating Procedures)",
-        "Map decision trees and business logic flows",
-        "Implement process governance with assigned owners",
-        "Use BPMN or flowcharts to visualize workflows"
+        "Implement data standardization protocols and schema enforcement",
+        "Create automated data validation and quality check pipelines",
+        "Collect additional historical data over 3-6 months for baseline",
+        "Establish single source of truth and data governance policies",
+        "Deploy validation frameworks with multi-layer error detection",
+        "Build data cleaning and normalization processes"
       ]
     },
-    "Volume & Frequency": {
+    "Integration Feasibility": {
       rootCauses: [
-        "Irregular or unpredictable processing schedules",
-        "Low transaction volumes not justifying automation ROI",
-        "Seasonal or sporadic activity patterns",
-        "Unclear processing triggers"
+        "Complex integration landscape with 6+ systems",
+        "Incompatible systems lacking modern integration connectors",
+        "Complex authentication requirements with frequent re-authorization",
+        "Severe API rate limits restricting automation throughput",
+        "Poor error handling with no retry or failover mechanisms",
+        "Unstable APIs with frequent breaking changes"
       ],
       mitigations: [
-        "Analyze historical patterns to identify optimal automation windows",
-        "Batch low-volume tasks to improve automation efficiency",
-        "Set up event-driven triggers for irregular processes",
-        "Consider hybrid automation for variable workloads",
-        "Document volume trends for 6-12 months before automating"
+        "Prioritize critical integrations and establish middleware layer",
+        "Evaluate integration platforms (Zapier, MuleSoft, custom iPaaS)",
+        "Work with IT security to streamline authentication protocols",
+        "Implement request throttling, caching, and batch processing strategies",
+        "Build robust error handling with circuit breakers and retry logic",
+        "Engage with vendors for API stability guarantees and long-term support"
       ]
     },
-    "Exception Handling": {
+    "Security/Compliance": {
       rootCauses: [
-        "High exception rates with manual intervention required",
-        "Undefined escalation procedures",
-        "Complex edge cases without clear resolution paths",
-        "Lack of exception logging and tracking"
+        "Highly sensitive regulated data requiring strict controls (HIPAA, PCI-DSS)",
+        "Stringent compliance requirements with heavy audit obligations",
+        "Long security approval cycles (6+ months for new tools)",
+        "Complex data retention and archival requirements"
       ],
       mitigations: [
-        "Categorize exceptions by type and frequency",
-        "Create decision matrices for common exception scenarios",
-        "Design fallback procedures and escalation workflows",
-        "Implement exception logging and analytics dashboard",
-        "Start with straight-through processing, add exception handling iteratively"
-      ]
-    },
-    "System Access": {
-      rootCauses: [
-        "Legacy systems without API capabilities",
-        "Security restrictions limiting integration",
-        "Lack of technical documentation",
-        "Complex authentication requirements"
-      ],
-      mitigations: [
-        "Evaluate RPA tools for systems without APIs",
-        "Work with IT security to establish integration protocols",
-        "Document existing system interfaces and limitations",
-        "Consider middleware or integration platforms (iPaaS)",
-        "Prioritize vendor discussions for API access"
-      ]
-    },
-    "Stakeholder Buy-in": {
-      rootCauses: [
-        "Fear of job displacement among staff",
-        "Previous failed automation attempts",
-        "Lack of understanding of automation benefits",
-        "Insufficient leadership support"
-      ],
-      mitigations: [
-        "Run stakeholder education sessions on automation value",
-        "Start with pilot projects to demonstrate quick wins",
-        "Position automation as augmentation, not replacement",
-        "Establish change management program with clear communication",
-        "Involve end users in solution design process"
+        "Engage compliance team early to define automation security requirements",
+        "Select pre-approved vendors or SOC 2 certified platforms",
+        "Implement data encryption, access controls, and audit logging from day one",
+        "Accelerate approval by demonstrating compliance alignment and security posture",
+        "Design retention policies into automation architecture with automated archival",
+        "Consider starting with less sensitive workflows to build trust"
       ]
     }
   };
