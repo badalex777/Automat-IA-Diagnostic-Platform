@@ -2,9 +2,7 @@
 
 ## Overview
 
-The Automat-IA Diagnostic Platform is a professional data management web application designed to help consultants manage AI implementation diagnostics for client companies. The platform enables Phase-1 diagnostics per project (company) and workflow, facilitating Technical Feasibility Assessments (TFA), Readiness Rubrics, and Business Impact calculations to determine ROI and implementation viability.
-
-The application follows a hierarchical data structure: Companies → Workflows → Assessments (TFA/Readiness/Impact), providing a streamlined interface for managing multiple diagnostic projects and generating shareable assessment links for technical contacts.
+The Automat-IA Diagnostic Platform is a professional data management web application designed to help consultants manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics per project (company) and workflow, including Technical Feasibility Assessments (TFA), Readiness Rubrics, and Business Impact calculations to determine ROI and implementation viability. The platform aims to streamline the management of multiple diagnostic projects and generate shareable assessment links for technical contacts.
 
 ## User Preferences
 
@@ -14,215 +12,54 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework & Routing**
-- React 18+ with TypeScript for type-safe component development
-- Wouter for lightweight client-side routing
-- Single Page Application (SPA) architecture with route-based code organization
-
-**UI Component System**
-- Radix UI primitives for accessible, unstyled components
-- Shadcn/ui design system (New York variant) for consistent component styling
-- Tailwind CSS for utility-first styling with custom design tokens
-- Class Variance Authority (CVA) for variant-based component APIs
-- Dark mode by default with light mode support via ThemeProvider context
-
-**State Management**
-- TanStack Query (React Query) for server state management and caching
-- Local component state with React hooks for UI-specific state
-- No global state management library - leverages React Query's caching layer
-
-**Design System**
-- Professional, data-focused aesthetic inspired by Linear and Notion
-- Custom HSL-based color system with semantic tokens (background, foreground, muted, accent, destructive)
-- Typography: Inter for UI/body, JetBrains Mono for data/metrics display
-- Consistent elevation system using hover/active states (elevate-1, elevate-2)
-- Border radius tokens: lg (9px), md (6px), sm (3px)
+The frontend is built as a Single Page Application (SPA) using React 18+ with TypeScript and Wouter for routing. It leverages Radix UI primitives and Shadcn/ui (New York variant) for a consistent, accessible UI, styled with Tailwind CSS. State management relies on TanStack Query for server state and React hooks for local component state. The design system features a professional, data-focused aesthetic with a custom HSL-based color system, Inter and JetBrains Mono typography, and a consistent elevation system. Dark mode is supported by default.
 
 ### Backend Architecture
 
-**Server Framework**
-- Express.js for HTTP server and API routing
-- TypeScript throughout for type safety across client and server
-- ESM modules for modern JavaScript syntax
-- Vite integration for development with HMR and production builds
+The backend is built with Express.js and TypeScript, utilizing ESM modules. Data is stored in a PostgreSQL database (Neon serverless) managed by Drizzle ORM for type-safe queries and schema management, with Zod for runtime validation. The API follows a RESTful pattern with JSON request/response formats and includes middleware for logging, error handling, and CORS. Session management is prepared using connect-pg-simple.
 
-**Data Storage Strategy**
-- PostgreSQL database via Neon serverless (configured for connection pooling)
-- Drizzle ORM for type-safe database queries and schema management
-- Schema-first approach with automatic TypeScript type generation
-- Zod integration for runtime validation via drizzle-zod
+### Data Model
 
-**Current Implementation**
-- PostgreSQL database with Drizzle ORM (fully migrated from in-memory storage)
-- Database storage layer (DBStorage) with complete CRUD operations
-- All schemas implemented: Companies, Workflows, TFA Assessments, Business Impact
-- Shareable link system with nanoid-generated unique identifiers
+The core entities include Companies (client organizations), Workflows (business processes within companies), TFA Assessments (technical feasibility with weighted scoring across 6 categories: System Environment, Data Quality, Integration Feasibility, Security/Compliance, Process Stability, Ownership), Readiness Rubrics (planned), and Business Impact (ROI calculations). TFA assessments include a 24-question weighted scoring system (0-100 score), feasibility bands (Very High, High, Moderate, Low, Very Low), shareable links, and open-ended comments. The system also tracks initial respondents and multiple response sources to audit knowledge gaps.
 
-**API Design**
-- RESTful API pattern with /api prefix for all backend routes
-- JSON request/response format
-- Express middleware for request logging, error handling, and CORS
-- Session management ready via connect-pg-simple (PostgreSQL session store)
+### Feature Specifications
 
-### Data Model (Implemented)
+- **TFA Survey**: Collects responses to 24 questions, detects "Don't Know" answers, and collects "gap metadata" (why the question couldn't be answered, who might know).
+- **Gap Resolution**: Consultants can fill knowledge gaps, with an audit trail of who provided the information and why.
+- **TFA Analysis**: Provides auto-updating scores, assessment notes, visual analytics (radar and pie charts), a 5-tier feasibility interpretation with recommendations, detailed weakness analysis with priority ranking and mitigation strategies, and a Layer 1 Executive Summary with Go/No-Go recommendations and action plans.
+- **Workflow Progression**: Workflows track status from tfa_only → tfa_readiness → readiness_impact → complete.
+- **Dashboard**: Provides overview of companies and workflows with search/filter functionality.
 
-**Core Entities**
-1. **Companies** - Client organizations with industry and contact information
-2. **Workflows** - Specific business processes within companies requiring AI assessment
-   - Status tracking: tfa_only → tfa_readiness → readiness_impact → complete
-3. **TFA Assessments** - Technical Feasibility Assessment with weighted scoring across 6 categories:
-   - System Environment (20%) - deployment, APIs, data access  
-   - Data Quality (25%) - availability, structure, volume
-   - Integration Feasibility (25%) - system compatibility, authentication
-   - Security/Compliance (15%) - data sensitivity, compliance requirements
-   - Process Stability (10%) - change frequency, documentation
-   - Ownership (5%) - business sponsorship, technical ownership
-4. **Readiness Rubrics** - Implementation readiness evaluation (To Be Implemented)
-5. **Business Impact** - ROI calculations (time savings, FTE equivalents, annual benefits, payback period)
+## External Dependencies
 
-**TFA Scoring System**
-- 24 questions with weighted scoring (1-5 scale) across 6 sections
-- Automated score calculation: weighted average normalized to 0-100
-- Feasibility bands: Very High (>90), High (80-90), Moderate (60-80), Low (40-60), Very Low (<40)
-- Shareable link system for external respondents to complete assessments
-- Open-ended comments field for qualitative feedback
-- "Don't Know" responses (value 0, score null) excluded from calculations
+### Database & Infrastructure
 
-### External Dependencies
+- **Neon Serverless PostgreSQL**: Cloud database with connection pooling.
+- **Drizzle Kit**: For schema migrations.
 
-**Database & Infrastructure**
-- Neon Serverless PostgreSQL - Cloud database with connection pooling and WebSocket support
-- Database provisioned via DATABASE_URL environment variable
-- Drizzle Kit for schema migrations and database push operations
+### UI Component Libraries
 
-**UI Component Libraries**
-- @radix-ui/* - 20+ accessible component primitives (dialogs, dropdowns, tabs, etc.)
-- recharts - Charting library for radar charts, pie charts, and data visualization
-- embla-carousel - Touch-friendly carousel component
-- cmdk - Command palette component
-- date-fns - Date manipulation and formatting
-- lucide-react - Icon library
+- **@radix-ui/\***: Accessible component primitives.
+- **recharts**: Charting library for data visualization.
+- **embla-carousel**: Touch-friendly carousel.
+- **cmdk**: Command palette component.
+- **date-fns**: Date manipulation.
+- **lucide-react**: Icon library.
 
-**Form Handling & Validation**
-- React Hook Form - Form state management with performance optimization
-- @hookform/resolvers - Validation resolver integration
-- Zod - Schema validation library integrated with Drizzle and form validation
+### Form Handling & Validation
 
-**Development Tools**
-- Vite - Build tool and dev server with HMR
-- @replit/vite-plugin-* - Replit-specific development plugins (error overlay, cartographer, dev banner)
-- TypeScript compiler for type checking
-- ESBuild for production server bundling
+- **React Hook Form**: Form state management.
+- **Zod**: Schema validation.
 
-**Styling Infrastructure**
-- Tailwind CSS - Utility-first CSS framework
-- PostCSS with Autoprefixer - CSS processing
-- clsx & tailwind-merge - Conditional class name utilities
+### Development Tools
 
-**Key Configuration Files**
-- `drizzle.config.ts` - Database connection and migration settings
-- `vite.config.ts` - Build configuration with path aliases (@, @shared, @assets)
-- `tailwind.config.ts` - Design system tokens and theme configuration
-- `components.json` - Shadcn/ui configuration for component generation
+- **Vite**: Build tool and dev server.
+- **@replit/vite-plugin-\***: Replit-specific plugins.
+- **TypeScript**: For type checking.
+- **ESBuild**: For production server bundling.
 
-## Recent Changes (Last Updated: 2025-10-11)
+### Styling Infrastructure
 
-### Completed Features
-
-**Knowledge Gap Detection and Multi-Source Audit Trail System (2025-10-11)**
-- ✅ **Database Schema Enhancement**: Added `initialRespondent` (text) and `responseSources` (JSONB) fields to tfaAssessments table for comprehensive audit trail
-- ✅ **Knowledge Gap Detection**: Created utility functions to detect "Don't Know" responses (value "0"), group gaps by section, and block results display until resolved
-- ✅ **Enhanced TFA Form**:
-  - Added mandatory "Your Name" field to track initial respondent
-  - Displays on both first section and final section (if empty) for better UX
-  - Prominent alert when "Don't Know" responses detected, urging user to explain why and suggest technical contacts
-  - Validates respondent name before submission
-- ✅ **Knowledge Gap Warning Component**:
-  - Displays when assessment has unresolved gaps instead of showing inaccurate results
-  - Shows count of unanswered questions and initial respondent name
-  - Lists gaps grouped by section with full question context
-  - Form to fill each gap: answer selection (excludes "Don't Know"), "Answered by" field, reason for gap
-  - Server-side validation with `.min(1)` on answeredBy and reason fields
-- ✅ **Gap Resolution Backend**:
-  - PATCH /api/tfa/:id/fill-gaps endpoint accepts gap responses with audit trail
-  - Validates no "Don't Know" values allowed when filling gaps
-  - Merges responses into responseSources with timestamps
-  - Recalculates TFA score with filled gaps
-  - Full React Query cache invalidation flow
-- ✅ **Response Sources Disclaimer Component**:
-  - Displays at top of TFA results when multi-source data exists
-  - Shows initial respondent prominently
-  - Groups additional sources by person with questions answered and reasons
-  - Professional audit trail presentation for accountability
-- ✅ **Action Plan Prioritization**: Verified weightedSeverity sorting (weight × (5-score) descending) ensures highest-impact issues appear first
-- ✅ **End-to-End Testing**: Complete flow verified from submission with gaps → warning display → gap resolution with audit trail → results with disclaimer
-- ✅ **Radio Button Fix**: Moved data-testid to actual RadioGroupItem element for better test automation compatibility
-
-**TFA Expansion to 24 Questions (2025-10-10)**
-- ✅ **Expanded Question Set**: Increased from 16 to 24 questions across all sections:
-  - System Environment (20%): 3 → 5 questions (added performance monitoring, system monitoring)
-  - Data Quality (25%): 3 → 5 questions (added data consistency, validation processes)
-  - Integration Feasibility (25%): 3 → 5 questions (added rate limit handling, error handling)
-  - Security/Compliance (15%): 3 → 4 questions (added data retention policies)
-  - Process Stability (10%): 2 → 3 questions (added exception handling documentation)
-  - Ownership (5%): 2 questions (unchanged)
-- ✅ **Weight Rebalancing**: Maintained aggregate weight targets (20/25/25/15/10/5) with balanced distribution within sections
-- ✅ **Bug Fixes**:
-  - Fixed comments persistence: `completeTFA()` now correctly accepts and saves comments parameter
-  - Fixed assessment retrieval: `getTFAByWorkflowId()` now returns most recently completed assessment using `ORDER BY completedAt DESC NULLS LAST`
-  - Prevents stale assessments from displaying when multiple shareable links are regenerated
-- ✅ **End-to-End Testing**: All 24 questions, scoring, weighted prioritization, radar charts, and comments verified working
-- ✅ **Action Plan Fix**: Corrected logic for high-scoring TFAs - action plans now focus on implementation readiness instead of incorrectly treating TFA diagnostic criteria (Data Quality, Integration Feasibility, etc.) as automation targets. When scores are high, first action is: "Engage development team to begin detailed automation analysis and solution architecture"
-
-**Enhanced TFA Layer 1 Analysis System (Fully Implemented)**
-- ✅ **Auto-refresh mechanism**: TFA scores update automatically when returning to WorkflowDetail tab via `refetchOnWindowFocus: true`
-- ✅ **Assessment Notes display**: Open-ended comments from TFA submissions shown in dedicated card
-- ✅ **Visual Analytics**: 
-  - Radar chart showing section score profile (0-5 scale)
-  - Pie chart displaying weight distribution across sections
-  - Tabbed interface for clean presentation using Recharts
-- ✅ **Enhanced Score Interpretation**: 5-tier feasibility system with icons, descriptions, and recommendations
-  - Very High (>90%): Ready for immediate implementation
-  - High (80-90%): Strong feasibility, minor preparation needed
-  - Moderate (60-80%): Viable with 2-4 weeks prep
-  - Low (40-60%): Significant challenges, 4-8 weeks remediation
-  - Very Low (<40%): Not recommended, 3-6 months foundational work
-- ✅ **Detailed Weakness Analysis**:
-  - Priority ranking (Critical <1.5, High 1.5-2.0, Medium 2.0-2.5)
-  - Root cause identification per weakness type
-  - 4-5 specific mitigation strategies per weak section
-  - Effort estimation (Critical: 4-8w, High: 2-4w, Medium: 1-2w)
-  - Automated total remediation timeline calculation
-- ✅ **Layer 1 Executive Summary**:
-  - Go/No-Go recommendation engine with decision logic
-  - Key findings dashboard (Strengths vs Risk Factors)
-  - Prioritized action plans (3-4 steps) based on recommendation
-  - Timeline estimates including remediation effort
-  - Balance metrics and consistency analysis
-
-**Previous TFA Features**
-- ✅ Complete backend API with CRUD operations for companies, workflows, TFA assessments, and business impact
-- ✅ Database integration with PostgreSQL and Drizzle ORM
-- ✅ Shareable link system for external respondents
-- ✅ Automated TFA scoring: 24 questions across 6 weighted sections → normalized 0-100 score
-- ✅ Frontend pages: Dashboard, CompanyDetail, WorkflowDetail, TFAForm with full React Query integration
-- ✅ Search/filter functionality for companies and workflows
-- ✅ Delete functionality with confirmation dialogs and cache invalidation
-- ✅ TFA form enhancements: workflow description, disclaimers, Previous/Next navigation, auto-scroll, comments field
-- ✅ Thank you confirmation page after TFA submission
-
-### Pending Implementation
-
-**Readiness Rubric Module**
-- [ ] Schema definition for readiness assessment
-- [ ] Backend API routes for readiness CRUD
-- [ ] Frontend UI for readiness rubric evaluation
-- [ ] Integration with workflow status progression
-
-**Business Impact Enhancements**
-- [ ] Opportunity matrix visualization (scatter plot)
-- [ ] Per-company aggregated view of all workflows
-- [ ] ROI calculation refinements
-
-**Additional Features**
-- [ ] Company reordering with drag-and-drop or manual sort controls
+- **Tailwind CSS**: Utility-first CSS framework.
+- **PostCSS with Autoprefixer**: CSS processing.
+- **clsx & tailwind-merge**: Conditional class name utilities.
