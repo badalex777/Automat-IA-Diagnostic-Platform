@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +28,7 @@ export default function TFAForm() {
   const { toast } = useToast();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [comments, setComments] = useState("");
+  const [respondentName, setRespondentName] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
 
   const { data: tfaData, isLoading, error } = useQuery<TFAData>({
@@ -47,7 +51,7 @@ export default function TFAForm() {
   const progress = (answeredQuestions / totalQuestions) * 100;
 
   const submitMutation = useMutation({
-    mutationFn: async (data: { responses: Record<string, string>; comments?: string }) => {
+    mutationFn: async (data: { responses: Record<string, string>; comments?: string; initialRespondent?: string }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
     },
     onSuccess: () => {
@@ -66,6 +70,14 @@ export default function TFAForm() {
   });
 
   const handleSubmit = () => {
+    if (!respondentName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter your name before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (answeredQuestions < totalQuestions) {
       toast({
         title: "Incomplete assessment",
@@ -74,7 +86,11 @@ export default function TFAForm() {
       });
       return;
     }
-    submitMutation.mutate({ responses: answers, comments: comments || undefined });
+    submitMutation.mutate({ 
+      responses: answers, 
+      comments: comments || undefined,
+      initialRespondent: respondentName.trim(),
+    });
   };
 
   const handleSectionChange = (newSection: number) => {
@@ -139,6 +155,23 @@ export default function TFAForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {currentSection === 0 && (
+          <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border">
+            <Label htmlFor="respondent-name" className="text-sm font-medium">Your Name *</Label>
+            <Input
+              id="respondent-name"
+              placeholder="Enter your full name"
+              value={respondentName}
+              onChange={(e) => setRespondentName(e.target.value)}
+              className="mt-2"
+              data-testid="input-respondent-name"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              This helps us track who completed the initial assessment and contact the right person for follow-ups.
+            </p>
+          </div>
+        )}
+
         {!isLastSection ? (
           <>
             <div className="mb-6">
@@ -166,6 +199,40 @@ export default function TFAForm() {
           </>
         ) : (
           <div className="space-y-6">
+            {!respondentName.trim() && (
+              <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                <Label htmlFor="respondent-name-final" className="text-sm font-medium">Your Name *</Label>
+                <Input
+                  id="respondent-name-final"
+                  placeholder="Enter your full name"
+                  value={respondentName}
+                  onChange={(e) => setRespondentName(e.target.value)}
+                  className="mt-2"
+                  data-testid="input-respondent-name-final"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Please enter your name before submitting the assessment.
+                </p>
+              </div>
+            )}
+            {Object.values(answers).some(v => v === "0") && (
+              <Alert variant="default" className="border-2 border-primary">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <p className="font-semibold mb-2">Important: Questions marked "Don't Know/Not Sure"</p>
+                  <p className="text-sm">
+                    You selected "Don't Know/Not Sure" for some questions. In the comments below, please:
+                  </p>
+                  <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                    <li>Explain why you couldn't answer those specific questions</li>
+                    <li>Suggest who in your organization might have this information (name, role, department)</li>
+                  </ul>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This helps us gather accurate data from the right sources for a complete assessment.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
             <div>
               <h2 className="text-xl font-semibold mb-2">Additional Comments</h2>
               <p className="text-sm text-muted-foreground mb-4">

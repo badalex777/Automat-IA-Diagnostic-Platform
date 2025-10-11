@@ -119,7 +119,7 @@ export class DbStorage implements IStorage {
     throw new Error('Failed to generate unique shareable ID after maximum attempts');
   }
 
-  async updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string): Promise<TFAAssessment | undefined> {
+  async updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string, initialRespondent?: string): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
     if (score !== undefined) {
       updateData.score = score;
@@ -127,7 +127,37 @@ export class DbStorage implements IStorage {
     if (comments !== undefined) {
       updateData.comments = comments;
     }
+    if (initialRespondent !== undefined) {
+      updateData.initialRespondent = initialRespondent;
+    }
     const [updated] = await db.update(tfaAssessments).set(updateData).where(eq(tfaAssessments.id, id)).returning();
+    return updated;
+  }
+
+  async fillTFAGaps(id: string, gapResponses: Record<string, { value: string, answeredBy: string, reason: string }>, updatedResponses: Record<string, string>, updatedScore: number): Promise<TFAAssessment | undefined> {
+    const assessment = await this.getTFAAssessment(id);
+    if (!assessment) return undefined;
+
+    const currentSources = (assessment.responseSources as Record<string, any>) || {};
+    
+    // Merge gap responses into responseSources with timestamps
+    for (const [questionId, gapData] of Object.entries(gapResponses)) {
+      currentSources[questionId] = {
+        answeredBy: gapData.answeredBy,
+        reason: gapData.reason,
+        answeredAt: new Date().toISOString(),
+      };
+    }
+
+    const [updated] = await db.update(tfaAssessments)
+      .set({
+        responses: updatedResponses,
+        responseSources: currentSources,
+        score: updatedScore,
+      })
+      .where(eq(tfaAssessments.id, id))
+      .returning();
+    
     return updated;
   }
 

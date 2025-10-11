@@ -31,6 +31,8 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   responses: jsonb("responses").default({}),
   comments: text("comments"),
   score: integer("score"),
+  initialRespondent: text("initial_respondent"),
+  responseSources: jsonb("response_sources").default({}),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
@@ -78,6 +80,15 @@ export const insertTFAAssessmentSchema = createInsertSchema(tfaAssessments).omit
 export const tfaResponsesSchema = z.object({
   responses: z.record(z.string(), z.string()),
   comments: z.string().optional(),
+  initialRespondent: z.string().optional(),
+});
+
+export const fillGapsSchema = z.object({
+  gapResponses: z.record(z.string(), z.object({
+    value: z.string().min(1, "Answer is required"),
+    answeredBy: z.string().min(1, "Answered by is required"),
+    reason: z.string().min(1, "Reason is required"),
+  })),
 });
 
 export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omit({

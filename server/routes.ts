@@ -8,6 +8,7 @@ import {
   updateWorkflowSchema,
   insertTFAAssessmentSchema,
   tfaResponsesSchema,
+  fillGapsSchema,
   insertBusinessImpactSchema,
   updateBusinessImpactSchema,
 } from "@shared/schema";
@@ -288,7 +289,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tfa/shareable/:shareableId/submit", async (req, res) => {
     try {
       const validatedData = tfaResponsesSchema.parse(req.body);
-      const { responses, comments } = validatedData;
+      const { responses, comments, initialRespondent } = validatedData;
 
       // Get assessment by shareableId
       const assessment = await storage.getTFAByShareableId(req.params.shareableId);
@@ -328,7 +329,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sectionScores = calculateSectionScores(responses);
 
       // Update TFA with responses and mark as complete with all data in one operation
-      await storage.updateTFAResponses(assessment.id, responses, score, comments);
+      await storage.updateTFAResponses(assessment.id, responses, score, comments, initialRespondent);
       const updatedAssessment = await storage.completeTFA(assessment.id, score, comments);
       
       if (!updatedAssessment) {
@@ -419,6 +420,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.status(204).send();
     } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Fill knowledge gaps endpoint
+  app.patch("/api/tfa/:id/fill-gaps", async (req, res) => {
+    try {
+      const validatedData = fillGapsSchema.parse(req.body);
+      const { gapResponses } = validatedData;
+
+      // Get the current assessment
+      const assessment = await storage.getTFAAssessment(req.params.id);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Validate gap responses
+      for (const [questionId, gapData] of Object.entries(gapResponses)) {
+        const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
+        if (!question) {
+          return res.status(400).json({ error: `Invalid question ID: ${questionId}` });
+        }
+
+        const validValues = question.options.map(opt => opt.value);
+        if (!validValues.includes(gapData.value)) {
+          return res.status(400).json({ 
+            error: `Invalid response value "${gapData.value}" for question ${questionId}. Must be one of: ${validValues.join(', ')}`
+          });
+        }
+
+        // Ensure it's not "Don't Know" again
+        if (gapData.value === "0") {
+          return res.status(400).json({ 
+            error: `Cannot fill gap with "Don't Know" response for question ${questionId}`
+          });
+        }
+      }
+
+      // Merge gap responses into existing responses
+      const currentResponses = (assessment.responses as Record<string, string>) || {};
+      const updatedResponses = { ...currentResponses };
+      
+      for (const [questionId, gapData] of Object.entries(gapResponses)) {
+        updatedResponses[questionId] = gapData.value;
+      }
+
+      // Recalculate score with filled gaps
+      const updatedScore = calculateTFAScore(updatedResponses);
+      const sectionScores = calculateSectionScores(updatedResponses);
+
+      // Update assessment with filled gaps
+      const updated = await storage.fillTFAGaps(
+        req.params.id,
+        gapResponses,
+        updatedResponses,
+        updatedScore
+      );
+
+      if (!updated) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      res.json({ 
+        assessment: updated,
+        score: updatedScore,
+        sectionScores,
+      });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: "Internal server error" });
     }
   });

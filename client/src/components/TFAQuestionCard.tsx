@@ -42,9 +42,13 @@ export default function TFAQuestionCard({
                 ? "border-primary bg-primary/5"
                 : "border-border hover-elevate"
             }`}
-            data-testid={`radio-option-${questionNumber}-${option.value}`}
           >
-            <RadioGroupItem value={option.value} id={`q${questionNumber}-${option.value}`} className="mt-0.5" />
+            <RadioGroupItem 
+              value={option.value} 
+              id={`q${questionNumber}-${option.value}`} 
+              className="mt-0.5"
+              data-testid={`radio-option-${questionNumber}-${option.value}`}
+            />
             <Label
               htmlFor={`q${questionNumber}-${option.value}`}
               className="flex-1 cursor-pointer space-y-1"

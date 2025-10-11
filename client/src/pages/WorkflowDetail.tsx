@@ -12,11 +12,14 @@ import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
 import TFAWeaknessAnalysis from "@/components/TFAWeaknessAnalysis";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
+import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
+import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact } from "@shared/schema";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
+import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
@@ -256,32 +259,51 @@ export default function WorkflowDetail() {
             ) : tfaLoading ? (
               <p className="text-muted-foreground">Loading TFA assessment...</p>
             ) : tfaAssessment?.completedAt ? (
-              <>
-                <TFAExecutiveSummary
-                  score={tfaAssessment.score || 0}
-                  sections={sectionScores}
-                  responses={tfaAssessment.responses as Record<string, string>}
-                />
-                <TFAScoreDisplay 
-                  score={tfaAssessment.score || 0} 
-                  sections={sectionScores} 
-                />
-                <TFAVisualAnalytics sections={sectionScores} />
-                <TFAWeaknessAnalysis sections={sectionScores} />
-                {tfaAssessment.comments && (
-                  <Card className="p-6">
-                    <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-tfa-comments">
-                      {tfaAssessment.comments}
-                    </p>
-                  </Card>
-                )}
-                <ShareableLinkCard
-                  workflowId={workflowId}
-                  companyName={company?.name || ''}
-                  workflowTitle={workflow?.name || ''}
-                />
-              </>
+              (() => {
+                const responses = tfaAssessment.responses as Record<string, string>;
+                const gaps = detectKnowledgeGaps(responses);
+                const hasGaps = gaps.length > 0;
+
+                return hasGaps ? (
+                  <KnowledgeGapWarning
+                    assessmentId={tfaAssessment.id}
+                    workflowId={workflowId}
+                    gaps={gaps}
+                    initialRespondent={tfaAssessment.initialRespondent || undefined}
+                  />
+                ) : (
+                  <>
+                    <ResponseSourcesDisclaimer
+                      initialRespondent={tfaAssessment.initialRespondent || undefined}
+                      responseSources={tfaAssessment.responseSources as Record<string, any> || undefined}
+                    />
+                    <TFAExecutiveSummary
+                      score={tfaAssessment.score || 0}
+                      sections={sectionScores}
+                      responses={responses}
+                    />
+                    <TFAScoreDisplay 
+                      score={tfaAssessment.score || 0} 
+                      sections={sectionScores} 
+                    />
+                    <TFAVisualAnalytics sections={sectionScores} />
+                    <TFAWeaknessAnalysis sections={sectionScores} />
+                    {tfaAssessment.comments && (
+                      <Card className="p-6">
+                        <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-tfa-comments">
+                          {tfaAssessment.comments}
+                        </p>
+                      </Card>
+                    )}
+                    <ShareableLinkCard
+                      workflowId={workflowId}
+                      companyName={company?.name || ''}
+                      workflowTitle={workflow?.name || ''}
+                    />
+                  </>
+                );
+              })()
             ) : tfaAssessment ? (
               <div className="bg-card rounded-lg border border-border p-6" data-testid="card-waiting-tfa">
                 <div className="text-center py-8">
