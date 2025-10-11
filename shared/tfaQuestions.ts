@@ -12,16 +12,14 @@ export interface TFAQuestion {
 }
 
 export const TFA_SECTIONS = [
-  { name: "System Environment", weight: 20 },
-  { name: "Data Quality", weight: 25 },
-  { name: "Integration Feasibility", weight: 25 },
+  { name: "System Environment", weight: 25 },
+  { name: "Data Quality", weight: 30 },
+  { name: "Integration Feasibility", weight: 30 },
   { name: "Security/Compliance", weight: 15 },
-  { name: "Process Stability", weight: 10 },
-  { name: "Ownership", weight: 5 },
 ];
 
 export const TFA_QUESTIONS: TFAQuestion[] = [
-  // System Environment (20%) - 5 questions
+  // System Environment (25%) - 6 questions
   {
     id: 1,
     section: "System Environment",
@@ -68,7 +66,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     id: 4,
     section: "System Environment",
     question: "System performance: What is the typical response time and reliability of the systems involved?",
-    weight: 3,
+    weight: 4,
     options: [
       { value: "1", label: "Frequent failures or timeouts", description: "Systems often down, >10 second response times", score: 1 },
       { value: "2", label: "Below average performance", description: "Regular slowdowns, 5-10 second responses, occasional outages", score: 2 },
@@ -82,7 +80,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     id: 5,
     section: "System Environment",
     question: "Monitoring capabilities: Are there monitoring/logging tools to track automation performance and errors?",
-    weight: 2,
+    weight: 3,
     options: [
       { value: "1", label: "No monitoring", description: "No logs, no visibility into system operations", score: 1 },
       { value: "2", label: "Basic logging only", description: "System logs exist but hard to access or search", score: 2 },
@@ -92,10 +90,24 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
       { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
     ],
   },
-  
-  // Data Quality (25%) - 5 questions
   {
     id: 6,
+    section: "System Environment",
+    question: "Backup and disaster recovery: What backup and recovery capabilities exist for the systems involved?",
+    weight: 3,
+    options: [
+      { value: "1", label: "No backup strategy", description: "No backups, data loss would be catastrophic", score: 1 },
+      { value: "2", label: "Minimal backups", description: "Irregular backups, long recovery time (days)", score: 2 },
+      { value: "3", label: "Basic backup system", description: "Daily backups, recovery time 4-24 hours", score: 3 },
+      { value: "4", label: "Good backup system", description: "Hourly backups, point-in-time recovery, < 4 hour RTO", score: 4 },
+      { value: "5", label: "Enterprise disaster recovery", description: "Real-time replication, automated failover, < 1 hour RTO", score: 5 },
+      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
+    ],
+  },
+  
+  // Data Quality (30%) - 5 questions
+  {
+    id: 7,
     section: "Data Quality",
     question: "Data structure: How structured and consistent is the input data for this workflow?",
     weight: 6,
@@ -109,10 +121,10 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 7,
+    id: 8,
     section: "Data Quality",
     question: "Data quality: How accurate and complete is the data typically? (Consider missing fields, errors, duplicates)",
-    weight: 5,
+    weight: 6,
     options: [
       { value: "1", label: "Poor quality, frequent errors", description: "20%+ error rate, many missing required fields", score: 1 },
       { value: "2", label: "Below average quality", description: "10-20% errors, regular cleanup required", score: 2 },
@@ -123,10 +135,10 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 8,
+    id: 9,
     section: "Data Quality",
     question: "Data availability: Is sufficient historical/training data available for AI to learn patterns?",
-    weight: 4,
+    weight: 6,
     options: [
       { value: "1", label: "No historical data", description: "New process, less than 100 records", score: 1 },
       { value: "2", label: "Very limited data", description: "100-1,000 records, insufficient for training", score: 2 },
@@ -137,10 +149,10 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 9,
+    id: 10,
     section: "Data Quality",
     question: "Data consistency: How consistent is the data format and values across different sources and time periods?",
-    weight: 5,
+    weight: 6,
     options: [
       { value: "1", label: "Highly inconsistent", description: "Different formats per source, conflicting values, no standards", score: 1 },
       { value: "2", label: "Mostly inconsistent", description: "Frequent format variations, manual mapping needed", score: 2 },
@@ -151,10 +163,10 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 10,
+    id: 11,
     section: "Data Quality",
     question: "Data validation: Are there validation rules and error handling mechanisms in place for incoming data?",
-    weight: 5,
+    weight: 6,
     options: [
       { value: "1", label: "No validation", description: "Any data accepted, no checks or error handling", score: 1 },
       { value: "2", label: "Minimal validation", description: "Basic type checks only, errors cause failures", score: 2 },
@@ -165,9 +177,9 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
 
-  // Integration Feasibility (25%) - 5 questions
+  // Integration Feasibility (30%) - 6 questions
   {
-    id: 11,
+    id: 12,
     section: "Integration Feasibility",
     question: "Integration complexity: How many different systems need to be integrated for this workflow?",
     weight: 5,
@@ -181,7 +193,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 12,
+    id: 13,
     section: "Integration Feasibility",
     question: "System compatibility: Are the systems compatible with modern integration platforms? (Zapier, MuleSoft, custom middleware)",
     weight: 6,
@@ -195,7 +207,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 13,
+    id: 14,
     section: "Integration Feasibility",
     question: "Authentication: How complex is the authentication/authorization setup for system access?",
     weight: 5,
@@ -209,7 +221,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 14,
+    id: 15,
     section: "Integration Feasibility",
     question: "API rate limits: Are there rate limiting or throttling restrictions that could impact automation throughput?",
     weight: 5,
@@ -223,10 +235,10 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 15,
+    id: 16,
     section: "Integration Feasibility",
     question: "Error handling: How robust are the existing integration error handling and retry mechanisms?",
-    weight: 4,
+    weight: 5,
     options: [
       { value: "1", label: "No error handling", description: "Failures cause complete stops, manual intervention required", score: 1 },
       { value: "2", label: "Basic error handling", description: "Simple failure logs, no automatic retry", score: 2 },
@@ -236,10 +248,24 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
       { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
     ],
   },
+  {
+    id: 17,
+    section: "Integration Feasibility",
+    question: "API versioning and stability: How stable are the APIs, and how are version changes managed?",
+    weight: 4,
+    options: [
+      { value: "1", label: "Unstable, frequent breaking changes", description: "APIs change without notice, no versioning strategy", score: 1 },
+      { value: "2", label: "Poorly managed versions", description: "Breaking changes common, short deprecation windows", score: 2 },
+      { value: "3", label: "Moderate version management", description: "Some versioning, occasional breaking changes with notice", score: 3 },
+      { value: "4", label: "Good version control", description: "Semantic versioning, 6+ month deprecation period", score: 4 },
+      { value: "5", label: "Enterprise-grade stability", description: "Long-term support, backwards compatibility guaranteed, 12+ month deprecation", score: 5 },
+      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
+    ],
+  },
 
   // Security/Compliance (15%) - 4 questions
   {
-    id: 16,
+    id: 18,
     section: "Security/Compliance",
     question: "Data sensitivity: What type of data does this workflow process?",
     weight: 5,
@@ -253,7 +279,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 17,
+    id: 19,
     section: "Security/Compliance",
     question: "Compliance requirements: What compliance standards or regulations apply to this workflow?",
     weight: 4,
@@ -267,7 +293,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 18,
+    id: 20,
     section: "Security/Compliance",
     question: "Security approval: How long does security/compliance approval typically take for new tools?",
     weight: 3,
@@ -281,7 +307,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 19,
+    id: 21,
     section: "Security/Compliance",
     question: "Data retention: What are the data retention and archival requirements for this workflow?",
     weight: 3,
@@ -294,81 +320,14 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
       { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
     ],
   },
-
-  // Process Stability (10%) - 3 questions
-  {
-    id: 20,
-    section: "Process Stability",
-    question: "Process definition: How well-defined and documented is this workflow?",
-    weight: 4,
-    options: [
-      { value: "1", label: "Undefined or ad-hoc", description: "Different approach every time, tribal knowledge", score: 1 },
-      { value: "2", label: "Poorly defined", description: "Rough guidelines, lots of exceptions, minimal docs", score: 2 },
-      { value: "3", label: "Moderately defined", description: "Basic documentation, known steps with some variation", score: 3 },
-      { value: "4", label: "Well defined", description: "Clear SOPs, documented decision trees", score: 4 },
-      { value: "5", label: "Fully documented with examples", description: "Detailed process maps, training materials, decision logic", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
-  {
-    id: 21,
-    section: "Process Stability",
-    question: "Process changes: How frequently do the rules or steps for this workflow change?",
-    weight: 3,
-    options: [
-      { value: "1", label: "Weekly changes", description: "Constant tweaks, seasonal variations, reactive adjustments", score: 1 },
-      { value: "2", label: "Monthly changes", description: "Regular updates, new exceptions frequently added", score: 2 },
-      { value: "3", label: "Quarterly changes", description: "Periodic reviews, some updates per year", score: 3 },
-      { value: "4", label: "Annual changes", description: "Stable process with yearly refinements", score: 4 },
-      { value: "5", label: "Rarely changes", description: "Established process, only changes for major events", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
-  {
-    id: 22,
-    section: "Process Stability",
-    question: "Exception handling: How frequently do exceptions or edge cases occur that require manual intervention?",
-    weight: 3,
-    options: [
-      { value: "1", label: "Very frequent exceptions", description: "50%+ of cases need manual handling, unpredictable variations", score: 1 },
-      { value: "2", label: "Frequent exceptions", description: "20-50% exceptions, many edge cases", score: 2 },
-      { value: "3", label: "Moderate exceptions", description: "10-20% exceptions, known edge cases", score: 3 },
-      { value: "4", label: "Few exceptions", description: "5-10% exceptions, well-documented patterns", score: 4 },
-      { value: "5", label: "Rare exceptions", description: "<5% exceptions, highly standardized process", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
-
-  // Ownership (5%) - 2 questions
-  {
-    id: 23,
-    section: "Ownership",
-    question: "Business sponsorship: Is there executive or business leadership support for automating this workflow?",
-    weight: 3,
-    options: [
-      { value: "1", label: "No sponsorship", description: "No executive awareness or interest", score: 1 },
-      { value: "2", label: "Weak sponsorship", description: "Passive support, no active involvement", score: 2 },
-      { value: "3", label: "Moderate sponsorship", description: "Manager-level support, budget unclear", score: 3 },
-      { value: "4", label: "Strong sponsorship", description: "Director/VP champion, approved budget", score: 4 },
-      { value: "5", label: "Executive champion", description: "C-level sponsor, strategic priority, dedicated resources", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
-  {
-    id: 24,
-    section: "Ownership",
-    question: "Technical ownership: Is there clear technical ownership and support for implementing automation?",
-    weight: 2,
-    options: [
-      { value: "1", label: "No technical owner", description: "No one assigned, unclear responsibility", score: 1 },
-      { value: "2", label: "Unclear ownership", description: "Shared responsibility, no dedicated resource", score: 2 },
-      { value: "3", label: "Moderate ownership", description: "Part-time owner, competing priorities", score: 3 },
-      { value: "4", label: "Clear ownership", description: "Designated technical lead, allocated time", score: 4 },
-      { value: "5", label: "Dedicated owner with team", description: "Full-time owner, supporting team, clear mandate", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
 ];
+
+// Group questions by section for form display
+export const tfaSections = TFA_SECTIONS.map(section => ({
+  section: section.name,
+  weight: section.weight,
+  questions: TFA_QUESTIONS.filter(q => q.section === section.name),
+}));
 
 // Calculate weighted score
 export function calculateTFAScore(responses: Record<string, string>): number {
@@ -378,50 +337,39 @@ export function calculateTFAScore(responses: Record<string, string>): number {
   TFA_QUESTIONS.forEach((question) => {
     const response = responses[question.id.toString()];
     if (response) {
-      const option = question.options.find((opt) => opt.value === response);
-      if (option && option.score !== null) {
-        totalWeightedScore += (option.score / 5) * question.weight;
+      const selectedOption = question.options.find(opt => opt.value === response);
+      if (selectedOption && selectedOption.score !== null) {
+        totalWeightedScore += selectedOption.score * question.weight;
         totalWeight += question.weight;
       }
     }
   });
 
-  return totalWeight > 0 ? Math.round((totalWeightedScore / totalWeight) * 100) : 0;
+  // Return normalized score (0-100)
+  return totalWeight > 0 ? Math.round((totalWeightedScore / (totalWeight * 5)) * 100) : 0;
 }
 
-// Calculate section scores
-export function calculateSectionScores(responses: Record<string, string>) {
-  const sectionScores: Record<string, { score: number; weight: number }> = {};
-
-  TFA_SECTIONS.forEach((section) => {
-    const sectionQuestions = TFA_QUESTIONS.filter((q) => q.section === section.name);
-    let sectionWeightedScore = 0;
-    let sectionTotalWeight = 0;
-
-    sectionQuestions.forEach((question) => {
-      const response = responses[question.id.toString()];
-      if (response) {
-        const option = question.options.find((opt) => opt.value === response);
-        if (option && option.score !== null) {
-          sectionWeightedScore += (option.score / 5) * question.weight;
-          sectionTotalWeight += question.weight;
-        }
+// Calculate scores per section
+export function calculateSectionScores(responses: Record<string, string>): Array<{ name: string; score: number; weight: number }> {
+  return tfaSections.map(section => {
+    const sectionQuestions = section.questions;
+    const totalWeight = sectionQuestions.reduce((acc, q) => acc + q.weight, 0);
+    const weightedScore = sectionQuestions.reduce((acc, q) => {
+      const response = responses[q.id.toString()];
+      if (!response) return acc;
+      const selectedOption = q.options.find(opt => opt.value === response);
+      if (selectedOption && selectedOption.score !== null) {
+        return acc + (selectedOption.score * q.weight);
       }
-    });
-
-    const sectionScore = sectionTotalWeight > 0 ? (sectionWeightedScore / sectionTotalWeight) * 5 : 0;
-    sectionScores[section.name] = {
-      score: sectionScore,
+      return acc;
+    }, 0);
+    
+    const score = totalWeight > 0 ? (weightedScore / totalWeight) : 0;
+    
+    return {
+      name: section.section,
+      score: parseFloat(score.toFixed(1)),
       weight: section.weight,
     };
   });
-
-  return sectionScores;
 }
-
-// Group questions by section for frontend use
-export const tfaSections = TFA_SECTIONS.map(section => ({
-  section: section.name,
-  weight: section.weight,
-  questions: TFA_QUESTIONS.filter(q => q.section === section.name)
-}));
