@@ -18,6 +18,30 @@ export const TFA_SECTIONS = [
   { name: "Security/Compliance", weight: 15 },
 ];
 
+export interface QuestionWithImpact {
+  id: number;
+  question: string;
+  section: string;
+  sectionWeight: number;
+  score: number;
+  impactScore: number;
+  respondent?: string;
+}
+
+export function calculateQuestionImpact(
+  questionId: number,
+  score: number | null,
+  sectionWeight: number
+): number {
+  if (score === null) return 0;
+  return (5 - score) * sectionWeight;
+}
+
+export function getSectionWeight(sectionName: string): number {
+  const section = TFA_SECTIONS.find(s => s.name === sectionName);
+  return section?.weight || 0;
+}
+
 export const TFA_QUESTIONS: TFAQuestion[] = [
   // System Environment (25%) - 6 questions
   {
