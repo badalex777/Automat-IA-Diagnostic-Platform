@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Pencil, Check, X } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronLeft, Pencil, Check, X, ChevronDown } from "lucide-react";
 import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
 import TFAWeaknessAnalysis from "@/components/TFAWeaknessAnalysis";
+import { TFAQuestionDetails } from "@/components/TFAQuestionDetails";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
@@ -28,6 +30,7 @@ export default function WorkflowDetail() {
   const { toast } = useToast();
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -289,6 +292,46 @@ export default function WorkflowDetail() {
                     />
                     <TFAVisualAnalytics sections={sectionScores} />
                     <TFAWeaknessAnalysis sections={sectionScores} />
+                    
+                    <Collapsible 
+                      open={isQuestionDetailsOpen} 
+                      onOpenChange={setIsQuestionDetailsOpen}
+                    >
+                      <Card>
+                        <CollapsibleTrigger className="w-full" data-testid="button-toggle-question-details">
+                          <div className="p-6 flex items-center justify-between hover-elevate">
+                            <div className="text-left">
+                              <h3 className="font-semibold text-lg">Question-Level Analysis</h3>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Detailed responses and recommendations for each question
+                              </p>
+                            </div>
+                            <ChevronDown 
+                              className={`h-5 w-5 text-muted-foreground transition-transform ${
+                                isQuestionDetailsOpen ? 'rotate-180' : ''
+                              }`} 
+                            />
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <div className="px-6 pb-6 border-t border-border pt-6">
+                            <TFAQuestionDetails
+                              responses={responses}
+                              respondents={(() => {
+                                const sources = tfaAssessment.responseSources as Record<string, any> || {};
+                                return Object.keys(sources).map(questionId => ({
+                                  questionId: parseInt(questionId),
+                                  respondentName: sources[questionId].respondentName || tfaAssessment.initialRespondent || 'Unknown',
+                                  respondentRole: sources[questionId].respondentRole,
+                                  source: sources[questionId].source,
+                                }));
+                              })()}
+                            />
+                          </div>
+                        </CollapsibleContent>
+                      </Card>
+                    </Collapsible>
+
                     {tfaAssessment.comments && (
                       <Card className="p-6">
                         <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>

@@ -63,12 +63,12 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
       // Section filter
       if (sectionFilter !== "all" && q.section !== sectionFilter) return false;
 
-      // Score range filter
+      // Score range filter (mutually exclusive integer ranges)
       if (scoreFilter !== "all") {
-        if (scoreFilter === "critical" && (q.score === null || q.score > 2)) return false;
-        if (scoreFilter === "weak" && (q.score === null || q.score < 2 || q.score > 3)) return false;
-        if (scoreFilter === "moderate" && (q.score === null || q.score < 3 || q.score > 4)) return false;
-        if (scoreFilter === "strong" && (q.score === null || q.score < 4)) return false;
+        if (scoreFilter === "critical" && (q.score === null || q.score > 2)) return false;  // 1-2 only
+        if (scoreFilter === "weak" && (q.score === null || q.score !== 3)) return false;  // 3 only
+        if (scoreFilter === "moderate" && (q.score === null || q.score !== 4)) return false;  // 4 only
+        if (scoreFilter === "strong" && (q.score === null || q.score !== 5)) return false;  // 5 only
       }
 
       // Text search
@@ -167,9 +167,9 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
           <SelectContent>
             <SelectItem value="all">All scores</SelectItem>
             <SelectItem value="critical">Critical (1-2)</SelectItem>
-            <SelectItem value="weak">Weak (2-3)</SelectItem>
-            <SelectItem value="moderate">Moderate (3-4)</SelectItem>
-            <SelectItem value="strong">Strong (4-5)</SelectItem>
+            <SelectItem value="weak">Weak (3)</SelectItem>
+            <SelectItem value="moderate">Moderate (4)</SelectItem>
+            <SelectItem value="strong">Strong (5)</SelectItem>
           </SelectContent>
         </Select>
       </div>
