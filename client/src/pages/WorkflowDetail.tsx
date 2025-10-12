@@ -10,7 +10,6 @@ import { ChevronLeft, Pencil, Check, X, ChevronDown } from "lucide-react";
 import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
-import TFAWeaknessAnalysis from "@/components/TFAWeaknessAnalysis";
 import { TFAQuestionDetails } from "@/components/TFAQuestionDetails";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
@@ -291,7 +290,6 @@ export default function WorkflowDetail() {
                       sections={sectionScores} 
                     />
                     <TFAVisualAnalytics sections={sectionScores} />
-                    <TFAWeaknessAnalysis sections={sectionScores} />
                     
                     <Collapsible 
                       open={isQuestionDetailsOpen} 
