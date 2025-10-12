@@ -437,10 +437,7 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "What type of work process will be automated?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
+        // Note: Frontend shows Q33-Q41 when Q32 >= 4 (values 4 or 5)
         options: [
           { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
           { value: "document", label: "Document Review & Processing", description: "Reading, extracting, or classifying documents" },
@@ -456,10 +453,6 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How often do errors or quality issues currently occur in this process?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
         options: [
           { value: "very_frequent", label: "Very frequent", description: "Errors occur in more than 30% of cases" },
           { value: "frequent", label: "Frequent", description: "Errors occur in 15-30% of cases" },
@@ -472,10 +465,6 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "What is the primary cause of errors or quality issues?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
         options: [
           { value: "fatigue", label: "Manual, repetitive work leading to human fatigue or oversight" },
           { value: "missing_info", label: "Missing or incomplete information when making decisions" },
@@ -489,10 +478,6 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "When are errors or quality issues typically discovered?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
         options: [
           { value: "after_delivery", label: "After delivery to customer", description: "Customer complaints, returns, escalations" },
           { value: "end_process", label: "At the end of the process", description: "Final review or quality check" },
@@ -505,10 +490,6 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How standardized is the current process?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
         options: [
           { value: "variable", label: "Highly variable", description: "Each case is handled differently" },
           { value: "guidelines", label: "Some guidelines", description: "General approach but flexibility in execution" },
@@ -521,10 +502,6 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How well-suited is this work for AI quality improvement?",
         section: "Quality Impact Module",
         type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        },
         options: [
           { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
           { value: "pattern", label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
@@ -537,33 +514,21 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "What is the current error rate?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter percentage (e.g., 15 for 15%)",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        }
+        placeholder: "Enter percentage (e.g., 15 for 15%)"
       },
       {
         id: 40,
         question: "How many minutes of rework does each error require?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter minutes per error",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        }
+        placeholder: "Enter minutes per error"
       },
       {
         id: 41,
         question: "What is the financial cost per error (if applicable)?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter cost in dollars (or 0 if not applicable)",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "4"
-        }
+        placeholder: "Enter cost in dollars (or 0 if not applicable)"
       }
     ]
   }
@@ -607,6 +572,29 @@ export function calculatePISScores(responses: Record<string, string>): {
     processClarity: calculateSectionScore("Process Clarity"),
     changeMagnitude: calculateSectionScore("Change Magnitude"),
     workflowBrittleness: calculateSectionScore("Workflow Brittleness"),
+  };
+}
+
+// Extract ROI inputs from responses
+export function extractROIInputs(responses: Record<string, string>): {
+  employeeCount?: number;
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  processesPerPeriod?: number;
+  minutesPerProcess?: number;
+  hasQualityImpact?: boolean;
+  errorRate?: number;
+  reworkMinutesPerError?: number;
+  costPerError?: number;
+} {
+  return {
+    employeeCount: responses['28'] ? parseInt(responses['28'], 10) : undefined,
+    frequency: responses['29'] as 'daily' | 'weekly' | 'monthly' | undefined,
+    processesPerPeriod: responses['30'] ? parseInt(responses['30'], 10) : undefined,
+    minutesPerProcess: responses['31'] ? parseInt(responses['31'], 10) : undefined,
+    hasQualityImpact: responses['32'] ? (parseInt(responses['32'], 10) >= 4) : undefined,
+    errorRate: responses['39'] ? parseFloat(responses['39']) : undefined,
+    reworkMinutesPerError: responses['40'] ? parseInt(responses['40'], 10) : undefined,
+    costPerError: responses['41'] ? parseFloat(responses['41']) : undefined,
   };
 }
 
