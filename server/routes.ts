@@ -567,15 +567,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pis/shareable/:shareableId", async (req, res) => {
     try {
-      const responses = await storage.getPISByShareableId(req.params.shareableId);
-      if (responses.length === 0) {
-        return res.status(404).json({ error: "No responses found" });
-      }
-
-      const firstResponse = responses[0];
-      const workflow = await storage.getWorkflow(firstResponse.workflowId);
+      // For PIS, shareableId IS the workflowId (no separate registration needed)
+      const workflow = await storage.getWorkflow(req.params.shareableId);
       if (!workflow) {
-        return res.status(404).json({ error: "Workflow not found" });
+        return res.status(404).json({ error: "Survey not found" });
       }
 
       const company = await storage.getCompany(workflow.companyId);
