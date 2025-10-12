@@ -18,6 +18,7 @@ import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
 import { PISAggregatedScores } from "@/components/PISAggregatedScores";
 import { PISRespondentList } from "@/components/PISRespondentList";
 import { PISRespondentDetail } from "@/components/PISRespondentDetail";
+import ReadinessRubric from "@/components/ReadinessRubric";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -25,6 +26,7 @@ import type { Workflow, Company, TFAAssessment, BusinessImpact, PISResponse } fr
 import type { AggregatedPISScores } from "@shared/pisCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
+import { calculateReadinessRubric } from "@shared/pisCalculations";
 import {
   Dialog,
   DialogContent,
@@ -486,12 +488,80 @@ export default function WorkflowDetail() {
           </TabsContent>
 
           <TabsContent value="readiness" className="space-y-6">
-            <div className="bg-card rounded-lg border border-card-border p-6">
-              <h2 className="text-lg font-semibold mb-4">Readiness Rubric</h2>
-              <p className="text-muted-foreground">
-                Readiness data entry interface would go here (prefilled from TFA where applicable, fully editable)
-              </p>
-            </div>
+            {(() => {
+              // Check if we have all required data for readiness calculation
+              const hasTFA = tfaAssessment && tfaAssessment.score !== null && tfaAssessment.score !== undefined;
+              const hasPIS = pisData && pisData.responses.length > 0;
+              
+              if (!hasTFA || !hasPIS) {
+                return (
+                  <div className="bg-card rounded-lg border border-border p-6" data-testid="card-readiness-incomplete">
+                    <div className="text-center py-8">
+                      <h3 className="text-lg font-semibold mb-2">Readiness Rubric</h3>
+                      <p className="text-muted-foreground mb-4">
+                        The combined readiness assessment requires both Technical Feasibility (TFA) and Process Insight Survey (PIS) data.
+                      </p>
+                      <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center justify-center gap-2">
+                          {hasTFA ? (
+                            <span className="text-green-600 dark:text-green-400">✓ TFA Complete</span>
+                          ) : (
+                            <span>○ TFA Pending</span>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          {hasPIS ? (
+                            <span className="text-green-600 dark:text-green-400">✓ PIS Complete ({pisData.responses.length} response{pisData.responses.length > 1 ? 's' : ''})</span>
+                          ) : (
+                            <span>○ PIS Pending</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Calculate section scores from TFA
+              const sectionScores = {
+                systemEnvironment: 0,
+                dataQuality: 0,
+                integrationFeasibility: 0,
+                securityCompliance: 0,
+              };
+
+              if (tfaAssessment.responses) {
+                const responses = tfaAssessment.responses as Record<string, number>;
+                
+                allSections.forEach((section) => {
+                  const sectionResponses = section.questions
+                    .map(q => responses[q.id])
+                    .filter((score): score is number => 
+                      score !== null && 
+                      score !== undefined && 
+                      score !== 0
+                    );
+                  
+                  if (sectionResponses.length > 0) {
+                    const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
+                    const normalizedScore = Math.round((avgScore / 5) * 100);
+                    
+                    if (section.id === 'system-environment') sectionScores.systemEnvironment = normalizedScore;
+                    if (section.id === 'data-quality') sectionScores.dataQuality = normalizedScore;
+                    if (section.id === 'integration-feasibility') sectionScores.integrationFeasibility = normalizedScore;
+                    if (section.id === 'security-compliance') sectionScores.securityCompliance = normalizedScore;
+                  }
+                });
+              }
+
+              const rubric = calculateReadinessRubric(
+                tfaAssessment.score || 0,
+                sectionScores,
+                pisData.aggregated
+              );
+
+              return <ReadinessRubric rubric={rubric} />;
+            })()}
           </TabsContent>
 
           <TabsContent value="impact" className="space-y-6">
