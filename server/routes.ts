@@ -9,10 +9,13 @@ import {
   insertTFAAssessmentSchema,
   tfaResponsesSchema,
   fillGapsSchema,
+  pisSubmitSchema,
   insertBusinessImpactSchema,
   updateBusinessImpactSchema,
 } from "@shared/schema";
 import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
+import { ALL_PIS_QUESTIONS, calculatePISScores, extractROIInputs, extractQualitativeResponses } from "@shared/pisQuestions";
+import { calculateAggregatedPISScores } from "@shared/pisCalculations";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Companies
@@ -491,6 +494,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: error.message });
       }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // PIS (Process Insight Survey)
+  app.get("/api/pis/questions", (req, res) => {
+    res.json({ questions: ALL_PIS_QUESTIONS });
+  });
+
+  app.post("/api/workflows/:workflowId/pis/submit", async (req, res) => {
+    try {
+      const validatedData = pisSubmitSchema.parse(req.body);
+      const { respondentName, respondentRole, respondentResponsibilities, responses, roiInputs, qualitativeResponses } = validatedData;
+
+      // Verify workflow exists
+      const workflow = await storage.getWorkflow(req.params.workflowId);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+
+      // Calculate operational scores
+      const scores = calculatePISScores(responses);
+      
+      // Extract ROI inputs
+      const extractedROI = extractROIInputs(responses);
+      const finalROI = roiInputs || extractedROI;
+      
+      // Extract qualitative responses
+      const extractedQualitative = extractQualitativeResponses(responses);
+      const finalQualitative = qualitativeResponses || extractedQualitative;
+
+      // Create PIS response
+      const pisResponse = await storage.createPISResponse({
+        workflowId: req.params.workflowId,
+        respondentName,
+        respondentRole,
+        respondentResponsibilities: respondentResponsibilities || null,
+        responses,
+        processClarity: scores.processClarity,
+        changeMagnitude: scores.changeMagnitude,
+        workflowBrittleness: scores.workflowBrittleness,
+        roiInputs: finalROI,
+        qualitativeResponses: finalQualitative,
+        completedAt: new Date(),
+      });
+
+      res.status(201).json(pisResponse);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/workflows/:workflowId/pis", async (req, res) => {
+    try {
+      const responses = await storage.getAllPISResponsesForWorkflow(req.params.workflowId);
+      
+      // Calculate aggregated scores with variance
+      const aggregated = calculateAggregatedPISScores(responses);
+      
+      res.json({
+        responses,
+        aggregated
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/pis/shareable/:shareableId", async (req, res) => {
+    try {
+      const responses = await storage.getPISByShareableId(req.params.shareableId);
+      if (responses.length === 0) {
+        return res.status(404).json({ error: "No responses found" });
+      }
+
+      const firstResponse = responses[0];
+      const workflow = await storage.getWorkflow(firstResponse.workflowId);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+
+      const company = await storage.getCompany(workflow.companyId);
+      if (!company) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      res.json({
+        workflow,
+        company,
+        shareableId: req.params.shareableId
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.delete("/api/pis/:id", async (req, res) => {
+    try {
+      const success = await storage.deletePISResponse(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Response not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
       res.status(500).json({ error: "Internal server error" });
     }
   });
