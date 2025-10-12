@@ -11,7 +11,7 @@ import {
   Target,
   Zap
 } from "lucide-react";
-import { TFA_QUESTIONS } from "@shared/tfaQuestions";
+import { TFA_QUESTIONS, calculateQuestionImpact, getSectionWeight, type QuestionWithImpact, QUESTION_RECOMMENDATIONS } from "@shared/tfaQuestions";
 
 interface SectionScore {
   name: string;
@@ -261,96 +261,143 @@ const getRecommendation = (
   };
 };
 
-const generateActionPlan = (
-  decision: string,
-  insights: SectionInsight[],
-  score: number
-): string[] => {
-  // Sort all categories by weighted severity (weight × (5 - score)) for true prioritization
-  const critical = insights.filter(i => i.category === 'critical').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
-  const risks = insights.filter(i => i.category === 'risk').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
-  const opportunities = insights.filter(i => i.category === 'opportunity').sort((a, b) => b.weightedSeverity - a.weightedSeverity);
-  const strengths = insights.filter(i => i.category === 'strength').sort((a, b) => b.weight - a.weight);
+const generateImplementationRoadmap = (
+  responses: Record<string, string>,
+  decision: string
+): Array<{ priority: string; action: string; impact: number }> => {
+  const roadmap: Array<{ priority: string; action: string; impact: number }> = [];
   
-  const actions: string[] = [];
+  // Build question-level impact list
+  const questionImpacts: QuestionWithImpact[] = [];
+  
+  TFA_QUESTIONS.forEach(question => {
+    const responseValue = responses[question.id.toString()];
+    if (!responseValue) return;
+    
+    const selectedOption = question.options.find(opt => opt.value === responseValue);
+    if (!selectedOption || selectedOption.score === null) return;
+    
+    const sectionWeight = getSectionWeight(question.section);
+    const impactScore = calculateQuestionImpact(question.id, selectedOption.score, sectionWeight);
+    
+    questionImpacts.push({
+      id: question.id,
+      question: question.question,
+      section: question.section,
+      sectionWeight,
+      score: selectedOption.score,
+      impactScore
+    });
+  });
+  
+  // Sort by impact score descending (highest impact first)
+  questionImpacts.sort((a, b) => b.impactScore - a.impactScore);
   
   if (decision === 'Proceed') {
-    // High scores = technically feasible, ready for next assessment phase
-    actions.push('Technical feasibility confirmed - proceed to implementation readiness evaluation');
+    // Show strengths and any minor optimizations
+    const strengths = questionImpacts.filter(q => q.score === 5).slice(0, 2);
+    const opportunities = questionImpacts.filter(q => q.score === 4).slice(0, 1);
     
-    if (opportunities.length > 0) {
-      const topOpportunity = opportunities[0];  // Already sorted by weight
-      actions.push(`Minor optimization opportunity in ${topOpportunity.name} (${topOpportunity.weight}%): ${topOpportunity.recommendations[0] || 'Can be addressed in next phase'}`);
-    } else {
-      actions.push('All technical criteria meet automation requirements');
-    }
-    
-    actions.push('Document technical architecture and data flows for readiness assessment');
-    
-    if (insights.some(i => i.name === 'Security/Compliance' && i.score < 4.5)) {
-      actions.push('Include security/compliance review in next phase planning');
-    } else {
-      actions.push('Strong technical foundation across all evaluation criteria');
-    }
-  }
-  
-  else if (decision === 'Proceed with Caution') {
-    // Prioritize technical gaps by weight
-    if (critical.length > 0) {
-      const topCritical = critical[0];  // Highest weight critical issue
-      actions.push(`PRIORITY (${topCritical.weight}% weight): ${topCritical.name} requires immediate attention - ${topCritical.recommendations[0] || 'Critical technical gap'}`);
-    }
-    
-    // Address highest-weight technical risks
-    if (risks.length > 0) {
-      const topRisk = risks[0];  // Highest weight risk
-      actions.push(`Technical risk in ${topRisk.name} (${topRisk.weight}%): ${topRisk.recommendations[0] || 'Requires technical remediation'}`);
-    }
-    
-    // Note strengths
-    if (strengths.length > 0) {
-      const topStrength = strengths[0];  // Highest weight strength
-      actions.push(`Strong technical foundation in ${topStrength.name} (${topStrength.weight}%) supports partial feasibility`);
-    } else if (opportunities.length > 0) {
-      actions.push(`${opportunities[0].name} shows potential but needs optimization`);
-    }
-    
-    // Re-assessment with weighted severity context
-    const allWeaknesses = [...critical, ...risks].sort((a, b) => b.weightedSeverity - a.weightedSeverity);
-    if (allWeaknesses.length > 2) {
-      const nextPriority = allWeaknesses[1];  // Second highest weighted severity weakness
-      actions.push(`Next: Resolve ${nextPriority.name} (${nextPriority.weight}%) gap, then re-assess technical feasibility`);
-    } else {
-      actions.push('Re-evaluate technical feasibility after addressing identified gaps');
-    }
-  }
-  
-  else { // Not Recommended  
-    actions.push('Technical feasibility assessment: NOT RECOMMENDED for automation at this time');
-    
-    // Address critical technical gaps in weight order (highest impact first)
-    critical.forEach(c => {
-      if (actions.length < 4 && c.recommendations[0]) {
-        actions.push(`${c.name} (${c.weight}% weight): ${c.recommendations[0]}`);
-      }
+    roadmap.push({
+      priority: 'Ready',
+      action: 'Technical feasibility confirmed - proceed to implementation readiness evaluation',
+      impact: 100
     });
     
-    // Fill with top technical risks by weight if needed
-    if (actions.length < 3) {
-      risks.forEach(r => {
-        if (actions.length < 4 && r.recommendations[0]) {
-          actions.push(`${r.name} (${r.weight}% weight): ${r.recommendations[0]}`);
-        }
+    if (strengths.length > 0) {
+      roadmap.push({
+        priority: 'Strength',
+        action: `Leverage ${strengths[0].section} excellence (scored 5/5) as implementation foundation`,
+        impact: strengths[0].sectionWeight
       });
     }
     
-    // Add re-assessment guidance
-    if (actions.length < 4) {
-      actions.push('Re-assess technical feasibility after addressing critical gaps');
+    if (opportunities.length > 0) {
+      const rec = QUESTION_RECOMMENDATIONS[opportunities[0].id]?.[opportunities[0].score];
+      roadmap.push({
+        priority: 'Optimize',
+        action: `${opportunities[0].section}: ${rec || 'Minor optimization opportunity'}`,
+        impact: opportunities[0].impactScore
+      });
+    }
+    
+    roadmap.push({
+      priority: 'Next Phase',
+      action: 'Document technical architecture and proceed to readiness rubric assessment',
+      impact: 50
+    });
+  }
+  
+  else if (decision === 'Proceed with Caution') {
+    // Critical gaps (1-2), then risks (3), prioritized by impact
+    const critical = questionImpacts.filter(q => q.score <= 2);
+    const risks = questionImpacts.filter(q => q.score === 3);
+    
+    if (critical.length > 0) {
+      const top = critical[0];
+      const rec = QUESTION_RECOMMENDATIONS[top.id]?.[top.score];
+      roadmap.push({
+        priority: `CRITICAL (${top.sectionWeight}%)`,
+        action: `${top.section}: ${rec || 'Immediate technical remediation required'}`,
+        impact: top.impactScore
+      });
+    }
+    
+    if (critical.length > 1) {
+      const second = critical[1];
+      const rec = QUESTION_RECOMMENDATIONS[second.id]?.[second.score];
+      roadmap.push({
+        priority: `High Priority (${second.sectionWeight}%)`,
+        action: `${second.section}: ${rec || 'Address before implementation'}`,
+        impact: second.impactScore
+      });
+    }
+    
+    if (risks.length > 0) {
+      const topRisk = risks[0];
+      const rec = QUESTION_RECOMMENDATIONS[topRisk.id]?.[topRisk.score];
+      roadmap.push({
+        priority: `Risk (${topRisk.sectionWeight}%)`,
+        action: `${topRisk.section}: ${rec || 'Mitigate during planning'}`,
+        impact: topRisk.impactScore
+      });
+    }
+    
+    roadmap.push({
+      priority: 'Re-assess',
+      action: 'Re-evaluate technical feasibility after addressing top priority gaps',
+      impact: 30
+    });
+  }
+  
+  else { // Not Recommended
+    const criticalGaps = questionImpacts.filter(q => q.score <= 2).slice(0, 3);
+    
+    roadmap.push({
+      priority: 'NOT RECOMMENDED',
+      action: 'Technical feasibility insufficient - foundational improvements required',
+      impact: 0
+    });
+    
+    criticalGaps.forEach((gap, index) => {
+      const rec = QUESTION_RECOMMENDATIONS[gap.id]?.[gap.score];
+      roadmap.push({
+        priority: `Priority ${index + 1} (${gap.sectionWeight}%)`,
+        action: `${gap.section}: ${rec || 'Critical gap must be resolved'}`,
+        impact: gap.impactScore
+      });
+    });
+    
+    if (roadmap.length < 4) {
+      roadmap.push({
+        priority: 'Timeline',
+        action: '3-6 months foundational work before re-assessment recommended',
+        impact: 0
+      });
     }
   }
   
-  return actions.slice(0, 4);
+  return roadmap.slice(0, 4);
 };
 
 export default function TFAExecutiveSummary({ score, sections, responses }: TFAExecutiveSummaryProps) {
@@ -360,7 +407,7 @@ export default function TFAExecutiveSummary({ score, sections, responses }: TFAE
   );
   
   const recommendation = getRecommendation(score, insights);
-  const actionPlan = generateActionPlan(recommendation.decision, insights, score);
+  const implementationRoadmap = generateImplementationRoadmap(responses, recommendation.decision);
   const RecommendationIcon = recommendation.icon;
   
   // Categorize insights
@@ -483,17 +530,27 @@ export default function TFAExecutiveSummary({ score, sections, responses }: TFAE
           </Card>
         </div>
 
-        {/* Prioritized Actions - Now fully dynamic */}
+        {/* Implementation Roadmap - Data-driven from question-level analysis */}
         <div>
           <div className="flex items-center gap-2 mb-3">
             <Target className="h-4 w-4" />
-            <h4 className="font-semibold">Prioritized Action Plan</h4>
+            <h4 className="font-semibold">Implementation Roadmap</h4>
+            <span className="text-xs text-muted-foreground">(Prioritized by impact: section weight × severity)</span>
           </div>
           <div className="space-y-2">
-            {actionPlan.map((action, index) => (
-              <div key={index} className="flex items-start gap-2 text-sm p-3 bg-muted/50 rounded-lg">
-                <span className="font-bold text-primary">{index + 1}.</span>
-                <p>{action}</p>
+            {implementationRoadmap.map((item, index) => (
+              <div key={index} className="flex items-start gap-3 text-sm p-3 bg-muted/50 rounded-lg">
+                <Badge 
+                  variant={
+                    item.priority.includes('CRITICAL') ? 'destructive' : 
+                    item.priority.includes('Ready') || item.priority.includes('Strength') ? 'default' :
+                    'secondary'
+                  }
+                  className="text-xs whitespace-nowrap mt-0.5"
+                >
+                  {item.priority}
+                </Badge>
+                <p className="flex-1">{item.action}</p>
               </div>
             ))}
           </div>
