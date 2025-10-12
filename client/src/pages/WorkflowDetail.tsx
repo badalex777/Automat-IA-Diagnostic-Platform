@@ -15,12 +15,22 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
+import { PISAggregatedScores } from "@/components/PISAggregatedScores";
+import { PISRespondentList } from "@/components/PISRespondentList";
+import { PISRespondentDetail } from "@/components/PISRespondentDetail";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact } from "@shared/schema";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, PISResponse } from "@shared/schema";
+import type { AggregatedPISScores } from "@shared/pisCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
@@ -30,6 +40,7 @@ export default function WorkflowDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
+  const [selectedPISResponse, setSelectedPISResponse] = useState<PISResponse | null>(null);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -49,6 +60,14 @@ export default function WorkflowDetail() {
 
   const { data: businessImpact, isLoading: impactLoading, error: impactError } = useQuery<BusinessImpact>({
     queryKey: [`/api/workflows/${workflowId}/business-impact`],
+    enabled: !!workflowId,
+  });
+
+  const { data: pisData, isLoading: pisLoading, error: pisError } = useQuery<{ 
+    responses: PISResponse[]; 
+    aggregated: AggregatedPISScores 
+  }>({
+    queryKey: [`/api/workflows/${workflowId}/pis`],
     enabled: !!workflowId,
   });
 
@@ -249,6 +268,7 @@ export default function WorkflowDetail() {
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
+            <TabsTrigger value="pis" data-testid="tab-pis">Process Insights</TabsTrigger>
             <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
             <TabsTrigger value="impact" data-testid="tab-impact">Business Impact</TabsTrigger>
           </TabsList>
@@ -388,6 +408,81 @@ export default function WorkflowDetail() {
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="pis" className="space-y-6">
+            {pisError ? (
+              <div className="bg-card rounded-lg border border-destructive p-6">
+                <p className="text-destructive">Error loading PIS data: {pisError.message}</p>
+              </div>
+            ) : pisLoading ? (
+              <p className="text-muted-foreground">Loading Process Insight Survey data...</p>
+            ) : pisData && pisData.responses.length > 0 ? (
+              <>
+                <Card className="p-6">
+                  <h3 className="font-semibold text-lg mb-4">Aggregated Operational Readiness</h3>
+                  <PISAggregatedScores aggregated={pisData.aggregated} />
+                </Card>
+
+                <Card className="p-6">
+                  <h3 className="font-semibold text-lg mb-4">Respondent Insights</h3>
+                  <PISRespondentList
+                    responses={pisData.responses}
+                    onViewDetail={(response) => setSelectedPISResponse(response)}
+                    onDelete={async (id) => {
+                      try {
+                        await apiRequest('DELETE', `/api/pis/${id}`, {});
+                        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/pis`] });
+                        toast({
+                          title: "Response deleted",
+                          description: "The PIS response has been deleted successfully.",
+                        });
+                      } catch (error: any) {
+                        toast({
+                          title: "Delete failed",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                  />
+                </Card>
+
+                <ShareableLinkCard
+                  workflowId={workflowId}
+                  companyName={company?.name || ''}
+                  workflowTitle={workflow?.name || ''}
+                  type="pis"
+                />
+              </>
+            ) : (
+              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-no-pis">
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-2">No Process Insights Yet</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Generate a shareable link below to collect operational insights from end users and process owners.
+                  </p>
+                  <ShareableLinkCard
+                    workflowId={workflowId}
+                    companyName={company?.name || ''}
+                    workflowTitle={workflow?.name || ''}
+                    type="pis"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* PIS Response Detail Dialog */}
+            <Dialog open={!!selectedPISResponse} onOpenChange={() => setSelectedPISResponse(null)}>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Process Insight Survey Response</DialogTitle>
+                </DialogHeader>
+                {selectedPISResponse && (
+                  <PISRespondentDetail response={selectedPISResponse} />
+                )}
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="readiness" className="space-y-6">

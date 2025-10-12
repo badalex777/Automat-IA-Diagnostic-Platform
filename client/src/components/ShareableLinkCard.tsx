@@ -12,20 +12,25 @@ interface ShareableLinkCardProps {
   workflowId: string;
   companyName: string;
   workflowTitle: string;
+  type?: 'tfa' | 'pis';
 }
 
 export default function ShareableLinkCard({
   workflowId,
   companyName,
   workflowTitle,
+  type = 'tfa',
 }: ShareableLinkCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
   const { data: existingAssessment } = useQuery<TFAAssessment>({
     queryKey: [`/api/workflows/${workflowId}/tfa`],
-    enabled: !!workflowId,
+    enabled: !!workflowId && type === 'tfa',
   });
+
+  // For PIS, we generate a new shareableId with each workflow
+  const pisShareableId = type === 'pis' ? workflowId : '';
 
   const generateLinkMutation = useMutation({
     mutationFn: async () => {
@@ -48,7 +53,9 @@ export default function ShareableLinkCard({
     },
   });
 
-  const shareableUrl = existingAssessment?.shareableId 
+  const shareableUrl = type === 'pis' && pisShareableId
+    ? `${window.location.origin}/pis/${pisShareableId}`
+    : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
 
@@ -66,23 +73,33 @@ export default function ShareableLinkCard({
     }
   };
 
-  if (!existingAssessment || !shareableUrl) {
+  const linkTitle = type === 'pis' ? 'Process Insight Survey Link' : 'Shareable TFA Link';
+  const linkDescription = type === 'pis' 
+    ? 'Share this link with end users and process owners to collect operational insights. Multiple responses can be submitted.'
+    : 'Send this link to the technical contact to complete the Technical Feasibility Assessment';
+
+  if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pis' && !shareableUrl)) {
     return (
       <Card className="p-6" data-testid="card-shareable-link">
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold text-base mb-1">Shareable TFA Link</h3>
+            <h3 className="font-semibold text-base mb-1">{linkTitle}</h3>
             <p className="text-sm text-muted-foreground">
-              Generate a unique link to send to your technical contact for completing the assessment.
+              {type === 'pis' 
+                ? 'Share a link with end users and process owners to collect operational insights about this workflow.'
+                : 'Generate a unique link to send to your technical contact for completing the assessment.'
+              }
             </p>
           </div>
-          <Button 
-            onClick={() => generateLinkMutation.mutate()}
-            disabled={generateLinkMutation.isPending}
-            data-testid="button-generate-link"
-          >
-            {generateLinkMutation.isPending ? 'Generating...' : 'Generate Shareable Link'}
-          </Button>
+          {type === 'tfa' && (
+            <Button 
+              onClick={() => generateLinkMutation.mutate()}
+              disabled={generateLinkMutation.isPending}
+              data-testid="button-generate-link"
+            >
+              {generateLinkMutation.isPending ? 'Generating...' : 'Generate Shareable Link'}
+            </Button>
+          )}
         </div>
       </Card>
     );
@@ -92,9 +109,9 @@ export default function ShareableLinkCard({
     <Card className="p-6" data-testid="card-shareable-link">
       <div className="space-y-4">
         <div>
-          <h3 className="font-semibold text-base mb-1">Shareable TFA Link</h3>
+          <h3 className="font-semibold text-base mb-1">{linkTitle}</h3>
           <p className="text-sm text-muted-foreground">
-            Send this link to the technical contact to complete the Technical Feasibility Assessment
+            {linkDescription}
           </p>
         </div>
 
@@ -131,15 +148,17 @@ export default function ShareableLinkCard({
           <p className="text-muted-foreground">• Workflow: {workflowTitle}</p>
         </div>
         
-        <Button 
-          onClick={() => generateLinkMutation.mutate()}
-          variant="outline"
-          size="sm"
-          disabled={generateLinkMutation.isPending}
-          data-testid="button-regenerate-link"
-        >
-          {generateLinkMutation.isPending ? 'Regenerating...' : 'Regenerate Link'}
-        </Button>
+        {type === 'tfa' && (
+          <Button 
+            onClick={() => generateLinkMutation.mutate()}
+            variant="outline"
+            size="sm"
+            disabled={generateLinkMutation.isPending}
+            data-testid="button-regenerate-link"
+          >
+            {generateLinkMutation.isPending ? 'Regenerating...' : 'Regenerate Link'}
+          </Button>
+        )}
       </div>
     </Card>
   );
