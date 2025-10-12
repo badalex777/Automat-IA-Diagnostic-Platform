@@ -27,6 +27,7 @@ The core entities include Companies (client organizations), Workflows (business 
 - **TFA Survey**: Collects responses to 21 questions across 4 technical sections (System Environment: 6q, Data Quality: 5q, Integration Feasibility: 6q, Security/Compliance: 4q), detects "Don't Know" answers, and collects "gap metadata" (why the question couldn't be answered, who might know).
 - **Gap Resolution**: Consultants can fill knowledge gaps, with an audit trail of who provided the information and why.
 - **TFA Analysis**: Provides auto-updating scores, assessment notes, visual analytics (radar and pie charts), a 5-tier feasibility interpretation with recommendations, detailed weakness analysis with priority ranking and mitigation strategies, and a Layer 1 Executive Summary with Go/No-Go recommendations and action plans.
+- **Question-Level Analysis**: Collapsible detailed view showing individual question responses with score-specific recommendations (105 total: 21 questions × 5 score levels). Features include: text search, section filter (4 technical categories), score filter (Critical 1-2, Weak 3, Moderate 4, Strong 5), automatic exclusion of "Don't Know" responses, respondent attribution, and actionable mitigation strategies for each answer.
 - **Workflow Progression**: Workflows track status from tfa_only → tfa_readiness → readiness_impact → complete.
 - **Dashboard**: Provides overview of companies and workflows with search/filter functionality.
 
