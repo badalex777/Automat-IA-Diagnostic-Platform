@@ -265,31 +265,41 @@ export default function WorkflowDetail() {
                 const responses = tfaAssessment.responses as Record<string, string>;
                 const gaps = detectKnowledgeGaps(responses);
                 const hasGaps = gaps.length > 0;
+                const answeredCount = Object.keys(responses).filter(key => {
+                  const value = responses[key];
+                  return value && value !== '0'; // Exclude "Don't Know" (value "0")
+                }).length;
 
-                return hasGaps ? (
-                  <KnowledgeGapWarning
-                    assessmentId={tfaAssessment.id}
-                    workflowId={workflowId}
-                    gaps={gaps}
-                    initialRespondent={tfaAssessment.initialRespondent || undefined}
-                    gapMetadata={tfaAssessment.gapMetadata as Record<string, { why: string; whoMightKnow: string }> | undefined}
-                  />
-                ) : (
+                return (
                   <>
-                    <ResponseSourcesDisclaimer
-                      initialRespondent={tfaAssessment.initialRespondent || undefined}
-                      responseSources={tfaAssessment.responseSources as Record<string, any> || undefined}
-                    />
-                    <TFAExecutiveSummary
-                      score={tfaAssessment.score || 0}
-                      sections={sectionScores}
-                      responses={responses}
-                    />
-                    <TFAScoreDisplay 
-                      score={tfaAssessment.score || 0} 
-                      sections={sectionScores} 
-                    />
-                    <TFAVisualAnalytics sections={sectionScores} />
+                    {hasGaps && (
+                      <KnowledgeGapWarning
+                        assessmentId={tfaAssessment.id}
+                        workflowId={workflowId}
+                        gaps={gaps}
+                        initialRespondent={tfaAssessment.initialRespondent || undefined}
+                        gapMetadata={tfaAssessment.gapMetadata as Record<string, { why: string; whoMightKnow: string }> | undefined}
+                      />
+                    )}
+
+                    {!hasGaps && (
+                      <>
+                        <ResponseSourcesDisclaimer
+                          initialRespondent={tfaAssessment.initialRespondent || undefined}
+                          responseSources={tfaAssessment.responseSources as Record<string, any> || undefined}
+                        />
+                        <TFAExecutiveSummary
+                          score={tfaAssessment.score || 0}
+                          sections={sectionScores}
+                          responses={responses}
+                        />
+                        <TFAScoreDisplay 
+                          score={tfaAssessment.score || 0} 
+                          sections={sectionScores} 
+                        />
+                        <TFAVisualAnalytics sections={sectionScores} />
+                      </>
+                    )}
                     
                     <Collapsible 
                       open={isQuestionDetailsOpen} 
@@ -301,7 +311,10 @@ export default function WorkflowDetail() {
                             <div className="text-left">
                               <h3 className="font-semibold text-lg">Question-Level Analysis</h3>
                               <p className="text-sm text-muted-foreground mt-1">
-                                Detailed responses and recommendations for each question
+                                {hasGaps 
+                                  ? `Showing ${answeredCount} answered questions - Complete all questions to unlock full analysis`
+                                  : 'Detailed responses and recommendations for each question'
+                                }
                               </p>
                             </div>
                             <ChevronDown 
@@ -330,7 +343,7 @@ export default function WorkflowDetail() {
                       </Card>
                     </Collapsible>
 
-                    {tfaAssessment.comments && (
+                    {!hasGaps && tfaAssessment.comments && (
                       <Card className="p-6">
                         <h3 className="font-semibold text-lg mb-3">Assessment Notes</h3>
                         <p className="text-sm text-muted-foreground whitespace-pre-wrap" data-testid="text-tfa-comments">

@@ -410,11 +410,37 @@ export default function TFAExecutiveSummary({ score, sections, responses }: TFAE
   const implementationRoadmap = generateImplementationRoadmap(responses, recommendation.decision);
   const RecommendationIcon = recommendation.icon;
   
-  // Categorize insights
-  const strengths = insights.filter(i => i.category === 'strength');
-  const opportunities = insights.filter(i => i.category === 'opportunity');
-  const risks = insights.filter(i => i.category === 'risk');
+  // Build question-level insights with impact scores
+  const questionInsights: QuestionWithImpact[] = [];
+  TFA_QUESTIONS.forEach(question => {
+    const responseValue = responses[question.id.toString()];
+    if (!responseValue) return;
+    
+    const selectedOption = question.options.find(opt => opt.value === responseValue);
+    if (!selectedOption || selectedOption.score === null) return;
+    
+    const sectionWeight = getSectionWeight(question.section);
+    const impactScore = calculateQuestionImpact(question.id, selectedOption.score, sectionWeight);
+    
+    questionInsights.push({
+      id: question.id,
+      question: question.question,
+      section: question.section,
+      sectionWeight,
+      score: selectedOption.score,
+      impactScore
+    });
+  });
+  
+  // Categorize by score for display
+  const criticalGaps = questionInsights.filter(q => q.score <= 2).sort((a, b) => b.impactScore - a.impactScore).slice(0, 4);
+  const strengths = questionInsights.filter(q => q.score === 5).sort((a, b) => b.sectionWeight - a.sectionWeight).slice(0, 3);
+  const risks = questionInsights.filter(q => q.score === 3).sort((a, b) => b.impactScore - a.impactScore).slice(0, 2);
+  
+  // Categorize section insights (for backward compatibility with timeline calc)
   const critical = insights.filter(i => i.category === 'critical');
+  const sectionRisks = insights.filter(i => i.category === 'risk');
+  const opportunities = insights.filter(i => i.category === 'opportunity');
   
   // Calculate metrics
   const avgScore = sections.reduce((sum, s) => sum + s.score, 0) / sections.length;
@@ -456,76 +482,75 @@ export default function TFAExecutiveSummary({ score, sections, responses }: TFAE
           </div>
         </Alert>
 
-        {/* Key Findings - Enhanced with all categories */}
+        {/* Question-Level Key Findings */}
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="p-4 bg-muted/50">
             <div className="flex items-center gap-2 mb-3">
               <TrendingUp className="h-4 w-4 text-chart-2" />
-              <h4 className="font-semibold text-sm">Strengths & Opportunities</h4>
+              <h4 className="font-semibold text-sm">Key Strengths</h4>
+              <span className="text-xs text-muted-foreground">(Top scoring questions)</span>
             </div>
-            {strengths.length > 0 || opportunities.length > 0 ? (
+            {strengths.length > 0 ? (
               <ul className="space-y-2 text-sm">
-                {strengths.map(s => (
-                  <li key={s.name} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-3 w-3 text-chart-2 flex-shrink-0" />
-                    <span><strong>{s.name}</strong> ({s.score.toFixed(1)}/5.0)</span>
-                  </li>
-                ))}
-                {opportunities.map(o => (
-                  <li key={o.name} className="flex items-start gap-2">
-                    <Zap className="h-3 w-3 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <span><strong>{o.name}</strong> ({o.score.toFixed(1)}/5.0)</span>
-                      {o.recommendations[0] && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{o.recommendations[0]}</p>
-                      )}
+                {strengths.map(q => (
+                  <li key={q.id} className="flex items-start gap-2">
+                    <CheckCircle2 className="h-3 w-3 text-chart-2 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <span className="font-medium text-xs">{q.section}</span>
+                        <Badge variant="default" className="text-xs">5/5</Badge>
+                        <span className="text-xs text-muted-foreground">({q.sectionWeight}% weight)</span>
+                      </div>
+                      <p className="text-xs mt-0.5">{q.question.split(':')[0]}</p>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">All sections require improvement</p>
+              <p className="text-sm text-muted-foreground">No perfect scores - opportunities for improvement across all areas</p>
             )}
           </Card>
 
           <Card className="p-4 bg-muted/50">
             <div className="flex items-center gap-2 mb-3">
               <Shield className="h-4 w-4 text-destructive" />
-              <h4 className="font-semibold text-sm">Risks & Critical Issues</h4>
+              <h4 className="font-semibold text-sm">Critical Technical Gaps</h4>
+              <span className="text-xs text-muted-foreground">(Impact-prioritized)</span>
             </div>
-            {critical.length > 0 || risks.length > 0 ? (
+            {criticalGaps.length > 0 ? (
               <ul className="space-y-2 text-sm">
-                {critical.map(c => (
-                  <li key={c.name} className="flex items-start gap-2">
+                {criticalGaps.map(q => (
+                  <li key={q.id} className="flex items-start gap-2">
                     <XCircle className="h-3 w-3 text-destructive mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium">{c.name}</span>
-                        <Badge variant="destructive" className="text-xs">Critical</Badge>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <span className="font-medium text-xs">{q.section}</span>
+                        <Badge variant="destructive" className="text-xs">{q.score}/5</Badge>
+                        <span className="text-xs text-muted-foreground">Impact: {q.impactScore.toFixed(0)}</span>
                       </div>
-                      {c.specificIssues[0] && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{c.specificIssues[0]}</p>
-                      )}
+                      <p className="text-xs mt-0.5">{q.question.split(':')[0]}</p>
                     </div>
                   </li>
                 ))}
-                {risks.map(r => (
-                  <li key={r.name} className="flex items-start gap-2">
+              </ul>
+            ) : risks.length > 0 ? (
+              <ul className="space-y-2 text-sm">
+                {risks.map(q => (
+                  <li key={q.id} className="flex items-start gap-2">
                     <AlertTriangle className="h-3 w-3 text-orange-600 dark:text-orange-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span className="font-medium">{r.name}</span>
-                        <Badge variant="secondary" className="text-xs">Risk</Badge>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <span className="font-medium text-xs">{q.section}</span>
+                        <Badge variant="secondary" className="text-xs">3/5 - Risk</Badge>
+                        <span className="text-xs text-muted-foreground">({q.sectionWeight}% weight)</span>
                       </div>
-                      {r.specificIssues[0] && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{r.specificIssues[0]}</p>
-                      )}
+                      <p className="text-xs mt-0.5">{q.question.split(':')[0]}</p>
                     </div>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-muted-foreground">No significant risks identified</p>
+              <p className="text-sm text-muted-foreground">No critical gaps - strong technical foundation</p>
             )}
           </Card>
         </div>
@@ -562,9 +587,9 @@ export default function TFAExecutiveSummary({ score, sections, responses }: TFAE
           <AlertDescription>
             <p className="text-sm">
               <strong>Estimated Timeline:</strong> {recommendation.timeframe}
-              {(critical.length > 0 || risks.length > 0) && (
+              {(critical.length > 0 || sectionRisks.length > 0) && (
                 <span className="ml-2 text-muted-foreground">
-                  (includes {critical.length * 8 + risks.length * 4 + opportunities.length * 2} weeks remediation)
+                  (includes {critical.length * 8 + sectionRisks.length * 4 + opportunities.length * 2} weeks remediation)
                 </span>
               )}
             </p>
