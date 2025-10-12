@@ -41,6 +41,26 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   shareableIdIdx: index("tfa_assessments_shareable_id_idx").on(table.shareableId),
 }));
 
+export const pisResponses = pgTable("pis_responses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  shareableId: varchar("shareable_id").notNull(),
+  respondentName: text("respondent_name").notNull(),
+  respondentRole: text("respondent_role").notNull(),
+  respondentResponsibilities: text("respondent_responsibilities"),
+  responses: jsonb("responses").default({}),
+  processClarity: integer("process_clarity"),
+  changeMagnitude: integer("change_magnitude"),
+  workflowBrittleness: integer("workflow_brittleness"),
+  roiInputs: jsonb("roi_inputs").default({}),
+  qualitativeResponses: jsonb("qualitative_responses").default({}),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  workflowIdIdx: index("pis_responses_workflow_id_idx").on(table.workflowId),
+  shareableIdIdx: index("pis_responses_shareable_id_idx").on(table.shareableId),
+}));
+
 export const businessImpact = pgTable("business_impact", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().unique().references(() => workflows.id, { onDelete: 'cascade' }),
@@ -101,6 +121,30 @@ export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omi
   createdAt: true,
 });
 
+export const insertPISResponseSchema = createInsertSchema(pisResponses).omit({
+  id: true,
+  shareableId: true,
+  createdAt: true,
+});
+
+export const pisSubmitSchema = z.object({
+  respondentName: z.string().min(1, "Name is required"),
+  respondentRole: z.string().min(1, "Role is required"),
+  respondentResponsibilities: z.string().optional(),
+  responses: z.record(z.string(), z.string()),
+  roiInputs: z.object({
+    employeeCount: z.number().optional(),
+    frequency: z.enum(['daily', 'weekly', 'monthly']).optional(),
+    processesPerPeriod: z.number().optional(),
+    minutesPerProcess: z.number().optional(),
+    hasQualityImpact: z.boolean().optional(),
+    errorRate: z.number().optional(),
+    reworkMinutesPerError: z.number().optional(),
+    costPerError: z.number().optional(),
+  }).optional(),
+  qualitativeResponses: z.record(z.string(), z.string()).optional(),
+});
+
 export const updateBusinessImpactSchema = insertBusinessImpactSchema.omit({ workflowId: true }).partial();
 
 // Select types
@@ -112,6 +156,10 @@ export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
 
 export type TFAAssessment = typeof tfaAssessments.$inferSelect;
 export type InsertTFAAssessment = z.infer<typeof insertTFAAssessmentSchema>;
+
+export type PISResponse = typeof pisResponses.$inferSelect;
+export type InsertPISResponse = z.infer<typeof insertPISResponseSchema>;
+export type PISSubmit = z.infer<typeof pisSubmitSchema>;
 
 export type BusinessImpact = typeof businessImpact.$inferSelect;
 export type InsertBusinessImpact = z.infer<typeof insertBusinessImpactSchema>;
