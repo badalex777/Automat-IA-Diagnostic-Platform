@@ -33,7 +33,7 @@ export interface PISSection {
 export const PIS_SECTIONS: PISSection[] = [
   {
     section: "Process Clarity",
-    weight: 20, // 20% of Readiness Rubric
+    weight: 20, // 20% of PIS contribution to Readiness Rubric
     description: "Assess whether the workflow is clearly defined, consistent, and repeatable",
     questions: [
       {
@@ -82,7 +82,7 @@ export const PIS_SECTIONS: PISSection[] = [
   },
   {
     section: "Change Magnitude",
-    weight: 20, // 20% of Readiness Rubric
+    weight: 20, // 20% of PIS contribution to Readiness Rubric
     description: "Understand how much employee behavior, retraining, or adaptation will be needed when introducing automation/AI",
     questions: [
       {
@@ -132,7 +132,7 @@ export const PIS_SECTIONS: PISSection[] = [
   },
   {
     section: "Workflow Brittleness",
-    weight: 15, // 15% of Readiness Rubric (Total operational = 55%, but we use 40% for PIS in final calc)
+    weight: 15, // 15% of PIS contribution to Readiness Rubric
     description: "Identify hidden fragility — processes that break easily, depend on manual steps, or lack error handling",
     questions: [
       {
@@ -196,97 +196,14 @@ export const PIS_SECTIONS: PISSection[] = [
     ]
   },
   {
-    section: "Quality Impact Rubric",
-    weight: 0, // Used for ROI, not Readiness Rubric
-    description: "Answer questions about your process to estimate how much AI can improve quality and reduce errors",
+    section: "Time Savings",
+    weight: 0, // Used for ROI estimation, not Readiness Rubric
+    description: "Estimate automation time savings potential",
     questions: [
       {
         id: 11,
-        question: "What type of work process will be automated?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
-          { value: "document", label: "Document Review & Processing", description: "Reading, extracting, or classifying documents" },
-          { value: "communication", label: "Communication & Customer Service", description: "Emails, inquiries, customer interactions" },
-          { value: "analysis", label: "Analysis & Reporting", description: "Analyzing data, creating reports, generating insights" },
-          { value: "compliance", label: "Compliance & Validation", description: "Checking compliance, quality assurance, auditing" },
-          { value: "coordination", label: "Coordination & Scheduling", description: "Managing schedules, coordinating resources" },
-          { value: "creative", label: "Creative & Strategic Work", description: "Strategy, creative content, complex decisions" }
-        ]
-      },
-      {
-        id: 12,
-        question: "How often do errors or quality issues currently occur in this process?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "very_frequent", label: "Very frequent", description: "Errors occur in more than 30% of cases" },
-          { value: "frequent", label: "Frequent", description: "Errors occur in 15-30% of cases" },
-          { value: "occasional", label: "Occasional", description: "Errors occur in 5-15% of cases" },
-          { value: "rare", label: "Rare", description: "Errors occur in less than 5% of cases" }
-        ]
-      },
-      {
-        id: 13,
-        question: "What is the primary cause of errors or quality issues?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "fatigue", label: "Manual, repetitive work leading to human fatigue or oversight" },
-          { value: "missing_info", label: "Missing or incomplete information when making decisions" },
-          { value: "interpretation", label: "Inconsistent interpretation of rules or standards" },
-          { value: "complexity", label: "High complexity requiring significant expertise or judgment" },
-          { value: "communication", label: "Communication gaps or misunderstandings between people" }
-        ]
-      },
-      {
-        id: 14,
-        question: "When are errors or quality issues typically discovered?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "after_delivery", label: "After delivery to customer", description: "Customer complaints, returns, escalations" },
-          { value: "end_process", label: "At the end of the process", description: "Final review or quality check" },
-          { value: "during_process", label: "During the process", description: "Spotted before completion" },
-          { value: "early", label: "Early in the process", description: "Caught quickly with minimal rework" }
-        ]
-      },
-      {
-        id: 15,
-        question: "How standardized is the current process?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "variable", label: "Highly variable", description: "Each case is handled differently" },
-          { value: "guidelines", label: "Some guidelines", description: "General approach but flexibility in execution" },
-          { value: "documented", label: "Documented process", description: "Clear steps and procedures to follow" },
-          { value: "strict", label: "Strict standards", description: "Detailed rules and quality requirements" }
-        ]
-      },
-      {
-        id: 16,
-        question: "How well-suited is this work for AI quality improvement?",
-        section: "Quality Impact Rubric",
-        type: "radio",
-        options: [
-          { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
-          { value: "pattern", label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
-          { value: "contextual", label: "Contextual judgment", description: "Requires understanding context and nuance" },
-          { value: "subjective", label: "Highly subjective", description: "Depends heavily on personal opinion or taste" }
-        ]
-      }
-    ]
-  },
-  {
-    section: "Time Savings Rubric",
-    weight: 0, // Used for ROI, not Readiness Rubric
-    description: "Answer a few questions to get a personalized time savings estimate",
-    questions: [
-      {
-        id: 18,
         question: "What type of process will be automated?",
-        section: "Time Savings Rubric",
+        section: "Time Savings",
         type: "radio",
         options: [
           { value: "data_entry", label: "Data Entry & Validation" },
@@ -297,9 +214,9 @@ export const PIS_SECTIONS: PISSection[] = [
         ]
       },
       {
-        id: 19,
+        id: 12,
         question: "How complex is the task?",
-        section: "Time Savings Rubric",
+        section: "Time Savings",
         type: "radio",
         options: [
           { value: "simple", label: "Simple", description: "Follows clear rules and patterns" },
@@ -308,9 +225,9 @@ export const PIS_SECTIONS: PISSection[] = [
         ]
       },
       {
-        id: 20,
+        id: 13,
         question: "How structured is the data you work with?",
-        section: "Time Savings Rubric",
+        section: "Time Savings",
         type: "radio",
         options: [
           { value: "structured", label: "Highly structured", description: "Forms, databases, spreadsheets" },
@@ -321,14 +238,14 @@ export const PIS_SECTIONS: PISSection[] = [
     ]
   },
   {
-    section: "Revenue Uplift Rubric",
-    weight: 0, // Used for ROI, not Readiness Rubric
-    description: "Answer questions to determine if and how much saved time can realistically convert to revenue generation",
+    section: "Revenue Uplift",
+    weight: 0, // Used for ROI estimation, not Readiness Rubric
+    description: "Determine if saved time can convert to revenue generation",
     questions: [
       {
-        id: 21,
+        id: 14,
         question: "Who gets the time back from this AI implementation?",
-        section: "Revenue Uplift Rubric",
+        section: "Revenue Uplift",
         type: "radio",
         options: [
           { value: "sales_ops", label: "Sales Operations / CRM Administrator", description: "Sales Ops Analyst, CRM Specialist, Deal Desk Coordinator" },
@@ -343,9 +260,9 @@ export const PIS_SECTIONS: PISSection[] = [
         ]
       },
       {
-        id: 22,
+        id: 15,
         question: "What is the relationship between current capacity and available opportunities?",
-        section: "Revenue Uplift Rubric",
+        section: "Revenue Uplift",
         type: "radio",
         options: [
           { value: "high_demand", label: "High demand with team at/above capacity", description: "Turning away opportunities, clear revenue potential" },
@@ -355,9 +272,9 @@ export const PIS_SECTIONS: PISSection[] = [
         ]
       },
       {
-        id: 23,
+        id: 16,
         question: "How does more time translate to more revenue?",
-        section: "Revenue Uplift Rubric",
+        section: "Revenue Uplift",
         type: "radio",
         options: [
           { value: "direct", label: "Direct & predictable", description: "Example: More hours = more billable consulting, more service appointments, more deals closed" },
@@ -369,21 +286,111 @@ export const PIS_SECTIONS: PISSection[] = [
     ]
   },
   {
-    section: "ROI Data Collection",
-    weight: 0, // Used for ROI calculator
-    description: "Numerical inputs for ROI calculation",
+    section: "Your Experience & Insights",
+    weight: 0, // Used for qualitative analysis, not Readiness Rubric
+    description: "Share your experience and insights about this workflow",
     questions: [
       {
+        id: 17,
+        question: "What tools or systems do you use most in your daily work?",
+        section: "Your Experience & Insights",
+        type: "text",
+        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
+      },
+      {
+        id: 18,
+        question: "What do you find most frustrating or limiting about these tools?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Describe the main pain points or limitations you experience"
+      },
+      {
+        id: 19,
+        question: "What are the biggest time-wasters in your current workflow?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Describe tasks that take longer than they should"
+      },
+      {
+        id: 20,
+        question: "If you could automate one part of this process, what would it be and why?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Describe what you'd automate and the impact it would have"
+      },
+      {
+        id: 21,
+        question: "What concerns do you have about automation of this workflow?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Any worries about job security, reliability, or changes to your role"
+      },
+      {
+        id: 22,
+        question: "How would you describe your role in relation to this workflow?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "e.g., I execute it daily, I manage the team, I oversee quality, etc."
+      },
+      {
+        id: 23,
+        question: "How long have you been performing this type of work?",
+        section: "Your Experience & Insights",
+        type: "radio",
+        options: [
+          { value: "less_than_1", label: "Less than 1 year" },
+          { value: "1_to_3", label: "1-3 years" },
+          { value: "3_to_5", label: "3-5 years" },
+          { value: "5_to_10", label: "5-10 years" },
+          { value: "more_than_10", label: "More than 10 years" }
+        ]
+      },
+      {
         id: 24,
+        question: "What skills or knowledge are most critical for performing this workflow well?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Describe the key competencies needed"
+      },
+      {
+        id: 25,
+        question: "What happens if this process is delayed or done incorrectly?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Describe the business impact of delays or errors"
+      },
+      {
+        id: 26,
+        question: "Are there peak times or periods when this workflow becomes especially challenging?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "e.g., month-end, seasonal rushes, specific events"
+      },
+      {
+        id: 27,
+        question: "Is there anything else about this workflow that we should know?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Any additional context, edge cases, or important details"
+      }
+    ]
+  },
+  {
+    section: "Time & Volume Data",
+    weight: 0, // Used for ROI calculations, not Readiness Rubric
+    description: "Provide information about time spent and volume of work",
+    questions: [
+      {
+        id: 28,
         question: "How many employees perform this task?",
-        section: "ROI Data Collection",
+        section: "Time & Volume Data",
         type: "number",
         placeholder: "Enter number of employees"
       },
       {
-        id: 25,
+        id: 29,
         question: "How often is this task performed?",
-        section: "ROI Data Collection",
+        section: "Time & Volume Data",
         type: "radio",
         options: [
           { value: "daily", label: "Daily" },
@@ -392,110 +399,171 @@ export const PIS_SECTIONS: PISSection[] = [
         ]
       },
       {
-        id: 26,
+        id: 30,
         question: "How many times is this process completed in the selected period?",
-        section: "ROI Data Collection",
+        section: "Time & Volume Data",
         type: "number",
         placeholder: "e.g., 5 times per day"
       },
       {
-        id: 27,
+        id: 31,
         question: "How many minutes does each process take?",
-        section: "ROI Data Collection",
+        section: "Time & Volume Data",
         type: "number",
         placeholder: "Enter minutes per process"
-      },
-      {
-        id: 37,
-        question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
-        section: "ROI Data Collection",
-        type: "radio",
-        options: [
-          { value: "yes", label: "Yes - This workflow has error-related costs" },
-          { value: "no", label: "No - Quality impact is not a factor" }
-        ]
-      },
-      {
-        id: 28,
-        question: "What is the current error rate?",
-        section: "ROI Data Collection",
-        type: "number",
-        placeholder: "Enter percentage (e.g., 15 for 15%)",
-        conditional: {
-          dependsOn: 37,
-          showWhen: "yes"
-        }
-      },
-      {
-        id: 29,
-        question: "How many minutes of rework does each error require?",
-        section: "ROI Data Collection",
-        type: "number",
-        placeholder: "Enter minutes per error",
-        conditional: {
-          dependsOn: 37,
-          showWhen: "yes"
-        }
-      },
-      {
-        id: 30,
-        question: "What is the financial cost per error (if applicable)?",
-        section: "ROI Data Collection",
-        type: "number",
-        placeholder: "Enter cost in dollars (or 0 if not applicable)",
-        conditional: {
-          dependsOn: 37,
-          showWhen: "yes"
-        }
       }
     ]
   },
   {
-    section: "Qualitative Insights",
-    weight: 0, // Used for analysis, not Readiness Rubric
-    description: "Open-ended questions to gather context and insights",
+    section: "Quality Impact Module",
+    weight: 0, // Used for ROI estimation, not Readiness Rubric (conditional section)
+    description: "Estimate quality improvement and error reduction potential (shown when quality impact is significant)",
     questions: [
       {
-        id: 31,
-        question: "What tools or systems do you use most in your daily work?",
-        section: "Qualitative Insights",
-        type: "text",
-        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
-      },
-      {
         id: 32,
-        question: "What do you find most frustrating or limiting about these tools?",
-        section: "Qualitative Insights",
-        type: "textarea",
-        placeholder: "Describe the main pain points or limitations you experience"
+        question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
+        section: "Quality Impact Module",
+        type: "radio",
+        options: [
+          { value: "1", label: "No - Quality impact is not a factor" },
+          { value: "2", label: "Minimal - Very few errors" },
+          { value: "3", label: "Moderate - Some errors occur" },
+          { value: "4", label: "Significant - Errors are common" },
+          { value: "5", label: "Major - Errors are a serious problem" }
+        ]
       },
       {
         id: 33,
-        question: "What are the biggest time-wasters in your current workflow?",
-        section: "Qualitative Insights",
-        type: "textarea",
-        placeholder: "Describe tasks that take longer than they should"
+        question: "What type of work process will be automated?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
+          { value: "document", label: "Document Review & Processing", description: "Reading, extracting, or classifying documents" },
+          { value: "communication", label: "Communication & Customer Service", description: "Emails, inquiries, customer interactions" },
+          { value: "analysis", label: "Analysis & Reporting", description: "Analyzing data, creating reports, generating insights" },
+          { value: "compliance", label: "Compliance & Validation", description: "Checking compliance, quality assurance, auditing" },
+          { value: "coordination", label: "Coordination & Scheduling", description: "Managing schedules, coordinating resources" },
+          { value: "creative", label: "Creative & Strategic Work", description: "Strategy, creative content, complex decisions" }
+        ]
       },
       {
         id: 34,
-        question: "If you could automate one part of this process, what would it be and why?",
-        section: "Qualitative Insights",
-        type: "textarea",
-        placeholder: "Describe what you'd automate and the impact it would have"
+        question: "How often do errors or quality issues currently occur in this process?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "very_frequent", label: "Very frequent", description: "Errors occur in more than 30% of cases" },
+          { value: "frequent", label: "Frequent", description: "Errors occur in 15-30% of cases" },
+          { value: "occasional", label: "Occasional", description: "Errors occur in 5-15% of cases" },
+          { value: "rare", label: "Rare", description: "Errors occur in less than 5% of cases" }
+        ]
       },
       {
         id: 35,
-        question: "What concerns do you have about automation of this workflow?",
-        section: "Qualitative Insights",
-        type: "textarea",
-        placeholder: "Any worries about job security, reliability, or changes to your role"
+        question: "What is the primary cause of errors or quality issues?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "fatigue", label: "Manual, repetitive work leading to human fatigue or oversight" },
+          { value: "missing_info", label: "Missing or incomplete information when making decisions" },
+          { value: "interpretation", label: "Inconsistent interpretation of rules or standards" },
+          { value: "complexity", label: "High complexity requiring significant expertise or judgment" },
+          { value: "communication", label: "Communication gaps or misunderstandings between people" }
+        ]
       },
       {
         id: 36,
-        question: "Is there anything else about this workflow that we should know?",
-        section: "Qualitative Insights",
-        type: "textarea",
-        placeholder: "Any additional context, edge cases, or important details"
+        question: "When are errors or quality issues typically discovered?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "after_delivery", label: "After delivery to customer", description: "Customer complaints, returns, escalations" },
+          { value: "end_process", label: "At the end of the process", description: "Final review or quality check" },
+          { value: "during_process", label: "During the process", description: "Spotted before completion" },
+          { value: "early", label: "Early in the process", description: "Caught quickly with minimal rework" }
+        ]
+      },
+      {
+        id: 37,
+        question: "How standardized is the current process?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "variable", label: "Highly variable", description: "Each case is handled differently" },
+          { value: "guidelines", label: "Some guidelines", description: "General approach but flexibility in execution" },
+          { value: "documented", label: "Documented process", description: "Clear steps and procedures to follow" },
+          { value: "strict", label: "Strict standards", description: "Detailed rules and quality requirements" }
+        ]
+      },
+      {
+        id: 38,
+        question: "How well-suited is this work for AI quality improvement?",
+        section: "Quality Impact Module",
+        type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        },
+        options: [
+          { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
+          { value: "pattern", label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
+          { value: "contextual", label: "Contextual judgment", description: "Requires understanding context and nuance" },
+          { value: "subjective", label: "Highly subjective", description: "Depends heavily on personal opinion or taste" }
+        ]
+      },
+      {
+        id: 39,
+        question: "What is the current error rate?",
+        section: "Quality Impact Module",
+        type: "number",
+        placeholder: "Enter percentage (e.g., 15 for 15%)",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        }
+      },
+      {
+        id: 40,
+        question: "How many minutes of rework does each error require?",
+        section: "Quality Impact Module",
+        type: "number",
+        placeholder: "Enter minutes per error",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        }
+      },
+      {
+        id: 41,
+        question: "What is the financial cost per error (if applicable)?",
+        section: "Quality Impact Module",
+        type: "number",
+        placeholder: "Enter cost in dollars (or 0 if not applicable)",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "4"
+        }
       }
     ]
   }
@@ -538,43 +606,20 @@ export function calculatePISScores(responses: Record<string, string>): {
   return {
     processClarity: calculateSectionScore("Process Clarity"),
     changeMagnitude: calculateSectionScore("Change Magnitude"),
-    workflowBrittleness: calculateSectionScore("Workflow Brittleness")
+    workflowBrittleness: calculateSectionScore("Workflow Brittleness"),
   };
 }
 
-// Extract ROI inputs from responses
-export function extractROIInputs(responses: Record<string, string>): {
-  employeeCount?: number;
-  frequency?: 'daily' | 'weekly' | 'monthly';
-  processesPerPeriod?: number;
-  minutesPerProcess?: number;
-  hasQualityImpact?: boolean;
-  errorRate?: number;
-  reworkMinutesPerError?: number;
-  costPerError?: number;
-} {
-  const hasQualityImpact = responses['37'] === 'yes';
-  
-  return {
-    employeeCount: responses['24'] ? parseInt(responses['24'], 10) : undefined,
-    frequency: responses['25'] as 'daily' | 'weekly' | 'monthly' | undefined,
-    processesPerPeriod: responses['26'] ? parseInt(responses['26'], 10) : undefined,
-    minutesPerProcess: responses['27'] ? parseInt(responses['27'], 10) : undefined,
-    hasQualityImpact,
-    errorRate: hasQualityImpact && responses['28'] ? parseFloat(responses['28']) : undefined,
-    reworkMinutesPerError: hasQualityImpact && responses['29'] ? parseInt(responses['29'], 10) : undefined,
-    costPerError: hasQualityImpact && responses['30'] ? parseFloat(responses['30']) : undefined,
-  };
-}
-
-// Extract qualitative responses
+// Extract qualitative responses for analysis
 export function extractQualitativeResponses(responses: Record<string, string>): Record<string, string> {
-  const qualitativeQuestionIds = [31, 32, 33, 34, 35, 36];
   const qualitative: Record<string, string> = {};
   
-  qualitativeQuestionIds.forEach(id => {
-    if (responses[id.toString()]) {
-      qualitative[id.toString()] = responses[id.toString()];
+  ALL_PIS_QUESTIONS.forEach(q => {
+    if (q.type === 'text' || q.type === 'textarea') {
+      const value = responses[q.id.toString()];
+      if (value) {
+        qualitative[`q${q.id}`] = value;
+      }
     }
   });
   
