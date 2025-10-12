@@ -4,7 +4,8 @@ import { db } from "./db";
 import { 
   companies, 
   workflows, 
-  tfaAssessments, 
+  tfaAssessments,
+  pisResponses,
   businessImpact,
   type Company,
   type InsertCompany,
@@ -12,6 +13,8 @@ import {
   type InsertWorkflow,
   type TFAAssessment,
   type InsertTFAAssessment,
+  type PISResponse,
+  type InsertPISResponse,
   type BusinessImpact,
   type InsertBusinessImpact,
 } from "@shared/schema";
@@ -185,6 +188,31 @@ export class DbStorage implements IStorage {
 
   async deleteTFAAssessment(id: string): Promise<boolean> {
     const result = await db.delete(tfaAssessments).where(eq(tfaAssessments.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // PIS Responses
+  async getPISResponse(id: string): Promise<PISResponse | undefined> {
+    const [response] = await db.select().from(pisResponses).where(eq(pisResponses.id, id));
+    return response;
+  }
+
+  async getPISByShareableId(shareableId: string): Promise<PISResponse[]> {
+    return db.select().from(pisResponses).where(eq(pisResponses.shareableId, shareableId)).orderBy(desc(pisResponses.createdAt));
+  }
+
+  async getAllPISResponsesForWorkflow(workflowId: string): Promise<PISResponse[]> {
+    return db.select().from(pisResponses).where(eq(pisResponses.workflowId, workflowId)).orderBy(desc(pisResponses.createdAt));
+  }
+
+  async createPISResponse(response: InsertPISResponse): Promise<PISResponse> {
+    const shareableId = nanoid(10);
+    const [newResponse] = await db.insert(pisResponses).values({ ...response, shareableId }).returning();
+    return newResponse;
+  }
+
+  async deletePISResponse(id: string): Promise<boolean> {
+    const result = await db.delete(pisResponses).where(eq(pisResponses.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
