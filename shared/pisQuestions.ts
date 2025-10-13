@@ -152,7 +152,7 @@ export const PIS_SECTIONS: PISSection[] = [
       },
       {
         id: 8,
-        question: "How dependent is this workflow on manual workarounds (Excel files, copy-paste, rework)?",
+        question: "How dependent is this workflow on manual workarounds (e.g., Excel files, copy-paste, manual rework)?",
         section: "Workflow Brittleness",
         type: "radio",
         weight: 1,
@@ -202,15 +202,15 @@ export const PIS_SECTIONS: PISSection[] = [
     questions: [
       {
         id: 11,
-        question: "What type of process will be automated?",
+        question: "Which of these best describes the work you perform in this step?",
         section: "Time Savings",
         type: "radio",
         options: [
-          { value: "data_entry", label: "Data Entry & Validation" },
-          { value: "document", label: "Document Processing & Review" },
-          { value: "communication", label: "Communication & Coordination" },
-          { value: "research", label: "Research & Analysis" },
-          { value: "qa", label: "Quality Assurance & Compliance" }
+          { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
+          { value: "document", label: "Document Processing & Review", description: "Reading, extracting, or reviewing documents" },
+          { value: "communication", label: "Communication & Coordination", description: "Emails, messages, scheduling" },
+          { value: "research", label: "Research & Analysis", description: "Gathering information, analyzing data" },
+          { value: "qa", label: "Quality Assurance & Compliance", description: "Checking quality, ensuring compliance" }
         ]
       },
       {
@@ -320,37 +320,31 @@ export const PIS_SECTIONS: PISSection[] = [
       },
       {
         id: 21,
-        question: "What concerns do you have about automation of this workflow?",
+        question: "What do you usually produce or complete at the end of your step?",
         section: "Your Experience & Insights",
         type: "textarea",
-        placeholder: "Any worries about job security, reliability, or changes to your role"
+        placeholder: "Example: Approved file, completed report, data entry in system, email sent to customer, invoice processed"
       },
       {
         id: 22,
-        question: "How would you describe your role in relation to this workflow?",
+        question: "What makes this process slow, repetitive, or error-prone in your experience?",
         section: "Your Experience & Insights",
         type: "textarea",
-        placeholder: "e.g., I execute it daily, I manage the team, I oversee quality, etc."
+        placeholder: "Describe key difficulties or pain points you encounter"
       },
       {
         id: 23,
-        question: "How long have you been performing this type of work?",
+        question: "What specific steps do you personally perform in this workflow?",
         section: "Your Experience & Insights",
-        type: "radio",
-        options: [
-          { value: "less_than_1", label: "Less than 1 year" },
-          { value: "1_to_3", label: "1-3 years" },
-          { value: "3_to_5", label: "3-5 years" },
-          { value: "5_to_10", label: "5-10 years" },
-          { value: "more_than_10", label: "More than 10 years" }
-        ]
+        type: "textarea",
+        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
       },
       {
         id: 24,
-        question: "What skills or knowledge are most critical for performing this workflow well?",
+        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
         section: "Your Experience & Insights",
         type: "textarea",
-        placeholder: "Describe the key competencies needed"
+        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
       },
       {
         id: 25,
@@ -361,10 +355,10 @@ export const PIS_SECTIONS: PISSection[] = [
       },
       {
         id: 26,
-        question: "Are there peak times or periods when this workflow becomes especially challenging?",
+        question: "Are there exceptions or special cases you need to watch out for during this process?",
         section: "Your Experience & Insights",
         type: "textarea",
-        placeholder: "e.g., month-end, seasonal rushes, specific events"
+        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
       },
       {
         id: 27,
@@ -425,19 +419,19 @@ export const PIS_SECTIONS: PISSection[] = [
         section: "Quality Impact Module",
         type: "radio",
         options: [
-          { value: "1", label: "No - Quality impact is not a factor" },
-          { value: "2", label: "Minimal - Very few errors" },
-          { value: "3", label: "Moderate - Some errors occur" },
-          { value: "4", label: "Significant - Errors are common" },
-          { value: "5", label: "Major - Errors are a serious problem" }
+          { value: "no", label: "No", description: "Quality impact is not a significant factor" },
+          { value: "yes", label: "Yes", description: "We have measurable quality issues (errors, rework, defects)" }
         ]
       },
       {
         id: 33,
-        question: "What type of work process will be automated?",
+        question: "Which of these best describes the work you perform in this step?",
         section: "Quality Impact Module",
         type: "radio",
-        // Note: Frontend shows Q33-Q41 when Q32 >= 4 (values 4 or 5)
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
           { value: "document", label: "Document Review & Processing", description: "Reading, extracting, or classifying documents" },
@@ -453,6 +447,10 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How often do errors or quality issues currently occur in this process?",
         section: "Quality Impact Module",
         type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "very_frequent", label: "Very frequent", description: "Errors occur in more than 30% of cases" },
           { value: "frequent", label: "Frequent", description: "Errors occur in 15-30% of cases" },
@@ -465,6 +463,10 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "What is the primary cause of errors or quality issues?",
         section: "Quality Impact Module",
         type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "fatigue", label: "Manual, repetitive work leading to human fatigue or oversight" },
           { value: "missing_info", label: "Missing or incomplete information when making decisions" },
@@ -478,6 +480,10 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "When are errors or quality issues typically discovered?",
         section: "Quality Impact Module",
         type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "after_delivery", label: "After delivery to customer", description: "Customer complaints, returns, escalations" },
           { value: "end_process", label: "At the end of the process", description: "Final review or quality check" },
@@ -490,6 +496,10 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How standardized is the current process?",
         section: "Quality Impact Module",
         type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "variable", label: "Highly variable", description: "Each case is handled differently" },
           { value: "guidelines", label: "Some guidelines", description: "General approach but flexibility in execution" },
@@ -502,6 +512,10 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "How well-suited is this work for AI quality improvement?",
         section: "Quality Impact Module",
         type: "radio",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        },
         options: [
           { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
           { value: "pattern", label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
@@ -514,30 +528,52 @@ export const PIS_SECTIONS: PISSection[] = [
         question: "What is the current error rate?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter percentage (e.g., 15 for 15%)"
+        placeholder: "Enter percentage (e.g., 15 for 15%)",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        }
       },
       {
         id: 40,
         question: "How many minutes of rework does each error require?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter minutes per error"
+        placeholder: "Enter minutes per error",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        }
       },
       {
         id: 41,
-        question: "What is the financial cost per error (if applicable)?",
+        question: "What is the estimated cost per error?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter cost in dollars (or 0 if not applicable)"
+        placeholder: "Enter cost in dollars (e.g., 50)",
+        conditional: {
+          dependsOn: 32,
+          showWhen: "yes"
+        }
       }
     ]
   }
 ];
 
-// Get all questions in order
-export const ALL_PIS_QUESTIONS = PIS_SECTIONS.flatMap(section => section.questions);
+// Helper function to get all questions flattened
+export function getAllPISQuestions(): PISQuestion[] {
+  return PIS_SECTIONS.flatMap(section => section.questions);
+}
 
-// Calculate operational readiness scores
+// Helper function to get question by ID
+export function getPISQuestionById(id: number): PISQuestion | undefined {
+  return getAllPISQuestions().find(q => q.id === id);
+}
+
+// Export flattened questions array for backwards compatibility
+export const ALL_PIS_QUESTIONS = getAllPISQuestions();
+
+// Calculate PIS operational scores from responses
 export function calculatePISScores(responses: Record<string, string>): {
   processClarity: number;
   changeMagnitude: number;
@@ -545,27 +581,29 @@ export function calculatePISScores(responses: Record<string, string>): {
 } {
   const calculateSectionScore = (sectionName: string): number => {
     const section = PIS_SECTIONS.find(s => s.section === sectionName);
-    if (!section || section.questions.length === 0) return 0;
+    if (!section) return 0;
 
-    const scores = section.questions
-      .filter(q => q.weight) // Only weighted questions
-      .map(q => {
-        const responseValue = responses[q.id.toString()];
-        if (!responseValue) return 0;
-        
-        let score = parseInt(responseValue, 10);
-        if (isNaN(score)) return 0;
-        
-        // Apply inverse scoring if needed (higher value = worse)
-        if (q.inverseScoring) {
-          score = 6 - score; // Convert 1->5, 2->4, 3->3, 4->2, 5->1
-        }
-        
-        return score * 20; // Convert 1-5 scale to 0-100
-      });
+    const questions = section.questions.filter(q => q.weight && q.weight > 0);
+    if (questions.length === 0) return 0;
 
-    if (scores.length === 0) return 0;
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    let totalScore = 0;
+    let totalWeight = 0;
+
+    questions.forEach(q => {
+      const answer = responses[q.id.toString()];
+      if (!answer) return;
+
+      const numericValue = parseInt(answer);
+      if (isNaN(numericValue)) return;
+
+      const score = q.inverseScoring ? numericValue : numericValue;
+      totalScore += score * (q.weight || 1);
+      totalWeight += q.weight || 1;
+    });
+
+    if (totalWeight === 0) return 0;
+    // Normalize to 0-100 scale (questions are 1-5, so (avg/5)*100)
+    return Math.round((totalScore / totalWeight / 5) * 100);
   };
 
   return {
@@ -577,39 +615,66 @@ export function calculatePISScores(responses: Record<string, string>): {
 
 // Extract ROI inputs from responses
 export function extractROIInputs(responses: Record<string, string>): {
-  employeeCount?: number;
-  frequency?: 'daily' | 'weekly' | 'monthly';
-  processesPerPeriod?: number;
-  minutesPerProcess?: number;
-  hasQualityImpact?: boolean;
-  errorRate?: number;
-  reworkMinutesPerError?: number;
-  costPerError?: number;
+  employeeCount: number | null;
+  frequency: 'daily' | 'weekly' | 'monthly' | null;
+  processesPerPeriod: number | null;
+  minutesPerProcess: number | null;
+  hasQualityImpact: boolean;
+  errorRate: number | null;
+  reworkMinutesPerError: number | null;
+  costPerError: number | null;
 } {
+  // Q28-Q31: Always captured
+  const employeeCount = responses['28'] ? parseInt(responses['28']) : null;
+  const frequency = responses['29'] as 'daily' | 'weekly' | 'monthly' | null || null;
+  const processesPerPeriod = responses['30'] ? parseInt(responses['30']) : null;
+  const minutesPerProcess = responses['31'] ? parseInt(responses['31']) : null;
+
+  // Q32: Changed from Likert scale to yes/no
+  const hasQualityImpact = responses['32'] === 'yes';
+
+  // Q39-Q41: Only captured when Q32 is 'yes'
+  const errorRate = hasQualityImpact && responses['39'] ? parseFloat(responses['39']) : null;
+  const reworkMinutesPerError = hasQualityImpact && responses['40'] ? parseInt(responses['40']) : null;
+  const costPerError = hasQualityImpact && responses['41'] ? parseFloat(responses['41']) : null;
+
   return {
-    employeeCount: responses['28'] ? parseInt(responses['28'], 10) : undefined,
-    frequency: responses['29'] as 'daily' | 'weekly' | 'monthly' | undefined,
-    processesPerPeriod: responses['30'] ? parseInt(responses['30'], 10) : undefined,
-    minutesPerProcess: responses['31'] ? parseInt(responses['31'], 10) : undefined,
-    hasQualityImpact: responses['32'] ? (parseInt(responses['32'], 10) >= 4) : undefined,
-    errorRate: responses['39'] ? parseFloat(responses['39']) : undefined,
-    reworkMinutesPerError: responses['40'] ? parseInt(responses['40'], 10) : undefined,
-    costPerError: responses['41'] ? parseFloat(responses['41']) : undefined,
+    employeeCount,
+    frequency,
+    processesPerPeriod,
+    minutesPerProcess,
+    hasQualityImpact,
+    errorRate,
+    reworkMinutesPerError,
+    costPerError,
   };
 }
 
-// Extract qualitative responses for analysis
-export function extractQualitativeResponses(responses: Record<string, string>): Record<string, string> {
-  const qualitative: Record<string, string> = {};
-  
-  ALL_PIS_QUESTIONS.forEach(q => {
-    if (q.type === 'text' || q.type === 'textarea') {
-      const value = responses[q.id.toString()];
-      if (value) {
-        qualitative[`q${q.id}`] = value;
-      }
-    }
-  });
-  
-  return qualitative;
+// Extract qualitative responses
+export function extractQualitativeResponses(responses: Record<string, string>): {
+  toolsUsed?: string;
+  toolLimitations?: string;
+  timeWasters?: string;
+  automationWish?: string;
+  typicalOutcome?: string;
+  keyDifficulties?: string;
+  personalSteps?: string;
+  criticalKnowledge?: string;
+  impactOfDelays?: string;
+  exceptions?: string;
+  additionalContext?: string;
+} {
+  return {
+    toolsUsed: responses['17'] || undefined,
+    toolLimitations: responses['18'] || undefined,
+    timeWasters: responses['19'] || undefined,
+    automationWish: responses['20'] || undefined,
+    typicalOutcome: responses['21'] || undefined,
+    keyDifficulties: responses['22'] || undefined,
+    personalSteps: responses['23'] || undefined,
+    criticalKnowledge: responses['24'] || undefined,
+    impactOfDelays: responses['25'] || undefined,
+    exceptions: responses['26'] || undefined,
+    additionalContext: responses['27'] || undefined,
+  };
 }

@@ -12,7 +12,7 @@ import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ALL_PIS_QUESTIONS } from "@shared/pisQuestions";
+import { getAllPISQuestions } from "@shared/pisQuestions";
 import type { Workflow, Company } from "@shared/schema";
 
 interface PISData {
@@ -26,6 +26,8 @@ export default function PISForm() {
   const [, setLocation] = useLocation();
   const shareableId = params?.shareableId || '';
   const { toast } = useToast();
+  
+  const ALL_PIS_QUESTIONS = getAllPISQuestions();
   
   const [currentSection, setCurrentSection] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -94,7 +96,7 @@ export default function PISForm() {
 
     // Check all required questions are answered
     const q32Answer = answers['32'];
-    const isErrorProne = q32Answer === '4' || q32Answer === '5';
+    const isErrorProne = q32Answer === 'yes';
     
     const requiredQuestions = ALL_PIS_QUESTIONS.filter(q => {
       // Text/textarea are optional
@@ -156,8 +158,8 @@ export default function PISForm() {
   const isRespondentInfoSection = currentSection === 0;
   const currentPISSection = isRespondentInfoSection ? null : sections[currentSection - 1];
 
-  // Check if Q32 indicates error-prone workflow (4 or 5 means yes)
-  const isErrorProne = answers['32'] === '4' || answers['32'] === '5';
+  // Check if Q32 indicates quality impact (yes means show Quality Impact module)
+  const isErrorProne = answers['32'] === 'yes';
 
   // Calculate progress - include required questions only
   const requiredQuestionsCount = ALL_PIS_QUESTIONS.filter(q => {
@@ -192,10 +194,10 @@ export default function PISForm() {
         const sectionRequiredQuestions = currentPISSection.questions.filter(q => {
           // Text/textarea are optional
           if (q.type === 'text' || q.type === 'textarea') return false;
-          // Quality Impact questions only required if error-prone
+          // Quality Impact questions only required if quality impact exists
           if (q.id >= 33 && q.id <= 41) {
             const q32Answer = answers['32'];
-            const isErrorProne = q32Answer === '4' || q32Answer === '5';
+            const isErrorProne = q32Answer === 'yes';
             return isErrorProne;
           }
           return true;
@@ -227,7 +229,7 @@ export default function PISForm() {
   // Filter questions based on Q32 (conditional Quality Impact)
   const getVisibleQuestions = (questions: typeof ALL_PIS_QUESTIONS) => {
     return questions.filter(q => {
-      // Quality Impact questions (33-41) only shown if error-prone (Q32 = 4 or 5)
+      // Quality Impact questions (33-41) only shown if quality impact exists (Q32 = yes)
       if (q.id >= 33 && q.id <= 41) {
         return isErrorProne;
       }
