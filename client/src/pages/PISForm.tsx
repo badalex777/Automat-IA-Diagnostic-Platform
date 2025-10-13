@@ -185,6 +185,33 @@ export default function PISForm() {
         });
         return;
       }
+    } else {
+      // Validate required questions in current section before proceeding
+      const currentPISSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
+      if (currentPISSection) {
+        const sectionRequiredQuestions = currentPISSection.questions.filter(q => {
+          // Text/textarea are optional
+          if (q.type === 'text' || q.type === 'textarea') return false;
+          // Quality Impact questions only required if error-prone
+          if (q.id >= 33 && q.id <= 41) {
+            const q32Answer = answers['32'];
+            const isErrorProne = q32Answer === '4' || q32Answer === '5';
+            return isErrorProne;
+          }
+          return true;
+        });
+        
+        const missingSectionAnswers = sectionRequiredQuestions.filter(q => !answers[q.id.toString()]);
+        
+        if (missingSectionAnswers.length > 0) {
+          toast({
+            title: "Required questions",
+            description: `Please answer all required questions in this section before continuing. ${missingSectionAnswers.length} question(s) remaining.`,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
     }
     setCurrentSection(prev => Math.min(prev + 1, totalSections - 1));
     window.scrollTo({ top: 0, behavior: 'smooth' });
