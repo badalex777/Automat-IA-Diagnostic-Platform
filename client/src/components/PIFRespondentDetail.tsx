@@ -186,7 +186,7 @@ export function PIFRespondentDetail({ response }: PIFRespondentDetailProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             {Object.entries(qualitative).map(([questionId, answer]) => {
-              const question = ALL_PIS_QUESTIONS.find(q => q.id.toString() === questionId);
+              const question = ALL_PIF_QUESTIONS.find(q => q.id.toString() === questionId);
               if (!question || !answer) return null;
               
               return (
