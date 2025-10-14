@@ -298,70 +298,70 @@ export const PIF_SECTIONS: PIFSection[] = [
     description: "Share your experience and insights about this workflow",
     questions: [
       {
-        id: 23,
+        id: 17,
         question: "What specific steps do you personally perform in this workflow?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
       },
       {
-        id: 24,
+        id: 18,
         question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
       },
       {
-        id: 26,
+        id: 19,
         question: "Are there exceptions or special cases you need to watch out for during this process?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
       },
       {
-        id: 17,
+        id: 20,
         question: "What tools or systems do you use most in your daily work?",
         section: "Your Experience & Insights",
         type: "text",
         placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
       },
       {
-        id: 18,
+        id: 21,
         question: "What do you find most frustrating or limiting about these tools?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Describe the main pain points or limitations you experience"
       },
       {
-        id: 19,
+        id: 22,
         question: "What are the biggest time-wasters in your current workflow?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Describe tasks that take longer than they should"
       },
       {
-        id: 20,
+        id: 23,
         question: "If you could automate one part of this process, what would it be and why?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Describe what you'd automate and the impact it would have"
       },
       {
-        id: 21,
+        id: 24,
         question: "What do you usually produce or complete at the end of your step?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Example: Approved file, completed report, data entry in system, email sent to customer, invoice processed"
       },
       {
-        id: 22,
+        id: 25,
         question: "What makes this process slow, repetitive, or error-prone in your experience?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Describe key difficulties or pain points you encounter"
       },
       {
-        id: 25,
+        id: 26,
         question: "What happens if this process is delayed or done incorrectly?",
         section: "Your Experience & Insights",
         type: "textarea",

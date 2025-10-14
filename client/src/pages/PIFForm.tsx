@@ -112,8 +112,8 @@ export default function PIFForm() {
     const isErrorProne = q32Answer === 'yes';
     
     const requiredQuestions = ALL_PIF_QUESTIONS.filter(q => {
-      // Only Q23, Q24, Q26 are mandatory in Experience & Insights
-      if (q.id === 23 || q.id === 24 || q.id === 26) return true;
+      // Only Q17, Q18, Q19 are mandatory in Experience & Insights
+      if (q.id === 17 || q.id === 18 || q.id === 19) return true;
       // Other text/textarea are optional
       if (q.type === 'text' || q.type === 'textarea') return false;
       // Quality Impact questions only required if error-prone
@@ -178,8 +178,8 @@ export default function PIFForm() {
 
   // Calculate progress - include required questions only
   const requiredQuestionsCount = ALL_PIF_QUESTIONS.filter(q => {
-    // Only Q23, Q24, Q26 are mandatory in Experience & Insights
-    if (q.id === 23 || q.id === 24 || q.id === 26) return true;
+    // Only Q17, Q18, Q19 are mandatory in Experience & Insights
+    if (q.id === 17 || q.id === 18 || q.id === 19) return true;
     // Other text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
     // Quality Impact questions (33-40) only required if error-prone
@@ -189,8 +189,8 @@ export default function PIFForm() {
   const answeredCount = Object.keys(answers).filter(id => {
     const q = ALL_PIF_QUESTIONS.find(q => q.id.toString() === id);
     if (!q) return false;
-    // Only Q23, Q24, Q26 are mandatory in Experience & Insights
-    if (q.id === 23 || q.id === 24 || q.id === 26) return true;
+    // Only Q17, Q18, Q19 are mandatory in Experience & Insights
+    if (q.id === 17 || q.id === 18 || q.id === 19) return true;
     // Other text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
     // Quality Impact questions (33-40) only required if error-prone
@@ -214,8 +214,8 @@ export default function PIFForm() {
       const currentPIFSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
       if (currentPIFSection) {
         const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
-          // Only Q23, Q24, Q26 are mandatory in Experience & Insights
-          if (q.id === 23 || q.id === 24 || q.id === 26) return true;
+          // Only Q17, Q18, Q19 are mandatory in Experience & Insights
+          if (q.id === 17 || q.id === 18 || q.id === 19) return true;
           // Other text/textarea are optional
           if (q.type === 'text' || q.type === 'textarea') return false;
           // Quality Impact questions only required if quality impact exists
@@ -354,8 +354,8 @@ export default function PIFForm() {
                   <Label className="text-base">
                     Q{question.id}. {question.question}
                     {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
-                    {(question.id === 23 || question.id === 24 || question.id === 26) && <span className="text-destructive ml-1">*</span>}
-                    {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 23 && question.id !== 24 && question.id !== 26 && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                    {(question.id === 17 || question.id === 18 || question.id === 19) && <span className="text-destructive ml-1">*</span>}
+                    {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 17 && question.id !== 18 && question.id !== 19 && <span className="text-muted-foreground ml-1">(Optional)</span>}
                   </Label>
 
                   {question.type === 'radio' && question.options && (
