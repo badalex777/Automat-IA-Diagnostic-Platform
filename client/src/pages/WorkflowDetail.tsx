@@ -52,6 +52,8 @@ export default function WorkflowDetail() {
   const { data: workflow, isLoading: workflowLoading, error: workflowError } = useQuery<Workflow>({
     queryKey: [`/api/workflows/${workflowId}`],
     enabled: !!workflowId,
+    refetchInterval: 10000, // Refetch every 10 seconds to catch new PIF submissions
+    refetchOnWindowFocus: true,
   });
 
   const { data: tfaAssessment, isLoading: tfaLoading, error: tfaError } = useQuery<TFAAssessment>({
@@ -71,6 +73,8 @@ export default function WorkflowDetail() {
   }>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
     enabled: !!workflowId,
+    refetchInterval: 10000, // Refetch every 10 seconds to catch new submissions
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
