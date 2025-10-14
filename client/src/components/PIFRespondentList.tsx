@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User, ChevronRight, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import type { PISResponse } from "@shared/schema";
+import type { PIFResponse } from "@shared/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,13 +16,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface PISRespondentListProps {
-  responses: PISResponse[];
-  onViewDetail: (response: PISResponse) => void;
+interface PIFRespondentListProps {
+  responses: PIFResponse[];
+  onViewDetail: (response: PIFResponse) => void;
   onDelete?: (id: string) => void;
 }
 
-export function PISRespondentList({ responses, onViewDetail, onDelete }: PISRespondentListProps) {
+export function PIFRespondentList({ responses, onViewDetail, onDelete }: PIFRespondentListProps) {
   if (responses.length === 0) {
     return (
       <Card>

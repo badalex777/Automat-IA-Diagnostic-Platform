@@ -9,8 +9,8 @@ import CompanyDetail from "@/pages/CompanyDetail";
 import WorkflowDetail from "@/pages/WorkflowDetail";
 import TFAForm from "@/pages/TFAForm";
 import TFAThankYou from "@/pages/TFAThankYou";
-import PISForm from "@/pages/PISForm";
-import PISThankYou from "@/pages/PISThankYou";
+import PIFForm from "@/pages/PIFForm";
+import PIFThankYou from "@/pages/PIFThankYou";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,8 +21,8 @@ function Router() {
       <Route path="/company/:companyId/workflow/:workflowId" component={WorkflowDetail} />
       <Route path="/tfa/:shareableLink/thank-you" component={TFAThankYou} />
       <Route path="/tfa/:shareableLink" component={TFAForm} />
-      <Route path="/pis/:shareableId/thank-you" component={PISThankYou} />
-      <Route path="/pis/:shareableId" component={PISForm} />
+      <Route path="/pif/:shareableId/thank-you" component={PIFThankYou} />
+      <Route path="/pif/:shareableId" component={PIFForm} />
       <Route component={NotFound} />
     </Switch>
   );

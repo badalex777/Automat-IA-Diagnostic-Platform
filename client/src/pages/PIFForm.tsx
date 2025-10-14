@@ -12,22 +12,22 @@ import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { getAllPISQuestions } from "@shared/pisQuestions";
+import { getAllPIFQuestions } from "@shared/pifQuestions";
 import type { Workflow, Company } from "@shared/schema";
 
-interface PISData {
+interface PIFData {
   workflow: Workflow;
   company: Company;
   shareableId: string;
 }
 
-export default function PISForm() {
-  const [, params] = useRoute("/pis/:shareableId");
+export default function PIFForm() {
+  const [, params] = useRoute("/pif/:shareableId");
   const [, setLocation] = useLocation();
   const shareableId = params?.shareableId || '';
   const { toast } = useToast();
   
-  const ALL_PIS_QUESTIONS = getAllPISQuestions();
+  const ALL_PIF_QUESTIONS = getAllPIFQuestions();
   
   const [currentSection, setCurrentSection] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -35,8 +35,8 @@ export default function PISForm() {
   const [respondentRole, setRespondentRole] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
 
-  const { data: pisData, isLoading, error } = useQuery<PISData>({
-    queryKey: [`/api/pis/shareable/${shareableId}`],
+  const { data: pifData, isLoading, error } = useQuery<PIFData>({
+    queryKey: [`/api/pif/shareable/${shareableId}`],
     enabled: !!shareableId,
   });
 
@@ -57,14 +57,14 @@ export default function PISForm() {
       respondentResponsibilities?: string;
       responses: Record<string, string>;
     }) => {
-      if (!pisData?.workflow?.id) throw new Error("Workflow not found");
-      return await apiRequest('POST', `/api/workflows/${pisData.workflow.id}/pis/submit`, data);
+      if (!pifData?.workflow?.id) throw new Error("Workflow not found");
+      return await apiRequest('POST', `/api/workflows/${pifData.workflow.id}/pif/submit`, data);
     },
     onSuccess: () => {
-      if (pisData?.workflow?.id) {
-        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pisData.workflow.id}/pis`] });
+      if (pifData?.workflow?.id) {
+        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pifData.workflow.id}/pif`] });
       }
-      setLocation(`/pis/${shareableId}/thank-you`);
+      setLocation(`/pif/${shareableId}/thank-you`);
     },
     onError: (error: Error) => {
       toast({
@@ -98,7 +98,7 @@ export default function PISForm() {
     const q32Answer = answers['32'];
     const isErrorProne = q32Answer === 'yes';
     
-    const requiredQuestions = ALL_PIS_QUESTIONS.filter(q => {
+    const requiredQuestions = ALL_PIF_QUESTIONS.filter(q => {
       // Text/textarea are optional
       if (q.type === 'text' || q.type === 'textarea') return false;
       // Quality Impact questions only required if error-prone
@@ -133,7 +133,7 @@ export default function PISForm() {
     );
   }
 
-  if (!pisData) {
+  if (!pifData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Survey not found</p>
@@ -141,28 +141,28 @@ export default function PISForm() {
     );
   }
 
-  const { company, workflow } = pisData;
+  const { company, workflow } = pifData;
 
-  // Section definitions: 0 = Respondent Info, 1-8 = PIS sections
-  const sections = ALL_PIS_QUESTIONS.reduce((acc, q) => {
+  // Section definitions: 0 = Respondent Info, 1-8 = PIF sections
+  const sections = ALL_PIF_QUESTIONS.reduce((acc, q) => {
     if (!acc.find(s => s.name === q.section)) {
       acc.push({
         name: q.section,
-        questions: ALL_PIS_QUESTIONS.filter(sq => sq.section === q.section)
+        questions: ALL_PIF_QUESTIONS.filter(sq => sq.section === q.section)
       });
     }
     return acc;
-  }, [] as Array<{ name: string; questions: typeof ALL_PIS_QUESTIONS }>);
+  }, [] as Array<{ name: string; questions: typeof ALL_PIF_QUESTIONS }>);
 
   const totalSections = sections.length + 1; // +1 for respondent info
   const isRespondentInfoSection = currentSection === 0;
-  const currentPISSection = isRespondentInfoSection ? null : sections[currentSection - 1];
+  const currentPIFSection = isRespondentInfoSection ? null : sections[currentSection - 1];
 
   // Check if Q32 indicates quality impact (yes means show Quality Impact module)
   const isErrorProne = answers['32'] === 'yes';
 
   // Calculate progress - include required questions only
-  const requiredQuestionsCount = ALL_PIS_QUESTIONS.filter(q => {
+  const requiredQuestionsCount = ALL_PIF_QUESTIONS.filter(q => {
     // Text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
     // Quality Impact questions (33-41) only required if error-prone
@@ -170,7 +170,7 @@ export default function PISForm() {
     return true;
   }).length;
   const answeredCount = Object.keys(answers).filter(id => {
-    const q = ALL_PIS_QUESTIONS.find(q => q.id.toString() === id);
+    const q = ALL_PIF_QUESTIONS.find(q => q.id.toString() === id);
     if (!q || q.type === 'text' || q.type === 'textarea') return false;
     if (q.id >= 33 && q.id <= 41 && !isErrorProne) return false;
     return true;
@@ -189,9 +189,9 @@ export default function PISForm() {
       }
     } else {
       // Validate required questions in current section before proceeding
-      const currentPISSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
-      if (currentPISSection) {
-        const sectionRequiredQuestions = currentPISSection.questions.filter(q => {
+      const currentPIFSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
+      if (currentPIFSection) {
+        const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
           // Text/textarea are optional
           if (q.type === 'text' || q.type === 'textarea') return false;
           // Quality Impact questions only required if quality impact exists
@@ -227,7 +227,7 @@ export default function PISForm() {
   const isLastSection = currentSection === totalSections - 1;
   
   // Filter questions based on Q32 (conditional Quality Impact)
-  const getVisibleQuestions = (questions: typeof ALL_PIS_QUESTIONS) => {
+  const getVisibleQuestions = (questions: typeof ALL_PIF_QUESTIONS) => {
     return questions.filter(q => {
       // Quality Impact questions (33-41) only shown if quality impact exists (Q32 = yes)
       if (q.id >= 33 && q.id <= 41) {
@@ -243,7 +243,7 @@ export default function PISForm() {
         <div className="max-w-4xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-pis-title">Process Insight Survey</h1>
+              <h1 className="text-2xl font-semibold" data-testid="text-pif-title">Process Insight Form</h1>
               <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
               {workflow.description && (
                 <p className="text-sm text-muted-foreground mt-2" data-testid="text-workflow-description">{workflow.description}</p>
@@ -310,11 +310,11 @@ export default function PISForm() {
               </div>
             </div>
           </div>
-        ) : currentPISSection ? (
+        ) : currentPIFSection ? (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{currentPISSection.name}</h2>
-              {currentPISSection.name === "Quality Impact" && !isErrorProne && (
+              <h2 className="text-xl font-semibold">{currentPIFSection.name}</h2>
+              {currentPIFSection.name === "Quality Impact" && !isErrorProne && (
                 <Alert className="mt-4">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
@@ -325,7 +325,7 @@ export default function PISForm() {
             </div>
 
             <div className="space-y-8">
-              {getVisibleQuestions(currentPISSection.questions).map((question) => (
+              {getVisibleQuestions(currentPIFSection.questions).map((question) => (
                 <div key={question.id} className="space-y-3">
                   <Label className="text-base">
                     Q{question.id}. {question.question}

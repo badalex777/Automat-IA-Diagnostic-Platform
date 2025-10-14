@@ -1,18 +1,18 @@
-// Process Insight Survey (PIS) Questions
+// Process Insight Form (PIF) Questions
 // Collects operational readiness data and ROI inputs from end users
 
-export interface PISOption {
+export interface PIFOption {
   value: string;
   label: string;
   description?: string;
 }
 
-export interface PISQuestion {
+export interface PIFQuestion {
   id: number;
   question: string;
   section: string;
   type: 'radio' | 'number' | 'text' | 'textarea';
-  options?: PISOption[];
+  options?: PIFOption[];
   weight?: number;
   inverseScoring?: boolean;
   placeholder?: string;
@@ -22,18 +22,18 @@ export interface PISQuestion {
   };
 }
 
-export interface PISSection {
+export interface PIFSection {
   section: string;
   weight: number;
-  questions: PISQuestion[];
+  questions: PIFQuestion[];
   description: string;
 }
 
 // Operational Readiness Sections (for Readiness Rubric - 40% of total)
-export const PIS_SECTIONS: PISSection[] = [
+export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Process Clarity",
-    weight: 20, // 20% of PIS contribution to Readiness Rubric
+    weight: 20, // 20% of PIF contribution to Readiness Rubric
     description: "Assess whether the workflow is clearly defined, consistent, and repeatable",
     questions: [
       {
@@ -82,7 +82,7 @@ export const PIS_SECTIONS: PISSection[] = [
   },
   {
     section: "Change Magnitude",
-    weight: 20, // 20% of PIS contribution to Readiness Rubric
+    weight: 20, // 20% of PIF contribution to Readiness Rubric
     description: "Understand how much employee behavior, retraining, or adaptation will be needed when introducing automation/AI",
     questions: [
       {
@@ -561,26 +561,26 @@ export const PIS_SECTIONS: PISSection[] = [
 ];
 
 // Helper function to get all questions flattened
-export function getAllPISQuestions(): PISQuestion[] {
-  return PIS_SECTIONS.flatMap(section => section.questions);
+export function getAllPIFQuestions(): PIFQuestion[] {
+  return PIF_SECTIONS.flatMap(section => section.questions);
 }
 
 // Helper function to get question by ID
-export function getPISQuestionById(id: number): PISQuestion | undefined {
-  return getAllPISQuestions().find(q => q.id === id);
+export function getPIFQuestionById(id: number): PIFQuestion | undefined {
+  return getAllPIFQuestions().find(q => q.id === id);
 }
 
 // Export flattened questions array for backwards compatibility
-export const ALL_PIS_QUESTIONS = getAllPISQuestions();
+export const ALL_PIF_QUESTIONS = getAllPIFQuestions();
 
-// Calculate PIS operational scores from responses
-export function calculatePISScores(responses: Record<string, string>): {
+// Calculate PIF operational scores from responses
+export function calculatePIFScores(responses: Record<string, string>): {
   processClarity: number;
   changeMagnitude: number;
   workflowBrittleness: number;
 } {
   const calculateSectionScore = (sectionName: string): number => {
-    const section = PIS_SECTIONS.find(s => s.section === sectionName);
+    const section = PIF_SECTIONS.find(s => s.section === sectionName);
     if (!section) return 0;
 
     const questions = section.questions.filter(q => q.weight && q.weight > 0);

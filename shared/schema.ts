@@ -121,13 +121,13 @@ export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omi
   createdAt: true,
 });
 
-export const insertPISResponseSchema = createInsertSchema(pisResponses).omit({
+export const insertPIFResponseSchema = createInsertSchema(pisResponses).omit({
   id: true,
   shareableId: true,
   createdAt: true,
 });
 
-export const pisSubmitSchema = z.object({
+export const pifSubmitSchema = z.object({
   respondentName: z.string().min(1, "Name is required"),
   respondentRole: z.string().min(1, "Role is required"),
   respondentResponsibilities: z.string().optional(),
@@ -157,9 +157,9 @@ export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
 export type TFAAssessment = typeof tfaAssessments.$inferSelect;
 export type InsertTFAAssessment = z.infer<typeof insertTFAAssessmentSchema>;
 
-export type PISResponse = typeof pisResponses.$inferSelect;
-export type InsertPISResponse = z.infer<typeof insertPISResponseSchema>;
-export type PISSubmit = z.infer<typeof pisSubmitSchema>;
+export type PIFResponse = typeof pisResponses.$inferSelect;
+export type InsertPIFResponse = z.infer<typeof insertPIFResponseSchema>;
+export type PIFSubmit = z.infer<typeof pifSubmitSchema>;
 
 export type BusinessImpact = typeof businessImpact.$inferSelect;
 export type InsertBusinessImpact = z.infer<typeof insertBusinessImpactSchema>;

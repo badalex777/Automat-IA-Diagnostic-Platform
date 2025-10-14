@@ -2,13 +2,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import type { AggregatedPISScores } from "@shared/pisCalculations";
+import type { AggregatedPIFScores } from "@shared/pifCalculations";
 
-interface PISAggregatedScoresProps {
-  aggregated: AggregatedPISScores;
+interface PIFAggregatedScoresProps {
+  aggregated: AggregatedPIFScores;
 }
 
-export function PISAggregatedScores({ aggregated }: PISAggregatedScoresProps) {
+export function PIFAggregatedScores({ aggregated }: PIFAggregatedScoresProps) {
   const getVarianceIcon = (variance: number) => {
     if (variance > 1.5) return <TrendingUp className="w-4 h-4 text-destructive" />;
     if (variance > 0.5) return <Minus className="w-4 h-4 text-warning" />;
