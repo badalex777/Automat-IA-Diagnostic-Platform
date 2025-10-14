@@ -12,7 +12,7 @@ interface ShareableLinkCardProps {
   workflowId: string;
   companyName: string;
   workflowTitle: string;
-  type?: 'tfa' | 'pis';
+  type?: 'tfa' | 'pif';
 }
 
 export default function ShareableLinkCard({
@@ -29,8 +29,8 @@ export default function ShareableLinkCard({
     enabled: !!workflowId && type === 'tfa',
   });
 
-  // For PIS, we generate a new shareableId with each workflow
-  const pisShareableId = type === 'pis' ? workflowId : '';
+  // For PIF, we generate a new shareableId with each workflow
+  const pifShareableId = type === 'pif' ? workflowId : '';
 
   const generateLinkMutation = useMutation({
     mutationFn: async () => {
@@ -53,8 +53,8 @@ export default function ShareableLinkCard({
     },
   });
 
-  const shareableUrl = type === 'pis' && pisShareableId
-    ? `${window.location.origin}/pis/${pisShareableId}`
+  const shareableUrl = type === 'pif' && pifShareableId
+    ? `${window.location.origin}/pif/${pifShareableId}`
     : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
@@ -73,19 +73,19 @@ export default function ShareableLinkCard({
     }
   };
 
-  const linkTitle = type === 'pis' ? 'Process Insight Survey Link' : 'Shareable TFA Link';
-  const linkDescription = type === 'pis' 
+  const linkTitle = type === 'pif' ? 'Process Insight Form Link' : 'Shareable TFA Link';
+  const linkDescription = type === 'pif' 
     ? 'Share this link with end users and process owners to collect operational insights. Multiple responses can be submitted.'
     : 'Send this link to the technical contact to complete the Technical Feasibility Assessment';
 
-  if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pis' && !shareableUrl)) {
+  if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pif' && !shareableUrl)) {
     return (
       <Card className="p-6" data-testid="card-shareable-link">
         <div className="space-y-4">
           <div>
             <h3 className="font-semibold text-base mb-1">{linkTitle}</h3>
             <p className="text-sm text-muted-foreground">
-              {type === 'pis' 
+              {type === 'pif' 
                 ? 'Share a link with end users and process owners to collect operational insights about this workflow.'
                 : 'Generate a unique link to send to your technical contact for completing the assessment.'
               }

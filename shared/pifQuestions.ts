@@ -132,7 +132,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   },
   {
     section: "Workflow Brittleness",
-    weight: 15, // 15% of PIS contribution to Readiness Rubric
+    weight: 15, // 15% of PIF contribution to Readiness Rubric
     description: "Identify hidden fragility — processes that break easily, depend on manual steps, or lack error handling",
     questions: [
       {

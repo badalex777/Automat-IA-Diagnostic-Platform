@@ -15,18 +15,18 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
-import { PISAggregatedScores } from "@/components/PISAggregatedScores";
-import { PISRespondentList } from "@/components/PISRespondentList";
-import { PISRespondentDetail } from "@/components/PISRespondentDetail";
+import { PIFAggregatedScores } from "@/components/PIFAggregatedScores";
+import { PIFRespondentList } from "@/components/PIFRespondentList";
+import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import ReadinessRubric from "@/components/ReadinessRubric";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, PISResponse } from "@shared/schema";
-import type { AggregatedPISScores } from "@shared/pisCalculations";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse } from "@shared/schema";
+import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
-import { calculateReadinessRubric } from "@shared/pisCalculations";
+import { calculateReadinessRubric } from "@shared/pifCalculations";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +42,7 @@ export default function WorkflowDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
-  const [selectedPISResponse, setSelectedPISResponse] = useState<PISResponse | null>(null);
+  const [selectedPIFResponse, setSelectedPIFResponse] = useState<PIFResponse | null>(null);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -65,11 +65,11 @@ export default function WorkflowDetail() {
     enabled: !!workflowId,
   });
 
-  const { data: pisData, isLoading: pisLoading, error: pisError } = useQuery<{ 
-    responses: PISResponse[]; 
-    aggregated: AggregatedPISScores 
+  const { data: pifData, isLoading: pifLoading, error: pifError } = useQuery<{ 
+    responses: PIFResponse[]; 
+    aggregated: AggregatedPIFScores 
   }>({
-    queryKey: [`/api/workflows/${workflowId}/pis`],
+    queryKey: [`/api/workflows/${workflowId}/pif`],
     enabled: !!workflowId,
   });
 
@@ -270,7 +270,7 @@ export default function WorkflowDetail() {
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
-            <TabsTrigger value="pis" data-testid="tab-pis">Process Insights</TabsTrigger>
+            <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
             <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
             <TabsTrigger value="impact" data-testid="tab-impact">Business Impact</TabsTrigger>
           </TabsList>
@@ -412,32 +412,32 @@ export default function WorkflowDetail() {
             )}
           </TabsContent>
 
-          <TabsContent value="pis" className="space-y-6">
-            {pisError ? (
+          <TabsContent value="pif" className="space-y-6">
+            {pifError ? (
               <div className="bg-card rounded-lg border border-destructive p-6">
-                <p className="text-destructive">Error loading PIS data: {pisError.message}</p>
+                <p className="text-destructive">Error loading PIF data: {pifError.message}</p>
               </div>
-            ) : pisLoading ? (
-              <p className="text-muted-foreground">Loading Process Insight Survey data...</p>
-            ) : pisData && pisData.responses.length > 0 ? (
+            ) : pifLoading ? (
+              <p className="text-muted-foreground">Loading Process Insight Form data...</p>
+            ) : pifData && pifData.responses.length > 0 ? (
               <>
                 <Card className="p-6">
                   <h3 className="font-semibold text-lg mb-4">Aggregated Operational Readiness</h3>
-                  <PISAggregatedScores aggregated={pisData.aggregated} />
+                  <PIFAggregatedScores aggregated={pifData.aggregated} />
                 </Card>
 
                 <Card className="p-6">
                   <h3 className="font-semibold text-lg mb-4">Respondent Insights</h3>
-                  <PISRespondentList
-                    responses={pisData.responses}
-                    onViewDetail={(response) => setSelectedPISResponse(response)}
+                  <PIFRespondentList
+                    responses={pifData.responses}
+                    onViewDetail={(response) => setSelectedPIFResponse(response)}
                     onDelete={async (id) => {
                       try {
-                        await apiRequest('DELETE', `/api/pis/${id}`, {});
-                        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/pis`] });
+                        await apiRequest('DELETE', `/api/pif/${id}`, {});
+                        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/pif`] });
                         toast({
                           title: "Response deleted",
-                          description: "The PIS response has been deleted successfully.",
+                          description: "The PIF response has been deleted successfully.",
                         });
                       } catch (error: any) {
                         toast({
@@ -454,11 +454,11 @@ export default function WorkflowDetail() {
                   workflowId={workflowId}
                   companyName={company?.name || ''}
                   workflowTitle={workflow?.name || ''}
-                  type="pis"
+                  type="pif"
                 />
               </>
             ) : (
-              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-no-pis">
+              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-no-pif">
                 <div className="text-center py-8">
                   <h3 className="text-lg font-semibold mb-2">No Process Insights Yet</h3>
                   <p className="text-muted-foreground mb-6">
@@ -468,20 +468,20 @@ export default function WorkflowDetail() {
                     workflowId={workflowId}
                     companyName={company?.name || ''}
                     workflowTitle={workflow?.name || ''}
-                    type="pis"
+                    type="pif"
                   />
                 </div>
               </div>
             )}
 
-            {/* PIS Response Detail Dialog */}
-            <Dialog open={!!selectedPISResponse} onOpenChange={() => setSelectedPISResponse(null)}>
+            {/* PIF Response Detail Dialog */}
+            <Dialog open={!!selectedPIFResponse} onOpenChange={() => setSelectedPIFResponse(null)}>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Process Insight Survey Response</DialogTitle>
+                  <DialogTitle>Process Insight Form Response</DialogTitle>
                 </DialogHeader>
-                {selectedPISResponse && (
-                  <PISRespondentDetail response={selectedPISResponse} />
+                {selectedPIFResponse && (
+                  <PIFRespondentDetail response={selectedPIFResponse} />
                 )}
               </DialogContent>
             </Dialog>
@@ -491,15 +491,15 @@ export default function WorkflowDetail() {
             {(() => {
               // Check if we have all required data for readiness calculation
               const hasTFA = tfaAssessment && tfaAssessment.score !== null && tfaAssessment.score !== undefined;
-              const hasPIS = pisData && pisData.responses.length > 0;
+              const hasPIF = pifData && pifData.responses.length > 0;
               
-              if (!hasTFA || !hasPIS) {
+              if (!hasTFA || !hasPIF) {
                 return (
                   <div className="bg-card rounded-lg border border-border p-6" data-testid="card-readiness-incomplete">
                     <div className="text-center py-8">
                       <h3 className="text-lg font-semibold mb-2">Readiness Rubric</h3>
                       <p className="text-muted-foreground mb-4">
-                        The combined readiness assessment requires both Technical Feasibility (TFA) and Process Insight Survey (PIS) data.
+                        The combined readiness assessment requires both Technical Feasibility (TFA) and Process Insight Form (PIF) data.
                       </p>
                       <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center justify-center gap-2">
@@ -510,10 +510,10 @@ export default function WorkflowDetail() {
                           )}
                         </div>
                         <div className="flex items-center justify-center gap-2">
-                          {hasPIS ? (
-                            <span className="text-green-600 dark:text-green-400">✓ PIS Complete ({pisData.responses.length} response{pisData.responses.length > 1 ? 's' : ''})</span>
+                          {hasPIF ? (
+                            <span className="text-green-600 dark:text-green-400">✓ PIF Complete ({pifData.responses.length} response{pifData.responses.length > 1 ? 's' : ''})</span>
                           ) : (
-                            <span>○ PIS Pending</span>
+                            <span>○ PIF Pending</span>
                           )}
                         </div>
                       </div>
@@ -557,7 +557,7 @@ export default function WorkflowDetail() {
               const rubric = calculateReadinessRubric(
                 tfaAssessment.score || 0,
                 sectionScores,
-                pisData.aggregated
+                pifData.aggregated
               );
 
               return <ReadinessRubric rubric={rubric} />;

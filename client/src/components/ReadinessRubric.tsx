@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle, XCircle } from "lucide-react";
-import type { ReadinessRubricScore } from "@shared/pisCalculations";
+import type { ReadinessRubricScore } from "@shared/pifCalculations";
 
 interface ReadinessRubricProps {
   rubric: ReadinessRubricScore;
@@ -117,7 +117,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
           </div>
           <div className="bg-muted/30 rounded-md p-4">
             <p className="text-sm text-muted-foreground mb-1">Operational Readiness (40%)</p>
-            <p className="text-2xl font-bold" data-testid="text-pis-score">{rubric.pisScore}/100</p>
+            <p className="text-2xl font-bold" data-testid="text-pif-score">{rubric.pifScore}/100</p>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             })}
           </div>
 
-          {/* PIS Components */}
+          {/* PIF Components */}
           <div className="space-y-3 pt-4 border-t border-border">
             <p className="text-sm font-medium text-muted-foreground">Operational Readiness (40%)</p>
             {(['processClarity', 'changeMagnitude', 'workflowBrittleness'] as const).map((key) => {
