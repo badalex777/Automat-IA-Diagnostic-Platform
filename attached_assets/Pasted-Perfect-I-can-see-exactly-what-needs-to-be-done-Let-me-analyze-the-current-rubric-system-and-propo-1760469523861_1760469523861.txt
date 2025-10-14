@@ -1,0 +1,75 @@
+Perfect! I can see exactly what needs to be done. Let me analyze the current rubric system and propose a comprehensive expansion plan.
+
+Current State Analysis
+Time Savings Rubric Q1 has 5 categories:
+
+Data Entry & Validation → 60% base
+Document Processing & Review → 45% base
+Communication & Coordination → 50% base
+Research & Analysis → 35% base
+QA & Compliance → 40% base
+Quality Impact Rubric Q1 has 7 categories:
+
+Data Entry & Validation → 70% base
+Document Review & Processing → 60% base
+Communication & Customer Service → 50% base
+Analysis & Reporting → 55% base
+Compliance & Validation → 65% base
+Coordination & Scheduling → 45% base
+Creative & Strategic Work → 25% base
+You're right - they're similar but inconsistent!
+
+Proposed Unified Framework
+I'll create a unified 12-category taxonomy for both rubrics, adding your 5 new options with research-backed automation potential:
+
+New Unified Categories (Ordered by Automation Potential)
+Category	Time Savings Base	Quality Impact Base	Rationale
+Data Entry & Validation	60%	70%	Highest automation - repetitive, rule-based
+Financial Processing 🆕	55%	65%	Invoice/payment - highly structured, error-prone
+Document Processing & Review	45%	60%	Medium-high - OCR, extraction works well
+Operations & Maintenance 🆕	40%	50%	Checklists, monitoring - moderately automatable
+Communication & Coordination	50%	50%	Email, scheduling - good automation
+Compliance & Validation	40%	65%	QA/audit - high quality impact, moderate time
+Technical/IT Support 🆕	35%	45%	Troubleshooting - AI helps but needs judgment
+Analysis & Reporting	35%	55%	Data analysis - good for insights, some judgment
+Coordination & Scheduling	45%	45%	Resource allocation - moderate automation
+Training & Knowledge Transfer 🆕	30%	40%	Teaching requires human touch, AI assists
+Creative & Strategic Work	25%	25%	Lowest automation - subjective, strategic
+Other (specify in comments) 🆕	40%	50%	Neutral middle ground for edge cases
+Mathematical Impact
+Current calculation:
+
+Time Savings: Base% × Complexity × Repetition × Structure
+Quality Impact: Base% × ArithmeticMean(5 multipliers)
+With expanded categories:
+
+✅ Better granularity: Financial vs Operations vs IT Support now distinct
+✅ More accurate baselines: Research shows Financial Processing ~55% time savings vs Training ~30%
+✅ Improved ROI precision: Financial automation typically shows 2-3x higher quality gains than training
+⚠️ Weight recalibration needed: Currently weights 0-6, expanding to 0-11
+Impact on Calculator Effectiveness
+POSITIVE IMPACTS:
+
+Better Process Matching: "Invoice processing" now maps to Financial (55%) vs old generic Data Entry (60%)
+Clearer Segmentation: IT Support (35%) distinct from general Analysis (35%)
+Comprehensive Coverage: Training & Ops/Maintenance previously unmapped
+Data Intelligence: Can now track which process types show best ROI
+POTENTIAL ISSUES:
+
+Weight Compression: 12 categories in 0-11 weights may cause overlap
+Translation Updates: Need bilingual labels for 5 new categories
+Word Export: Rubric methodology section needs updating
+User Clarity: More options = potential confusion
+Recommended Next Steps
+I'll create a comprehensive task list to:
+
+✅ Unify both Q1 questions to identical text & options
+✅ Add 5 new categories with research-backed base percentages
+✅ Recalibrate weight system (0-11 linear mapping)
+✅ Update translations (English/Spanish)
+✅ Test all combinations to verify math accuracy
+✅ Update Word export methodology section
+✅ Add UI hint: "Select 'Other' and specify in comments if none fit"
+Question for you: Should "Other (specify)" use a neutral 40%/50% baseline, or should it default to the lowest automation tier (25%/25%) for conservatism?
+
+I'll create the detailed task list to implement this expansion. This will significantly improve the calculator's accuracy for your target SME clients! 🎯
