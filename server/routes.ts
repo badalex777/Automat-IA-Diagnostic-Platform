@@ -9,13 +9,13 @@ import {
   insertTFAAssessmentSchema,
   tfaResponsesSchema,
   fillGapsSchema,
-  pisSubmitSchema,
+  pifSubmitSchema,
   insertBusinessImpactSchema,
   updateBusinessImpactSchema,
 } from "@shared/schema";
 import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
-import { ALL_PIS_QUESTIONS, calculatePISScores, extractROIInputs, extractQualitativeResponses } from "@shared/pisQuestions";
-import { calculateAggregatedPISScores } from "@shared/pisCalculations";
+import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualitativeResponses } from "@shared/pifQuestions";
+import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Companies
@@ -498,14 +498,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // PIS (Process Insight Survey)
-  app.get("/api/pis/questions", (req, res) => {
-    res.json({ questions: ALL_PIS_QUESTIONS });
+  // PIF (Process Insight Form)
+  app.get("/api/pif/questions", (req, res) => {
+    res.json({ questions: ALL_PIF_QUESTIONS });
   });
 
-  app.post("/api/workflows/:workflowId/pis/submit", async (req, res) => {
+  app.post("/api/workflows/:workflowId/pif/submit", async (req, res) => {
     try {
-      const validatedData = pisSubmitSchema.parse(req.body);
+      const validatedData = pifSubmitSchema.parse(req.body);
       const { respondentName, respondentRole, respondentResponsibilities, responses, roiInputs, qualitativeResponses } = validatedData;
 
       // Verify workflow exists
@@ -515,7 +515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Calculate operational scores
-      const scores = calculatePISScores(responses);
+      const scores = calculatePIFScores(responses);
       
       // Extract ROI inputs
       const extractedROI = extractROIInputs(responses);
@@ -525,8 +525,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extractedQualitative = extractQualitativeResponses(responses);
       const finalQualitative = qualitativeResponses || extractedQualitative;
 
-      // Create PIS response
-      const pisResponse = await storage.createPISResponse({
+      // Create PIF response
+      const pifResponse = await storage.createPIFResponse({
         workflowId: req.params.workflowId,
         respondentName,
         respondentRole,
@@ -540,7 +540,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedAt: new Date(),
       });
 
-      res.status(201).json(pisResponse);
+      res.status(201).json(pifResponse);
     } catch (error: any) {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: error.message });
@@ -549,12 +549,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/workflows/:workflowId/pis", async (req, res) => {
+  app.get("/api/workflows/:workflowId/pif", async (req, res) => {
     try {
-      const responses = await storage.getAllPISResponsesForWorkflow(req.params.workflowId);
+      const responses = await storage.getAllPIFResponsesForWorkflow(req.params.workflowId);
       
       // Calculate aggregated scores with variance
-      const aggregated = calculateAggregatedPISScores(responses);
+      const aggregated = calculateAggregatedPIFScores(responses);
       
       res.json({
         responses,
@@ -565,9 +565,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/pis/shareable/:shareableId", async (req, res) => {
+  app.get("/api/pif/shareable/:shareableId", async (req, res) => {
     try {
-      // For PIS, shareableId IS the workflowId (no separate registration needed)
+      // For PIF, shareableId IS the workflowId (no separate registration needed)
       const workflow = await storage.getWorkflow(req.params.shareableId);
       if (!workflow) {
         return res.status(404).json({ error: "Survey not found" });
@@ -588,9 +588,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pis/:id", async (req, res) => {
+  app.delete("/api/pif/:id", async (req, res) => {
     try {
-      const success = await storage.deletePISResponse(req.params.id);
+      const success = await storage.deletePIFResponse(req.params.id);
       if (!success) {
         return res.status(404).json({ error: "Response not found" });
       }

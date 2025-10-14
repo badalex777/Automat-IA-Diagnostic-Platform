@@ -5,8 +5,8 @@ import {
   type InsertWorkflow,
   type TFAAssessment,
   type InsertTFAAssessment,
-  type PISResponse,
-  type InsertPISResponse,
+  type PIFResponse,
+  type InsertPIFResponse,
   type BusinessImpact,
   type InsertBusinessImpact,
 } from "@shared/schema";
@@ -36,12 +36,12 @@ export interface IStorage {
   completeTFA(id: string, score: number): Promise<TFAAssessment | undefined>;
   deleteTFAAssessment(id: string): Promise<boolean>;
   
-  // PIS Responses
-  getPISResponse(id: string): Promise<PISResponse | undefined>;
-  getPISByShareableId(shareableId: string): Promise<PISResponse[]>;
-  getAllPISResponsesForWorkflow(workflowId: string): Promise<PISResponse[]>;
-  createPISResponse(response: InsertPISResponse): Promise<PISResponse>;
-  deletePISResponse(id: string): Promise<boolean>;
+  // PIF Responses
+  getPIFResponse(id: string): Promise<PIFResponse | undefined>;
+  getPIFByShareableId(shareableId: string): Promise<PIFResponse[]>;
+  getAllPIFResponsesForWorkflow(workflowId: string): Promise<PIFResponse[]>;
+  createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse>;
+  deletePIFResponse(id: string): Promise<boolean>;
   
   // Business Impact
   getBusinessImpact(workflowId: string): Promise<BusinessImpact | undefined>;

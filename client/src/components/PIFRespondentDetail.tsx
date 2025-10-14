@@ -3,29 +3,29 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { User, Briefcase, FileText } from "lucide-react";
 import { format } from "date-fns";
-import type { PISResponse } from "@shared/schema";
-import { ALL_PIS_QUESTIONS } from "@shared/pisQuestions";
+import type { PIFResponse } from "@shared/schema";
+import { ALL_PIF_QUESTIONS } from "@shared/pifQuestions";
 
-interface PISRespondentDetailProps {
-  response: PISResponse;
+interface PIFRespondentDetailProps {
+  response: PIFResponse;
 }
 
-export function PISRespondentDetail({ response }: PISRespondentDetailProps) {
+export function PIFRespondentDetail({ response }: PIFRespondentDetailProps) {
   const responses = response.responses as Record<string, string>;
   const roiInputs = response.roiInputs as any;
   const qualitative = response.qualitativeResponses as Record<string, string>;
 
   // Group questions by section
-  const sections = ALL_PIS_QUESTIONS.reduce((acc, q) => {
+  const sections = ALL_PIF_QUESTIONS.reduce((acc, q) => {
     if (!acc[q.section]) {
       acc[q.section] = [];
     }
     acc[q.section].push(q);
     return acc;
-  }, {} as Record<string, typeof ALL_PIS_QUESTIONS>);
+  }, {} as Record<string, typeof ALL_PIF_QUESTIONS>);
 
   const getQuestionResponse = (questionId: number) => {
-    const question = ALL_PIS_QUESTIONS.find(q => q.id === questionId);
+    const question = ALL_PIF_QUESTIONS.find(q => q.id === questionId);
     const responseValue = responses[questionId.toString()];
     
     if (!responseValue) return null;

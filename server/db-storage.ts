@@ -13,8 +13,8 @@ import {
   type InsertWorkflow,
   type TFAAssessment,
   type InsertTFAAssessment,
-  type PISResponse,
-  type InsertPISResponse,
+  type PIFResponse,
+  type InsertPIFResponse,
   type BusinessImpact,
   type InsertBusinessImpact,
 } from "@shared/schema";
@@ -191,27 +191,27 @@ export class DbStorage implements IStorage {
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
-  // PIS Responses
-  async getPISResponse(id: string): Promise<PISResponse | undefined> {
+  // PIF Responses
+  async getPIFResponse(id: string): Promise<PIFResponse | undefined> {
     const [response] = await db.select().from(pisResponses).where(eq(pisResponses.id, id));
     return response;
   }
 
-  async getPISByShareableId(shareableId: string): Promise<PISResponse[]> {
+  async getPIFByShareableId(shareableId: string): Promise<PIFResponse[]> {
     return db.select().from(pisResponses).where(eq(pisResponses.shareableId, shareableId)).orderBy(desc(pisResponses.createdAt));
   }
 
-  async getAllPISResponsesForWorkflow(workflowId: string): Promise<PISResponse[]> {
+  async getAllPIFResponsesForWorkflow(workflowId: string): Promise<PIFResponse[]> {
     return db.select().from(pisResponses).where(eq(pisResponses.workflowId, workflowId)).orderBy(desc(pisResponses.createdAt));
   }
 
-  async createPISResponse(response: InsertPISResponse): Promise<PISResponse> {
+  async createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse> {
     const shareableId = nanoid(10);
     const [newResponse] = await db.insert(pisResponses).values({ ...response, shareableId }).returning();
     return newResponse;
   }
 
-  async deletePISResponse(id: string): Promise<boolean> {
+  async deletePIFResponse(id: string): Promise<boolean> {
     const result = await db.delete(pisResponses).where(eq(pisResponses.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
