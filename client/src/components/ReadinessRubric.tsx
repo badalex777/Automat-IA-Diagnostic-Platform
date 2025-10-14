@@ -1,8 +1,9 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from "recharts";
 
 interface ReadinessRubricProps {
   rubric: ReadinessRubricScore;
@@ -73,6 +74,119 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     // Convert weighted contribution back to 0-100 scale
     return Math.round((rubric.components[key] / componentWeightValues[key]));
   };
+
+  // Prepare data for radar chart
+  const radarData = ([
+    'systemEnvironment',
+    'dataQuality',
+    'integrationFeasibility',
+    'securityCompliance',
+    'processClarity',
+    'changeMagnitude',
+    'workflowBrittleness'
+  ] as const).map((key) => ({
+    component: componentLabels[key],
+    score: getDisplayScore(key),
+    fullMark: 100,
+  }));
+
+  // Prepare data for technical vs operational comparison
+  const comparisonData = [
+    {
+      category: 'Technical Foundation',
+      score: rubric.tfaScore,
+      weight: 60,
+      contribution: rubric.tfaScore * 0.6,
+    },
+    {
+      category: 'Operational Readiness',
+      score: rubric.pifScore,
+      weight: 40,
+      contribution: rubric.pifScore * 0.4,
+    },
+  ];
+
+  // Generate dynamic insights
+  const generateInsights = () => {
+    const insights: Array<{ type: 'strength' | 'risk' | 'neutral'; text: string }> = [];
+    
+    // Analyze overall score
+    if (rubric.totalScore >= 80) {
+      insights.push({
+        type: 'strength',
+        text: `Excellent readiness score of ${rubric.totalScore}/100 indicates strong potential for successful AI implementation.`
+      });
+    } else if (rubric.totalScore >= 65) {
+      insights.push({
+        type: 'neutral',
+        text: `Good readiness score of ${rubric.totalScore}/100 suggests viable implementation with moderate preparation needed.`
+      });
+    } else if (rubric.totalScore >= 50) {
+      insights.push({
+        type: 'neutral',
+        text: `Moderate readiness score of ${rubric.totalScore}/100 indicates significant preparation required before implementation.`
+      });
+    } else {
+      insights.push({
+        type: 'risk',
+        text: `Low readiness score of ${rubric.totalScore}/100 suggests major challenges that must be addressed before proceeding.`
+      });
+    }
+
+    // Analyze TFA vs PIF balance
+    const diff = Math.abs(rubric.tfaScore - rubric.pifScore);
+    if (diff > 20) {
+      if (rubric.tfaScore > rubric.pifScore) {
+        insights.push({
+          type: 'risk',
+          text: `Technical capabilities (${rubric.tfaScore}) significantly exceed operational readiness (${rubric.pifScore}). Focus on change management and process clarity.`
+        });
+      } else {
+        insights.push({
+          type: 'risk',
+          text: `Operational readiness (${rubric.pifScore}) outpaces technical foundation (${rubric.tfaScore}). Address system environment and data quality concerns.`
+        });
+      }
+    } else {
+      insights.push({
+        type: 'strength',
+        text: `Balanced technical (${rubric.tfaScore}) and operational (${rubric.pifScore}) scores indicate well-rounded readiness.`
+      });
+    }
+
+    // Identify strongest component
+    const componentScores = Object.entries(rubric.components).map(([key, value]) => ({
+      key: key as keyof ReadinessRubricScore['components'],
+      score: getDisplayScore(key as keyof ReadinessRubricScore['components'])
+    }));
+    componentScores.sort((a, b) => b.score - a.score);
+    
+    const strongest = componentScores[0];
+    const weakest = componentScores[componentScores.length - 1];
+
+    if (strongest.score >= 80) {
+      insights.push({
+        type: 'strength',
+        text: `${componentLabels[strongest.key]} is a key strength at ${strongest.score}/100, providing a solid foundation for implementation.`
+      });
+    }
+
+    if (weakest.score < 50) {
+      insights.push({
+        type: 'risk',
+        text: `${componentLabels[weakest.key]} scores ${weakest.score}/100 and requires immediate attention to avoid implementation risks.`
+      });
+    } else if (weakest.score < 65) {
+      insights.push({
+        type: 'neutral',
+        text: `${componentLabels[weakest.key]} at ${weakest.score}/100 is the weakest area and should be prioritized for improvement.`
+      });
+    }
+
+    return insights;
+  };
+
+  const insights = generateInsights();
 
   return (
     <div className="space-y-6">
@@ -165,6 +279,104 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
           </div>
         </div>
       </Card>
+
+      {/* Executive Summary */}
+      <Card data-testid="card-executive-summary">
+        <CardHeader>
+          <CardTitle>Executive Summary</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {insights.map((insight, index) => (
+            <div 
+              key={index} 
+              className={`flex items-start gap-3 p-3 rounded-md ${
+                insight.type === 'strength' 
+                  ? 'bg-green-500/10 dark:bg-green-500/20' 
+                  : insight.type === 'risk'
+                  ? 'bg-red-500/10 dark:bg-red-500/20'
+                  : 'bg-blue-500/10 dark:bg-blue-500/20'
+              }`}
+            >
+              {insight.type === 'strength' && <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />}
+              {insight.type === 'risk' && <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />}
+              {insight.type === 'neutral' && <Minus className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />}
+              <p className="text-sm">{insight.text}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Visual Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Radar Chart - Component Comparison */}
+        <Card data-testid="card-radar-chart">
+          <CardHeader>
+            <CardTitle>Component Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="hsl(var(--border))" />
+                <PolarAngleAxis 
+                  dataKey="component" 
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                />
+                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                <Radar 
+                  name="Score" 
+                  dataKey="score" 
+                  stroke="hsl(var(--primary))" 
+                  fill="hsl(var(--primary))" 
+                  fillOpacity={0.3} 
+                />
+              </RadarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Bar Chart - Technical vs Operational */}
+        <Card data-testid="card-comparison-chart">
+          <CardHeader>
+            <CardTitle>Technical vs Operational</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={comparisonData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="category" 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--popover))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '6px'
+                  }}
+                  formatter={(value: number, name: string) => {
+                    if (name === 'score') return [`${value}/100`, 'Score'];
+                    if (name === 'contribution') return [`${value.toFixed(1)}`, 'Contribution to Total'];
+                    return [value, name];
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="score" name="Raw Score (0-100)" fill="hsl(var(--primary))" />
+                <Bar dataKey="contribution" name="Weighted Contribution" fill="hsl(var(--chart-2))">
+                  {comparisonData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={index === 0 ? 'hsl(var(--chart-1))' : 'hsl(var(--chart-2))'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="mt-4 text-xs text-muted-foreground space-y-1">
+              <p>• Technical Foundation contributes 60% to total score ({rubric.tfaScore} × 0.6 = {(rubric.tfaScore * 0.6).toFixed(1)})</p>
+              <p>• Operational Readiness contributes 40% to total score ({rubric.pifScore} × 0.4 = {(rubric.pifScore * 0.4).toFixed(1)})</p>
+              <p>• <strong>Combined Score: {rubric.totalScore}/100</strong></p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
