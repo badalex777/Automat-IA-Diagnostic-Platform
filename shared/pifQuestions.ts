@@ -298,6 +298,27 @@ export const PIF_SECTIONS: PIFSection[] = [
     description: "Share your experience and insights about this workflow",
     questions: [
       {
+        id: 23,
+        question: "What specific steps do you personally perform in this workflow?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
+      },
+      {
+        id: 24,
+        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
+      },
+      {
+        id: 26,
+        question: "Are there exceptions or special cases you need to watch out for during this process?",
+        section: "Your Experience & Insights",
+        type: "textarea",
+        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
+      },
+      {
         id: 17,
         question: "What tools or systems do you use most in your daily work?",
         section: "Your Experience & Insights",
@@ -340,32 +361,11 @@ export const PIF_SECTIONS: PIFSection[] = [
         placeholder: "Describe key difficulties or pain points you encounter"
       },
       {
-        id: 23,
-        question: "What specific steps do you personally perform in this workflow?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
-      },
-      {
-        id: 24,
-        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
-      },
-      {
         id: 25,
         question: "What happens if this process is delayed or done incorrectly?",
         section: "Your Experience & Insights",
         type: "textarea",
         placeholder: "Describe the business impact of delays or errors"
-      },
-      {
-        id: 26,
-        question: "Are there exceptions or special cases you need to watch out for during this process?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
       },
       {
         id: 27,

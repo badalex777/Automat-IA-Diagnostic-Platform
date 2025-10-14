@@ -112,8 +112,8 @@ export default function PIFForm() {
     const isErrorProne = q32Answer === 'yes';
     
     const requiredQuestions = ALL_PIF_QUESTIONS.filter(q => {
-      // Experience & Insights section (Q17-Q27) is mandatory
-      if (q.id >= 17 && q.id <= 27) return true;
+      // Only Q23, Q24, Q26 are mandatory in Experience & Insights
+      if (q.id === 23 || q.id === 24 || q.id === 26) return true;
       // Other text/textarea are optional
       if (q.type === 'text' || q.type === 'textarea') return false;
       // Quality Impact questions only required if error-prone
@@ -178,8 +178,8 @@ export default function PIFForm() {
 
   // Calculate progress - include required questions only
   const requiredQuestionsCount = ALL_PIF_QUESTIONS.filter(q => {
-    // Experience & Insights section (Q17-Q27) is mandatory
-    if (q.id >= 17 && q.id <= 27) return true;
+    // Only Q23, Q24, Q26 are mandatory in Experience & Insights
+    if (q.id === 23 || q.id === 24 || q.id === 26) return true;
     // Other text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
     // Quality Impact questions (33-40) only required if error-prone
@@ -189,8 +189,8 @@ export default function PIFForm() {
   const answeredCount = Object.keys(answers).filter(id => {
     const q = ALL_PIF_QUESTIONS.find(q => q.id.toString() === id);
     if (!q) return false;
-    // Experience & Insights section (Q17-Q27) is mandatory
-    if (q.id >= 17 && q.id <= 27) return true;
+    // Only Q23, Q24, Q26 are mandatory in Experience & Insights
+    if (q.id === 23 || q.id === 24 || q.id === 26) return true;
     // Other text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
     // Quality Impact questions (33-40) only required if error-prone
@@ -214,8 +214,8 @@ export default function PIFForm() {
       const currentPIFSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
       if (currentPIFSection) {
         const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
-          // Experience & Insights section (Q17-Q27) is mandatory
-          if (q.id >= 17 && q.id <= 27) return true;
+          // Only Q23, Q24, Q26 are mandatory in Experience & Insights
+          if (q.id === 23 || q.id === 24 || q.id === 26) return true;
           // Other text/textarea are optional
           if (q.type === 'text' || q.type === 'textarea') return false;
           // Quality Impact questions only required if quality impact exists
@@ -354,7 +354,8 @@ export default function PIFForm() {
                   <Label className="text-base">
                     Q{question.id}. {question.question}
                     {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
-                    {question.id >= 17 && question.id <= 27 && <span className="text-destructive ml-1">*</span>}
+                    {(question.id === 23 || question.id === 24 || question.id === 26) && <span className="text-destructive ml-1">*</span>}
+                    {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 23 && question.id !== 24 && question.id !== 26 && <span className="text-muted-foreground ml-1">(Optional)</span>}
                   </Label>
 
                   {question.type === 'radio' && question.options && (
@@ -363,18 +364,26 @@ export default function PIFForm() {
                       onValueChange={(value) => setAnswers(prev => ({ ...prev, [question.id.toString()]: value }))}
                     >
                       {question.options.map((option) => (
-                        <div key={option.value} className="flex items-center space-x-2">
+                        <div key={option.value} className="flex items-start space-x-2">
                           <RadioGroupItem 
                             value={option.value.toString()} 
                             id={`q${question.id}-${option.value}`}
                             data-testid={`radio-q${question.id}-${option.value}`}
+                            className="mt-1"
                           />
-                          <Label 
-                            htmlFor={`q${question.id}-${option.value}`}
-                            className="font-normal cursor-pointer"
-                          >
-                            {option.label}
-                          </Label>
+                          <div className="flex-1">
+                            <Label 
+                              htmlFor={`q${question.id}-${option.value}`}
+                              className="font-normal cursor-pointer"
+                            >
+                              {option.label}
+                            </Label>
+                            {option.description && (
+                              <p className="text-sm text-muted-foreground mt-0.5">
+                                {option.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </RadioGroup>
