@@ -5,7 +5,7 @@ import {
   companies, 
   workflows, 
   tfaAssessments,
-  pisResponses,
+  pifResponses,
   businessImpact,
   type Company,
   type InsertCompany,
@@ -193,26 +193,26 @@ export class DbStorage implements IStorage {
 
   // PIF Responses
   async getPIFResponse(id: string): Promise<PIFResponse | undefined> {
-    const [response] = await db.select().from(pisResponses).where(eq(pisResponses.id, id));
+    const [response] = await db.select().from(pifResponses).where(eq(pifResponses.id, id));
     return response;
   }
 
   async getPIFByShareableId(shareableId: string): Promise<PIFResponse[]> {
-    return db.select().from(pisResponses).where(eq(pisResponses.shareableId, shareableId)).orderBy(desc(pisResponses.createdAt));
+    return db.select().from(pifResponses).where(eq(pifResponses.shareableId, shareableId)).orderBy(desc(pifResponses.createdAt));
   }
 
   async getAllPIFResponsesForWorkflow(workflowId: string): Promise<PIFResponse[]> {
-    return db.select().from(pisResponses).where(eq(pisResponses.workflowId, workflowId)).orderBy(desc(pisResponses.createdAt));
+    return db.select().from(pifResponses).where(eq(pifResponses.workflowId, workflowId)).orderBy(desc(pifResponses.createdAt));
   }
 
   async createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse> {
     const shareableId = nanoid(10);
-    const [newResponse] = await db.insert(pisResponses).values({ ...response, shareableId }).returning();
+    const [newResponse] = await db.insert(pifResponses).values({ ...response, shareableId }).returning();
     return newResponse;
   }
 
   async deletePIFResponse(id: string): Promise<boolean> {
-    const result = await db.delete(pisResponses).where(eq(pisResponses.id, id));
+    const result = await db.delete(pifResponses).where(eq(pifResponses.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 

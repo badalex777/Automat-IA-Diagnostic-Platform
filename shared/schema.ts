@@ -41,7 +41,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   shareableIdIdx: index("tfa_assessments_shareable_id_idx").on(table.shareableId),
 }));
 
-export const pisResponses = pgTable("pis_responses", {
+export const pifResponses = pgTable("pis_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
   shareableId: varchar("shareable_id").notNull(),
@@ -121,7 +121,7 @@ export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omi
   createdAt: true,
 });
 
-export const insertPIFResponseSchema = createInsertSchema(pisResponses).omit({
+export const insertPIFResponseSchema = createInsertSchema(pifResponses).omit({
   id: true,
   shareableId: true,
   createdAt: true,
@@ -157,7 +157,7 @@ export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
 export type TFAAssessment = typeof tfaAssessments.$inferSelect;
 export type InsertTFAAssessment = z.infer<typeof insertTFAAssessmentSchema>;
 
-export type PIFResponse = typeof pisResponses.$inferSelect;
+export type PIFResponse = typeof pifResponses.$inferSelect;
 export type InsertPIFResponse = z.infer<typeof insertPIFResponseSchema>;
 export type PIFSubmit = z.infer<typeof pifSubmitSchema>;
 
