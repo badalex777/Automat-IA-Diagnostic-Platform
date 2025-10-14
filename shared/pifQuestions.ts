@@ -621,10 +621,10 @@ export function extractROIInputs(responses: Record<string, string>): {
   // Q32: Changed from Likert scale to yes/no
   const hasQualityImpact = responses['32'] === 'yes';
 
-  // Q39-Q41: Only captured when Q32 is 'yes'
-  const errorRate = hasQualityImpact && responses['39'] ? parseFloat(responses['39']) : null;
-  const reworkMinutesPerError = hasQualityImpact && responses['40'] ? parseInt(responses['40']) : null;
-  const costPerError = hasQualityImpact && responses['41'] ? parseFloat(responses['41']) : null;
+  // Q38-Q40: Only captured when Q32 is 'yes'
+  const errorRate = hasQualityImpact && responses['38'] ? parseFloat(responses['38']) : null;
+  const reworkMinutesPerError = hasQualityImpact && responses['39'] ? parseInt(responses['39']) : null;
+  const costPerError = hasQualityImpact && responses['40'] ? parseFloat(responses['40']) : null;
 
   return {
     employeeCount,

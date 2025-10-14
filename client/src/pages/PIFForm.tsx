@@ -62,7 +62,11 @@ export default function PIFForm() {
     },
     onSuccess: () => {
       if (pifData?.workflow?.id) {
+        // Invalidate PIF responses cache
         queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pifData.workflow.id}/pif`] });
+        // Invalidate workflow detail cache so consultants see updated responses immediately
+        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pifData.workflow.id}`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/workflows'] });
       }
       setLocation(`/pif/${shareableId}/thank-you`);
     },
@@ -108,10 +112,12 @@ export default function PIFForm() {
     const isErrorProne = q32Answer === 'yes';
     
     const requiredQuestions = ALL_PIF_QUESTIONS.filter(q => {
-      // Text/textarea are optional
+      // Experience & Insights section (Q17-Q27) is mandatory
+      if (q.id >= 17 && q.id <= 27) return true;
+      // Other text/textarea are optional
       if (q.type === 'text' || q.type === 'textarea') return false;
       // Quality Impact questions only required if error-prone
-      if (q.id >= 33 && q.id <= 41 && !isErrorProne) return false;
+      if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
       return true;
     });
     
@@ -172,16 +178,23 @@ export default function PIFForm() {
 
   // Calculate progress - include required questions only
   const requiredQuestionsCount = ALL_PIF_QUESTIONS.filter(q => {
-    // Text/textarea are optional
+    // Experience & Insights section (Q17-Q27) is mandatory
+    if (q.id >= 17 && q.id <= 27) return true;
+    // Other text/textarea are optional
     if (q.type === 'text' || q.type === 'textarea') return false;
-    // Quality Impact questions (33-41) only required if error-prone
-    if (q.id >= 33 && q.id <= 41 && !isErrorProne) return false;
+    // Quality Impact questions (33-40) only required if error-prone
+    if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
     return true;
   }).length;
   const answeredCount = Object.keys(answers).filter(id => {
     const q = ALL_PIF_QUESTIONS.find(q => q.id.toString() === id);
-    if (!q || q.type === 'text' || q.type === 'textarea') return false;
-    if (q.id >= 33 && q.id <= 41 && !isErrorProne) return false;
+    if (!q) return false;
+    // Experience & Insights section (Q17-Q27) is mandatory
+    if (q.id >= 17 && q.id <= 27) return true;
+    // Other text/textarea are optional
+    if (q.type === 'text' || q.type === 'textarea') return false;
+    // Quality Impact questions (33-40) only required if error-prone
+    if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
     return true;
   }).length;
   const progress = requiredQuestionsCount > 0 ? (answeredCount / requiredQuestionsCount) * 100 : 0;
@@ -201,10 +214,12 @@ export default function PIFForm() {
       const currentPIFSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
       if (currentPIFSection) {
         const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
-          // Text/textarea are optional
+          // Experience & Insights section (Q17-Q27) is mandatory
+          if (q.id >= 17 && q.id <= 27) return true;
+          // Other text/textarea are optional
           if (q.type === 'text' || q.type === 'textarea') return false;
           // Quality Impact questions only required if quality impact exists
-          if (q.id >= 33 && q.id <= 41) {
+          if (q.id >= 33 && q.id <= 40) {
             const q32Answer = answers['32'];
             const isErrorProne = q32Answer === 'yes';
             return isErrorProne;
@@ -307,7 +322,7 @@ export default function PIFForm() {
               </div>
 
               <div>
-                <Label htmlFor="respondent-responsibilities">Your Responsibilities *</Label>
+                <Label htmlFor="respondent-responsibilities">Your Responsibilities on {workflow.name} *</Label>
                 <Textarea
                   id="respondent-responsibilities"
                   data-testid="input-respondent-responsibilities"
@@ -338,7 +353,8 @@ export default function PIFForm() {
                 <div key={question.id} className="space-y-3">
                   <Label className="text-base">
                     Q{question.id}. {question.question}
-                    {(question.type === 'text' || question.type === 'textarea') && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                    {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                    {question.id >= 17 && question.id <= 27 && <span className="text-destructive ml-1">*</span>}
                   </Label>
 
                   {question.type === 'radio' && question.options && (
