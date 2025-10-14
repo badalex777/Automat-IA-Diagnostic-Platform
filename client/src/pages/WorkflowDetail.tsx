@@ -535,14 +535,18 @@ export default function WorkflowDetail() {
               };
 
               if (tfaAssessment.responses) {
-                const responses = tfaAssessment.responses as Record<string, number>;
+                const responses = tfaAssessment.responses as Record<string, string | number>;
                 
                 allSections.forEach((section) => {
                   const sectionResponses = section.questions
-                    .map(q => responses[q.id])
+                    .map(q => {
+                      const val = responses[q.id];
+                      return typeof val === 'string' ? parseInt(val, 10) : val;
+                    })
                     .filter((score): score is number => 
                       score !== null && 
                       score !== undefined && 
+                      !isNaN(score) &&
                       score !== 0
                     );
                   
