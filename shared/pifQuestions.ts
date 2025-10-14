@@ -207,10 +207,17 @@ export const PIF_SECTIONS: PIFSection[] = [
         type: "radio",
         options: [
           { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
+          { value: "financial", label: "Financial Processing", description: "Invoice processing, payment handling, expense tracking" },
           { value: "document", label: "Document Processing & Review", description: "Reading, extracting, or reviewing documents" },
+          { value: "operations", label: "Operations & Maintenance", description: "Monitoring systems, running checklists, routine maintenance" },
           { value: "communication", label: "Communication & Coordination", description: "Emails, messages, scheduling" },
-          { value: "research", label: "Research & Analysis", description: "Gathering information, analyzing data" },
-          { value: "qa", label: "Quality Assurance & Compliance", description: "Checking quality, ensuring compliance" }
+          { value: "compliance", label: "Compliance & Validation", description: "Quality assurance, auditing, ensuring compliance" },
+          { value: "technical_support", label: "Technical/IT Support", description: "Troubleshooting, help desk, technical assistance" },
+          { value: "analysis", label: "Analysis & Reporting", description: "Data analysis, creating reports, generating insights" },
+          { value: "coordination", label: "Coordination & Scheduling", description: "Resource allocation, coordinating teams or activities" },
+          { value: "training", label: "Training & Knowledge Transfer", description: "Teaching, onboarding, knowledge sharing" },
+          { value: "creative", label: "Creative & Strategic Work", description: "Strategy, creative content, complex decision-making" },
+          { value: "other", label: "Other (specify in comments)", description: "Work type not covered above" }
         ]
       },
       {
@@ -219,9 +226,9 @@ export const PIF_SECTIONS: PIFSection[] = [
         section: "Time Savings",
         type: "radio",
         options: [
-          { value: "simple", label: "Simple", description: "Follows clear rules and patterns" },
-          { value: "moderate", label: "Moderate", description: "Requires some decision-making" },
-          { value: "complex", label: "Complex", description: "Requires significant analysis" }
+          { value: "simple", label: "Simple", description: "Examples: Data entry from forms, copy-paste, checklists" },
+          { value: "moderate", label: "Moderate", description: "Examples: Reviewing for completeness, categorizing, troubleshooting" },
+          { value: "complex", label: "Complex", description: "Examples: Financial modeling, technical diagnostics, strategic recommendations" }
         ]
       },
       {
@@ -230,9 +237,9 @@ export const PIF_SECTIONS: PIFSection[] = [
         section: "Time Savings",
         type: "radio",
         options: [
-          { value: "structured", label: "Highly structured", description: "Forms, databases, spreadsheets" },
-          { value: "semi_structured", label: "Semi-structured", description: "Emails, documents with templates" },
-          { value: "unstructured", label: "Unstructured", description: "Free-form text, images, audio" }
+          { value: "structured", label: "Highly structured", description: "Examples: CRM entries, Excel spreadsheets, database forms" },
+          { value: "semi_structured", label: "Semi-structured", description: "Examples: Email threads, PDF documents, templated reports" },
+          { value: "unstructured", label: "Unstructured", description: "Examples: Handwritten notes, transcripts, customer feedback, photos" }
         ]
       }
     ]
@@ -425,25 +432,6 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 33,
-        question: "Which of these best describes the work you perform in this step?",
-        section: "Quality Impact Module",
-        type: "radio",
-        conditional: {
-          dependsOn: 32,
-          showWhen: "yes"
-        },
-        options: [
-          { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
-          { value: "document", label: "Document Review & Processing", description: "Reading, extracting, or classifying documents" },
-          { value: "communication", label: "Communication & Customer Service", description: "Emails, inquiries, customer interactions" },
-          { value: "analysis", label: "Analysis & Reporting", description: "Analyzing data, creating reports, generating insights" },
-          { value: "compliance", label: "Compliance & Validation", description: "Checking compliance, quality assurance, auditing" },
-          { value: "coordination", label: "Coordination & Scheduling", description: "Managing schedules, coordinating resources" },
-          { value: "creative", label: "Creative & Strategic Work", description: "Strategy, creative content, complex decisions" }
-        ]
-      },
-      {
-        id: 34,
         question: "How often do errors or quality issues currently occur in this process?",
         section: "Quality Impact Module",
         type: "radio",
@@ -459,7 +447,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 35,
+        id: 34,
         question: "What is the primary cause of errors or quality issues?",
         section: "Quality Impact Module",
         type: "radio",
@@ -476,7 +464,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 36,
+        id: 35,
         question: "When are errors or quality issues typically discovered?",
         section: "Quality Impact Module",
         type: "radio",
@@ -492,7 +480,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 37,
+        id: 36,
         question: "How standardized is the current process?",
         section: "Quality Impact Module",
         type: "radio",
@@ -508,7 +496,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 38,
+        id: 37,
         question: "How well-suited is this work for AI quality improvement?",
         section: "Quality Impact Module",
         type: "radio",
@@ -524,7 +512,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 39,
+        id: 38,
         question: "What is the current error rate?",
         section: "Quality Impact Module",
         type: "number",
@@ -535,7 +523,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         }
       },
       {
-        id: 40,
+        id: 39,
         question: "How many minutes of rework does each error require?",
         section: "Quality Impact Module",
         type: "number",
@@ -546,11 +534,11 @@ export const PIF_SECTIONS: PIFSection[] = [
         }
       },
       {
-        id: 41,
-        question: "What is the estimated cost per error?",
+        id: 40,
+        question: "What is the estimated cost per error (in USD)?",
         section: "Quality Impact Module",
         type: "number",
-        placeholder: "Enter cost in dollars (e.g., 50)",
+        placeholder: "Enter cost in USD (e.g., 50)",
         conditional: {
           dependsOn: 32,
           showWhen: "yes"
