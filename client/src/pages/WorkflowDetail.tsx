@@ -550,10 +550,10 @@ export default function WorkflowDetail() {
                     const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
                     const normalizedScore = Math.round((avgScore / 5) * 100);
                     
-                    if (section.id === 'system-environment') sectionScores.systemEnvironment = normalizedScore;
-                    if (section.id === 'data-quality') sectionScores.dataQuality = normalizedScore;
-                    if (section.id === 'integration-feasibility') sectionScores.integrationFeasibility = normalizedScore;
-                    if (section.id === 'security-compliance') sectionScores.securityCompliance = normalizedScore;
+                    if (section.section === 'System Environment') sectionScores.systemEnvironment = normalizedScore;
+                    if (section.section === 'Data Quality') sectionScores.dataQuality = normalizedScore;
+                    if (section.section === 'Integration Feasibility') sectionScores.integrationFeasibility = normalizedScore;
+                    if (section.section === 'Security/Compliance') sectionScores.securityCompliance = normalizedScore;
                   }
                 });
               }
