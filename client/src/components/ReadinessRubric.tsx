@@ -70,11 +70,6 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     workflowBrittleness: 0.06,
   };
 
-  const getDisplayScore = (key: keyof ReadinessRubricScore['components']) => {
-    // Convert weighted contribution back to 0-100 scale
-    return Math.round((rubric.components[key] / componentWeightValues[key]));
-  };
-
   // Prepare data for radar chart
   const radarData = ([
     'systemEnvironment',
@@ -86,7 +81,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     'workflowBrittleness'
   ] as const).map((key) => ({
     component: componentLabels[key],
-    score: getDisplayScore(key),
+    score: rubric.componentScores[key],
     fullMark: 100,
   }));
 
@@ -155,14 +150,14 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     }
 
     // Identify strongest component
-    const componentScores = Object.entries(rubric.components).map(([key, value]) => ({
-      key: key as keyof ReadinessRubricScore['components'],
-      score: getDisplayScore(key as keyof ReadinessRubricScore['components'])
+    const componentScoresArray = Object.entries(rubric.componentScores).map(([key, value]) => ({
+      key: key as keyof ReadinessRubricScore['componentScores'],
+      score: value
     }));
-    componentScores.sort((a, b) => b.score - a.score);
+    componentScoresArray.sort((a, b) => b.score - a.score);
     
-    const strongest = componentScores[0];
-    const weakest = componentScores[componentScores.length - 1];
+    const strongest = componentScoresArray[0];
+    const weakest = componentScoresArray[componentScoresArray.length - 1];
 
     if (strongest.score >= 80) {
       insights.push({
@@ -242,7 +237,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
           <div className="space-y-3">
             <p className="text-sm font-medium text-muted-foreground">Technical Foundation (60%)</p>
             {(['systemEnvironment', 'dataQuality', 'integrationFeasibility', 'securityCompliance'] as const).map((key) => {
-              const displayScore = getDisplayScore(key);
+              const displayScore = rubric.componentScores[key];
               return (
                 <div key={key} className="space-y-1" data-testid={`component-${key}`}>
                   <div className="flex items-center justify-between text-sm">
@@ -262,7 +257,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
           <div className="space-y-3 pt-4 border-t border-border">
             <p className="text-sm font-medium text-muted-foreground">Operational Readiness (40%)</p>
             {(['processClarity', 'changeMagnitude', 'workflowBrittleness'] as const).map((key) => {
-              const displayScore = getDisplayScore(key);
+              const displayScore = rubric.componentScores[key];
               return (
                 <div key={key} className="space-y-1" data-testid={`component-${key}`}>
                   <div className="flex items-center justify-between text-sm">

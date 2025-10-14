@@ -90,7 +90,18 @@ export interface ReadinessRubricScore {
   totalScore: number;
   tfaScore: number;
   pifScore: number;
+  componentScores: {
+    // Raw 0-100 scores for each component
+    systemEnvironment: number;
+    dataQuality: number;
+    integrationFeasibility: number;
+    securityCompliance: number;
+    processClarity: number;
+    changeMagnitude: number;
+    workflowBrittleness: number;
+  };
   components: {
+    // Weighted contributions to total score (for calculation verification)
     // TFA components (60% total)
     systemEnvironment: number; // 15% of total (25% of TFA × 60%)
     dataQuality: number; // 18% of total (30% of TFA × 60%)
@@ -129,7 +140,18 @@ export function calculateReadinessRubric(
   // Combined score: TFA 60% + PIF 40%
   const totalScore = Math.round((tfaScore * 0.6) + (pifOperationalScore * 0.4));
 
-  // Component breakdown with actual weights
+  // Raw component scores (0-100)
+  const componentScores = {
+    systemEnvironment: tfaSectionScores.systemEnvironment,
+    dataQuality: tfaSectionScores.dataQuality,
+    integrationFeasibility: tfaSectionScores.integrationFeasibility,
+    securityCompliance: tfaSectionScores.securityCompliance,
+    processClarity: Math.round(aggregatedPIF.processClarity.average),
+    changeMagnitude: Math.round(aggregatedPIF.changeMagnitude.average),
+    workflowBrittleness: Math.round(aggregatedPIF.workflowBrittleness.average),
+  };
+
+  // Component breakdown with actual weights (for verification)
   const components = {
     systemEnvironment: Math.round(tfaSectionScores.systemEnvironment * 0.15), // 25% of 60%
     dataQuality: Math.round(tfaSectionScores.dataQuality * 0.18), // 30% of 60%
@@ -165,6 +187,7 @@ export function calculateReadinessRubric(
     totalScore,
     tfaScore,
     pifScore: pifOperationalScore,
+    componentScores,
     components,
     feasibilityBand,
     recommendation
