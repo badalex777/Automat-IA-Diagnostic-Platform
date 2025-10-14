@@ -130,7 +130,7 @@ export const insertPIFResponseSchema = createInsertSchema(pifResponses).omit({
 export const pifSubmitSchema = z.object({
   respondentName: z.string().min(1, "Name is required"),
   respondentRole: z.string().min(1, "Role is required"),
-  respondentResponsibilities: z.string().optional(),
+  respondentResponsibilities: z.string().min(1, "Responsibilities are required"),
   responses: z.record(z.string(), z.string()),
   roiInputs: z.object({
     employeeCount: z.number().optional(),

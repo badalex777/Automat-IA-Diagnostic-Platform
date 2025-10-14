@@ -312,7 +312,7 @@ export default function TFAForm() {
           </div>
         ) : isFinalCommentsSection ? (
           <div className="space-y-6">
-            {respondentName.trim().length < 2 && (
+            {!respondentName.trim() && (
               <div className="p-4 bg-muted/50 rounded-lg border border-border">
                 <Label htmlFor="respondent-name-final" className="text-sm font-medium">Your Name *</Label>
                 <Input

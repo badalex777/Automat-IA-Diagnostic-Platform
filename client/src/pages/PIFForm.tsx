@@ -94,6 +94,15 @@ export default function PIFForm() {
       return;
     }
 
+    if (!respondentResponsibilities.trim()) {
+      toast({
+        title: "Responsibilities required",
+        description: "Please describe your responsibilities before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check all required questions are answered
     const q32Answer = answers['32'];
     const isErrorProne = q32Answer === 'yes';
@@ -120,7 +129,7 @@ export default function PIFForm() {
     submitMutation.mutate({ 
       respondentName: respondentName.trim(),
       respondentRole: respondentRole.trim(),
-      respondentResponsibilities: respondentResponsibilities.trim() || undefined,
+      respondentResponsibilities: respondentResponsibilities.trim(),
       responses: answers,
     });
   };
@@ -179,10 +188,10 @@ export default function PIFForm() {
 
   const handleNext = () => {
     if (currentSection === 0) {
-      if (!respondentName.trim() || !respondentRole.trim()) {
+      if (!respondentName.trim() || !respondentRole.trim() || !respondentResponsibilities.trim()) {
         toast({
           title: "Required fields",
-          description: "Please enter your name and role before continuing.",
+          description: "Please enter your name, role, and responsibilities before continuing.",
           variant: "destructive",
         });
         return;
@@ -298,7 +307,7 @@ export default function PIFForm() {
               </div>
 
               <div>
-                <Label htmlFor="respondent-responsibilities">Your Responsibilities (Optional)</Label>
+                <Label htmlFor="respondent-responsibilities">Your Responsibilities *</Label>
                 <Textarea
                   id="respondent-responsibilities"
                   data-testid="input-respondent-responsibilities"
