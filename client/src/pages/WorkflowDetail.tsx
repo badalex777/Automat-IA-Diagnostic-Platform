@@ -807,53 +807,6 @@ export default function WorkflowDetail() {
                           />
                         ))}
                       </div>
-
-                      <Card className="p-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold">Matrix View Controls</h3>
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  id="error-toggle"
-                                  checked={errorToggle}
-                                  onCheckedChange={setErrorToggle}
-                                  data-testid="switch-error-metrics"
-                                />
-                                <label
-                                  htmlFor="error-toggle"
-                                  className="text-sm font-medium cursor-pointer"
-                                >
-                                  Error Reduction Metrics
-                                </label>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Switch
-                                  id="revenue-toggle"
-                                  checked={revenueToggle}
-                                  onCheckedChange={setRevenueToggle}
-                                  data-testid="switch-revenue-metrics"
-                                />
-                                <label
-                                  htmlFor="revenue-toggle"
-                                  className="text-sm font-medium cursor-pointer"
-                                >
-                                  Revenue Impact Metrics
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Toggle metric groups to adjust the business impact calculation in the matrix below
-                          </p>
-                        </div>
-                      </Card>
-
-                      <OpportunityMatrix
-                        opportunities={opportunities}
-                        readinessScores={{ [workflowId]: readinessScore }}
-                        toggles={toggles}
-                      />
                     </>
                   )}
 
