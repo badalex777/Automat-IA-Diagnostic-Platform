@@ -31,9 +31,6 @@ export function OpportunityForm({
   onCancel,
   isLoading 
 }: OpportunityFormProps) {
-  const [showErrorMetrics, setShowErrorMetrics] = useState(false);
-  const [showRevenueMetrics, setShowRevenueMetrics] = useState(false);
-
   const form = useForm<InsertImplementationOpportunity>({
     resolver: zodResolver(insertImplementationOpportunitySchema),
     defaultValues: {
@@ -50,33 +47,29 @@ export function OpportunityForm({
       revenueUpliftAnnual: initialData?.revenueUpliftAnnual,
       paybackPeriodMonths: initialData?.paybackPeriodMonths,
       trainingHoursPerEmployee: initialData?.trainingHoursPerEmployee,
+      errorMetricsEnabled: initialData?.errorMetricsEnabled ?? false,
+      revenueMetricsEnabled: initialData?.revenueMetricsEnabled ?? false,
     },
   });
 
-  useEffect(() => {
-    if (initialData?.errorReductionPct || initialData?.errorsAvoidedAnnually) {
-      setShowErrorMetrics(true);
-    }
-    if (initialData?.hoursReallocatedToRevenue || initialData?.revenueUpliftAnnual) {
-      setShowRevenueMetrics(true);
-    }
-  }, [initialData]);
+  const errorMetricsEnabled = form.watch('errorMetricsEnabled');
+  const revenueMetricsEnabled = form.watch('revenueMetricsEnabled');
 
   // Clear error metrics when toggle is disabled
   useEffect(() => {
-    if (!showErrorMetrics) {
+    if (!errorMetricsEnabled) {
       form.setValue('errorReductionPct', undefined);
       form.setValue('errorsAvoidedAnnually', undefined);
     }
-  }, [showErrorMetrics, form]);
+  }, [errorMetricsEnabled, form]);
 
   // Clear revenue metrics when toggle is disabled
   useEffect(() => {
-    if (!showRevenueMetrics) {
+    if (!revenueMetricsEnabled) {
       form.setValue('hoursReallocatedToRevenue', undefined);
       form.setValue('revenueUpliftAnnual', undefined);
     }
-  }, [showRevenueMetrics, form]);
+  }, [revenueMetricsEnabled, form]);
 
   // Convert string values to numbers on submit
   const handleSubmit = (data: any) => {
@@ -296,19 +289,27 @@ export function OpportunityForm({
         </div>
 
         {/* Optional: Error Reduction Metrics */}
-        <div className="flex items-center gap-2 pt-2">
-          <Switch
-            id="error-metrics-toggle"
-            checked={showErrorMetrics}
-            onCheckedChange={setShowErrorMetrics}
-            data-testid="switch-error-metrics-form"
-          />
-          <label htmlFor="error-metrics-toggle" className="text-sm font-semibold cursor-pointer">
-            Include Error Reduction Metrics
-          </label>
-        </div>
+        <FormField
+          control={form.control}
+          name="errorMetricsEnabled"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2 pt-2">
+              <FormControl>
+                <Switch
+                  id="error-metrics-toggle"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  data-testid="switch-error-metrics-form"
+                />
+              </FormControl>
+              <FormLabel htmlFor="error-metrics-toggle" className="text-sm font-semibold cursor-pointer !mt-0">
+                Include Error Reduction Metrics
+              </FormLabel>
+            </FormItem>
+          )}
+        />
 
-        {showErrorMetrics && (
+        {errorMetricsEnabled && (
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground">Error Reduction (Optional)</h3>
             
@@ -363,19 +364,27 @@ export function OpportunityForm({
         )}
 
         {/* Optional: Revenue Growth Metrics */}
-        <div className="flex items-center gap-2 pt-2">
-          <Switch
-            id="revenue-metrics-toggle"
-            checked={showRevenueMetrics}
-            onCheckedChange={setShowRevenueMetrics}
-            data-testid="switch-revenue-metrics-form"
-          />
-          <label htmlFor="revenue-metrics-toggle" className="text-sm font-semibold cursor-pointer">
-            Include Revenue Impact Metrics
-          </label>
-        </div>
+        <FormField
+          control={form.control}
+          name="revenueMetricsEnabled"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2 pt-2">
+              <FormControl>
+                <Switch
+                  id="revenue-metrics-toggle"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  data-testid="switch-revenue-metrics-form"
+                />
+              </FormControl>
+              <FormLabel htmlFor="revenue-metrics-toggle" className="text-sm font-semibold cursor-pointer !mt-0">
+                Include Revenue Impact Metrics
+              </FormLabel>
+            </FormItem>
+          )}
+        />
 
-        {showRevenueMetrics && (
+        {revenueMetricsEnabled && (
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-muted-foreground">Revenue Growth (Optional)</h3>
             

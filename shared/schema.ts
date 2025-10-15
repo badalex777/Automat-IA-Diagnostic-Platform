@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb, index, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, jsonb, index, decimal, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -90,6 +90,8 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   revenueUpliftAnnual: decimal("revenue_uplift_annual", { precision: 12, scale: 2 }),
   paybackPeriodMonths: decimal("payback_period_months", { precision: 6, scale: 2 }),
   trainingHoursPerEmployee: decimal("training_hours_per_employee", { precision: 6, scale: 2 }),
+  errorMetricsEnabled: boolean("error_metrics_enabled").default(false).notNull(),
+  revenueMetricsEnabled: boolean("revenue_metrics_enabled").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("implementation_opportunities_workflow_id_idx").on(table.workflowId),

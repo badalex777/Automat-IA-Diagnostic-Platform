@@ -480,7 +480,6 @@ export default function CompanyDetail() {
                   <OpportunityMatrix
                     opportunities={filteredOpportunities}
                     readinessScores={readinessScores}
-                    toggles={toggles}
                   />
                 </div>
 
@@ -503,7 +502,6 @@ export default function CompanyDetail() {
                             key={opp.id}
                             opportunity={opp}
                             readinessScore={readinessScores[opp.workflowId]}
-                            toggles={toggles}
                           />
                         ))}
                       </div>

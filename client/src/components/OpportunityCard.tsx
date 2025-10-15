@@ -8,14 +8,13 @@ import { Edit, Trash2, DollarSign, Clock, Users } from "lucide-react";
 interface OpportunityCardProps {
   opportunity: ImplementationOpportunity;
   readinessScore: number;
-  toggles: ToggleState;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
 const quadrantColors = {
   "Quick Wins": "bg-green-500/10 text-green-700 dark:text-green-400",
-  "Big Swings": "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  "Strategic Goals": "bg-blue-500/10 text-blue-700 dark:text-blue-400",
   "Nice-To-Haves": "bg-amber-500/10 text-amber-700 dark:text-amber-400",
   "Deprioritize": "bg-red-500/10 text-red-700 dark:text-red-400",
 };
@@ -23,10 +22,15 @@ const quadrantColors = {
 export function OpportunityCard({
   opportunity,
   readinessScore,
-  toggles,
   onEdit,
   onDelete,
 }: OpportunityCardProps) {
+  // Use per-opportunity toggle state
+  const toggles: ToggleState = {
+    errorMetrics: opportunity.errorMetricsEnabled ?? false,
+    revenueMetrics: opportunity.revenueMetricsEnabled ?? false,
+  };
+  
   const score = calculateOpportunityScore(opportunity, readinessScore, toggles);
   
   const formatCurrency = (value: string | null | undefined) => {

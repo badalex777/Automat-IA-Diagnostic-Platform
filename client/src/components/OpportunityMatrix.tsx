@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
   readinessScores: Record<string, number>; // workflowId -> readiness score
-  toggles: ToggleState;
   workflowColors?: Record<string, string>; // workflowId -> color
   onOpportunityClick?: (opportunity: ImplementationOpportunity) => void;
 }
@@ -36,8 +35,7 @@ interface DataPoint {
 
 export default function OpportunityMatrix({ 
   opportunities, 
-  readinessScores, 
-  toggles,
+  readinessScores,
   workflowColors,
   onOpportunityClick 
 }: OpportunityMatrixProps) {
@@ -50,9 +48,16 @@ export default function OpportunityMatrix({
       colorMap[workflowId] = workflowColors?.[workflowId] || WORKFLOW_COLORS[index % WORKFLOW_COLORS.length];
     });
 
-    // Calculate scores for each opportunity
+    // Calculate scores for each opportunity using per-opportunity toggle state
     const points: DataPoint[] = opportunities.map(opp => {
       const readinessScore = readinessScores[opp.workflowId];
+      
+      // Use per-opportunity toggle state
+      const toggles: ToggleState = {
+        errorMetrics: opp.errorMetricsEnabled ?? false,
+        revenueMetrics: opp.revenueMetricsEnabled ?? false,
+      };
+      
       const score = calculateOpportunityScore(opp, readinessScore, toggles);
       
       return {
@@ -73,7 +78,7 @@ export default function OpportunityMatrix({
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, readinessScores, toggles, workflowColors]);
+  }, [opportunities, readinessScores, workflowColors]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {

@@ -78,29 +78,18 @@ function normalizeToScale(value: number | null | undefined, maxReference: number
  * Calculate Business Impact Score (X-axis)
  * Higher score = better business impact
  * 
- * Base formula (no toggles):
+ * ADDITIVE FORMULA (ensures toggling metrics never reduces impact):
+ * 
+ * Base (always applied):
  * - Annual ROI: 40%
  * - FTE Savings: 30%
  * - Annual Hours Saved: 30%
  * 
- * With Error toggle:
- * - Annual ROI: 30%
- * - FTE Savings: 20%
- * - Annual Hours: 20%
- * - Error Impact: 30%
+ * Bonus (added when toggled AND has data):
+ * - Error Impact: +30% bonus
+ * - Revenue Impact: +35% bonus
  * 
- * With Revenue toggle:
- * - Annual ROI: 30%
- * - FTE Savings: 20%
- * - Annual Hours: 15%
- * - Revenue Impact: 35%
- * 
- * With both toggles:
- * - Annual ROI: 25%
- * - FTE Savings: 15%
- * - Annual Hours: 15%
- * - Error Impact: 20%
- * - Revenue Impact: 25%
+ * Final score capped at 100
  */
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
@@ -120,67 +109,42 @@ export function calculateBusinessImpact(
   const fteScore = normalizeToScale(fteSavings, maxFteSavings);
   const hoursScore = normalizeToScale(annualHours, maxAnnualHours);
 
-  // Calculate error impact if toggle is on AND has data
-  let errorImpact = 0;
-  let hasErrorData = false;
+  // Calculate BASE impact (always applied with constant weights)
+  const baseImpact = 
+    (roiScore * 0.40) +
+    (fteScore * 0.30) +
+    (hoursScore * 0.30);
+
+  // Calculate error impact BONUS if toggle is on AND has data
+  let errorBonus = 0;
   if (toggles.errorMetrics) {
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
     if (errorPct > 0 || errorsAvoided > 0) {
-      hasErrorData = true;
       const errorPctScore = errorPct; // Already 0-100
       const errorsScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
-      errorImpact = (errorPctScore * 0.5) + (errorsScore * 0.5);
+      const errorImpact = (errorPctScore * 0.5) + (errorsScore * 0.5);
+      errorBonus = errorImpact * 0.30; // 30% bonus
     }
   }
 
-  // Calculate revenue impact if toggle is on AND has data
-  let revenueImpact = 0;
-  let hasRevenueData = false;
+  // Calculate revenue impact BONUS if toggle is on AND has data
+  let revenueBonus = 0;
   if (toggles.revenueMetrics) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
     if (hoursReallocated > 0 || revenueUplift > 0) {
-      hasRevenueData = true;
       const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
       const revenueScore = normalizeToScale(revenueUplift, maxRevenueUplift);
-      revenueImpact = (hoursReallocatedScore * 0.4) + (revenueScore * 0.6);
+      const revenueImpact = (hoursReallocatedScore * 0.4) + (revenueScore * 0.6);
+      revenueBonus = revenueImpact * 0.35; // 35% bonus
     }
   }
 
-  // Apply weights based on actual data presence
-  let impact = 0;
-  if (hasErrorData && hasRevenueData) {
-    // Both toggles on with data
-    impact = 
-      (roiScore * 0.25) +
-      (fteScore * 0.15) +
-      (hoursScore * 0.15) +
-      (errorImpact * 0.20) +
-      (revenueImpact * 0.25);
-  } else if (hasErrorData) {
-    // Error toggle only with data
-    impact = 
-      (roiScore * 0.30) +
-      (fteScore * 0.20) +
-      (hoursScore * 0.20) +
-      (errorImpact * 0.30);
-  } else if (hasRevenueData) {
-    // Revenue toggle only with data
-    impact = 
-      (roiScore * 0.30) +
-      (fteScore * 0.20) +
-      (hoursScore * 0.15) +
-      (revenueImpact * 0.35);
-  } else {
-    // Base formula - no toggles or no data
-    impact = 
-      (roiScore * 0.40) +
-      (fteScore * 0.30) +
-      (hoursScore * 0.30);
-  }
+  // Add bonuses to base (capped at 100)
+  const totalImpact = Math.min(baseImpact + errorBonus + revenueBonus, 100);
 
-  return Math.round(impact * 100) / 100; // Round to 2 decimals
+  return Math.round(totalImpact * 100) / 100; // Round to 2 decimals
 }
 
 /**
