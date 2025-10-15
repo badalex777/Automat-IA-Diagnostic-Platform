@@ -85,6 +85,8 @@ export function OpportunityForm({
       revenueUpliftAnnual: data.revenueUpliftAnnual ? parseFloat(data.revenueUpliftAnnual) : undefined,
       paybackPeriodMonths: data.paybackPeriodMonths ? parseFloat(data.paybackPeriodMonths) : undefined,
       trainingHoursPerEmployee: data.trainingHoursPerEmployee ? parseFloat(data.trainingHoursPerEmployee) : undefined,
+      errorMetricsEnabled: data.errorMetricsEnabled ?? false,
+      revenueMetricsEnabled: data.revenueMetricsEnabled ?? false,
     };
     onSubmit(converted);
   };
