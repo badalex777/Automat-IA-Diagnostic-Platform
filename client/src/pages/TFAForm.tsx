@@ -312,20 +312,22 @@ export default function TFAForm() {
           </div>
         ) : isFinalCommentsSection ? (
           <div className="space-y-6">
-            <div className="p-4 bg-muted/50 rounded-lg border border-border">
-              <Label htmlFor="respondent-name-final" className="text-sm font-medium">Your Name *</Label>
-              <Input
-                id="respondent-name-final"
-                placeholder="Enter your full name"
-                value={respondentName}
-                onChange={(e) => setRespondentName(e.target.value)}
-                className="mt-2"
-                data-testid="input-respondent-name-final"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                Please enter your name before submitting the assessment.
-              </p>
-            </div>
+            {!respondentName.trim() && (
+              <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                <Label htmlFor="respondent-name-final" className="text-sm font-medium">Your Name *</Label>
+                <Input
+                  id="respondent-name-final"
+                  placeholder="Enter your full name"
+                  value={respondentName}
+                  onChange={(e) => setRespondentName(e.target.value)}
+                  className="mt-2"
+                  data-testid="input-respondent-name-final"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Please enter your name before submitting the assessment.
+                </p>
+              </div>
+            )}
             <div>
               <h2 className="text-xl font-semibold mb-2">Additional Comments</h2>
               <p className="text-sm text-muted-foreground mb-4">

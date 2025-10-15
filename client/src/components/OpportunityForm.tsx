@@ -71,13 +71,16 @@ export function OpportunityForm({
     }
   }, [revenueMetricsEnabled, form]);
 
-  // Convert string values to numbers on submit
+  // Convert string values to numbers and auto-calculate annual hours on submit
   const handleSubmit = (data: any) => {
+    const hoursSavedPerWeek = data.hoursSavedPerWeek ? parseFloat(data.hoursSavedPerWeek) : undefined;
+    const annualHoursSaved = hoursSavedPerWeek ? hoursSavedPerWeek * 50 : undefined;
+    
     const converted = {
       ...data,
       annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
-      hoursSavedPerWeek: data.hoursSavedPerWeek ? parseFloat(data.hoursSavedPerWeek) : undefined,
-      annualHoursSaved: data.annualHoursSaved ? parseFloat(data.annualHoursSaved) : undefined,
+      hoursSavedPerWeek,
+      annualHoursSaved,
       fteSavings: data.fteSavings ? parseFloat(data.fteSavings) : undefined,
       errorReductionPct: data.errorReductionPct ? parseFloat(data.errorReductionPct) : undefined,
       errorsAvoidedAnnually: data.errorsAvoidedAnnually ? parseInt(data.errorsAvoidedAnnually) : undefined,
@@ -167,51 +170,30 @@ export function OpportunityForm({
             )}
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="hoursSavedPerWeek"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hours Saved / Week</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="any"
-                      placeholder="0.00"
-                      data-testid="input-hours-saved-per-week"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="annualHoursSaved"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Annual Hours Saved</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="any"
-                      placeholder="0.00"
-                      data-testid="input-annual-hours-saved"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="hoursSavedPerWeek"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hours Saved / Week</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    step="any"
+                    placeholder="0.00"
+                    data-testid="input-hours-saved-per-week"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={e => field.onChange(e.target.value)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Annual hours will be calculated automatically (hours/week × 50 weeks)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

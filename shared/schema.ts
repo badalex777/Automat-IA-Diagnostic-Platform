@@ -173,16 +173,16 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
   id: true,
   createdAt: true,
 }).extend({
-  annualRoi: z.number().optional(),
-  hoursSavedPerWeek: z.number().optional(),
-  annualHoursSaved: z.number().optional(),
-  fteSavings: z.number().optional(),
-  errorReductionPct: z.number().min(0).max(100).optional(),
-  errorsAvoidedAnnually: z.number().int().optional(),
-  hoursReallocatedToRevenue: z.number().optional(),
-  revenueUpliftAnnual: z.number().optional(),
-  paybackPeriodMonths: z.number().optional(),
-  trainingHoursPerEmployee: z.number().optional(),
+  annualRoi: z.coerce.number().optional(),
+  hoursSavedPerWeek: z.coerce.number().optional(),
+  annualHoursSaved: z.coerce.number().optional(),
+  fteSavings: z.coerce.number().optional(),
+  errorReductionPct: z.coerce.number().min(0).max(100).optional(),
+  errorsAvoidedAnnually: z.coerce.number().int().optional(),
+  hoursReallocatedToRevenue: z.coerce.number().optional(),
+  revenueUpliftAnnual: z.coerce.number().optional(),
+  paybackPeriodMonths: z.coerce.number().optional(),
+  trainingHoursPerEmployee: z.coerce.number().optional(),
 });
 
 export const updateImplementationOpportunitySchema = insertImplementationOpportunitySchema.omit({ workflowId: true }).partial();
