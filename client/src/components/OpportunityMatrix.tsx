@@ -52,7 +52,7 @@ export default function OpportunityMatrix({
 
     // Calculate scores for each opportunity
     const points: DataPoint[] = opportunities.map(opp => {
-      const readinessScore = readinessScores[opp.workflowId] || 50;
+      const readinessScore = readinessScores[opp.workflowId];
       const score = calculateOpportunityScore(opp, readinessScore, toggles);
       
       return {

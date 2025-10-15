@@ -1,16 +1,21 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ChevronLeft, Search, Pencil, Check, X } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
+import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Company, Workflow } from "@shared/schema";
+import type { Company, Workflow, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
+import type { AggregatedPIFScores } from "@shared/pifCalculations";
+import { calculateReadinessRubric } from "@shared/pifCalculations";
+import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 
 export default function CompanyDetail() {
@@ -20,6 +25,8 @@ export default function CompanyDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [errorToggle, setErrorToggle] = useState(false);
+  const [revenueToggle, setRevenueToggle] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -28,6 +35,11 @@ export default function CompanyDetail() {
 
   const { data: workflows = [], isLoading: workflowsLoading, error: workflowsError } = useQuery<Workflow[]>({
     queryKey: [`/api/companies/${companyId}/workflows`],
+    enabled: !!companyId,
+  });
+
+  const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
+    queryKey: [`/api/companies/${companyId}/opportunities`],
     enabled: !!companyId,
   });
 
@@ -124,14 +136,180 @@ export default function CompanyDetail() {
     (workflow.description && workflow.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const completedWorkflows = workflows.filter(w => w.status === 'completed');
-  const matrixData = completedWorkflows.map(w => ({
-    id: w.id,
-    name: w.name,
-    businessImpact: 0,
-    effortToImplement: 0,
-    status: w.status,
-  }));
+  // Get unique workflow IDs from opportunities
+  const workflowIdsWithOpportunities = useMemo(() => {
+    return Array.from(new Set(opportunities.map(opp => opp.workflowId)));
+  }, [opportunities]);
+
+  // Fetch TFA and PIF data for all workflows with opportunities using Promise.all
+  const { data: workflowAssessments, isLoading: assessmentsLoading, error: assessmentsError } = useQuery({
+    queryKey: [`/api/companies/${companyId}/workflow-assessments`, workflowIdsWithOpportunities],
+    queryFn: async () => {
+      if (workflowIdsWithOpportunities.length === 0) {
+        return { tfaData: {}, pifData: {} };
+      }
+
+      try {
+        // Fetch TFA and PIF data in parallel for all workflows
+        const tfaPromises = workflowIdsWithOpportunities.map(async (workflowId) => {
+          const response = await fetch(`/api/workflows/${workflowId}/tfa`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch TFA for workflow ${workflowId}: ${response.statusText}`);
+          }
+          return { workflowId, data: await response.json() };
+        });
+
+        const pifPromises = workflowIdsWithOpportunities.map(async (workflowId) => {
+          const response = await fetch(`/api/workflows/${workflowId}/pif`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch PIF for workflow ${workflowId}: ${response.statusText}`);
+          }
+          return { workflowId, data: await response.json() };
+        });
+
+        const [tfaResults, pifResults] = await Promise.all([
+          Promise.all(tfaPromises),
+          Promise.all(pifPromises)
+        ]);
+
+        // Convert arrays to objects keyed by workflowId
+        const tfaData: Record<string, TFAAssessment> = {};
+        const pifData: Record<string, { responses: PIFResponse[]; aggregated: AggregatedPIFScores }> = {};
+
+        tfaResults.forEach(result => {
+          tfaData[result.workflowId] = result.data;
+        });
+
+        pifResults.forEach(result => {
+          pifData[result.workflowId] = result.data;
+        });
+
+        return { tfaData, pifData };
+      } catch (error) {
+        throw error;
+      }
+    },
+    enabled: workflowIdsWithOpportunities.length > 0,
+  });
+
+  useEffect(() => {
+    if (assessmentsError) {
+      toast({
+        title: "Error loading assessment data",
+        description: assessmentsError.message,
+        variant: "destructive",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assessmentsError]);
+
+  // Calculate readiness scores for each workflow
+  const readinessScores = useMemo(() => {
+    if (!workflowAssessments) return {};
+    
+    const scores: Record<string, number> = {};
+    const { tfaData, pifData } = workflowAssessments;
+
+    workflowIdsWithOpportunities.forEach((workflowId) => {
+      const tfa = tfaData[workflowId];
+      const pif = pifData[workflowId];
+
+      // Validate TFA: must exist, be completed, and have valid responses object
+      if (!tfa || !tfa.completedAt || !tfa.responses || typeof tfa.responses !== 'object') {
+        return;
+      }
+
+      // Validate PIF: must exist, have responses array, and at least one response
+      if (!pif || !pif.responses || !Array.isArray(pif.responses) || pif.responses.length === 0) {
+        return;
+      }
+
+      // Calculate section scores from TFA
+      const responses = tfa.responses as Record<string, string>;
+      const sectionScores = tfaSections.map(section => {
+        const sectionQuestions = section.questions;
+        const totalWeight = sectionQuestions.reduce((acc, q) => acc + q.weight, 0);
+        const weightedScore = sectionQuestions.reduce((acc, q) => {
+          const response = responses[q.id.toString()];
+          if (!response) return acc;
+          return acc + (parseInt(response) * q.weight);
+        }, 0);
+        const score = totalWeight > 0 ? (weightedScore / totalWeight) : 0;
+        return {
+          name: section.section,
+          score: parseFloat(score.toFixed(1)),
+          weight: section.weight,
+        };
+      });
+
+      // Extract section scores for readiness calculation
+      const tfaSectionScores = {
+        systemEnvironment: sectionScores.find(s => s.name === "System & Environment")?.score || 0,
+        dataQuality: sectionScores.find(s => s.name === "Data Quality & Availability")?.score || 0,
+        integrationFeasibility: sectionScores.find(s => s.name === "Integration Feasibility")?.score || 0,
+        securityCompliance: sectionScores.find(s => s.name === "Security & Compliance")?.score || 0,
+      };
+
+      // Calculate readiness score using the same logic as WorkflowDetail
+      const readinessRubric = calculateReadinessRubric(
+        tfa.score || 0,
+        tfaSectionScores,
+        pif.aggregated
+      );
+
+      // Only add to scores if calculation succeeded
+      scores[workflowId] = readinessRubric.totalScore;
+    });
+
+    return scores;
+  }, [workflowIdsWithOpportunities, workflowAssessments]);
+
+  // Filter opportunities to only show those with completed TFA and at least one PIF response
+  const filteredOpportunities = useMemo(() => {
+    if (!workflowAssessments) return [];
+    
+    const { tfaData, pifData } = workflowAssessments;
+    
+    return opportunities.filter(opp => {
+      const tfa = tfaData[opp.workflowId];
+      const pif = pifData[opp.workflowId];
+      
+      // Must have completed TFA assessment
+      if (!tfa || !tfa.completedAt) return false;
+      
+      // Must have at least one PIF response
+      if (!pif || !pif.responses || pif.responses.length === 0) return false;
+      
+      return true;
+    });
+  }, [opportunities, workflowAssessments]);
+
+  // Create toggles object
+  const toggles = useMemo(() => ({
+    errorMetrics: errorToggle,
+    revenueMetrics: revenueToggle,
+  }), [errorToggle, revenueToggle]);
+
+  // Group opportunities by workflow
+  const workflowsWithOpportunities = useMemo(() => {
+    const grouped = filteredOpportunities.reduce((acc, opp) => {
+      if (!acc[opp.workflowId]) {
+        const workflow = workflows.find(w => w.id === opp.workflowId);
+        if (workflow) {
+          acc[opp.workflowId] = {
+            workflow,
+            opportunities: [],
+          };
+        }
+      }
+      if (acc[opp.workflowId]) {
+        acc[opp.workflowId].opportunities.push(opp);
+      }
+      return acc;
+    }, {} as Record<string, { workflow: Workflow; opportunities: ImplementationOpportunity[] }>);
+
+    return Object.values(grouped);
+  }, [filteredOpportunities, workflows]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -214,7 +392,7 @@ export default function CompanyDetail() {
         <Tabs defaultValue="workflows" className="space-y-6">
           <TabsList>
             <TabsTrigger value="workflows" data-testid="tab-workflows">Workflows</TabsTrigger>
-            <TabsTrigger value="matrix" data-testid="tab-matrix">Opportunity Matrix</TabsTrigger>
+            <TabsTrigger value="opportunity-matrix" data-testid="tab-opportunity-matrix">Opportunity Matrix</TabsTrigger>
           </TabsList>
 
           <TabsContent value="workflows" className="space-y-4">
@@ -246,23 +424,94 @@ export default function CompanyDetail() {
             </div>
           </TabsContent>
 
-          <TabsContent value="matrix" className="space-y-4">
-            <div className="bg-card rounded-lg border border-card-border p-6">
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold">Implementation Prioritization</h2>
-                <p className="text-sm text-muted-foreground">
-                  {matrixData.length} completed workflows positioned for roadmap planning
+          <TabsContent value="opportunity-matrix" className="space-y-6">
+            {opportunitiesLoading ? (
+              <div className="bg-card rounded-lg border border-card-border p-6">
+                <p className="text-muted-foreground text-center py-8">Loading opportunities...</p>
+              </div>
+            ) : opportunitiesError ? (
+              <div className="bg-card rounded-lg border border-destructive p-6">
+                <p className="text-destructive">Error loading opportunities: {opportunitiesError.message}</p>
+              </div>
+            ) : filteredOpportunities.length === 0 ? (
+              <div className="bg-card rounded-lg border border-card-border p-6">
+                <p className="text-muted-foreground text-center py-8">
+                  {opportunities.length === 0 
+                    ? "No opportunities yet. Create opportunities in workflow detail pages." 
+                    : "No opportunities with completed TFA and PIF assessments. Complete assessments to see opportunities here."}
                 </p>
               </div>
-              {matrixData.length > 0 ? (
-                <OpportunityMatrix 
-                  workflows={matrixData}
-                  onWorkflowClick={(id) => console.log('Navigate to workflow:', id)}
-                />
-              ) : (
-                <p className="text-muted-foreground text-center py-8">No completed workflows yet. Complete TFA and business impact assessments to see workflows here.</p>
-              )}
-            </div>
+            ) : (
+              <>
+                <div className="bg-card rounded-lg border border-card-border p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold">Opportunity Matrix</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {filteredOpportunities.length} {filteredOpportunities.length === 1 ? 'opportunity' : 'opportunities'} across {workflowsWithOpportunities.length} {workflowsWithOpportunities.length === 1 ? 'workflow' : 'workflows'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          id="error-metrics-toggle"
+                          checked={errorToggle}
+                          onCheckedChange={setErrorToggle}
+                          data-testid="switch-error-metrics"
+                        />
+                        <label htmlFor="error-metrics-toggle" className="text-sm text-muted-foreground cursor-pointer">
+                          Include Error Metrics
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          id="revenue-metrics-toggle"
+                          checked={revenueToggle}
+                          onCheckedChange={setRevenueToggle}
+                          data-testid="switch-revenue-metrics"
+                        />
+                        <label htmlFor="revenue-metrics-toggle" className="text-sm text-muted-foreground cursor-pointer">
+                          Include Revenue Metrics
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <OpportunityMatrix
+                    opportunities={filteredOpportunities}
+                    readinessScores={readinessScores}
+                    toggles={toggles}
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  {workflowsWithOpportunities.map(({ workflow, opportunities: workflowOpps }) => (
+                    <div key={workflow.id} className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold" data-testid={`text-workflow-name-${workflow.id}`}>
+                          {workflow.name}
+                        </h3>
+                        <Link href={`/company/${companyId}/workflow/${workflow.id}`}>
+                          <Button variant="ghost" size="sm" data-testid={`button-view-workflow-${workflow.id}`}>
+                            View Workflow
+                          </Button>
+                        </Link>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {workflowOpps.map(opp => (
+                          <OpportunityCard
+                            key={opp.id}
+                            opportunity={opp}
+                            readinessScore={readinessScores[opp.workflowId]}
+                            toggles={toggles}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>

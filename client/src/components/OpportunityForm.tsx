@@ -62,9 +62,43 @@ export function OpportunityForm({
     }
   }, [initialData]);
 
+  // Clear error metrics when toggle is disabled
+  useEffect(() => {
+    if (!showErrorMetrics) {
+      form.setValue('errorReductionPct', undefined);
+      form.setValue('errorsAvoidedAnnually', undefined);
+    }
+  }, [showErrorMetrics, form]);
+
+  // Clear revenue metrics when toggle is disabled
+  useEffect(() => {
+    if (!showRevenueMetrics) {
+      form.setValue('hoursReallocatedToRevenue', undefined);
+      form.setValue('revenueUpliftAnnual', undefined);
+    }
+  }, [showRevenueMetrics, form]);
+
+  // Convert string values to numbers on submit
+  const handleSubmit = (data: any) => {
+    const converted = {
+      ...data,
+      annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
+      hoursSavedPerWeek: data.hoursSavedPerWeek ? parseFloat(data.hoursSavedPerWeek) : undefined,
+      annualHoursSaved: data.annualHoursSaved ? parseFloat(data.annualHoursSaved) : undefined,
+      fteSavings: data.fteSavings ? parseFloat(data.fteSavings) : undefined,
+      errorReductionPct: data.errorReductionPct ? parseFloat(data.errorReductionPct) : undefined,
+      errorsAvoidedAnnually: data.errorsAvoidedAnnually ? parseInt(data.errorsAvoidedAnnually) : undefined,
+      hoursReallocatedToRevenue: data.hoursReallocatedToRevenue ? parseFloat(data.hoursReallocatedToRevenue) : undefined,
+      revenueUpliftAnnual: data.revenueUpliftAnnual ? parseFloat(data.revenueUpliftAnnual) : undefined,
+      paybackPeriodMonths: data.paybackPeriodMonths ? parseFloat(data.paybackPeriodMonths) : undefined,
+      trainingHoursPerEmployee: data.trainingHoursPerEmployee ? parseFloat(data.trainingHoursPerEmployee) : undefined,
+    };
+    onSubmit(converted);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         {/* Basic Info */}
         <div className="space-y-4">
           <h3 className="text-sm font-semibold">Basic Information</h3>
@@ -127,7 +161,7 @@ export function OpportunityForm({
                     data-testid="input-annual-roi"
                     {...field}
                     value={field.value || ""}
-                    onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    onChange={e => field.onChange(e.target.value)}
                   />
                 </FormControl>
                 <FormDescription>
@@ -153,7 +187,7 @@ export function OpportunityForm({
                       data-testid="input-hours-saved-per-week"
                       {...field}
                       value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      onChange={e => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -175,7 +209,7 @@ export function OpportunityForm({
                       data-testid="input-annual-hours-saved"
                       {...field}
                       value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      onChange={e => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -198,7 +232,7 @@ export function OpportunityForm({
                     data-testid="input-fte-savings"
                     {...field}
                     value={field.value || ""}
-                    onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                    onChange={e => field.onChange(e.target.value)}
                   />
                 </FormControl>
                 <FormDescription>
@@ -229,7 +263,7 @@ export function OpportunityForm({
                       data-testid="input-payback-period"
                       {...field}
                       value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      onChange={e => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -251,7 +285,7 @@ export function OpportunityForm({
                       data-testid="input-training-hours"
                       {...field}
                       value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      onChange={e => field.onChange(e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -295,7 +329,7 @@ export function OpportunityForm({
                         data-testid="input-error-reduction-pct"
                         {...field}
                         value={field.value || ""}
-                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        onChange={e => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -317,7 +351,7 @@ export function OpportunityForm({
                         data-testid="input-errors-avoided"
                         {...field}
                         value={field.value || ""}
-                        onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        onChange={e => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -360,7 +394,7 @@ export function OpportunityForm({
                         data-testid="input-hours-reallocated"
                         {...field}
                         value={field.value || ""}
-                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        onChange={e => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -382,7 +416,7 @@ export function OpportunityForm({
                         data-testid="input-revenue-uplift"
                         {...field}
                         value={field.value || ""}
-                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        onChange={e => field.onChange(e.target.value)}
                       />
                     </FormControl>
                     <FormMessage />
