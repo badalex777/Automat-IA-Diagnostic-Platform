@@ -1,0 +1,47 @@
+Nice. Moving on—we’re going to begin creating the final section of this app: the Opportunity Matrix. Before we dive in, there’s an important sequence to understand.
+
+After stakeholder interviews, where we identify the best candidate workflows for automation, we first send the Technical Feasibility Assessment (TFA) to the system managers of those workflows. This step grounds us in the technical reality and context before investing time in workflows that aren’t suitable—or would require significant groundwork before reaching optimal automation.
+
+Once TFA data is collected, we distribute Process Insight Forms (PIFs) to end-users (the employees whose work will be made easier through automation/AI implementation). The PIF responses feed into the Readiness Rubric, helping us understand the workflow’s mechanics in detail. At this stage, we can accurately model the Y-axis (Implementation Effort) of the Opportunity Matrix.
+
+After gathering TFA and PIF data, we conduct end-user interviews. These interviews uncover real inefficiencies, error-prone steps, and bottlenecks within each candidate workflow. From these insights, we begin ROI modeling, combining (1) the data collected in PIFs with (2) our own estimates of implementation costs, training, and change management for potential automations within the workflow.
+
+The process looks like this:
+
+Analyse feasibility and confirm workflow readiness for automation.
+
+Brainstorm automation/AI implementations within each workflow.
+
+Model ROI around those implementations, drawing on both PIF data and our cost/effort estimates.
+
+Important note: multiple end-users from different roles within each workflow may fill out PIFs. Their data, role, and answers will guide us in brainstorming specific AI implementations for each part of the process.
+
+Now, for the app requirement: I need you to create a new subpage on the workflow’s main page (in addition to TFA, Process Insights, and Readiness Rubric). This new page should be dedicated to AI Implementation Opportunities per workflow. It must allow manual input of key business metrics from the ROI calculator, so the Opportunity Matrix can use these values to model the X-axis (Business Impact).
+
+The ROI outputs that must be manually entered on this page include:
+
+Payback period
+
+Annual run rate ROI (post ramp-up period)
+
+Hours saved per week
+
+Annual hours saved
+
+Full-time equivalent (FTE) savings
+
+Error reduction % (optional)
+
+Errors avoided annually (optional)
+
+Hours reallocated to revenue-producing activities per year (optional)
+
+Revenue uplift per year
+
+In summary:
+
+Y-axis (Implementation Effort): driven by TFA + PIF data.
+
+X-axis (Business Impact): driven by ROI calculator outputs.
+
+Together, these define where each potential automation/AI implementation is positioned in the Opportunity Matrix.
