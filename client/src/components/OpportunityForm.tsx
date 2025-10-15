@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertImplementationOpportunitySchema, type InsertImplementationOpportunity } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormControl,
@@ -29,6 +31,9 @@ export function OpportunityForm({
   onCancel,
   isLoading 
 }: OpportunityFormProps) {
+  const [showErrorMetrics, setShowErrorMetrics] = useState(false);
+  const [showRevenueMetrics, setShowRevenueMetrics] = useState(false);
+
   const form = useForm<InsertImplementationOpportunity>({
     resolver: zodResolver(insertImplementationOpportunitySchema),
     defaultValues: {
@@ -47,6 +52,15 @@ export function OpportunityForm({
       trainingHoursPerEmployee: initialData?.trainingHoursPerEmployee,
     },
   });
+
+  useEffect(() => {
+    if (initialData?.errorReductionPct || initialData?.errorsAvoidedAnnually) {
+      setShowErrorMetrics(true);
+    }
+    if (initialData?.hoursReallocatedToRevenue || initialData?.revenueUpliftAnnual) {
+      setShowRevenueMetrics(true);
+    }
+  }, [initialData]);
 
   return (
     <Form {...form}>
@@ -108,7 +122,7 @@ export function OpportunityForm({
                 <FormControl>
                   <Input 
                     type="number"
-                    step="0.01"
+                    step="any"
                     placeholder="0.00"
                     data-testid="input-annual-roi"
                     {...field}
@@ -134,7 +148,7 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="0.01"
+                      step="any"
                       placeholder="0.00"
                       data-testid="input-hours-saved-per-week"
                       {...field}
@@ -156,7 +170,7 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="0.01"
+                      step="any"
                       placeholder="0.00"
                       data-testid="input-annual-hours-saved"
                       {...field}
@@ -179,7 +193,7 @@ export function OpportunityForm({
                 <FormControl>
                   <Input 
                     type="number"
-                    step="0.01"
+                    step="any"
                     placeholder="0.00"
                     data-testid="input-fte-savings"
                     {...field}
@@ -210,7 +224,7 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="0.1"
+                      step="any"
                       placeholder="0.0"
                       data-testid="input-payback-period"
                       {...field}
@@ -232,7 +246,7 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="0.1"
+                      step="any"
                       placeholder="0.0"
                       data-testid="input-training-hours"
                       {...field}
@@ -248,108 +262,136 @@ export function OpportunityForm({
         </div>
 
         {/* Optional: Error Reduction Metrics */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-muted-foreground">Error Reduction (Optional)</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="errorReductionPct"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Error Reduction %</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="100"
-                      placeholder="0.0"
-                      data-testid="input-error-reduction-pct"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="errorsAvoidedAnnually"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Errors Avoided / Year</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="1"
-                      placeholder="0"
-                      data-testid="input-errors-avoided"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <div className="flex items-center gap-2 pt-2">
+          <Switch
+            id="error-metrics-toggle"
+            checked={showErrorMetrics}
+            onCheckedChange={setShowErrorMetrics}
+            data-testid="switch-error-metrics-form"
+          />
+          <label htmlFor="error-metrics-toggle" className="text-sm font-semibold cursor-pointer">
+            Include Error Reduction Metrics
+          </label>
         </div>
+
+        {showErrorMetrics && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Error Reduction (Optional)</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="errorReductionPct"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Error Reduction %</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        step="any"
+                        min="0"
+                        max="100"
+                        placeholder="0.0"
+                        data-testid="input-error-reduction-pct"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="errorsAvoidedAnnually"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Errors Avoided / Year</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        step="any"
+                        placeholder="0"
+                        data-testid="input-errors-avoided"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={e => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Optional: Revenue Growth Metrics */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-muted-foreground">Revenue Growth (Optional)</h3>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="hoursReallocatedToRevenue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hours Reallocated to Revenue / Year</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      data-testid="input-hours-reallocated"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="revenueUpliftAnnual"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Revenue Uplift / Year $</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      data-testid="input-revenue-uplift"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <div className="flex items-center gap-2 pt-2">
+          <Switch
+            id="revenue-metrics-toggle"
+            checked={showRevenueMetrics}
+            onCheckedChange={setShowRevenueMetrics}
+            data-testid="switch-revenue-metrics-form"
+          />
+          <label htmlFor="revenue-metrics-toggle" className="text-sm font-semibold cursor-pointer">
+            Include Revenue Impact Metrics
+          </label>
         </div>
+
+        {showRevenueMetrics && (
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Revenue Growth (Optional)</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="hoursReallocatedToRevenue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hours Reallocated to Revenue / Year</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        step="any"
+                        placeholder="0.00"
+                        data-testid="input-hours-reallocated"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="revenueUpliftAnnual"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Revenue Uplift / Year $</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number"
+                        step="any"
+                        placeholder="0.00"
+                        data-testid="input-revenue-uplift"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={e => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Form Actions */}
         <div className="flex justify-end gap-3">
