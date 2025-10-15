@@ -3,7 +3,7 @@ import type { ImplementationOpportunity } from "./schema";
 export interface OpportunityScore {
   implementationEffort: number; // 0-100, lower = easier
   businessImpact: number; // 0-100, higher = better
-  quadrant: "Quick Wins" | "Big Swings" | "Nice-To-Haves" | "Deprioritize";
+  quadrant: "Quick Wins" | "Strategic Goals" | "Nice-To-Haves" | "Deprioritize";
 }
 
 export interface ToggleState {
@@ -120,52 +120,60 @@ export function calculateBusinessImpact(
   const fteScore = normalizeToScale(fteSavings, maxFteSavings);
   const hoursScore = normalizeToScale(annualHours, maxAnnualHours);
 
-  // Calculate error impact if toggle is on
+  // Calculate error impact if toggle is on AND has data
   let errorImpact = 0;
+  let hasErrorData = false;
   if (toggles.errorMetrics) {
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
-    const errorPctScore = errorPct; // Already 0-100
-    const errorsScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
-    errorImpact = (errorPctScore * 0.5) + (errorsScore * 0.5);
+    if (errorPct > 0 || errorsAvoided > 0) {
+      hasErrorData = true;
+      const errorPctScore = errorPct; // Already 0-100
+      const errorsScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
+      errorImpact = (errorPctScore * 0.5) + (errorsScore * 0.5);
+    }
   }
 
-  // Calculate revenue impact if toggle is on
+  // Calculate revenue impact if toggle is on AND has data
   let revenueImpact = 0;
+  let hasRevenueData = false;
   if (toggles.revenueMetrics) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
-    const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
-    const revenueScore = normalizeToScale(revenueUplift, maxRevenueUplift);
-    revenueImpact = (hoursReallocatedScore * 0.4) + (revenueScore * 0.6);
+    if (hoursReallocated > 0 || revenueUplift > 0) {
+      hasRevenueData = true;
+      const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
+      const revenueScore = normalizeToScale(revenueUplift, maxRevenueUplift);
+      revenueImpact = (hoursReallocatedScore * 0.4) + (revenueScore * 0.6);
+    }
   }
 
-  // Apply weights based on toggle state
+  // Apply weights based on actual data presence
   let impact = 0;
-  if (toggles.errorMetrics && toggles.revenueMetrics) {
-    // Both toggles on
+  if (hasErrorData && hasRevenueData) {
+    // Both toggles on with data
     impact = 
       (roiScore * 0.25) +
       (fteScore * 0.15) +
       (hoursScore * 0.15) +
       (errorImpact * 0.20) +
       (revenueImpact * 0.25);
-  } else if (toggles.errorMetrics) {
-    // Error toggle only
+  } else if (hasErrorData) {
+    // Error toggle only with data
     impact = 
       (roiScore * 0.30) +
       (fteScore * 0.20) +
       (hoursScore * 0.20) +
       (errorImpact * 0.30);
-  } else if (toggles.revenueMetrics) {
-    // Revenue toggle only
+  } else if (hasRevenueData) {
+    // Revenue toggle only with data
     impact = 
       (roiScore * 0.30) +
       (fteScore * 0.20) +
       (hoursScore * 0.15) +
       (revenueImpact * 0.35);
   } else {
-    // Base formula - no toggles
+    // Base formula - no toggles or no data
     impact = 
       (roiScore * 0.40) +
       (fteScore * 0.30) +
@@ -184,7 +192,7 @@ export function getQuadrant(implementationEffort: number, businessImpact: number
   const isHighImpact = businessImpact >= 50;
 
   if (isLowEffort && isHighImpact) return "Quick Wins";
-  if (!isLowEffort && isHighImpact) return "Big Swings";
+  if (!isLowEffort && isHighImpact) return "Strategic Goals";
   if (isLowEffort && !isHighImpact) return "Nice-To-Haves";
   return "Deprioritize";
 }

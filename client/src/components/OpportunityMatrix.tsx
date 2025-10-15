@@ -60,7 +60,7 @@ export default function OpportunityMatrix({
         name: opp.name,
         workflowId: opp.workflowId,
         x: score.businessImpact,
-        y: 100 - score.implementationEffort, // Invert for display (higher = easier)
+        y: score.implementationEffort, // Higher effort = higher on Y-axis
         quadrant: score.quadrant,
         color: colorMap[opp.workflowId],
       };
@@ -87,7 +87,7 @@ export default function OpportunityMatrix({
               <span className="text-muted-foreground">Business Impact:</span> {data.x.toFixed(1)}
             </p>
             <p className="text-xs">
-              <span className="text-muted-foreground">Ease of Implementation:</span> {data.y.toFixed(1)}
+              <span className="text-muted-foreground">Implementation Effort:</span> {data.y.toFixed(1)}
             </p>
           </div>
         </div>
@@ -133,10 +133,10 @@ export default function OpportunityMatrix({
               <YAxis 
                 type="number" 
                 dataKey="y" 
-                name="Ease of Implementation"
+                name="Implementation Effort"
                 domain={[0, 100]}
                 label={{ 
-                  value: '← Effort to Implement', 
+                  value: 'Implementation Effort →', 
                   angle: -90, 
                   position: 'left',
                   offset: 40,
@@ -160,17 +160,17 @@ export default function OpportunityMatrix({
               />
 
               {/* Quadrant labels */}
-              <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+              <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                 Nice-To-Haves
               </text>
-              <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+              <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                 Quick Wins
               </text>
-              <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+              <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                 Deprioritize
               </text>
-              <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                Big Swings
+              <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                Strategic Goals
               </text>
 
               <Tooltip content={<CustomTooltip />} />
