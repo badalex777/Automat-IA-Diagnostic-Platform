@@ -16,7 +16,7 @@ interface TFAQuestionDetailsProps {
   }>;
 }
 
-type ScoreRange = "all" | "critical" | "weak" | "moderate" | "strong";
+type ScoreRange = "all" | "critical" | "weak" | "moderate" | "strong" | "optimal";
 type SectionFilter = "all" | "System Environment" | "Data Quality" | "Integration Feasibility" | "Security/Compliance";
 
 export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetailsProps) {
@@ -65,10 +65,11 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
 
       // Score range filter (mutually exclusive integer ranges)
       if (scoreFilter !== "all") {
-        if (scoreFilter === "critical" && (q.score === null || q.score > 2)) return false;  // 1-2 only
-        if (scoreFilter === "weak" && (q.score === null || q.score !== 3)) return false;  // 3 only
-        if (scoreFilter === "moderate" && (q.score === null || q.score !== 4)) return false;  // 4 only
-        if (scoreFilter === "strong" && (q.score === null || q.score !== 5)) return false;  // 5 only
+        if (scoreFilter === "critical" && (q.score === null || q.score !== 1)) return false;  // 1 only
+        if (scoreFilter === "weak" && (q.score === null || q.score !== 2)) return false;  // 2 only
+        if (scoreFilter === "moderate" && (q.score === null || q.score !== 3)) return false;  // 3 only
+        if (scoreFilter === "strong" && (q.score === null || q.score !== 4)) return false;  // 4 only
+        if (scoreFilter === "optimal" && (q.score === null || q.score !== 5)) return false;  // 5 only
       }
 
       // Text search
@@ -94,22 +95,26 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
     let icon = <Info className="h-3 w-3" />;
     let label = "";
 
-    if (score <= 2) {
+    if (score === 1) {
       variant = "destructive";
       icon = <AlertTriangle className="h-3 w-3" />;
       label = "Critical";
-    } else if (score <= 3) {
+    } else if (score === 2) {
       variant = "outline";
       icon = <AlertCircle className="h-3 w-3" />;
       label = "Weak";
-    } else if (score <= 4) {
+    } else if (score === 3) {
       variant = "secondary";
       icon = <Info className="h-3 w-3" />;
       label = "Moderate";
-    } else {
+    } else if (score === 4) {
       variant = "default";
       icon = <CheckCircle2 className="h-3 w-3" />;
       label = "Strong";
+    } else if (score === 5) {
+      variant = "default";
+      icon = <CheckCircle2 className="h-3 w-3" />;
+      label = "Optimal";
     }
 
     return (
@@ -166,10 +171,11 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All scores</SelectItem>
-            <SelectItem value="critical">Critical (1-2)</SelectItem>
-            <SelectItem value="weak">Weak (3)</SelectItem>
-            <SelectItem value="moderate">Moderate (4)</SelectItem>
-            <SelectItem value="strong">Strong (5)</SelectItem>
+            <SelectItem value="critical">Critical (1)</SelectItem>
+            <SelectItem value="weak">Weak (2)</SelectItem>
+            <SelectItem value="moderate">Moderate (3)</SelectItem>
+            <SelectItem value="strong">Strong (4)</SelectItem>
+            <SelectItem value="optimal">Optimal (5)</SelectItem>
           </SelectContent>
         </Select>
       </div>
