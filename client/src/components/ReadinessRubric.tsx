@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, AlertTriangle } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
 
@@ -100,87 +100,112 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     color: item.color,
   }));
 
-  // Generate dynamic insights
-  const generateInsights = () => {
-    const insights: Array<{ type: 'strength' | 'risk' | 'neutral'; text: string }> = [];
-    
-    // Analyze overall score
-    if (rubric.totalScore >= 80) {
-      insights.push({
-        type: 'strength',
-        text: `Excellent readiness score of ${rubric.totalScore}/100 indicates strong potential for successful AI implementation.`
-      });
-    } else if (rubric.totalScore >= 65) {
-      insights.push({
-        type: 'neutral',
-        text: `Good readiness score of ${rubric.totalScore}/100 suggests viable implementation with moderate preparation needed.`
-      });
-    } else if (rubric.totalScore >= 50) {
-      insights.push({
-        type: 'neutral',
-        text: `Moderate readiness score of ${rubric.totalScore}/100 indicates significant preparation required before implementation.`
-      });
-    } else {
-      insights.push({
-        type: 'risk',
-        text: `Low readiness score of ${rubric.totalScore}/100 suggests major challenges that must be addressed before proceeding.`
-      });
-    }
-
-    // Analyze TFA vs PIF balance
-    const diff = Math.abs(rubric.tfaScore - rubric.pifScore);
-    if (diff > 20) {
-      if (rubric.tfaScore > rubric.pifScore) {
-        insights.push({
-          type: 'risk',
-          text: `Technical capabilities (${rubric.tfaScore}) significantly exceed operational readiness (${rubric.pifScore}). Focus on change management and process clarity.`
-        });
-      } else {
-        insights.push({
-          type: 'risk',
-          text: `Operational readiness (${rubric.pifScore}) outpaces technical foundation (${rubric.tfaScore}). Address system environment and data quality concerns.`
-        });
-      }
-    } else {
-      insights.push({
-        type: 'strength',
-        text: `Balanced technical (${rubric.tfaScore}) and operational (${rubric.pifScore}) scores indicate well-rounded readiness.`
-      });
-    }
-
-    // Identify strongest component
+  // Generate detailed SWOT analysis
+  const generateSWOTAnalysis = () => {
     const componentScoresArray = Object.entries(rubric.componentScores).map(([key, value]) => ({
       key: key as keyof ReadinessRubricScore['componentScores'],
-      score: value
+      score: value,
+      label: componentLabels[key as keyof ReadinessRubricScore['componentScores']],
+      weight: componentWeightValues[key as keyof ReadinessRubricScore['componentScores']]
     }));
     componentScoresArray.sort((a, b) => b.score - a.score);
+
+    const strengths: string[] = [];
+    const weaknesses: string[] = [];
+    const opportunities: string[] = [];
+    const threats: string[] = [];
+
+    // STRENGTHS: High-scoring components (>= 70)
+    const strongComponents = componentScoresArray.filter(c => c.score >= 70);
+    if (strongComponents.length > 0) {
+      const topStrengths = strongComponents.slice(0, 3).map(c => 
+        `${c.label} (${c.score}/100)`
+      ).join(', ');
+      strengths.push(`Strong foundation in ${topStrengths} provides a solid technical and operational base for AI implementation.`);
+      
+      if (rubric.tfaScore >= 70 && rubric.pifScore >= 70) {
+        strengths.push(`Balanced excellence with Technical Feasibility at ${rubric.tfaScore}/100 and Operational Readiness at ${rubric.pifScore}/100 demonstrates comprehensive preparedness.`);
+      } else if (rubric.tfaScore >= 70) {
+        strengths.push(`Robust technical foundation (${rubric.tfaScore}/100) indicates systems are well-positioned for AI integration.`);
+      } else if (rubric.pifScore >= 70) {
+        strengths.push(`Strong operational readiness (${rubric.pifScore}/100) shows teams are prepared for workflow changes and process adoption.`);
+      }
+    }
     
-    const strongest = componentScoresArray[0];
-    const weakest = componentScoresArray[componentScoresArray.length - 1];
+    if (rubric.totalScore >= 75) {
+      strengths.push(`Overall readiness score of ${rubric.totalScore}/100 indicates high likelihood of successful implementation with minimal friction.`);
+    }
 
-    if (strongest.score >= 80) {
-      insights.push({
-        type: 'strength',
-        text: `${componentLabels[strongest.key]} is a key strength at ${strongest.score}/100, providing a solid foundation for implementation.`
+    // WEAKNESSES: Low-scoring components (< 60)
+    const weakComponents = componentScoresArray.filter(c => c.score < 60);
+    if (weakComponents.length > 0) {
+      weakComponents.forEach(c => {
+        if (c.score < 40) {
+          weaknesses.push(`Critical deficiency in ${c.label} (${c.score}/100) poses significant implementation barriers and requires immediate remediation.`);
+        } else {
+          weaknesses.push(`${c.label} scores ${c.score}/100, indicating gaps that need attention before full deployment.`);
+        }
       });
     }
 
-    if (weakest.score < 50) {
-      insights.push({
-        type: 'risk',
-        text: `${componentLabels[weakest.key]} scores ${weakest.score}/100 and requires immediate attention to avoid implementation risks.`
-      });
-    } else if (weakest.score < 65) {
-      insights.push({
-        type: 'neutral',
-        text: `${componentLabels[weakest.key]} at ${weakest.score}/100 is the weakest area and should be prioritized for improvement.`
+    const diff = Math.abs(rubric.tfaScore - rubric.pifScore);
+    if (diff > 25) {
+      if (rubric.tfaScore > rubric.pifScore) {
+        weaknesses.push(`Operational readiness (${rubric.pifScore}/100) lags behind technical capabilities (${rubric.tfaScore}/100) by ${diff} points, creating adoption risk.`);
+      } else {
+        weaknesses.push(`Technical foundation (${rubric.tfaScore}/100) trails operational readiness (${rubric.pifScore}/100) by ${diff} points, limiting implementation viability.`);
+      }
+    }
+
+    // OPPORTUNITIES: Where strengths enable progress
+    if (rubric.totalScore >= 65 && rubric.totalScore < 80) {
+      opportunities.push(`With a moderate-to-good readiness score of ${rubric.totalScore}/100, starting with a pilot program in the strongest areas can demonstrate value while addressing gaps.`);
+    } else if (rubric.totalScore >= 80) {
+      opportunities.push(`Exceptional readiness score of ${rubric.totalScore}/100 enables immediate full-scale implementation with high confidence.`);
+    }
+
+    if (strongComponents.length >= 3) {
+      const strongestAreas = strongComponents.slice(0, 2).map(c => c.label).join(' and ');
+      opportunities.push(`Leverage excellence in ${strongestAreas} as proof points to build stakeholder confidence and secure buy-in.`);
+    }
+
+    if (rubric.componentScores.dataQuality >= 70 && rubric.componentScores.integrationFeasibility >= 70) {
+      opportunities.push(`Strong Data Quality (${rubric.componentScores.dataQuality}/100) and Integration Feasibility (${rubric.componentScores.integrationFeasibility}/100) create ideal conditions for rapid AI deployment.`);
+    }
+
+    const moderateComponents = componentScoresArray.filter(c => c.score >= 50 && c.score < 70);
+    if (moderateComponents.length > 0 && strongComponents.length > 0) {
+      opportunities.push(`Moderate components (${moderateComponents.map(c => c.label).join(', ')}) can be improved through targeted initiatives while building on existing strengths.`);
+    }
+
+    // THREATS: Blockers and concerns
+    const criticalComponents = componentScoresArray.filter(c => c.score < 50);
+    if (criticalComponents.length > 0) {
+      criticalComponents.forEach(c => {
+        threats.push(`${c.label} at ${c.score}/100 represents a critical blocker that could derail implementation if not addressed.`);
       });
     }
 
-    return insights;
+    if (rubric.componentScores.securityCompliance < 60) {
+      threats.push(`Security & Compliance concerns (${rubric.componentScores.securityCompliance}/100) may trigger regulatory issues or data privacy violations during deployment.`);
+    }
+
+    if (rubric.componentScores.workflowBrittleness < 50) {
+      threats.push(`High Workflow Brittleness risk (${rubric.componentScores.workflowBrittleness}/100) suggests current processes may break under AI-driven changes.`);
+    }
+
+    if (rubric.totalScore < 50) {
+      threats.push(`Overall low readiness (${rubric.totalScore}/100) indicates proceeding without major improvements will likely result in implementation failure.`);
+    }
+
+    if (rubric.tfaScore < 60 && rubric.pifScore < 60) {
+      threats.push(`Both technical and operational scores below 60 create compounding risks that require comprehensive preparation strategy.`);
+    }
+
+    return { strengths, weaknesses, opportunities, threats };
   };
 
-  const insights = generateInsights();
+  const swotAnalysis = generateSWOTAnalysis();
 
   return (
     <div className="space-y-6">
@@ -274,29 +299,79 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
         </div>
       </Card>
 
-      {/* Executive Summary */}
+      {/* Executive Summary - SWOT Analysis */}
       <Card data-testid="card-executive-summary">
         <CardHeader>
-          <CardTitle>Executive Summary</CardTitle>
+          <CardTitle>Executive Summary: SWOT Analysis</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          {insights.map((insight, index) => (
-            <div 
-              key={index} 
-              className={`flex items-start gap-3 p-3 rounded-md ${
-                insight.type === 'strength' 
-                  ? 'bg-green-500/10 dark:bg-green-500/20' 
-                  : insight.type === 'risk'
-                  ? 'bg-red-500/10 dark:bg-red-500/20'
-                  : 'bg-blue-500/10 dark:bg-blue-500/20'
-              }`}
-            >
-              {insight.type === 'strength' && <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />}
-              {insight.type === 'risk' && <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />}
-              {insight.type === 'neutral' && <Minus className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />}
-              <p className="text-sm">{insight.text}</p>
+        <CardContent className="space-y-6">
+          {/* Strengths */}
+          {swotAnalysis.strengths.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm flex items-center gap-2 text-green-600 dark:text-green-400">
+                <CheckCircle2 className="h-4 w-4" />
+                Strengths
+              </h4>
+              <div className="space-y-2">
+                {swotAnalysis.strengths.map((strength, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 rounded-md bg-green-500/10 dark:bg-green-500/20">
+                    <p className="text-sm">{strength}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+
+          {/* Weaknesses */}
+          {swotAnalysis.weaknesses.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                <AlertCircle className="h-4 w-4" />
+                Weaknesses
+              </h4>
+              <div className="space-y-2">
+                {swotAnalysis.weaknesses.map((weakness, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 rounded-md bg-orange-500/10 dark:bg-orange-500/20">
+                    <p className="text-sm">{weakness}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Opportunities */}
+          {swotAnalysis.opportunities.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                <TrendingUp className="h-4 w-4" />
+                Opportunities
+              </h4>
+              <div className="space-y-2">
+                {swotAnalysis.opportunities.map((opportunity, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 rounded-md bg-blue-500/10 dark:bg-blue-500/20">
+                    <p className="text-sm">{opportunity}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Threats */}
+          {swotAnalysis.threats.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm flex items-center gap-2 text-red-600 dark:text-red-400">
+                <AlertTriangle className="h-4 w-4" />
+                Threats
+              </h4>
+              <div className="space-y-2">
+                {swotAnalysis.threats.map((threat, index) => (
+                  <div key={index} className="flex items-start gap-3 p-3 rounded-md bg-red-500/10 dark:bg-red-500/20">
+                    <p className="text-sm">{threat}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
