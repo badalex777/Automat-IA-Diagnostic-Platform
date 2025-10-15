@@ -4,7 +4,6 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { ChevronLeft, Search, Pencil, Check, X } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
@@ -25,8 +24,6 @@ export default function CompanyDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
-  const [errorToggle, setErrorToggle] = useState(false);
-  const [revenueToggle, setRevenueToggle] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -284,12 +281,6 @@ export default function CompanyDetail() {
     });
   }, [opportunities, workflowAssessments]);
 
-  // Create toggles object
-  const toggles = useMemo(() => ({
-    errorMetrics: errorToggle,
-    revenueMetrics: revenueToggle,
-  }), [errorToggle, revenueToggle]);
-
   // Group opportunities by workflow
   const workflowsWithOpportunities = useMemo(() => {
     const grouped = filteredOpportunities.reduce((acc, opp) => {
@@ -444,37 +435,11 @@ export default function CompanyDetail() {
             ) : (
               <>
                 <div className="bg-card rounded-lg border border-card-border p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-semibold">Opportunity Matrix</h2>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {filteredOpportunities.length} {filteredOpportunities.length === 1 ? 'opportunity' : 'opportunities'} across {workflowsWithOpportunities.length} {workflowsWithOpportunities.length === 1 ? 'workflow' : 'workflows'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          id="error-metrics-toggle"
-                          checked={errorToggle}
-                          onCheckedChange={setErrorToggle}
-                          data-testid="switch-error-metrics"
-                        />
-                        <label htmlFor="error-metrics-toggle" className="text-sm text-muted-foreground cursor-pointer">
-                          Include Error Metrics
-                        </label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          id="revenue-metrics-toggle"
-                          checked={revenueToggle}
-                          onCheckedChange={setRevenueToggle}
-                          data-testid="switch-revenue-metrics"
-                        />
-                        <label htmlFor="revenue-metrics-toggle" className="text-sm text-muted-foreground cursor-pointer">
-                          Include Revenue Metrics
-                        </label>
-                      </div>
-                    </div>
+                  <div>
+                    <h2 className="text-lg font-semibold">Opportunity Matrix</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {filteredOpportunities.length} {filteredOpportunities.length === 1 ? 'opportunity' : 'opportunities'} across {workflowsWithOpportunities.length} {workflowsWithOpportunities.length === 1 ? 'workflow' : 'workflows'}
+                    </p>
                   </div>
 
                   <OpportunityMatrix
@@ -502,6 +467,7 @@ export default function CompanyDetail() {
                             key={opp.id}
                             opportunity={opp}
                             readinessScore={readinessScores[opp.workflowId]}
+                            companyId={companyId}
                           />
                         ))}
                       </div>

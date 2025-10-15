@@ -3,11 +3,16 @@ import { calculateOpportunityScore, type ToggleState } from "@shared/opportunity
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, DollarSign, Clock, Users } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Edit, Trash2, DollarSign, Clock, Users, TrendingUp, AlertTriangle } from "lucide-react";
 
 interface OpportunityCardProps {
   opportunity: ImplementationOpportunity;
   readinessScore: number;
+  companyId?: string;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -22,9 +27,12 @@ const quadrantColors = {
 export function OpportunityCard({
   opportunity,
   readinessScore,
+  companyId,
   onEdit,
   onDelete,
 }: OpportunityCardProps) {
+  const { toast } = useToast();
+  
   // Use per-opportunity toggle state
   const toggles: ToggleState = {
     errorMetrics: opportunity.errorMetricsEnabled ?? false,
@@ -32,6 +40,32 @@ export function OpportunityCard({
   };
   
   const score = calculateOpportunityScore(opportunity, readinessScore, toggles);
+  
+  // Mutation to update toggle states
+  const updateToggleMutation = useMutation({
+    mutationFn: async (updates: { errorMetricsEnabled?: boolean; revenueMetricsEnabled?: boolean }) => {
+      return apiRequest(`/api/opportunities/${opportunity.id}`, {
+        method: "PATCH",
+        body: JSON.stringify(updates),
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: () => {
+      // Invalidate company opportunities query
+      if (companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/opportunities`] });
+      }
+      // Invalidate workflow opportunities query
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${opportunity.workflowId}/opportunities`] });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to update metrics",
+      });
+    },
+  });
   
   const formatCurrency = (value: string | null | undefined) => {
     if (!value) return "-";
@@ -136,6 +170,47 @@ export function OpportunityCard({
             </div>
           </div>
         </div>
+
+        {/* Metric Toggles */}
+        {(opportunity.errorReductionPct || opportunity.revenueUpliftAnnual) && (
+          <div className="space-y-2 pt-2 border-t">
+            <p className="text-xs font-medium text-muted-foreground">Impact Boosters</p>
+            
+            {opportunity.errorReductionPct && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-xs">Error Reduction</span>
+                </div>
+                <Switch
+                  checked={opportunity.errorMetricsEnabled ?? false}
+                  onCheckedChange={(checked) => 
+                    updateToggleMutation.mutate({ errorMetricsEnabled: checked })
+                  }
+                  disabled={updateToggleMutation.isPending}
+                  data-testid={`switch-error-${opportunity.id}`}
+                />
+              </div>
+            )}
+            
+            {opportunity.revenueUpliftAnnual && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-xs">Revenue Uplift</span>
+                </div>
+                <Switch
+                  checked={opportunity.revenueMetricsEnabled ?? false}
+                  onCheckedChange={(checked) => 
+                    updateToggleMutation.mutate({ revenueMetricsEnabled: checked })
+                  }
+                  disabled={updateToggleMutation.isPending}
+                  data-testid={`switch-revenue-${opportunity.id}`}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         {(onEdit || onDelete) && (
