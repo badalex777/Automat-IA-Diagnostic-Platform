@@ -21,7 +21,7 @@ import { PIFRespondentList } from "@/components/PIFRespondentList";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import ReadinessRubric from "@/components/ReadinessRubric";
 import { OpportunityForm } from "@/components/OpportunityForm";
-import { OpportunityMatrix } from "@/components/OpportunityMatrix";
+import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";

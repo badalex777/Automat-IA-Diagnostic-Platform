@@ -34,7 +34,7 @@ interface DataPoint {
   color: string;
 }
 
-export function OpportunityMatrix({ 
+export default function OpportunityMatrix({ 
   opportunities, 
   readinessScores, 
   toggles,
