@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from "recharts";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
 
 interface ReadinessRubricProps {
   rubric: ReadinessRubricScore;
@@ -85,21 +85,20 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     fullMark: 100,
   }));
 
-  // Prepare data for technical vs operational comparison
-  const comparisonData = [
-    {
-      category: 'Technical Foundation',
-      score: rubric.tfaScore,
-      weight: 60,
-      contribution: rubric.tfaScore * 0.6,
-    },
-    {
-      category: 'Operational Readiness',
-      score: rubric.pifScore,
-      weight: 40,
-      contribution: rubric.pifScore * 0.4,
-    },
-  ];
+  // Prepare data for component weights pie chart
+  const pieData = ([
+    { key: 'dataQuality', weight: 18, color: 'hsl(var(--chart-1))' },
+    { key: 'integrationFeasibility', weight: 18, color: 'hsl(var(--chart-2))' },
+    { key: 'systemEnvironment', weight: 15, color: 'hsl(var(--chart-3))' },
+    { key: 'securityCompliance', weight: 9, color: 'hsl(var(--chart-4))' },
+    { key: 'processClarity', weight: 8, color: 'hsl(var(--chart-5))' },
+    { key: 'changeMagnitude', weight: 8, color: 'hsl(140 60% 45%)' },
+    { key: 'workflowBrittleness', weight: 6, color: 'hsl(200 60% 45%)' },
+  ] as const).map(item => ({
+    name: componentLabels[item.key],
+    value: item.weight,
+    color: item.color,
+  }));
 
   // Generate dynamic insights
   const generateInsights = () => {
@@ -329,45 +328,59 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
           </CardContent>
         </Card>
 
-        {/* Bar Chart - Technical vs Operational */}
-        <Card data-testid="card-comparison-chart">
+        {/* Pie Chart - Component Weights */}
+        <Card data-testid="card-component-weights">
           <CardHeader>
-            <CardTitle>Technical vs Operational</CardTitle>
+            <CardTitle>Component Weight Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={comparisonData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="category" 
-                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                />
-                <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${value}%`}
+                  outerRadius={100}
+                  fill="hsl(var(--primary))"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--popover))', 
                     border: '1px solid hsl(var(--border))',
                     borderRadius: '6px'
                   }}
-                  formatter={(value: number, name: string) => {
-                    if (name === 'score') return [`${value}/100`, 'Score'];
-                    if (name === 'contribution') return [`${value.toFixed(1)}`, 'Contribution to Total'];
-                    return [value, name];
-                  }}
+                  formatter={(value: number) => `${value}%`}
                 />
-                <Legend />
-                <Bar dataKey="score" name="Raw Score (0-100)" fill="hsl(var(--primary))" />
-                <Bar dataKey="contribution" name="Weighted Contribution" fill="hsl(var(--chart-2))">
-                  {comparisonData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? 'hsl(var(--chart-1))' : 'hsl(var(--chart-2))'} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <Legend 
+                  layout="vertical"
+                  align="right"
+                  verticalAlign="middle"
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+              </PieChart>
             </ResponsiveContainer>
-            <div className="mt-4 text-xs text-muted-foreground space-y-1">
-              <p>• Technical Foundation contributes 60% to total score ({rubric.tfaScore} × 0.6 = {(rubric.tfaScore * 0.6).toFixed(1)})</p>
-              <p>• Operational Readiness contributes 40% to total score ({rubric.pifScore} × 0.4 = {(rubric.pifScore * 0.4).toFixed(1)})</p>
-              <p>• <strong>Combined Score: {rubric.totalScore}/100</strong></p>
+            
+            {/* Weight Explanation */}
+            <div className="mt-6 space-y-3 text-sm">
+              <h4 className="font-semibold">Why These Weights?</h4>
+              <div className="space-y-2 text-muted-foreground">
+                <p><strong>Data Quality (18%)</strong> and <strong>Integration Feasibility (18%)</strong> carry the most weight because they directly determine whether the AI can connect to existing systems and work with available data - the fundamental building blocks of any AI implementation.</p>
+                
+                <p><strong>System Environment (15%)</strong> is critical as it encompasses the technical infrastructure, scalability, and backup capabilities that ensure the AI solution can run reliably.</p>
+                
+                <p><strong>Security & Compliance (9%)</strong> addresses regulatory and security requirements that, while essential, are often more about verification than technical capability.</p>
+                
+                <p><strong>Process Clarity (8%)</strong> and <strong>Change Magnitude (8%)</strong> reflect operational readiness - clear processes reduce implementation complexity, while understanding change magnitude helps plan adoption strategies.</p>
+                
+                <p><strong>Workflow Brittleness (6%)</strong> has the lowest weight as it indicates risk rather than capability, and can often be mitigated through careful design even in brittle workflows.</p>
+              </div>
             </div>
           </CardContent>
         </Card>
