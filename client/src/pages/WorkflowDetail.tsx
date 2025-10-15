@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronLeft, Pencil, Check, X, ChevronDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus } from "lucide-react";
 import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
@@ -19,11 +20,15 @@ import { PIFAggregatedScores } from "@/components/PIFAggregatedScores";
 import { PIFRespondentList } from "@/components/PIFRespondentList";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import ReadinessRubric from "@/components/ReadinessRubric";
+import { OpportunityForm } from "@/components/OpportunityForm";
+import { OpportunityMatrix } from "@/components/OpportunityMatrix";
+import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse } from "@shared/schema";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
+import type { ToggleState } from "@shared/opportunityCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
 import { calculateReadinessRubric } from "@shared/pifCalculations";
@@ -43,6 +48,10 @@ export default function WorkflowDetail() {
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
   const [selectedPIFResponse, setSelectedPIFResponse] = useState<PIFResponse | null>(null);
+  const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
+  const [editingOpportunity, setEditingOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [errorToggle, setErrorToggle] = useState(false);
+  const [revenueToggle, setRevenueToggle] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -75,6 +84,11 @@ export default function WorkflowDetail() {
     enabled: !!workflowId,
     refetchInterval: 10000, // Refetch every 10 seconds to catch new submissions
     refetchOnWindowFocus: true,
+  });
+
+  const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
+    queryKey: [`/api/workflows/${workflowId}/opportunities`],
+    enabled: !!workflowId,
   });
 
   useEffect(() => {
@@ -164,6 +178,72 @@ export default function WorkflowDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error renaming workflow",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createOpportunityMutation = useMutation({
+    mutationFn: async (data: InsertImplementationOpportunity) => {
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/opportunities`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity created",
+        description: "The implementation opportunity has been created successfully.",
+      });
+      setIsOpportunityDialogOpen(false);
+      setEditingOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating opportunity",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateOpportunityMutation = useMutation({
+    mutationFn: async (data: { id: string; updates: Partial<InsertImplementationOpportunity> }) => {
+      const res = await apiRequest('PATCH', `/api/opportunities/${data.id}`, data.updates);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity updated",
+        description: "The implementation opportunity has been updated successfully.",
+      });
+      setIsOpportunityDialogOpen(false);
+      setEditingOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating opportunity",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteOpportunityMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest('DELETE', `/api/opportunities/${id}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity deleted",
+        description: "The implementation opportunity has been deleted successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting opportunity",
         description: error.message,
         variant: "destructive",
       });
@@ -276,6 +356,7 @@ export default function WorkflowDetail() {
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
             <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
             <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
+            <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
             <TabsTrigger value="impact" data-testid="tab-impact">Business Impact</TabsTrigger>
           </TabsList>
 
@@ -569,6 +650,239 @@ export default function WorkflowDetail() {
               );
 
               return <ReadinessRubric rubric={rubric} />;
+            })()}
+          </TabsContent>
+
+          <TabsContent value="opportunities" className="space-y-6">
+            {opportunitiesError ? (
+              <div className="bg-card rounded-lg border border-destructive p-6">
+                <p className="text-destructive">Error loading opportunities: {opportunitiesError.message}</p>
+              </div>
+            ) : opportunitiesLoading ? (
+              <p className="text-muted-foreground">Loading opportunities...</p>
+            ) : (() => {
+              // Check if we have all required data for opportunity matrix
+              const hasTFA = tfaAssessment && tfaAssessment.score !== null && tfaAssessment.score !== undefined;
+              const hasPIF = pifData && pifData.responses.length > 0;
+              
+              // Calculate readiness score from TFA and PIF data
+              let readinessScore = 50; // Default
+              
+              if (hasTFA && hasPIF) {
+                // Calculate section scores from TFA
+                const sectionScores = {
+                  systemEnvironment: 0,
+                  dataQuality: 0,
+                  integrationFeasibility: 0,
+                  securityCompliance: 0,
+                };
+
+                if (tfaAssessment.responses) {
+                  const responses = tfaAssessment.responses as Record<string, string | number>;
+                  
+                  allSections.forEach((section) => {
+                    const sectionResponses = section.questions
+                      .map(q => {
+                        const val = responses[q.id];
+                        return typeof val === 'string' ? parseInt(val, 10) : val;
+                      })
+                      .filter((score): score is number => 
+                        score !== null && 
+                        score !== undefined && 
+                        !isNaN(score) &&
+                        score !== 0
+                      );
+                    
+                    if (sectionResponses.length > 0) {
+                      const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
+                      const normalizedScore = Math.round((avgScore / 5) * 100);
+                      
+                      if (section.section === 'System Environment') sectionScores.systemEnvironment = normalizedScore;
+                      if (section.section === 'Data Quality') sectionScores.dataQuality = normalizedScore;
+                      if (section.section === 'Integration Feasibility') sectionScores.integrationFeasibility = normalizedScore;
+                      if (section.section === 'Security/Compliance') sectionScores.securityCompliance = normalizedScore;
+                    }
+                  });
+                }
+
+                const rubric = calculateReadinessRubric(
+                  tfaAssessment.score || 0,
+                  sectionScores,
+                  pifData.aggregated
+                );
+                
+                readinessScore = rubric.totalScore;
+              }
+
+              const toggles: ToggleState = {
+                errorMetrics: errorToggle,
+                revenueMetrics: revenueToggle,
+              };
+
+              const handleOpportunitySubmit = (data: InsertImplementationOpportunity) => {
+                if (editingOpportunity) {
+                  updateOpportunityMutation.mutate({
+                    id: editingOpportunity.id,
+                    updates: data,
+                  });
+                } else {
+                  createOpportunityMutation.mutate(data);
+                }
+              };
+
+              // Convert opportunity data from DB format (strings) to form format (numbers)
+              const convertOpportunityToFormData = (opp: ImplementationOpportunity): Partial<InsertImplementationOpportunity> => ({
+                name: opp.name,
+                description: opp.description,
+                annualRoi: opp.annualRoi ? parseFloat(opp.annualRoi) : undefined,
+                hoursSavedPerWeek: opp.hoursSavedPerWeek ? parseFloat(opp.hoursSavedPerWeek) : undefined,
+                annualHoursSaved: opp.annualHoursSaved ? parseFloat(opp.annualHoursSaved) : undefined,
+                fteSavings: opp.fteSavings ? parseFloat(opp.fteSavings) : undefined,
+                errorReductionPct: opp.errorReductionPct ? parseFloat(opp.errorReductionPct) : undefined,
+                errorsAvoidedAnnually: opp.errorsAvoidedAnnually ?? undefined,
+                hoursReallocatedToRevenue: opp.hoursReallocatedToRevenue ? parseFloat(opp.hoursReallocatedToRevenue) : undefined,
+                revenueUpliftAnnual: opp.revenueUpliftAnnual ? parseFloat(opp.revenueUpliftAnnual) : undefined,
+                paybackPeriodMonths: opp.paybackPeriodMonths ? parseFloat(opp.paybackPeriodMonths) : undefined,
+                trainingHoursPerEmployee: opp.trainingHoursPerEmployee ? parseFloat(opp.trainingHoursPerEmployee) : undefined,
+              });
+
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold">Implementation Opportunities</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Define and prioritize automation opportunities based on business impact and implementation effort
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setEditingOpportunity(null);
+                        setIsOpportunityDialogOpen(true);
+                      }}
+                      data-testid="button-create-opportunity"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Opportunity
+                    </Button>
+                  </div>
+
+                  {opportunities.length === 0 ? (
+                    <div className="bg-card rounded-lg border border-border p-8" data-testid="card-no-opportunities">
+                      <div className="text-center">
+                        <h3 className="text-lg font-semibold mb-2">No Opportunities Yet</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Create implementation opportunities to analyze their business impact and prioritization
+                        </p>
+                        <Button
+                          onClick={() => {
+                            setEditingOpportunity(null);
+                            setIsOpportunityDialogOpen(true);
+                          }}
+                          data-testid="button-create-first-opportunity"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create First Opportunity
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3">
+                        <h3 className="font-semibold">Opportunities List</h3>
+                        {opportunities.map((opportunity) => (
+                          <OpportunityCard
+                            key={opportunity.id}
+                            opportunity={opportunity}
+                            readinessScore={readinessScore}
+                            toggles={toggles}
+                            onEdit={() => {
+                              setEditingOpportunity(opportunity);
+                              setIsOpportunityDialogOpen(true);
+                            }}
+                            onDelete={() => {
+                              if (confirm('Are you sure you want to delete this opportunity?')) {
+                                deleteOpportunityMutation.mutate(opportunity.id);
+                              }
+                            }}
+                          />
+                        ))}
+                      </div>
+
+                      <Card className="p-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold">Matrix View Controls</h3>
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  id="error-toggle"
+                                  checked={errorToggle}
+                                  onCheckedChange={setErrorToggle}
+                                  data-testid="switch-error-metrics"
+                                />
+                                <label
+                                  htmlFor="error-toggle"
+                                  className="text-sm font-medium cursor-pointer"
+                                >
+                                  Error Reduction Metrics
+                                </label>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  id="revenue-toggle"
+                                  checked={revenueToggle}
+                                  onCheckedChange={setRevenueToggle}
+                                  data-testid="switch-revenue-metrics"
+                                />
+                                <label
+                                  htmlFor="revenue-toggle"
+                                  className="text-sm font-medium cursor-pointer"
+                                >
+                                  Revenue Impact Metrics
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            Toggle metric groups to adjust the business impact calculation in the matrix below
+                          </p>
+                        </div>
+                      </Card>
+
+                      <OpportunityMatrix
+                        opportunities={opportunities}
+                        readinessScores={{ [workflowId]: readinessScore }}
+                        toggles={toggles}
+                      />
+                    </>
+                  )}
+
+                  {/* Create/Edit Opportunity Dialog */}
+                  <Dialog open={isOpportunityDialogOpen} onOpenChange={(open) => {
+                    setIsOpportunityDialogOpen(open);
+                    if (!open) setEditingOpportunity(null);
+                  }}>
+                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-opportunity-form">
+                      <DialogHeader>
+                        <DialogTitle>
+                          {editingOpportunity ? 'Edit Opportunity' : 'Create New Opportunity'}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <OpportunityForm
+                        workflowId={workflowId}
+                        initialData={editingOpportunity ? convertOpportunityToFormData(editingOpportunity) : undefined}
+                        onSubmit={handleOpportunitySubmit}
+                        onCancel={() => {
+                          setIsOpportunityDialogOpen(false);
+                          setEditingOpportunity(null);
+                        }}
+                        isLoading={createOpportunityMutation.isPending || updateOpportunityMutation.isPending}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              );
             })()}
           </TabsContent>
 

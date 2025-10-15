@@ -12,6 +12,8 @@ import {
   pifSubmitSchema,
   insertBusinessImpactSchema,
   updateBusinessImpactSchema,
+  insertImplementationOpportunitySchema,
+  updateImplementationOpportunitySchema,
 } from "@shared/schema";
 import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
 import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualitativeResponses } from "@shared/pifQuestions";
@@ -652,6 +654,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const success = await storage.deleteBusinessImpact(req.params.workflowId);
       if (!success) {
         return res.status(404).json({ error: "Business impact not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Implementation Opportunities
+  app.get("/api/workflows/:workflowId/opportunities", async (req, res) => {
+    try {
+      const opportunities = await storage.getAllOpportunitiesForWorkflow(req.params.workflowId);
+      res.json(opportunities);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/companies/:companyId/opportunities", async (req, res) => {
+    try {
+      const opportunities = await storage.getAllOpportunitiesForCompany(req.params.companyId);
+      res.json(opportunities);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/opportunities/:id", async (req, res) => {
+    try {
+      const opportunity = await storage.getImplementationOpportunity(req.params.id);
+      if (!opportunity) {
+        return res.status(404).json({ error: "Opportunity not found" });
+      }
+      res.json(opportunity);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/workflows/:workflowId/opportunities", async (req, res) => {
+    try {
+      const validatedData = insertImplementationOpportunitySchema.parse({
+        ...req.body,
+        workflowId: req.params.workflowId,
+      });
+      const opportunity = await storage.createImplementationOpportunity(validatedData);
+      res.status(201).json(opportunity);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/opportunities/:id", async (req, res) => {
+    try {
+      const validatedData = updateImplementationOpportunitySchema.parse(req.body);
+
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const opportunity = await storage.updateImplementationOpportunity(req.params.id, validatedData);
+      if (!opportunity) {
+        return res.status(404).json({ error: "Opportunity not found" });
+      }
+      res.json(opportunity);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/opportunities/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteImplementationOpportunity(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Opportunity not found" });
       }
       res.status(204).send();
     } catch (error: any) {

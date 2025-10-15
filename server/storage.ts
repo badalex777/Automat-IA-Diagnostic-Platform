@@ -9,6 +9,8 @@ import {
   type InsertPIFResponse,
   type BusinessImpact,
   type InsertBusinessImpact,
+  type ImplementationOpportunity,
+  type InsertImplementationOpportunity,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -48,4 +50,12 @@ export interface IStorage {
   createBusinessImpact(impact: InsertBusinessImpact): Promise<BusinessImpact>;
   updateBusinessImpact(workflowId: string, impact: Partial<InsertBusinessImpact>): Promise<BusinessImpact | undefined>;
   deleteBusinessImpact(workflowId: string): Promise<boolean>;
+  
+  // Implementation Opportunities
+  getImplementationOpportunity(id: string): Promise<ImplementationOpportunity | undefined>;
+  getAllOpportunitiesForWorkflow(workflowId: string): Promise<ImplementationOpportunity[]>;
+  getAllOpportunitiesForCompany(companyId: string): Promise<ImplementationOpportunity[]>;
+  createImplementationOpportunity(opportunity: InsertImplementationOpportunity): Promise<ImplementationOpportunity>;
+  updateImplementationOpportunity(id: string, data: Partial<InsertImplementationOpportunity>): Promise<ImplementationOpportunity | undefined>;
+  deleteImplementationOpportunity(id: string): Promise<boolean>;
 }

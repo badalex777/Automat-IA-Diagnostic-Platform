@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, timestamp, jsonb, index, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -75,6 +75,26 @@ export const businessImpact = pgTable("business_impact", {
   workflowIdIdx: index("business_impact_workflow_id_idx").on(table.workflowId),
 }));
 
+export const implementationOpportunities = pgTable("implementation_opportunities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  name: text("name").notNull(),
+  description: text("description"),
+  annualRoi: decimal("annual_roi", { precision: 12, scale: 2 }),
+  hoursSavedPerWeek: decimal("hours_saved_per_week", { precision: 8, scale: 2 }),
+  annualHoursSaved: decimal("annual_hours_saved", { precision: 10, scale: 2 }),
+  fteSavings: decimal("fte_savings", { precision: 6, scale: 2 }),
+  errorReductionPct: decimal("error_reduction_pct", { precision: 5, scale: 2 }),
+  errorsAvoidedAnnually: integer("errors_avoided_annually"),
+  hoursReallocatedToRevenue: decimal("hours_reallocated_to_revenue", { precision: 10, scale: 2 }),
+  revenueUpliftAnnual: decimal("revenue_uplift_annual", { precision: 12, scale: 2 }),
+  paybackPeriodMonths: decimal("payback_period_months", { precision: 6, scale: 2 }),
+  trainingHoursPerEmployee: decimal("training_hours_per_employee", { precision: 6, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  workflowIdIdx: index("implementation_opportunities_workflow_id_idx").on(table.workflowId),
+}));
+
 // Insert schemas
 export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
@@ -147,6 +167,24 @@ export const pifSubmitSchema = z.object({
 
 export const updateBusinessImpactSchema = insertBusinessImpactSchema.omit({ workflowId: true }).partial();
 
+export const insertImplementationOpportunitySchema = createInsertSchema(implementationOpportunities).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  annualRoi: z.number().optional(),
+  hoursSavedPerWeek: z.number().optional(),
+  annualHoursSaved: z.number().optional(),
+  fteSavings: z.number().optional(),
+  errorReductionPct: z.number().min(0).max(100).optional(),
+  errorsAvoidedAnnually: z.number().int().optional(),
+  hoursReallocatedToRevenue: z.number().optional(),
+  revenueUpliftAnnual: z.number().optional(),
+  paybackPeriodMonths: z.number().optional(),
+  trainingHoursPerEmployee: z.number().optional(),
+});
+
+export const updateImplementationOpportunitySchema = insertImplementationOpportunitySchema.omit({ workflowId: true }).partial();
+
 // Select types
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
@@ -163,3 +201,6 @@ export type PIFSubmit = z.infer<typeof pifSubmitSchema>;
 
 export type BusinessImpact = typeof businessImpact.$inferSelect;
 export type InsertBusinessImpact = z.infer<typeof insertBusinessImpactSchema>;
+
+export type ImplementationOpportunity = typeof implementationOpportunities.$inferSelect;
+export type InsertImplementationOpportunity = z.infer<typeof insertImplementationOpportunitySchema>;

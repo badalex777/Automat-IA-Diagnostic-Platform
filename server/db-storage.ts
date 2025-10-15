@@ -7,6 +7,7 @@ import {
   tfaAssessments,
   pifResponses,
   businessImpact,
+  implementationOpportunities,
   type Company,
   type InsertCompany,
   type Workflow,
@@ -17,6 +18,8 @@ import {
   type InsertPIFResponse,
   type BusinessImpact,
   type InsertBusinessImpact,
+  type ImplementationOpportunity,
+  type InsertImplementationOpportunity,
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 
@@ -237,6 +240,70 @@ export class DbStorage implements IStorage {
 
   async deleteBusinessImpact(workflowId: string): Promise<boolean> {
     const result = await db.delete(businessImpact).where(eq(businessImpact.workflowId, workflowId));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Implementation Opportunities
+  async getImplementationOpportunity(id: string): Promise<ImplementationOpportunity | undefined> {
+    const [opportunity] = await db.select().from(implementationOpportunities).where(eq(implementationOpportunities.id, id));
+    return opportunity;
+  }
+
+  async getAllOpportunitiesForWorkflow(workflowId: string): Promise<ImplementationOpportunity[]> {
+    return db.select()
+      .from(implementationOpportunities)
+      .where(eq(implementationOpportunities.workflowId, workflowId))
+      .orderBy(desc(implementationOpportunities.createdAt));
+  }
+
+  async getAllOpportunitiesForCompany(companyId: string): Promise<ImplementationOpportunity[]> {
+    return db.select()
+      .from(implementationOpportunities)
+      .innerJoin(workflows, eq(implementationOpportunities.workflowId, workflows.id))
+      .where(eq(workflows.companyId, companyId))
+      .then(results => results.map(r => r.implementation_opportunities));
+  }
+
+  async createImplementationOpportunity(opportunity: InsertImplementationOpportunity): Promise<ImplementationOpportunity> {
+    // Convert number fields to strings for decimal columns
+    const dbOpportunity = {
+      ...opportunity,
+      annualRoi: opportunity.annualRoi?.toString(),
+      hoursSavedPerWeek: opportunity.hoursSavedPerWeek?.toString(),
+      annualHoursSaved: opportunity.annualHoursSaved?.toString(),
+      fteSavings: opportunity.fteSavings?.toString(),
+      errorReductionPct: opportunity.errorReductionPct?.toString(),
+      hoursReallocatedToRevenue: opportunity.hoursReallocatedToRevenue?.toString(),
+      revenueUpliftAnnual: opportunity.revenueUpliftAnnual?.toString(),
+      paybackPeriodMonths: opportunity.paybackPeriodMonths?.toString(),
+      trainingHoursPerEmployee: opportunity.trainingHoursPerEmployee?.toString(),
+    };
+    const [newOpportunity] = await db.insert(implementationOpportunities).values(dbOpportunity).returning();
+    return newOpportunity;
+  }
+
+  async updateImplementationOpportunity(id: string, data: Partial<InsertImplementationOpportunity>): Promise<ImplementationOpportunity | undefined> {
+    // Convert number fields to strings for decimal columns
+    const dbData: any = { ...data };
+    if (data.annualRoi !== undefined) dbData.annualRoi = data.annualRoi?.toString();
+    if (data.hoursSavedPerWeek !== undefined) dbData.hoursSavedPerWeek = data.hoursSavedPerWeek?.toString();
+    if (data.annualHoursSaved !== undefined) dbData.annualHoursSaved = data.annualHoursSaved?.toString();
+    if (data.fteSavings !== undefined) dbData.fteSavings = data.fteSavings?.toString();
+    if (data.errorReductionPct !== undefined) dbData.errorReductionPct = data.errorReductionPct?.toString();
+    if (data.hoursReallocatedToRevenue !== undefined) dbData.hoursReallocatedToRevenue = data.hoursReallocatedToRevenue?.toString();
+    if (data.revenueUpliftAnnual !== undefined) dbData.revenueUpliftAnnual = data.revenueUpliftAnnual?.toString();
+    if (data.paybackPeriodMonths !== undefined) dbData.paybackPeriodMonths = data.paybackPeriodMonths?.toString();
+    if (data.trainingHoursPerEmployee !== undefined) dbData.trainingHoursPerEmployee = data.trainingHoursPerEmployee?.toString();
+    
+    const [updated] = await db.update(implementationOpportunities)
+      .set(dbData)
+      .where(eq(implementationOpportunities.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteImplementationOpportunity(id: string): Promise<boolean> {
+    const result = await db.delete(implementationOpportunities).where(eq(implementationOpportunities.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 }
