@@ -357,7 +357,6 @@ export default function WorkflowDetail() {
             <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
             <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
             <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="impact" data-testid="tab-impact">Business Impact</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tfa" className="space-y-6">
@@ -884,21 +883,6 @@ export default function WorkflowDetail() {
                 </>
               );
             })()}
-          </TabsContent>
-
-          <TabsContent value="impact" className="space-y-6">
-            {impactError ? (
-              <div className="bg-card rounded-lg border border-destructive p-6">
-                <p className="text-destructive">Error loading business impact: {impactError.message}</p>
-              </div>
-            ) : impactLoading ? (
-              <p className="text-muted-foreground">Loading business impact...</p>
-            ) : (
-              <BusinessImpactForm 
-                workflowId={workflowId}
-                initialData={businessImpact || undefined}
-              />
-            )}
           </TabsContent>
         </Tabs>
       </div>
