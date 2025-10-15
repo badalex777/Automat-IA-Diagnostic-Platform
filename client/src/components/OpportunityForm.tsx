@@ -45,6 +45,7 @@ export function OpportunityForm({
       errorsAvoidedAnnually: initialData?.errorsAvoidedAnnually,
       hoursReallocatedToRevenue: initialData?.hoursReallocatedToRevenue,
       revenueUpliftAnnual: initialData?.revenueUpliftAnnual,
+      rampupPeriodMonths: initialData?.rampupPeriodMonths,
       paybackPeriodMonths: initialData?.paybackPeriodMonths,
       trainingHoursPerEmployee: initialData?.trainingHoursPerEmployee,
       errorMetricsEnabled: initialData?.errorMetricsEnabled ?? false,
@@ -86,6 +87,7 @@ export function OpportunityForm({
       errorsAvoidedAnnually: data.errorsAvoidedAnnually ? parseInt(data.errorsAvoidedAnnually) : undefined,
       hoursReallocatedToRevenue: data.hoursReallocatedToRevenue ? parseFloat(data.hoursReallocatedToRevenue) : undefined,
       revenueUpliftAnnual: data.revenueUpliftAnnual ? parseFloat(data.revenueUpliftAnnual) : undefined,
+      rampupPeriodMonths: data.rampupPeriodMonths ? parseFloat(data.rampupPeriodMonths) : undefined,
       paybackPeriodMonths: data.paybackPeriodMonths ? parseFloat(data.paybackPeriodMonths) : undefined,
       trainingHoursPerEmployee: data.trainingHoursPerEmployee ? parseFloat(data.trainingHoursPerEmployee) : undefined,
       errorMetricsEnabled: data.errorMetricsEnabled ?? false,
@@ -225,6 +227,31 @@ export function OpportunityForm({
         <div className="space-y-4">
           <h3 className="text-sm font-semibold">Implementation Effort</h3>
           
+          <FormField
+            control={form.control}
+            name="rampupPeriodMonths"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ramp-up Period (Months)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    step="any"
+                    placeholder="0.0"
+                    data-testid="input-rampup-period"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={e => field.onChange(e.target.value)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Time until the implementation becomes fully functional and delivers expected results
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}

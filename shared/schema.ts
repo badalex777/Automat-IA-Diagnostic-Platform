@@ -88,6 +88,7 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   errorsAvoidedAnnually: integer("errors_avoided_annually"),
   hoursReallocatedToRevenue: decimal("hours_reallocated_to_revenue", { precision: 10, scale: 2 }),
   revenueUpliftAnnual: decimal("revenue_uplift_annual", { precision: 12, scale: 2 }),
+  rampupPeriodMonths: decimal("rampup_period_months", { precision: 6, scale: 2 }),
   paybackPeriodMonths: decimal("payback_period_months", { precision: 6, scale: 2 }),
   trainingHoursPerEmployee: decimal("training_hours_per_employee", { precision: 6, scale: 2 }),
   errorMetricsEnabled: boolean("error_metrics_enabled").default(false).notNull(),
@@ -181,6 +182,7 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
   errorsAvoidedAnnually: z.coerce.number().int().optional(),
   hoursReallocatedToRevenue: z.coerce.number().optional(),
   revenueUpliftAnnual: z.coerce.number().optional(),
+  rampupPeriodMonths: z.coerce.number().optional(),
   paybackPeriodMonths: z.coerce.number().optional(),
   trainingHoursPerEmployee: z.coerce.number().optional(),
 });

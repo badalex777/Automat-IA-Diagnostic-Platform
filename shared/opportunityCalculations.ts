@@ -12,6 +12,19 @@ export interface ToggleState {
 }
 
 /**
+ * Normalize ramp-up period to 0-100 scale
+ * 3 months or less = 0 (lowest effort)
+ * 18+ months = 100 (highest effort)
+ */
+function normalizeRampupPeriod(months: number | null | undefined): number {
+  if (!months || months <= 0) return 0;
+  if (months <= 3) return 0;
+  if (months >= 18) return 100;
+  // Linear scale between 3 and 18 months
+  return ((months - 3) / (18 - 3)) * 100;
+}
+
+/**
  * Normalize payback period to 0-100 scale
  * 6 months or less = 0 (lowest effort)
  * 36+ months = 100 (highest effort)
@@ -42,24 +55,28 @@ function normalizeTrainingHours(hours: number | null | undefined): number {
  * Lower score = easier implementation
  * 
  * Formula:
- * - Readiness Score (inverted): 50%
- * - Payback Period: 30%
- * - Training Hours: 20%
+ * - Readiness Score (inverted): 40%
+ * - Ramp-up Period: 25%
+ * - Payback Period: 25%
+ * - Training Hours: 10%
  */
 export function calculateImplementationEffort(
   readinessScore: number, // 0-100 from Readiness Rubric
+  rampupPeriodMonths: number | null | undefined,
   paybackPeriodMonths: number | null | undefined,
   trainingHoursPerEmployee: number | null | undefined
 ): number {
   // Invert readiness: higher readiness = lower effort
   const readinessEffort = 100 - readinessScore;
+  const rampupEffort = normalizeRampupPeriod(rampupPeriodMonths);
   const paybackEffort = normalizePaybackPeriod(paybackPeriodMonths);
   const trainingEffort = normalizeTrainingHours(trainingHoursPerEmployee);
 
   const effort = 
-    (readinessEffort * 0.5) +
-    (paybackEffort * 0.3) +
-    (trainingEffort * 0.2);
+    (readinessEffort * 0.40) +
+    (rampupEffort * 0.25) +
+    (paybackEffort * 0.25) +
+    (trainingEffort * 0.10);
 
   return Math.round(effort * 100) / 100; // Round to 2 decimals
 }
@@ -78,18 +95,35 @@ function normalizeToScale(value: number | null | undefined, maxReference: number
  * Calculate Business Impact Score (X-axis)
  * Higher score = better business impact
  * 
- * ADDITIVE FORMULA (ensures toggling metrics never reduces impact):
+ * REDISTRIBUTIVE FORMULA (weights change based on active toggles):
  * 
- * Base (always applied):
+ * Base Case (both toggles OFF):
  * - Annual ROI: 40%
  * - FTE Savings: 30%
  * - Annual Hours Saved: 30%
+ * Total: 100%
  * 
- * Bonus (added when toggled AND has data):
- * - Error Impact: +30% bonus
- * - Revenue Impact: +35% bonus
+ * Error Toggle ON (revenue OFF):
+ * - Annual ROI: 30%
+ * - FTE Savings: 20%
+ * - Annual Hours Saved: 20%
+ * - Error Impact: 30%
+ * Total: 100%
  * 
- * Final score capped at 100
+ * Revenue Toggle ON (error OFF):
+ * - Annual ROI: 30%
+ * - FTE Savings: 20%
+ * - Annual Hours Saved: 20%
+ * - Revenue Impact: 30%
+ * Total: 100%
+ * 
+ * Both Toggles ON:
+ * - Annual ROI: 25%
+ * - FTE Savings: 15%
+ * - Annual Hours Saved: 15%
+ * - Error Impact: 25%
+ * - Revenue Impact: 20%
+ * Total: 100%
  */
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
@@ -104,45 +138,70 @@ export function calculateBusinessImpact(
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
   const annualHours = parseFloat(opportunity.annualHoursSaved || "0");
   
-  // Normalize core metrics
+  // Normalize core metrics (0-100)
   const roiScore = normalizeToScale(annualRoi, maxAnnualRoi);
   const fteScore = normalizeToScale(fteSavings, maxFteSavings);
   const hoursScore = normalizeToScale(annualHours, maxAnnualHours);
 
-  // Calculate BASE impact (always applied with constant weights)
-  const baseImpact = 
-    (roiScore * 0.40) +
-    (fteScore * 0.30) +
-    (hoursScore * 0.30);
+  // Determine weights based on active toggles
+  let roiWeight = 0.40;
+  let fteWeight = 0.30;
+  let hoursWeight = 0.30;
+  let errorWeight = 0;
+  let revenueWeight = 0;
 
-  // Calculate error impact BONUS if toggle is on AND has data
-  let errorBonus = 0;
-  if (toggles.errorMetrics) {
+  const errorActive = toggles.errorMetrics;
+  const revenueActive = toggles.revenueMetrics;
+
+  if (errorActive && revenueActive) {
+    // Both toggles ON
+    roiWeight = 0.25;
+    fteWeight = 0.15;
+    hoursWeight = 0.15;
+    errorWeight = 0.25;
+    revenueWeight = 0.20;
+  } else if (errorActive) {
+    // Only error toggle ON
+    roiWeight = 0.30;
+    fteWeight = 0.20;
+    hoursWeight = 0.20;
+    errorWeight = 0.30;
+  } else if (revenueActive) {
+    // Only revenue toggle ON
+    roiWeight = 0.30;
+    fteWeight = 0.20;
+    hoursWeight = 0.20;
+    revenueWeight = 0.30;
+  }
+  // else: base case with default weights (40/30/30)
+
+  // Calculate error impact if active
+  let errorScore = 0;
+  if (errorActive) {
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
-    if (errorPct > 0 || errorsAvoided > 0) {
-      const errorPctScore = errorPct; // Already 0-100
-      const errorsScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
-      const errorImpact = (errorPctScore * 0.5) + (errorsScore * 0.5);
-      errorBonus = errorImpact * 0.30; // 30% bonus
-    }
+    const errorPctScore = errorPct; // Already 0-100
+    const errorsAvoidedScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
+    errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
   }
 
-  // Calculate revenue impact BONUS if toggle is on AND has data
-  let revenueBonus = 0;
-  if (toggles.revenueMetrics) {
+  // Calculate revenue impact if active
+  let revenueScore = 0;
+  if (revenueActive) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
-    if (hoursReallocated > 0 || revenueUplift > 0) {
-      const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
-      const revenueScore = normalizeToScale(revenueUplift, maxRevenueUplift);
-      const revenueImpact = (hoursReallocatedScore * 0.4) + (revenueScore * 0.6);
-      revenueBonus = revenueImpact * 0.35; // 35% bonus
-    }
+    const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
+    const revenueUpliftScore = normalizeToScale(revenueUplift, maxRevenueUplift);
+    revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
   }
 
-  // Add bonuses to base (capped at 100)
-  const totalImpact = Math.min(baseImpact + errorBonus + revenueBonus, 100);
+  // Calculate total impact with redistributed weights
+  const totalImpact = 
+    (roiScore * roiWeight) +
+    (fteScore * fteWeight) +
+    (hoursScore * hoursWeight) +
+    (errorScore * errorWeight) +
+    (revenueScore * revenueWeight);
 
   return Math.round(totalImpact * 100) / 100; // Round to 2 decimals
 }
@@ -178,6 +237,7 @@ export function calculateOpportunityScore(
 ): OpportunityScore {
   const implementationEffort = calculateImplementationEffort(
     readinessScore,
+    parseFloat(opportunity.rampupPeriodMonths || "0"),
     parseFloat(opportunity.paybackPeriodMonths || "0"),
     parseFloat(opportunity.trainingHoursPerEmployee || "0")
   );
