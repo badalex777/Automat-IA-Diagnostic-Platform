@@ -44,11 +44,7 @@ export function OpportunityCard({
   // Mutation to update toggle states
   const updateToggleMutation = useMutation({
     mutationFn: async (updates: { errorMetricsEnabled?: boolean; revenueMetricsEnabled?: boolean }) => {
-      return apiRequest(`/api/opportunities/${opportunity.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(updates),
-        headers: { "Content-Type": "application/json" },
-      });
+      return apiRequest("PATCH", `/api/opportunities/${opportunity.id}`, updates);
     },
     onSuccess: () => {
       // Invalidate company opportunities query
