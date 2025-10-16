@@ -15,6 +15,7 @@ import type { Company } from "@shared/schema";
 
 interface EditCompanyContextDialogProps {
   company: Company;
+  trigger?: React.ReactNode;
   onSubmit?: (data: { 
     annualRevenue?: number;
     totalEmployees?: number;
@@ -22,7 +23,7 @@ interface EditCompanyContextDialogProps {
   }) => void;
 }
 
-export default function EditCompanyContextDialog({ company, onSubmit }: EditCompanyContextDialogProps) {
+export default function EditCompanyContextDialog({ company, trigger, onSubmit }: EditCompanyContextDialogProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     annualRevenue: '',
@@ -56,14 +57,16 @@ export default function EditCompanyContextDialog({ company, onSubmit }: EditComp
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          size="sm" 
-          variant="outline"
-          data-testid="button-edit-company-context"
-        >
-          <Pencil className="h-4 w-4 mr-2" />
-          Edit Financial Context
-        </Button>
+        {trigger || (
+          <Button 
+            size="sm" 
+            variant="outline"
+            data-testid="button-edit-company-context"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Financial Context
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>

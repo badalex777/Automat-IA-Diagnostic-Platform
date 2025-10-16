@@ -464,6 +464,7 @@ export default function CompanyDetail() {
                   </div>
                   <EditCompanyContextDialog 
                     company={company}
+                    onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
                     trigger={
                       <Button variant="outline" size="sm" data-testid="button-add-context">
                         Add Context
