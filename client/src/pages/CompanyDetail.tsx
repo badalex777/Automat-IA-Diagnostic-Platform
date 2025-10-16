@@ -16,6 +16,7 @@ import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric } from "@shared/pifCalculations";
 import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
+import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -103,6 +104,33 @@ export default function CompanyDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error renaming company",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateCompanyContextMutation = useMutation({
+    mutationFn: async (data: {
+      annualRevenue?: number;
+      totalEmployees?: number;
+      annualLaborCosts?: number;
+    }) => {
+      const res = await apiRequest('PATCH', `/api/companies/${companyId}`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}`] });
+      queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/opportunities`] });
+      toast({
+        title: "Company context updated",
+        description: "Financial metrics have been updated. Opportunity scores will recalculate automatically.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating company context",
         description: error.message,
         variant: "destructive",
       });
@@ -370,6 +398,12 @@ export default function CompanyDetail() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {company && (
+                <EditCompanyContextDialog 
+                  company={company}
+                  onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
+                />
+              )}
               <ThemeToggle />
               <CreateWorkflowDialog 
                 onSubmit={(data) => createWorkflowMutation.mutate(data)}
