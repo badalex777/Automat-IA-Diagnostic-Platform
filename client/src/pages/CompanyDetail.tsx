@@ -450,6 +450,30 @@ export default function CompanyDetail() {
           </TabsContent>
 
           <TabsContent value="opportunity-matrix" className="space-y-6">
+            {/* Financial Context Prompt */}
+            {company && !company.annualRevenue && !company.totalEmployees && !company.annualLaborCosts && (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">
+                      Add Financial Context for Better Insights
+                    </h3>
+                    <p className="text-sm text-amber-600/90 dark:text-amber-400/90">
+                      Company financial data (revenue, employees, labor costs) enables normalized opportunity scoring relative to company size. Without it, scores use absolute values which may not reflect true business impact.
+                    </p>
+                  </div>
+                  <EditCompanyContextDialog 
+                    company={company}
+                    trigger={
+                      <Button variant="outline" size="sm" data-testid="button-add-context">
+                        Add Context
+                      </Button>
+                    }
+                  />
+                </div>
+              </div>
+            )}
+
             {opportunitiesLoading ? (
               <div className="bg-card rounded-lg border border-card-border p-6">
                 <p className="text-muted-foreground text-center py-8">Loading opportunities...</p>
