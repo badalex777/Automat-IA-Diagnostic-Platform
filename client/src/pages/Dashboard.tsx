@@ -30,7 +30,14 @@ export default function Dashboard() {
   }, [error]);
 
   const createCompanyMutation = useMutation({
-    mutationFn: async (data: { name: string; industry: string; contact?: string }) => {
+    mutationFn: async (data: { 
+      name: string; 
+      industry: string; 
+      contact?: string;
+      annualRevenue?: number;
+      totalEmployees?: number;
+      annualLaborCosts?: number;
+    }) => {
       const res = await apiRequest('POST', '/api/companies', data);
       return await res.json();
     },

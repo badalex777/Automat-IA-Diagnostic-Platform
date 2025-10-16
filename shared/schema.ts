@@ -8,6 +8,9 @@ export const companies = pgTable("companies", {
   name: text("name").notNull(),
   industry: text("industry").notNull(),
   contact: text("contact"),
+  annualRevenue: decimal("annual_revenue", { precision: 15, scale: 2 }),
+  totalEmployees: integer("total_employees"),
+  annualLaborCosts: decimal("annual_labor_costs", { precision: 15, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -102,6 +105,10 @@ export const implementationOpportunities = pgTable("implementation_opportunities
 export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
   createdAt: true,
+}).extend({
+  annualRevenue: z.coerce.number().positive("Annual revenue must be positive").optional(),
+  totalEmployees: z.coerce.number().int().positive("Total employees must be a positive whole number").optional(),
+  annualLaborCosts: z.coerce.number().positive("Annual labor costs must be positive").optional(),
 });
 
 export const updateCompanySchema = insertCompanySchema.partial();

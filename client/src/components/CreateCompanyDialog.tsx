@@ -14,7 +14,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
 interface CreateCompanyDialogProps {
-  onSubmit?: (data: { name: string; industry: string; contact: string }) => void;
+  onSubmit?: (data: { 
+    name: string; 
+    industry: string; 
+    contact?: string;
+    annualRevenue?: number;
+    totalEmployees?: number;
+    annualLaborCosts?: number;
+  }) => void;
 }
 
 export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogProps) {
@@ -23,14 +30,34 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
     name: '',
     industry: '',
     contact: '',
+    annualRevenue: '',
+    totalEmployees: '',
+    annualLaborCosts: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Company created:', formData);
-    onSubmit?.(formData);
+    
+    const submitData = {
+      name: formData.name,
+      industry: formData.industry,
+      contact: formData.contact || undefined,
+      annualRevenue: formData.annualRevenue ? parseFloat(formData.annualRevenue) : undefined,
+      totalEmployees: formData.totalEmployees ? parseInt(formData.totalEmployees) : undefined,
+      annualLaborCosts: formData.annualLaborCosts ? parseFloat(formData.annualLaborCosts) : undefined,
+    };
+    
+    console.log('Company created:', submitData);
+    onSubmit?.(submitData);
     setOpen(false);
-    setFormData({ name: '', industry: '', contact: '' });
+    setFormData({ 
+      name: '', 
+      industry: '', 
+      contact: '',
+      annualRevenue: '',
+      totalEmployees: '',
+      annualLaborCosts: '',
+    });
   };
 
   return (
@@ -82,6 +109,57 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
               data-testid="input-contact"
             />
           </div>
+          
+          <div className="border-t pt-4 space-y-4">
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">Company Context (Optional)</h4>
+              <p className="text-xs text-muted-foreground">
+                These metrics help normalize opportunity analysis to your company's size and scale
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="annualRevenue">Annual Revenue ($)</Label>
+                <Input
+                  id="annualRevenue"
+                  type="number"
+                  step="0.01"
+                  placeholder="e.g., 5000000"
+                  value={formData.annualRevenue}
+                  onChange={(e) => setFormData({ ...formData, annualRevenue: e.target.value })}
+                  data-testid="input-annual-revenue"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="totalEmployees">Total Employees</Label>
+                <Input
+                  id="totalEmployees"
+                  type="number"
+                  step="1"
+                  placeholder="e.g., 50"
+                  value={formData.totalEmployees}
+                  onChange={(e) => setFormData({ ...formData, totalEmployees: e.target.value })}
+                  data-testid="input-total-employees"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="annualLaborCosts">Annual Labor Costs ($)</Label>
+              <Input
+                id="annualLaborCosts"
+                type="number"
+                step="0.01"
+                placeholder="e.g., 3000000"
+                value={formData.annualLaborCosts}
+                onChange={(e) => setFormData({ ...formData, annualLaborCosts: e.target.value })}
+                data-testid="input-annual-labor-costs"
+              />
+            </div>
+          </div>
+          
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} data-testid="button-cancel-company">
               Cancel
