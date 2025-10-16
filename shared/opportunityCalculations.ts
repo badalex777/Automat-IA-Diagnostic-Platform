@@ -91,9 +91,20 @@ function normalizeToScale(value: number | null | undefined, maxReference: number
   return Math.min(normalized, 100);
 }
 
+export interface CompanyContext {
+  annualRevenue?: number | string | null;
+  totalEmployees?: number | string | null;
+  annualLaborCosts?: number | string | null;
+}
+
 /**
- * Calculate Business Impact Score (X-axis)
+ * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE
  * Higher score = better business impact
+ * 
+ * Uses company financial context to calculate relative impact:
+ * - ROI as % of annual revenue
+ * - FTE savings as % of total employees
+ * - Hours saved as % of annual labor costs (converted to $)
  * 
  * REDISTRIBUTIVE FORMULA (weights change based on active toggles):
  * 
@@ -128,20 +139,49 @@ function normalizeToScale(value: number | null | undefined, maxReference: number
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
   toggles: ToggleState,
-  maxAnnualRoi: number = 1000000, // $1M reference
-  maxFteSavings: number = 5, // 5 FTE reference
-  maxAnnualHours: number = 10000, // 10k hours reference
-  maxErrorsAvoided: number = 1000, // 1k errors reference
-  maxRevenueUplift: number = 2000000 // $2M reference
+  companyContext?: CompanyContext
 ): number {
   const annualRoi = parseFloat(opportunity.annualRoi || "0");
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
   const annualHours = parseFloat(opportunity.annualHoursSaved || "0");
   
-  // Normalize core metrics (0-100)
-  const roiScore = normalizeToScale(annualRoi, maxAnnualRoi);
-  const fteScore = normalizeToScale(fteSavings, maxFteSavings);
-  const hoursScore = normalizeToScale(annualHours, maxAnnualHours);
+  // Parse company context
+  const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
+  const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
+  const companyLaborCosts = parseFloat(companyContext?.annualLaborCosts?.toString() || "0");
+  
+  // Calculate company-relative metrics (0-100)
+  // If no company context, fall back to absolute normalization
+  let roiScore = 0;
+  let fteScore = 0;
+  let hoursScore = 0;
+  
+  if (companyRevenue > 0) {
+    // ROI as % of annual revenue, capped at 100
+    roiScore = Math.min((annualRoi / companyRevenue) * 100, 100);
+  } else {
+    // Fallback: normalize to $1M
+    roiScore = normalizeToScale(annualRoi, 1000000);
+  }
+  
+  if (companyEmployees > 0) {
+    // FTE savings as % of total employees, capped at 100
+    fteScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+  } else {
+    // Fallback: normalize to 5 FTE
+    fteScore = normalizeToScale(fteSavings, 5);
+  }
+  
+  if (companyLaborCosts > 0) {
+    // Convert hours to dollar value (assuming ~$50/hour average)
+    // Then calculate as % of annual labor costs
+    const hourlyRate = 50;
+    const hoursDollarValue = annualHours * hourlyRate;
+    hoursScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+  } else {
+    // Fallback: normalize to 10k hours
+    hoursScore = normalizeToScale(annualHours, 10000);
+  }
 
   // Determine weights based on active toggles
   let roiWeight = 0.40;
@@ -181,7 +221,8 @@ export function calculateBusinessImpact(
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
     const errorPctScore = errorPct; // Already 0-100
-    const errorsAvoidedScore = normalizeToScale(errorsAvoided, maxErrorsAvoided);
+    // Normalize errors avoided to 0-100 (1000 errors = 100)
+    const errorsAvoidedScore = normalizeToScale(errorsAvoided, 1000);
     errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
   }
 
@@ -190,8 +231,25 @@ export function calculateBusinessImpact(
   if (revenueActive) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
-    const hoursReallocatedScore = normalizeToScale(hoursReallocated, maxAnnualHours);
-    const revenueUpliftScore = normalizeToScale(revenueUplift, maxRevenueUplift);
+    
+    // Use company-relative scoring
+    let hoursReallocatedScore = 0;
+    let revenueUpliftScore = 0;
+    
+    if (companyLaborCosts > 0) {
+      const hourlyRate = 50;
+      const hoursDollarValue = hoursReallocated * hourlyRate;
+      hoursReallocatedScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+    } else {
+      hoursReallocatedScore = normalizeToScale(hoursReallocated, 10000);
+    }
+    
+    if (companyRevenue > 0) {
+      revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 100, 100);
+    } else {
+      revenueUpliftScore = normalizeToScale(revenueUplift, 2000000);
+    }
+    
     revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
   }
 
@@ -227,13 +285,7 @@ export function calculateOpportunityScore(
   opportunity: ImplementationOpportunity,
   readinessScore: number,
   toggles: ToggleState,
-  maxValues?: {
-    annualRoi?: number;
-    fteSavings?: number;
-    annualHours?: number;
-    errorsAvoided?: number;
-    revenueUplift?: number;
-  }
+  companyContext?: CompanyContext
 ): OpportunityScore {
   const implementationEffort = calculateImplementationEffort(
     readinessScore,
@@ -245,11 +297,7 @@ export function calculateOpportunityScore(
   const businessImpact = calculateBusinessImpact(
     opportunity,
     toggles,
-    maxValues?.annualRoi,
-    maxValues?.fteSavings,
-    maxValues?.annualHours,
-    maxValues?.errorsAvoided,
-    maxValues?.revenueUplift
+    companyContext
   );
 
   const quadrant = getQuadrant(implementationEffort, businessImpact);
