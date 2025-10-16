@@ -479,6 +479,11 @@ export default function CompanyDetail() {
                   <OpportunityMatrix
                     opportunities={filteredOpportunities}
                     readinessScores={readinessScores}
+                    companyContext={{
+                      annualRevenue: company?.annualRevenue,
+                      totalEmployees: company?.totalEmployees,
+                      annualLaborCosts: company?.annualLaborCosts,
+                    }}
                   />
                 </div>
 
@@ -502,6 +507,11 @@ export default function CompanyDetail() {
                             opportunity={opp}
                             readinessScore={readinessScores[opp.workflowId]}
                             companyId={companyId}
+                            companyContext={{
+                              annualRevenue: company?.annualRevenue,
+                              totalEmployees: company?.totalEmployees,
+                              annualLaborCosts: company?.annualLaborCosts,
+                            }}
                           />
                         ))}
                       </div>

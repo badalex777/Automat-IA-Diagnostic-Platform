@@ -1,5 +1,5 @@
 import type { ImplementationOpportunity } from "@shared/schema";
-import { calculateOpportunityScore, type ToggleState } from "@shared/opportunityCalculations";
+import { calculateOpportunityScore, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ interface OpportunityCardProps {
   opportunity: ImplementationOpportunity;
   readinessScore: number;
   companyId?: string;
+  companyContext?: CompanyContext;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -28,6 +29,7 @@ export function OpportunityCard({
   opportunity,
   readinessScore,
   companyId,
+  companyContext,
   onEdit,
   onDelete,
 }: OpportunityCardProps) {
@@ -39,7 +41,7 @@ export function OpportunityCard({
     revenueMetrics: opportunity.revenueMetricsEnabled ?? false,
   };
   
-  const score = calculateOpportunityScore(opportunity, readinessScore, toggles);
+  const score = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext);
   
   // Mutation to update toggle states
   const updateToggleMutation = useMutation({

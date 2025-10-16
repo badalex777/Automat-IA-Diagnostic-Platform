@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import type { ImplementationOpportunity } from "@shared/schema";
-import { calculateOpportunityScore, type ToggleState } from "@shared/opportunityCalculations";
+import { calculateOpportunityScore, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
   readinessScores: Record<string, number>; // workflowId -> readiness score
   workflowColors?: Record<string, string>; // workflowId -> color
+  companyContext?: CompanyContext; // Company financial context for normalized scoring
   onOpportunityClick?: (opportunity: ImplementationOpportunity) => void;
 }
 
@@ -37,6 +38,7 @@ export default function OpportunityMatrix({
   opportunities, 
   readinessScores,
   workflowColors,
+  companyContext,
   onOpportunityClick 
 }: OpportunityMatrixProps) {
   const { dataPoints, workflowLegend } = useMemo(() => {
@@ -58,7 +60,7 @@ export default function OpportunityMatrix({
         revenueMetrics: opp.revenueMetricsEnabled ?? false,
       };
       
-      const score = calculateOpportunityScore(opp, readinessScore, toggles);
+      const score = calculateOpportunityScore(opp, readinessScore, toggles, companyContext);
       
       return {
         id: opp.id,
@@ -78,7 +80,7 @@ export default function OpportunityMatrix({
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, readinessScores, workflowColors]);
+  }, [opportunities, readinessScores, workflowColors, companyContext]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
