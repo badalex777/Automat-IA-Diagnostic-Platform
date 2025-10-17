@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Label } from "recharts";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, LabelList } from "recharts";
 import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
   calculateOpportunityScore, 
@@ -63,20 +63,23 @@ export default function OpportunityMatrix({
       // Start fade out
       setIsTransitioning(true);
       
+      let fadeInTimer: NodeJS.Timeout;
+      
       // After fade out completes, update filter
       const fadeOutTimer = setTimeout(() => {
         setFilterType(pendingFilterType);
         setPendingFilterType(null);
         
         // After a brief moment, fade back in
-        const fadeInTimer = setTimeout(() => {
+        fadeInTimer = setTimeout(() => {
           setIsTransitioning(false);
         }, 50);
-        
-        return () => clearTimeout(fadeInTimer);
       }, 200);
       
-      return () => clearTimeout(fadeOutTimer);
+      return () => {
+        clearTimeout(fadeOutTimer);
+        if (fadeInTimer) clearTimeout(fadeInTimer);
+      };
     }
   }, [pendingFilterType]);
 
@@ -202,24 +205,6 @@ export default function OpportunityMatrix({
     setPendingFilterType(value as MatrixFilterType);
   };
 
-  // Custom label content for opportunity names
-  const CustomLabel = (props: any) => {
-    const { cx, cy, payload } = props;
-    if (!payload || !payload.name) return null;
-    
-    return (
-      <text
-        x={cx}
-        y={cy - 12}
-        textAnchor="middle"
-        className="fill-foreground text-[10px] font-medium pointer-events-none"
-        style={{ userSelect: 'none' }}
-      >
-        {payload.name}
-      </text>
-    );
-  };
-
   return (
     <Card data-testid="card-opportunity-matrix">
       <CardHeader>
@@ -323,7 +308,6 @@ export default function OpportunityMatrix({
                 data={dataPoints} 
                 onClick={handleClick}
                 className="cursor-pointer"
-                label={<CustomLabel />}
               >
                 {dataPoints.map((entry) => (
                   <Cell 
@@ -332,6 +316,13 @@ export default function OpportunityMatrix({
                     className="hover:opacity-80 transition-opacity"
                   />
                 ))}
+                <LabelList 
+                  dataKey="name" 
+                  position="top" 
+                  offset={12}
+                  className="fill-foreground text-[10px] font-medium"
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+                />
               </Scatter>
             </ScatterChart>
           </ResponsiveContainer>
