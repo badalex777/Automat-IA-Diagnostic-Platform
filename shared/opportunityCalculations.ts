@@ -356,7 +356,8 @@ export type MatrixFilterType =
   | "all-opportunities";  // Show everything
 
 /**
- * Filter opportunities by their enabled metrics
+ * Filter opportunities by whether they have the required metric data (not toggle state)
+ * This ensures filters show opportunities that CAN use those metrics, regardless of toggles
  */
 export function filterOpportunitiesByMetrics(
   opportunities: ImplementationOpportunity[],
@@ -364,23 +365,27 @@ export function filterOpportunitiesByMetrics(
 ): ImplementationOpportunity[] {
   switch (filterType) {
     case "time-only":
+      // Only opportunities without error or revenue data
       return opportunities.filter(
-        opp => !opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+        opp => !hasErrorMetrics(opp) && !hasRevenueMetrics(opp)
       );
     
     case "time-error":
+      // Only opportunities with error data (and no revenue data)
       return opportunities.filter(
-        opp => opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+        opp => hasErrorMetrics(opp) && !hasRevenueMetrics(opp)
       );
     
     case "time-revenue":
+      // Only opportunities with revenue data (and no error data)
       return opportunities.filter(
-        opp => !opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+        opp => !hasErrorMetrics(opp) && hasRevenueMetrics(opp)
       );
     
     case "all-three":
+      // Only opportunities with both error and revenue data
       return opportunities.filter(
-        opp => opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+        opp => hasErrorMetrics(opp) && hasRevenueMetrics(opp)
       );
     
     case "all-opportunities":
@@ -389,6 +394,22 @@ export function filterOpportunitiesByMetrics(
     default:
       return opportunities;
   }
+}
+
+/**
+ * Check if opportunity has error reduction metric data
+ */
+function hasErrorMetrics(opp: ImplementationOpportunity): boolean {
+  const errorPct = parseFloat(opp.errorReductionPct || "0");
+  return errorPct > 0;
+}
+
+/**
+ * Check if opportunity has revenue uplift metric data
+ */
+function hasRevenueMetrics(opp: ImplementationOpportunity): boolean {
+  const revenue = parseFloat(opp.revenueUpliftAnnual || "0");
+  return revenue > 0;
 }
 
 /**

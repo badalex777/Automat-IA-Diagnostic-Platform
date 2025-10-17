@@ -235,97 +235,110 @@ export default function OpportunityMatrix({
         </div>
       </CardHeader>
       <CardContent>
-        <div 
-          className="h-[500px] transition-opacity duration-200" 
-          data-testid="chart-opportunity-matrix"
-          style={{ opacity: isTransitioning ? 0 : 1 }}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              
-              {/* Axes */}
-              <XAxis 
-                type="number" 
-                dataKey="x" 
-                name="Business Impact"
-                domain={[0, 100]}
-                label={{ 
-                  value: 'Business Impact →', 
-                  position: 'bottom',
-                  offset: 40,
-                  className: "fill-foreground text-sm"
-                }}
-                tick={{ className: "fill-muted-foreground text-xs" }}
-              />
-              <YAxis 
-                type="number" 
-                dataKey="y" 
-                name="Implementation Effort"
-                domain={[0, 100]}
-                label={{ 
-                  value: 'Implementation Effort →', 
-                  angle: -90, 
-                  position: 'left',
-                  offset: 40,
-                  className: "fill-foreground text-sm"
-                }}
-                tick={{ className: "fill-muted-foreground text-xs" }}
-              />
-
-              {/* Quadrant dividers */}
-              <ReferenceLine 
-                x={50} 
-                stroke="hsl(var(--border))" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-              <ReferenceLine 
-                y={50} 
-                stroke="hsl(var(--border))" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-
-              {/* Quadrant labels */}
-              <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                Nice-To-Haves
-              </text>
-              <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                Quick Wins
-              </text>
-              <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                Deprioritize
-              </text>
-              <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                Strategic Goals
-              </text>
-
-              <Tooltip content={<CustomTooltip />} />
-
-              {/* Data points */}
-              <Scatter 
-                data={dataPoints} 
-                onClick={handleClick}
-                className="cursor-pointer"
-              >
-                {dataPoints.map((entry) => (
-                  <Cell 
-                    key={entry.id} 
-                    fill={entry.color}
-                    className="hover:opacity-80 transition-opacity"
-                  />
-                ))}
-                <LabelList 
-                  dataKey="name" 
-                  position="top" 
-                  offset={12}
-                  className="fill-foreground text-[10px] font-medium"
-                  style={{ pointerEvents: 'none', userSelect: 'none' }}
+        <div className="relative">
+          <div 
+            className="h-[500px] transition-opacity duration-200" 
+            data-testid="chart-opportunity-matrix"
+            style={{ opacity: isTransitioning ? 0 : 1 }}
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                
+                {/* Axes */}
+                <XAxis 
+                  type="number" 
+                  dataKey="x" 
+                  name="Business Impact"
+                  domain={[0, 100]}
+                  label={{ 
+                    value: 'Business Impact →', 
+                    position: 'bottom',
+                    offset: 40,
+                    className: "fill-foreground text-sm"
+                  }}
+                  tick={{ className: "fill-muted-foreground text-xs" }}
                 />
-              </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
+                <YAxis 
+                  type="number" 
+                  dataKey="y" 
+                  name="Implementation Effort"
+                  domain={[0, 100]}
+                  label={{ 
+                    value: 'Implementation Effort →', 
+                    angle: -90, 
+                    position: 'left',
+                    offset: 40,
+                    className: "fill-foreground text-sm"
+                  }}
+                  tick={{ className: "fill-muted-foreground text-xs" }}
+                />
+
+                {/* Quadrant dividers */}
+                <ReferenceLine 
+                  x={50} 
+                  stroke="hsl(var(--border))" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+                <ReferenceLine 
+                  y={50} 
+                  stroke="hsl(var(--border))" 
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                />
+
+                {/* Quadrant labels */}
+                <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                  Nice-To-Haves
+                </text>
+                <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                  Quick Wins
+                </text>
+                <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                  Deprioritize
+                </text>
+                <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                  Strategic Goals
+                </text>
+
+                <Tooltip content={<CustomTooltip />} />
+
+                {/* Data points */}
+                <Scatter 
+                  data={dataPoints} 
+                  onClick={handleClick}
+                  className="cursor-pointer"
+                >
+                  {dataPoints.map((entry) => (
+                    <Cell 
+                      key={entry.id} 
+                      fill={entry.color}
+                      className="hover:opacity-80 transition-opacity"
+                    />
+                  ))}
+                  <LabelList 
+                    dataKey="name" 
+                    position="top" 
+                    offset={12}
+                    className="fill-foreground text-[10px] font-medium"
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}
+                  />
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Empty state */}
+          {dataPoints.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <p className="text-muted-foreground text-sm">
+                {filterType === "all-opportunities" 
+                  ? "No opportunities to display"
+                  : "No opportunities match this filter"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Legend */}
@@ -342,17 +355,6 @@ export default function OpportunityMatrix({
                 </span>
               </div>
             ))}
-          </div>
-        )}
-
-        {/* Empty state */}
-        {dataPoints.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-muted-foreground text-sm">
-              {filterType === "all-opportunities" 
-                ? "No opportunities to display"
-                : "No opportunities match this filter"}
-            </p>
           </div>
         )}
       </CardContent>
