@@ -713,11 +713,6 @@ export default function WorkflowDetail() {
                 readinessScore = rubric.totalScore;
               }
 
-              const toggles: ToggleState = {
-                errorMetrics: errorToggle,
-                revenueMetrics: revenueToggle,
-              };
-
               const handleOpportunitySubmit = (data: InsertImplementationOpportunity) => {
                 if (editingOpportunity) {
                   updateOpportunityMutation.mutate({
@@ -799,7 +794,6 @@ export default function WorkflowDetail() {
                             key={opportunity.id}
                             opportunity={opportunity}
                             readinessScore={readinessScore}
-                            toggles={toggles}
                             onEdit={() => {
                               setEditingOpportunity(opportunity);
                               setIsOpportunityDialogOpen(true);
