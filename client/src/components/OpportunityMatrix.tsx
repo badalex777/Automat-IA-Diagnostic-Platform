@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Label } from "recharts";
 import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
@@ -54,7 +54,31 @@ export default function OpportunityMatrix({
   onOpportunityClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
+  const [pendingFilterType, setPendingFilterType] = useState<MatrixFilterType | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Handle filter transition animation
+  useEffect(() => {
+    if (pendingFilterType) {
+      // Start fade out
+      setIsTransitioning(true);
+      
+      // After fade out completes, update filter
+      const fadeOutTimer = setTimeout(() => {
+        setFilterType(pendingFilterType);
+        setPendingFilterType(null);
+        
+        // After a brief moment, fade back in
+        const fadeInTimer = setTimeout(() => {
+          setIsTransitioning(false);
+        }, 50);
+        
+        return () => clearTimeout(fadeInTimer);
+      }, 200);
+      
+      return () => clearTimeout(fadeOutTimer);
+    }
+  }, [pendingFilterType]);
 
   const { dataPoints, workflowLegend } = useMemo(() => {
     // Create workflow name mapping
@@ -175,15 +199,7 @@ export default function OpportunityMatrix({
   };
 
   const handleFilterChange = (value: string) => {
-    setIsTransitioning(true);
-    // Fade out
-    setTimeout(() => {
-      setFilterType(value as MatrixFilterType);
-      // Fade in after data updates
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 50);
-    }, 200);
+    setPendingFilterType(value as MatrixFilterType);
   };
 
   // Custom label content for opportunity names
