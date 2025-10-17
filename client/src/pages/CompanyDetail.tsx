@@ -309,7 +309,7 @@ export default function CompanyDetail() {
     });
   }, [opportunities, workflowAssessments]);
 
-  // Group opportunities by workflow
+  // Group opportunities by workflow, then sort chronologically
   const workflowsWithOpportunities = useMemo(() => {
     const grouped = filteredOpportunities.reduce((acc, opp) => {
       if (!acc[opp.workflowId]) {
@@ -327,7 +327,23 @@ export default function CompanyDetail() {
       return acc;
     }, {} as Record<string, { workflow: Workflow; opportunities: ImplementationOpportunity[] }>);
 
-    return Object.values(grouped);
+    // Convert to array and sort workflows by createdAt DESC (newest first)
+    const workflowArray = Object.values(grouped).sort((a, b) => {
+      const dateA = a.workflow.createdAt ? new Date(a.workflow.createdAt).getTime() : 0;
+      const dateB = b.workflow.createdAt ? new Date(b.workflow.createdAt).getTime() : 0;
+      return dateB - dateA; // DESC order (newest first)
+    });
+
+    // Sort opportunities within each workflow by createdAt DESC (newest first)
+    workflowArray.forEach(item => {
+      item.opportunities.sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA; // DESC order (newest first)
+      });
+    });
+
+    return workflowArray;
   }, [filteredOpportunities, workflows]);
 
   return (
