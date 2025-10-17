@@ -741,8 +741,13 @@ export default function WorkflowDetail() {
                 errorsAvoidedAnnually: opp.errorsAvoidedAnnually ?? undefined,
                 hoursReallocatedToRevenue: opp.hoursReallocatedToRevenue ? parseFloat(opp.hoursReallocatedToRevenue) : undefined,
                 revenueUpliftAnnual: opp.revenueUpliftAnnual ? parseFloat(opp.revenueUpliftAnnual) : undefined,
+                rampupPeriodMonths: opp.rampupPeriodMonths ? parseFloat(opp.rampupPeriodMonths) : undefined,
                 paybackPeriodMonths: opp.paybackPeriodMonths ? parseFloat(opp.paybackPeriodMonths) : undefined,
                 trainingHoursPerEmployee: opp.trainingHoursPerEmployee ? parseFloat(opp.trainingHoursPerEmployee) : undefined,
+                employeeAnnualSalary: opp.employeeAnnualSalary ? parseFloat(opp.employeeAnnualSalary) : undefined,
+                overheadMultiplier: opp.overheadMultiplier ? parseFloat(opp.overheadMultiplier) : undefined,
+                errorMetricsEnabled: opp.errorMetricsEnabled ?? false,
+                revenueMetricsEnabled: opp.revenueMetricsEnabled ?? false,
               });
 
               return (
