@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
-import type { ImplementationOpportunity } from "@shared/schema";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, Label } from "recharts";
+import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
   calculateOpportunityScore, 
   type ToggleState, 
@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
+  workflows: Workflow[]; // Workflow data for name mapping
   readinessScores: Record<string, number>; // workflowId -> readiness score
   workflowColors?: Record<string, string>; // workflowId -> color
   companyContext?: CompanyContext; // Company financial context for normalized scoring
@@ -37,6 +38,7 @@ interface DataPoint {
   id: string;
   name: string;
   workflowId: string;
+  workflowName: string;
   x: number; // Business Impact
   y: number; // Implementation Effort (inverted for display)
   quadrant: string;
@@ -45,14 +47,22 @@ interface DataPoint {
 
 export default function OpportunityMatrix({ 
   opportunities, 
+  workflows,
   readinessScores,
   workflowColors,
   companyContext,
   onOpportunityClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const { dataPoints, workflowLegend } = useMemo(() => {
+    // Create workflow name mapping
+    const workflowMap = workflows.reduce((acc, w) => {
+      acc[w.id] = w.name;
+      return acc;
+    }, {} as Record<string, string>);
+
     // First filter opportunities based on selected filter
     const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
 
@@ -116,6 +126,7 @@ export default function OpportunityMatrix({
         id: point.id,
         name: point.name,
         workflowId: point.workflowId,
+        workflowName: workflowMap[point.workflowId] || "Unknown",
         x: normalizedImpact,
         y: point.implementationEffort,
         quadrant,
@@ -123,14 +134,15 @@ export default function OpportunityMatrix({
       };
     });
 
-    // Create legend data
+    // Create legend data with workflow names
     const legend = uniqueWorkflows.map(wId => ({
       workflowId: wId,
+      workflowName: workflowMap[wId] || "Unknown",
       color: colorMap[wId],
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, readinessScores, workflowColors, companyContext, filterType]);
+  }, [opportunities, workflows, readinessScores, workflowColors, companyContext, filterType]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -162,12 +174,42 @@ export default function OpportunityMatrix({
     }
   };
 
+  const handleFilterChange = (value: string) => {
+    setIsTransitioning(true);
+    // Fade out
+    setTimeout(() => {
+      setFilterType(value as MatrixFilterType);
+      // Fade in after data updates
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 50);
+    }, 200);
+  };
+
+  // Custom label component for opportunity names
+  const renderCustomLabel = (props: any) => {
+    const { x, y, payload } = props;
+    if (!payload || !payload.name) return null;
+    
+    return (
+      <text
+        x={x}
+        y={y - 12}
+        textAnchor="middle"
+        className="fill-foreground text-[10px] font-medium pointer-events-none"
+        style={{ userSelect: 'none' }}
+      >
+        {payload.name}
+      </text>
+    );
+  };
+
   return (
     <Card data-testid="card-opportunity-matrix">
       <CardHeader>
         <div className="flex items-center justify-between gap-4">
           <CardTitle>Opportunity Matrix</CardTitle>
-          <Select value={filterType} onValueChange={(value) => setFilterType(value as MatrixFilterType)}>
+          <Select value={filterType} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
               <SelectValue placeholder="Filter by metrics" />
             </SelectTrigger>
@@ -192,7 +234,11 @@ export default function OpportunityMatrix({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[500px]" data-testid="chart-opportunity-matrix">
+        <div 
+          className="h-[500px] transition-opacity duration-200" 
+          data-testid="chart-opportunity-matrix"
+          style={{ opacity: isTransitioning ? 0 : 1 }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -261,6 +307,7 @@ export default function OpportunityMatrix({
                 data={dataPoints} 
                 onClick={handleClick}
                 className="cursor-pointer"
+                label={renderCustomLabel}
               >
                 {dataPoints.map((entry) => (
                   <Cell 
@@ -284,7 +331,7 @@ export default function OpportunityMatrix({
                   style={{ backgroundColor: item.color }}
                 />
                 <span className="text-xs text-muted-foreground">
-                  Workflow {item.workflowId.slice(0, 8)}
+                  {item.workflowName}
                 </span>
               </div>
             ))}
