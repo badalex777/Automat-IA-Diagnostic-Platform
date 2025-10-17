@@ -337,8 +337,8 @@ export default function OpportunityMatrix({
           </ResponsiveContainer>
         </div>
 
-        {/* Legend (if multiple workflows) */}
-        {workflowLegend.length > 1 && (
+        {/* Legend */}
+        {workflowLegend.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-4">
             {workflowLegend.map(item => (
               <div key={item.workflowId} className="flex items-center gap-2">
