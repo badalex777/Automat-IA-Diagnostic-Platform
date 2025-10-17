@@ -54,34 +54,6 @@ export default function OpportunityMatrix({
   onOpportunityClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
-  const [pendingFilterType, setPendingFilterType] = useState<MatrixFilterType | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Handle filter transition animation
-  useEffect(() => {
-    if (pendingFilterType) {
-      // Start fade out
-      setIsTransitioning(true);
-      
-      let fadeInTimer: NodeJS.Timeout;
-      
-      // After fade out completes, update filter
-      const fadeOutTimer = setTimeout(() => {
-        setFilterType(pendingFilterType);
-        setPendingFilterType(null);
-        
-        // After a brief moment, fade back in
-        fadeInTimer = setTimeout(() => {
-          setIsTransitioning(false);
-        }, 50);
-      }, 200);
-      
-      return () => {
-        clearTimeout(fadeOutTimer);
-        if (fadeInTimer) clearTimeout(fadeInTimer);
-      };
-    }
-  }, [pendingFilterType]);
 
   const { dataPoints, workflowLegend } = useMemo(() => {
     // Create workflow name mapping
@@ -202,7 +174,7 @@ export default function OpportunityMatrix({
   };
 
   const handleFilterChange = (value: string) => {
-    setPendingFilterType(value as MatrixFilterType);
+    setFilterType(value as MatrixFilterType);
   };
 
   return (
@@ -237,9 +209,8 @@ export default function OpportunityMatrix({
       <CardContent>
         <div className="relative">
           <div 
-            className="h-[500px] transition-opacity duration-200" 
+            className="h-[500px]" 
             data-testid="chart-opportunity-matrix"
-            style={{ opacity: isTransitioning ? 0 : 1 }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
@@ -328,17 +299,6 @@ export default function OpportunityMatrix({
               </ScatterChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Empty state */}
-          {dataPoints.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <p className="text-muted-foreground text-sm">
-                {filterType === "all-opportunities" 
-                  ? "No opportunities to display"
-                  : "No opportunities match this filter"}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Legend */}
