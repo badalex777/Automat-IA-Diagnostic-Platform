@@ -64,8 +64,10 @@ export function OpportunityForm({
   const calculateHourlyRate = () => {
     const salary = parseFloat(employeeAnnualSalary?.toString() || "0");
     const overhead = parseFloat(overheadMultiplier?.toString() || "1.3");
-    if (salary <= 0) return null;
-    return ((salary * overhead) / 2080).toFixed(2);
+    if (salary <= 0) {
+      return { rate: "50.00", isFallback: true };
+    }
+    return { rate: ((salary * overhead) / 2080).toFixed(2), isFallback: false };
   };
 
   // Clear error metrics when toggle is disabled
@@ -298,17 +300,24 @@ export function OpportunityForm({
             />
           </div>
 
-          {calculateHourlyRate() && (
-            <div className="bg-muted/50 rounded-md p-3 border border-border">
-              <p className="text-xs text-muted-foreground mb-1">Calculated Hourly Rate</p>
-              <p className="text-lg font-semibold text-foreground">
-                ${calculateHourlyRate()}/hour
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Based on ROI Calculator formula: (Salary × Overhead) ÷ 2,080 hours
-              </p>
-            </div>
-          )}
+          {(() => {
+            const result = calculateHourlyRate();
+            return (
+              <div className="bg-muted/50 rounded-md p-3 border border-border">
+                <p className="text-xs text-muted-foreground mb-1">
+                  {result.isFallback ? "Hourly Rate (Fallback)" : "Calculated Hourly Rate"}
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  ${result.rate}/hour
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {result.isFallback 
+                    ? "Using $50/hour default (no salary data provided)" 
+                    : "Based on ROI Calculator formula: (Salary × Overhead) ÷ 2,080 hours"}
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Implementation Effort Metrics */}
