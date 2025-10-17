@@ -186,15 +186,15 @@ export default function OpportunityMatrix({
     }, 200);
   };
 
-  // Custom label component for opportunity names
-  const renderCustomLabel = (props: any) => {
-    const { x, y, payload } = props;
+  // Custom label content for opportunity names
+  const CustomLabel = (props: any) => {
+    const { cx, cy, payload } = props;
     if (!payload || !payload.name) return null;
     
     return (
       <text
-        x={x}
-        y={y - 12}
+        x={cx}
+        y={cy - 12}
         textAnchor="middle"
         className="fill-foreground text-[10px] font-medium pointer-events-none"
         style={{ userSelect: 'none' }}
@@ -307,7 +307,7 @@ export default function OpportunityMatrix({
                 data={dataPoints} 
                 onClick={handleClick}
                 className="cursor-pointer"
-                label={renderCustomLabel}
+                label={<CustomLabel />}
               >
                 {dataPoints.map((entry) => (
                   <Cell 

@@ -503,6 +503,7 @@ export default function CompanyDetail() {
 
                   <OpportunityMatrix
                     opportunities={filteredOpportunities}
+                    workflows={workflows}
                     readinessScores={readinessScores}
                     companyContext={{
                       annualRevenue: company?.annualRevenue,
