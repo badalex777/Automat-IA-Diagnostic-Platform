@@ -141,20 +141,20 @@ function calculateHourlyRate(
  * 
  * Error Toggle ON (revenue OFF):
  * - Annual ROI: 45%
- * - Annual Hours Saved: 35%
- * - Error Impact: 20%
+ * - Annual Hours Saved: 30%
+ * - Error Impact: 25%
  * Total: 100%
  * 
  * Revenue Toggle ON (error OFF):
  * - Annual ROI: 45%
- * - Annual Hours Saved: 35%
- * - Revenue Impact: 20%
+ * - Annual Hours Saved: 30%
+ * - Revenue Impact: 25%
  * Total: 100%
  * 
  * Both Toggles ON:
  * - Annual ROI: 40%
- * - Annual Hours Saved: 30%
- * - Error Impact: 15%
+ * - Annual Hours Saved: 25%
+ * - Error Impact: 20%
  * - Revenue Impact: 15%
  * Total: 100%
  */
@@ -217,19 +217,19 @@ export function calculateBusinessImpact(
   if (errorActive && revenueActive) {
     // Both toggles ON
     roiWeight = 0.40;
-    hoursWeight = 0.30;
-    errorWeight = 0.15;
+    hoursWeight = 0.25;
+    errorWeight = 0.20;
     revenueWeight = 0.15;
   } else if (errorActive) {
     // Only error toggle ON
     roiWeight = 0.45;
-    hoursWeight = 0.35;
-    errorWeight = 0.20;
+    hoursWeight = 0.30;
+    errorWeight = 0.25;
   } else if (revenueActive) {
     // Only revenue toggle ON
     roiWeight = 0.45;
-    hoursWeight = 0.35;
-    revenueWeight = 0.20;
+    hoursWeight = 0.30;
+    revenueWeight = 0.25;
   }
   // else: base case with default weights (60/40)
 
@@ -457,27 +457,27 @@ export function calculateBusinessImpactForFilter(
       break;
     
     case "time-error":
-      // Time + Error: keep time savings dominant (80% for ROI+Hours)
+      // Time + Error: keep time savings dominant (75% for ROI+Hours)
       totalImpact = 
         (roiScore * 0.45) +
-        (hoursScore * 0.35) +
-        (errorScore * 0.20);
+        (hoursScore * 0.30) +
+        (errorScore * 0.25);
       break;
     
     case "time-revenue":
-      // Time + Revenue: keep time savings dominant (80% for ROI+Hours)
+      // Time + Revenue: keep time savings dominant (75% for ROI+Hours)
       totalImpact = 
         (roiScore * 0.45) +
-        (hoursScore * 0.35) +
-        (revenueScore * 0.20);
+        (hoursScore * 0.30) +
+        (revenueScore * 0.25);
       break;
     
     case "all-three":
-      // All metrics: time savings still dominant (70% for ROI+Hours)
+      // All metrics: time savings still dominant (65% for ROI+Hours)
       totalImpact = 
         (roiScore * 0.40) +
-        (hoursScore * 0.30) +
-        (errorScore * 0.15) +
+        (hoursScore * 0.25) +
+        (errorScore * 0.20) +
         (revenueScore * 0.15);
       break;
     
