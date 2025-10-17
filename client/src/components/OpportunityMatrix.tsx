@@ -1,8 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import type { ImplementationOpportunity } from "@shared/schema";
-import { calculateOpportunityScore, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
+import { 
+  calculateOpportunityScore, 
+  type ToggleState, 
+  type CompanyContext,
+  type MatrixFilterType,
+  filterOpportunitiesByMetrics,
+  calculateBusinessImpactForFilter,
+  calculateImplementationEffort
+} from "@shared/opportunityCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
@@ -41,34 +50,51 @@ export default function OpportunityMatrix({
   companyContext,
   onOpportunityClick 
 }: OpportunityMatrixProps) {
+  const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
+
   const { dataPoints, workflowLegend } = useMemo(() => {
+    // First filter opportunities based on selected filter
+    const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
+
     // Assign colors to workflows
-    const uniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
+    const uniqueWorkflows = Array.from(new Set(filteredOpps.map(o => o.workflowId)));
     const colorMap: Record<string, string> = {};
     
     uniqueWorkflows.forEach((workflowId, index) => {
       colorMap[workflowId] = workflowColors?.[workflowId] || WORKFLOW_COLORS[index % WORKFLOW_COLORS.length];
     });
 
-    // Calculate scores for each opportunity using per-opportunity toggle state
-    const points: DataPoint[] = opportunities.map(opp => {
+    // Calculate scores for filtered opportunities
+    const points: DataPoint[] = filteredOpps.map(opp => {
       const readinessScore = readinessScores[opp.workflowId];
       
-      // Use per-opportunity toggle state
-      const toggles: ToggleState = {
-        errorMetrics: opp.errorMetricsEnabled ?? false,
-        revenueMetrics: opp.revenueMetricsEnabled ?? false,
-      };
+      // Calculate implementation effort (same for all filters)
+      const implementationEffort = calculateImplementationEffort(
+        readinessScore,
+        parseFloat(opp.rampupPeriodMonths || "0"),
+        parseFloat(opp.paybackPeriodMonths || "0"),
+        parseFloat(opp.trainingHoursPerEmployee || "0")
+      );
+
+      // Calculate business impact using filter-specific recalculation
+      const businessImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
       
-      const score = calculateOpportunityScore(opp, readinessScore, toggles, companyContext);
+      // Determine quadrant
+      const isLowEffort = implementationEffort < 50;
+      const isHighImpact = businessImpact >= 50;
+      let quadrant: string;
+      if (isLowEffort && isHighImpact) quadrant = "Quick Wins";
+      else if (!isLowEffort && isHighImpact) quadrant = "Strategic Goals";
+      else if (isLowEffort && !isHighImpact) quadrant = "Nice-To-Haves";
+      else quadrant = "Deprioritize";
       
       return {
         id: opp.id,
         name: opp.name,
         workflowId: opp.workflowId,
-        x: score.businessImpact,
-        y: score.implementationEffort, // Higher effort = higher on Y-axis
-        quadrant: score.quadrant,
+        x: businessImpact,
+        y: implementationEffort,
+        quadrant,
         color: colorMap[opp.workflowId],
       };
     });
@@ -80,7 +106,7 @@ export default function OpportunityMatrix({
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, readinessScores, workflowColors, companyContext]);
+  }, [opportunities, readinessScores, workflowColors, companyContext, filterType]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -115,7 +141,31 @@ export default function OpportunityMatrix({
   return (
     <Card data-testid="card-opportunity-matrix">
       <CardHeader>
-        <CardTitle>Opportunity Matrix</CardTitle>
+        <div className="flex items-center justify-between gap-4">
+          <CardTitle>Opportunity Matrix</CardTitle>
+          <Select value={filterType} onValueChange={(value) => setFilterType(value as MatrixFilterType)}>
+            <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
+              <SelectValue placeholder="Filter by metrics" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all-opportunities" data-testid="filter-all-opportunities">
+                All Opportunities
+              </SelectItem>
+              <SelectItem value="time-only" data-testid="filter-time-only">
+                Time Savings Only
+              </SelectItem>
+              <SelectItem value="time-error" data-testid="filter-time-error">
+                Time + Error Reduction
+              </SelectItem>
+              <SelectItem value="time-revenue" data-testid="filter-time-revenue">
+                Time + Revenue Uplift
+              </SelectItem>
+              <SelectItem value="all-three" data-testid="filter-all-three">
+                All 3 Metrics
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[500px]" data-testid="chart-opportunity-matrix">
@@ -221,7 +271,9 @@ export default function OpportunityMatrix({
         {dataPoints.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-muted-foreground text-sm">
-              No opportunities to display
+              {filterType === "all-opportunities" 
+                ? "No opportunities to display"
+                : "No opportunities match this filter"}
             </p>
           </div>
         )}

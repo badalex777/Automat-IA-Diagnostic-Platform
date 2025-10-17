@@ -333,3 +333,177 @@ export function calculateOpportunityScore(
     quadrant
   };
 }
+
+// Matrix Filter Types
+export type MatrixFilterType = 
+  | "time-only"           // No bonuses enabled
+  | "time-error"          // Error enabled, revenue disabled
+  | "time-revenue"        // Revenue enabled, error disabled
+  | "all-three"           // Both error and revenue enabled
+  | "all-opportunities";  // Show everything
+
+/**
+ * Filter opportunities by their enabled metrics
+ */
+export function filterOpportunitiesByMetrics(
+  opportunities: ImplementationOpportunity[],
+  filterType: MatrixFilterType
+): ImplementationOpportunity[] {
+  switch (filterType) {
+    case "time-only":
+      return opportunities.filter(
+        opp => !opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+      );
+    
+    case "time-error":
+      return opportunities.filter(
+        opp => opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+      );
+    
+    case "time-revenue":
+      return opportunities.filter(
+        opp => !opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+      );
+    
+    case "all-three":
+      return opportunities.filter(
+        opp => opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+      );
+    
+    case "all-opportunities":
+      return opportunities; // Return all
+    
+    default:
+      return opportunities;
+  }
+}
+
+/**
+ * Recalculate Business Impact for a specific filter view
+ * This redistributes weights to only the relevant metrics for fair comparison
+ */
+export function calculateBusinessImpactForFilter(
+  opportunity: ImplementationOpportunity,
+  filterType: MatrixFilterType,
+  companyContext?: CompanyContext
+): number {
+  const annualRoi = parseFloat(opportunity.annualRoi || "0");
+  const fteSavings = parseFloat(opportunity.fteSavings || "0");
+  const annualHours = parseFloat(opportunity.annualHoursSaved || "0");
+  
+  // Parse company context
+  const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
+  const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
+  const companyLaborCosts = parseFloat(companyContext?.annualLaborCosts?.toString() || "0");
+  
+  // Calculate company-relative metrics (0-100)
+  let roiScore = 0;
+  let fteScore = 0;
+  let hoursScore = 0;
+  
+  if (companyRevenue > 0) {
+    roiScore = Math.min((annualRoi / companyRevenue) * 100, 100);
+  } else {
+    roiScore = normalizeToScale(annualRoi, 1000000);
+  }
+  
+  if (companyEmployees > 0) {
+    fteScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+  } else {
+    fteScore = normalizeToScale(fteSavings, 5);
+  }
+  
+  if (companyLaborCosts > 0) {
+    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
+    const hoursDollarValue = annualHours * hourlyRate;
+    hoursScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+  } else {
+    hoursScore = normalizeToScale(annualHours, 10000);
+  }
+
+  // Calculate error impact
+  let errorScore = 0;
+  const errorPct = parseFloat(opportunity.errorReductionPct || "0");
+  const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
+  const errorPctScore = errorPct; // Already 0-100
+  const errorsAvoidedScore = normalizeToScale(errorsAvoided, 1000);
+  errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
+
+  // Calculate revenue impact
+  let revenueScore = 0;
+  const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
+  const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
+  
+  let hoursReallocatedScore = 0;
+  let revenueUpliftScore = 0;
+  
+  if (companyLaborCosts > 0) {
+    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
+    const hoursDollarValue = hoursReallocated * hourlyRate;
+    hoursReallocatedScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+  } else {
+    hoursReallocatedScore = normalizeToScale(hoursReallocated, 10000);
+  }
+  
+  if (companyRevenue > 0) {
+    revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 100, 100);
+  } else {
+    revenueUpliftScore = normalizeToScale(revenueUplift, 2000000);
+  }
+  
+  revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
+
+  // Redistribute weights based on filter type
+  let totalImpact = 0;
+
+  switch (filterType) {
+    case "time-only":
+      // Only time savings metrics: redistribute 100% across ROI, FTE, Hours
+      totalImpact = 
+        (roiScore * 0.40) +
+        (fteScore * 0.30) +
+        (hoursScore * 0.30);
+      break;
+    
+    case "time-error":
+      // Time + Error: redistribute 100% across ROI, FTE, Hours, Error
+      totalImpact = 
+        (roiScore * 0.30) +
+        (fteScore * 0.20) +
+        (hoursScore * 0.20) +
+        (errorScore * 0.30);
+      break;
+    
+    case "time-revenue":
+      // Time + Revenue: redistribute 100% across ROI, FTE, Hours, Revenue
+      totalImpact = 
+        (roiScore * 0.30) +
+        (fteScore * 0.20) +
+        (hoursScore * 0.20) +
+        (revenueScore * 0.30);
+      break;
+    
+    case "all-three":
+      // All metrics: redistribute 100% across all 5
+      totalImpact = 
+        (roiScore * 0.25) +
+        (fteScore * 0.15) +
+        (hoursScore * 0.15) +
+        (errorScore * 0.25) +
+        (revenueScore * 0.20);
+      break;
+    
+    case "all-opportunities":
+      // Use the opportunity's own toggle state
+      const toggles: ToggleState = {
+        errorMetrics: opportunity.errorMetricsEnabled || false,
+        revenueMetrics: opportunity.revenueMetricsEnabled || false
+      };
+      return calculateBusinessImpact(opportunity, toggles, companyContext);
+    
+    default:
+      totalImpact = 0;
+  }
+
+  return Math.round(totalImpact * 100) / 100; // Round to 2 decimals
+}
