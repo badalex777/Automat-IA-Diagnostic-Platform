@@ -98,6 +98,31 @@ export interface CompanyContext {
 }
 
 /**
+ * Calculate actual hourly rate from employee salary and overhead
+ * Matches ROI Calculator methodology: (Annual Salary × Overhead) ÷ 2,080 hours
+ * 
+ * @param employeeAnnualSalary - Yearly compensation for employees performing this work
+ * @param overheadMultiplier - Cost multiplier (typically 1.2-1.5), defaults to 1.3
+ * @returns Hourly rate in dollars, or 50 as fallback if salary not provided
+ */
+function calculateHourlyRate(
+  employeeAnnualSalary?: number | string | null,
+  overheadMultiplier?: number | string | null
+): number {
+  const salary = parseFloat(employeeAnnualSalary?.toString() || "0");
+  const overhead = parseFloat(overheadMultiplier?.toString() || "1.3");
+  
+  if (salary <= 0) {
+    // Fallback to $50/hour if no salary data provided
+    return 50;
+  }
+  
+  // ROI Calculator formula: (Annual Salary × Overhead) ÷ 2,080 annual hours
+  const ANNUAL_WORKING_HOURS = 2080;
+  return (salary * overhead) / ANNUAL_WORKING_HOURS;
+}
+
+/**
  * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE
  * Higher score = better business impact
  * 
@@ -173,9 +198,9 @@ export function calculateBusinessImpact(
   }
   
   if (companyLaborCosts > 0) {
-    // Convert hours to dollar value (assuming ~$50/hour average)
+    // Convert hours to dollar value using actual hourly rate
     // Then calculate as % of annual labor costs
-    const hourlyRate = 50;
+    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
     const hoursDollarValue = annualHours * hourlyRate;
     hoursScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
   } else {
@@ -237,7 +262,7 @@ export function calculateBusinessImpact(
     let revenueUpliftScore = 0;
     
     if (companyLaborCosts > 0) {
-      const hourlyRate = 50;
+      const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
       const hoursDollarValue = hoursReallocated * hourlyRate;
       hoursReallocatedScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
     } else {
