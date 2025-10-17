@@ -41,7 +41,8 @@ export function OpportunityCard({
     revenueMetrics: opportunity.revenueMetricsEnabled ?? false,
   };
   
-  const score = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext);
+  // Use additive bonuses so toggling metrics ON always increases business impact
+  const score = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext, true);
   
   // Mutation to update toggle states
   const updateToggleMutation = useMutation({

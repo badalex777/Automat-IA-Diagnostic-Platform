@@ -132,36 +132,45 @@ function calculateHourlyRate(
  * 
  * Note: FTE removed from scoring (it's just hours/40, redundant metric)
  * 
- * REDISTRIBUTIVE FORMULA (weights change based on active toggles):
+ * TWO CALCULATION MODES:
  * 
- * Base Case (both toggles OFF):
- * - Annual ROI: 60%
- * - Annual Hours Saved: 40%
- * Total: 100%
+ * 1. ADDITIVE MODE (useAdditiveBonus=true, for "all-opportunities" view):
+ *    - Base: ROI 60% + Hours 40% = 100%
+ *    - Error bonus (if active): + Error 25% on top
+ *    - Revenue bonus (if active): + Revenue 25% on top
+ *    - Max possible: 150% (when both bonuses active)
+ *    - Ensures toggling ON always increases score
  * 
- * Error Toggle ON (revenue OFF):
- * - Annual ROI: 45%
- * - Annual Hours Saved: 30%
- * - Error Impact: 25%
- * Total: 100%
+ * 2. REDISTRIBUTIVE MODE (useAdditiveBonus=false, for filtered category views):
+ *    Base Case (both toggles OFF):
+ *    - Annual ROI: 60%
+ *    - Annual Hours Saved: 40%
+ *    Total: 100%
  * 
- * Revenue Toggle ON (error OFF):
- * - Annual ROI: 45%
- * - Annual Hours Saved: 30%
- * - Revenue Impact: 25%
- * Total: 100%
+ *    Error Toggle ON (revenue OFF):
+ *    - Annual ROI: 45%
+ *    - Annual Hours Saved: 30%
+ *    - Error Impact: 25%
+ *    Total: 100%
  * 
- * Both Toggles ON:
- * - Annual ROI: 40%
- * - Annual Hours Saved: 25%
- * - Error Impact: 20%
- * - Revenue Impact: 15%
- * Total: 100%
+ *    Revenue Toggle ON (error OFF):
+ *    - Annual ROI: 45%
+ *    - Annual Hours Saved: 30%
+ *    - Revenue Impact: 25%
+ *    Total: 100%
+ * 
+ *    Both Toggles ON:
+ *    - Annual ROI: 40%
+ *    - Annual Hours Saved: 25%
+ *    - Error Impact: 20%
+ *    - Revenue Impact: 15%
+ *    Total: 100%
  */
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
   toggles: ToggleState,
-  companyContext?: CompanyContext
+  companyContext?: CompanyContext,
+  useAdditiveBonus: boolean = false
 ): number {
   const annualRoi = parseFloat(opportunity.annualRoi || "0");
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
@@ -205,7 +214,7 @@ export function calculateBusinessImpact(
     hoursScore = normalizeToScale(annualHours, 10000);
   }
 
-  // Determine weights based on active toggles (FTE removed as redundant)
+  // Determine weights based on active toggles and calculation mode
   let roiWeight = 0.60;
   let hoursWeight = 0.40;
   let errorWeight = 0;
@@ -214,24 +223,34 @@ export function calculateBusinessImpact(
   const errorActive = toggles.errorMetrics;
   const revenueActive = toggles.revenueMetrics;
 
-  if (errorActive && revenueActive) {
-    // Both toggles ON
-    roiWeight = 0.40;
-    hoursWeight = 0.25;
-    errorWeight = 0.20;
-    revenueWeight = 0.15;
-  } else if (errorActive) {
-    // Only error toggle ON
-    roiWeight = 0.45;
-    hoursWeight = 0.30;
-    errorWeight = 0.25;
-  } else if (revenueActive) {
-    // Only revenue toggle ON
-    roiWeight = 0.45;
-    hoursWeight = 0.30;
-    revenueWeight = 0.25;
+  if (useAdditiveBonus) {
+    // ADDITIVE MODE: Base metrics stay at 100%, bonuses add on top
+    roiWeight = 0.60;
+    hoursWeight = 0.40;
+    // Bonuses are added, not redistributed
+    errorWeight = errorActive ? 0.25 : 0;
+    revenueWeight = revenueActive ? 0.25 : 0;
+  } else {
+    // REDISTRIBUTIVE MODE: Weights sum to 100%
+    if (errorActive && revenueActive) {
+      // Both toggles ON
+      roiWeight = 0.40;
+      hoursWeight = 0.25;
+      errorWeight = 0.20;
+      revenueWeight = 0.15;
+    } else if (errorActive) {
+      // Only error toggle ON
+      roiWeight = 0.45;
+      hoursWeight = 0.30;
+      errorWeight = 0.25;
+    } else if (revenueActive) {
+      // Only revenue toggle ON
+      roiWeight = 0.45;
+      hoursWeight = 0.30;
+      revenueWeight = 0.25;
+    }
+    // else: base case with default weights (60/40)
   }
-  // else: base case with default weights (60/40)
 
   // Calculate error impact if active
   let errorScore = 0;
@@ -302,7 +321,8 @@ export function calculateOpportunityScore(
   opportunity: ImplementationOpportunity,
   readinessScore: number,
   toggles: ToggleState,
-  companyContext?: CompanyContext
+  companyContext?: CompanyContext,
+  useAdditiveBonus: boolean = false
 ): OpportunityScore {
   const implementationEffort = calculateImplementationEffort(
     readinessScore,
@@ -314,7 +334,8 @@ export function calculateOpportunityScore(
   const businessImpact = calculateBusinessImpact(
     opportunity,
     toggles,
-    companyContext
+    companyContext,
+    useAdditiveBonus
   );
 
   const quadrant = getQuadrant(implementationEffort, businessImpact);
@@ -482,12 +503,13 @@ export function calculateBusinessImpactForFilter(
       break;
     
     case "all-opportunities":
-      // Use the opportunity's own toggle state
+      // Use the opportunity's own toggle state with ADDITIVE bonuses
+      // This ensures toggling metrics ON always increases business impact
       const toggles: ToggleState = {
         errorMetrics: opportunity.errorMetricsEnabled || false,
         revenueMetrics: opportunity.revenueMetricsEnabled || false
       };
-      return calculateBusinessImpact(opportunity, toggles, companyContext);
+      return calculateBusinessImpact(opportunity, toggles, companyContext, true);
     
     default:
       totalImpact = 0;
