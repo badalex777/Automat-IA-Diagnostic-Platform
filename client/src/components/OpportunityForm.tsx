@@ -40,7 +40,7 @@ export function OpportunityForm({
       annualRoi: initialData?.annualRoi,
       hoursSavedPerWeek: initialData?.hoursSavedPerWeek,
       annualHoursSaved: initialData?.annualHoursSaved,
-      fteSavings: initialData?.fteSavings,
+      // fteSavings removed - auto-calculated from hours
       errorReductionPct: initialData?.errorReductionPct,
       errorsAvoidedAnnually: initialData?.errorsAvoidedAnnually,
       hoursReallocatedToRevenue: initialData?.hoursReallocatedToRevenue,
@@ -86,17 +86,19 @@ export function OpportunityForm({
     }
   }, [revenueMetricsEnabled, form]);
 
-  // Convert string values to numbers and auto-calculate annual hours on submit
+  // Convert string values to numbers, auto-calculate annual hours and FTE on submit
   const handleSubmit = (data: any) => {
     const hoursSavedPerWeek = data.hoursSavedPerWeek ? parseFloat(data.hoursSavedPerWeek) : undefined;
     const annualHoursSaved = hoursSavedPerWeek ? hoursSavedPerWeek * 50 : undefined;
+    // Auto-calculate FTE from hours: FTE = hours/week ÷ 40
+    const fteSavings = hoursSavedPerWeek ? hoursSavedPerWeek / 40 : undefined;
     
     const converted = {
       ...data,
       annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
       hoursSavedPerWeek,
       annualHoursSaved,
-      fteSavings: data.fteSavings ? parseFloat(data.fteSavings) : undefined,
+      fteSavings, // Auto-calculated from hours
       errorReductionPct: data.errorReductionPct ? parseFloat(data.errorReductionPct) : undefined,
       errorsAvoidedAnnually: data.errorsAvoidedAnnually ? parseInt(data.errorsAvoidedAnnually) : undefined,
       hoursReallocatedToRevenue: data.hoursReallocatedToRevenue ? parseFloat(data.hoursReallocatedToRevenue) : undefined,
@@ -206,32 +208,7 @@ export function OpportunityForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  Annual hours will be calculated automatically (hours/week × 50 weeks)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="fteSavings"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>FTE Savings</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number"
-                    step="any"
-                    placeholder="0.00"
-                    data-testid="input-fte-savings"
-                    {...field}
-                    value={field.value || ""}
-                    onChange={e => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Full-time equivalent savings (e.g., 0.5 FTE = half a full-time employee)
+                  Annual hours calculated automatically (hrs/week × 50 weeks). FTE auto-calculated as hrs/week ÷ 40 for display.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

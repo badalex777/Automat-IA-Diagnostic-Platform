@@ -64,8 +64,8 @@ export default function OpportunityMatrix({
       colorMap[workflowId] = workflowColors?.[workflowId] || WORKFLOW_COLORS[index % WORKFLOW_COLORS.length];
     });
 
-    // Calculate scores for filtered opportunities
-    const points: DataPoint[] = filteredOpps.map(opp => {
+    // Calculate raw scores for filtered opportunities
+    const rawPoints = filteredOpps.map(opp => {
       const readinessScore = readinessScores[opp.workflowId];
       
       // Calculate implementation effort (same for all filters)
@@ -79,9 +79,33 @@ export default function OpportunityMatrix({
       // Calculate business impact using filter-specific recalculation
       const businessImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
       
-      // Determine quadrant
-      const isLowEffort = implementationEffort < 50;
-      const isHighImpact = businessImpact >= 50;
+      return {
+        id: opp.id,
+        name: opp.name,
+        workflowId: opp.workflowId,
+        businessImpact,
+        implementationEffort,
+        color: colorMap[opp.workflowId],
+      };
+    });
+
+    // Within-category normalization: find max Business Impact and normalize
+    const maxBusinessImpact = Math.max(...rawPoints.map(p => p.businessImpact), 0);
+    
+    // Only normalize if we have meaningful scores (max > 20)
+    // This prevents over-inflation of very low scores
+    const shouldNormalize = maxBusinessImpact > 20 && filterType !== "all-opportunities";
+    
+    const points: DataPoint[] = rawPoints.map(point => {
+      // Normalize Business Impact to make best opportunity reach ~100
+      let normalizedImpact = point.businessImpact;
+      if (shouldNormalize && maxBusinessImpact > 0) {
+        normalizedImpact = (point.businessImpact / maxBusinessImpact) * 100;
+      }
+      
+      // Determine quadrant based on normalized scores
+      const isLowEffort = point.implementationEffort < 50;
+      const isHighImpact = normalizedImpact >= 50;
       let quadrant: string;
       if (isLowEffort && isHighImpact) quadrant = "Quick Wins";
       else if (!isLowEffort && isHighImpact) quadrant = "Strategic Goals";
@@ -89,13 +113,13 @@ export default function OpportunityMatrix({
       else quadrant = "Deprioritize";
       
       return {
-        id: opp.id,
-        name: opp.name,
-        workflowId: opp.workflowId,
-        x: businessImpact,
-        y: implementationEffort,
+        id: point.id,
+        name: point.name,
+        workflowId: point.workflowId,
+        x: normalizedImpact,
+        y: point.implementationEffort,
         quadrant,
-        color: colorMap[opp.workflowId],
+        color: point.color,
       };
     });
 

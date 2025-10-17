@@ -128,37 +128,34 @@ function calculateHourlyRate(
  * 
  * Uses company financial context to calculate relative impact:
  * - ROI as % of annual revenue
- * - FTE savings as % of total employees
- * - Hours saved as % of annual labor costs (converted to $)
+ * - Hours saved as % of annual labor costs (converted to $ using actual hourly rate)
+ * 
+ * Note: FTE removed from scoring (it's just hours/40, redundant metric)
  * 
  * REDISTRIBUTIVE FORMULA (weights change based on active toggles):
  * 
  * Base Case (both toggles OFF):
- * - Annual ROI: 40%
- * - FTE Savings: 30%
- * - Annual Hours Saved: 30%
+ * - Annual ROI: 60%
+ * - Annual Hours Saved: 40%
  * Total: 100%
  * 
  * Error Toggle ON (revenue OFF):
- * - Annual ROI: 30%
- * - FTE Savings: 20%
- * - Annual Hours Saved: 20%
- * - Error Impact: 30%
+ * - Annual ROI: 45%
+ * - Annual Hours Saved: 30%
+ * - Error Impact: 25%
  * Total: 100%
  * 
  * Revenue Toggle ON (error OFF):
- * - Annual ROI: 30%
- * - FTE Savings: 20%
- * - Annual Hours Saved: 20%
- * - Revenue Impact: 30%
+ * - Annual ROI: 45%
+ * - Annual Hours Saved: 30%
+ * - Revenue Impact: 25%
  * Total: 100%
  * 
  * Both Toggles ON:
- * - Annual ROI: 25%
- * - FTE Savings: 15%
- * - Annual Hours Saved: 15%
- * - Error Impact: 25%
- * - Revenue Impact: 20%
+ * - Annual ROI: 40%
+ * - Annual Hours Saved: 25%
+ * - Error Impact: 20%
+ * - Revenue Impact: 15%
  * Total: 100%
  */
 export function calculateBusinessImpact(
@@ -208,10 +205,9 @@ export function calculateBusinessImpact(
     hoursScore = normalizeToScale(annualHours, 10000);
   }
 
-  // Determine weights based on active toggles
-  let roiWeight = 0.40;
-  let fteWeight = 0.30;
-  let hoursWeight = 0.30;
+  // Determine weights based on active toggles (FTE removed as redundant)
+  let roiWeight = 0.60;
+  let hoursWeight = 0.40;
   let errorWeight = 0;
   let revenueWeight = 0;
 
@@ -220,25 +216,22 @@ export function calculateBusinessImpact(
 
   if (errorActive && revenueActive) {
     // Both toggles ON
-    roiWeight = 0.25;
-    fteWeight = 0.15;
-    hoursWeight = 0.15;
-    errorWeight = 0.25;
-    revenueWeight = 0.20;
+    roiWeight = 0.40;
+    hoursWeight = 0.25;
+    errorWeight = 0.20;
+    revenueWeight = 0.15;
   } else if (errorActive) {
     // Only error toggle ON
-    roiWeight = 0.30;
-    fteWeight = 0.20;
-    hoursWeight = 0.20;
-    errorWeight = 0.30;
+    roiWeight = 0.45;
+    hoursWeight = 0.30;
+    errorWeight = 0.25;
   } else if (revenueActive) {
     // Only revenue toggle ON
-    roiWeight = 0.30;
-    fteWeight = 0.20;
-    hoursWeight = 0.20;
-    revenueWeight = 0.30;
+    roiWeight = 0.45;
+    hoursWeight = 0.30;
+    revenueWeight = 0.25;
   }
-  // else: base case with default weights (40/30/30)
+  // else: base case with default weights (60/40)
 
   // Calculate error impact if active
   let errorScore = 0;
@@ -278,10 +271,9 @@ export function calculateBusinessImpact(
     revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
   }
 
-  // Calculate total impact with redistributed weights
+  // Calculate total impact with redistributed weights (FTE removed)
   const totalImpact = 
     (roiScore * roiWeight) +
-    (fteScore * fteWeight) +
     (hoursScore * hoursWeight) +
     (errorScore * errorWeight) +
     (revenueScore * revenueWeight);
@@ -453,44 +445,40 @@ export function calculateBusinessImpactForFilter(
   
   revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
 
-  // Redistribute weights based on filter type
+  // Redistribute weights based on filter type (FTE removed - it's just hours/40)
   let totalImpact = 0;
 
   switch (filterType) {
     case "time-only":
-      // Only time savings metrics: redistribute 100% across ROI, FTE, Hours
+      // Only time savings metrics: ROI + Hours (FTE removed as redundant)
       totalImpact = 
-        (roiScore * 0.40) +
-        (fteScore * 0.30) +
-        (hoursScore * 0.30);
+        (roiScore * 0.60) +
+        (hoursScore * 0.40);
       break;
     
     case "time-error":
-      // Time + Error: redistribute 100% across ROI, FTE, Hours, Error
+      // Time + Error: keep time savings dominant (75% for ROI+Hours)
       totalImpact = 
-        (roiScore * 0.30) +
-        (fteScore * 0.20) +
-        (hoursScore * 0.20) +
-        (errorScore * 0.30);
+        (roiScore * 0.45) +
+        (hoursScore * 0.30) +
+        (errorScore * 0.25);
       break;
     
     case "time-revenue":
-      // Time + Revenue: redistribute 100% across ROI, FTE, Hours, Revenue
+      // Time + Revenue: keep time savings dominant (75% for ROI+Hours)
       totalImpact = 
-        (roiScore * 0.30) +
-        (fteScore * 0.20) +
-        (hoursScore * 0.20) +
-        (revenueScore * 0.30);
+        (roiScore * 0.45) +
+        (hoursScore * 0.30) +
+        (revenueScore * 0.25);
       break;
     
     case "all-three":
-      // All metrics: redistribute 100% across all 5
+      // All metrics: time savings still dominant (65% for ROI+Hours)
       totalImpact = 
-        (roiScore * 0.25) +
-        (fteScore * 0.15) +
-        (hoursScore * 0.15) +
-        (errorScore * 0.25) +
-        (revenueScore * 0.20);
+        (roiScore * 0.40) +
+        (hoursScore * 0.25) +
+        (errorScore * 0.20) +
+        (revenueScore * 0.15);
       break;
     
     case "all-opportunities":

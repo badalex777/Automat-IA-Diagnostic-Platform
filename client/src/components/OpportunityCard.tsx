@@ -118,10 +118,10 @@ export function OpportunityCard({
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Clock className="w-3 h-3" />
-              <span className="text-xs">Hours Saved</span>
+              <span className="text-xs">Hours/Week</span>
             </div>
             <p className="text-sm font-semibold" data-testid={`text-hours-${opportunity.id}`}>
-              {formatNumber(opportunity.annualHoursSaved, 0)}
+              {formatNumber(opportunity.hoursSavedPerWeek, 1)} hrs
             </p>
           </div>
           
@@ -131,7 +131,7 @@ export function OpportunityCard({
               <span className="text-xs">FTE Savings</span>
             </div>
             <p className="text-sm font-semibold" data-testid={`text-fte-${opportunity.id}`}>
-              {formatNumber(opportunity.fteSavings)}
+              {formatNumber(opportunity.fteSavings, 2)} FTE
             </p>
           </div>
         </div>
