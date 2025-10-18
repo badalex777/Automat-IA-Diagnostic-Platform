@@ -58,8 +58,11 @@ export default function OpportunityMatrix({
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
 
   // Build stable color map based on ALL workflows (not just filtered)
+  // Sort workflow IDs to ensure stable color assignment even when opportunities change
   const colorMap = useMemo(() => {
     const allWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
+    // Sort by ID to ensure consistent ordering and stable colors
+    allWorkflows.sort();
     const colors: Record<string, string> = {};
     
     allWorkflows.forEach((workflowId, index) => {

@@ -358,6 +358,9 @@ export type MatrixFilterType =
 /**
  * Filter opportunities by their toggle states (errorMetricsEnabled, revenueMetricsEnabled)
  * This controls which filter category an opportunity appears in based on active metrics
+ * 
+ * IMPORTANT: Only checks toggle state if opportunity actually HAS the metric data
+ * This prevents opportunities without metrics from appearing in wrong filter views
  */
 export function filterOpportunitiesByMetrics(
   opportunities: ImplementationOpportunity[],
@@ -365,27 +368,51 @@ export function filterOpportunitiesByMetrics(
 ): ImplementationOpportunity[] {
   switch (filterType) {
     case "time-only":
-      // Only opportunities with both toggles disabled
+      // Only opportunities with both toggles disabled (or no metrics available)
       return opportunities.filter(
-        opp => !opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+        opp => {
+          const hasError = hasErrorMetrics(opp);
+          const hasRevenue = hasRevenueMetrics(opp);
+          const errorEnabled = hasError && opp.errorMetricsEnabled;
+          const revenueEnabled = hasRevenue && opp.revenueMetricsEnabled;
+          return !errorEnabled && !revenueEnabled;
+        }
       );
     
     case "time-error":
       // Only opportunities with error enabled and revenue disabled
       return opportunities.filter(
-        opp => opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+        opp => {
+          const hasError = hasErrorMetrics(opp);
+          const hasRevenue = hasRevenueMetrics(opp);
+          const errorEnabled = hasError && opp.errorMetricsEnabled;
+          const revenueEnabled = hasRevenue && opp.revenueMetricsEnabled;
+          return errorEnabled && !revenueEnabled;
+        }
       );
     
     case "time-revenue":
       // Only opportunities with revenue enabled and error disabled
       return opportunities.filter(
-        opp => !opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+        opp => {
+          const hasError = hasErrorMetrics(opp);
+          const hasRevenue = hasRevenueMetrics(opp);
+          const errorEnabled = hasError && opp.errorMetricsEnabled;
+          const revenueEnabled = hasRevenue && opp.revenueMetricsEnabled;
+          return !errorEnabled && revenueEnabled;
+        }
       );
     
     case "all-three":
       // Only opportunities with both toggles enabled
       return opportunities.filter(
-        opp => opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+        opp => {
+          const hasError = hasErrorMetrics(opp);
+          const hasRevenue = hasRevenueMetrics(opp);
+          const errorEnabled = hasError && opp.errorMetricsEnabled;
+          const revenueEnabled = hasRevenue && opp.revenueMetricsEnabled;
+          return errorEnabled && revenueEnabled;
+        }
       );
     
     case "all-opportunities":
