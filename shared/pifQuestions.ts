@@ -34,7 +34,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Process Clarity",
     weight: 20, // 20% of PIF contribution to Readiness Rubric
-    description: "Assess whether the workflow is clearly defined, consistent, and repeatable",
+    description: "Help us understand how structured and consistent your work process is so we can identify where AI could provide the most reliable support",
     questions: [
       {
         id: 1,
@@ -83,7 +83,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Change Magnitude",
     weight: 20, // 20% of PIF contribution to Readiness Rubric
-    description: "Understand how the workflow may evolve and what learning opportunities will support successful adoption of automation/AI",
+    description: "Share your comfort level with new tools so we can plan the right training and transition approach for you",
     questions: [
       {
         id: 4,
@@ -133,7 +133,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Workflow Brittleness",
     weight: 15, // 15% of PIF contribution to Readiness Rubric
-    description: "Identify hidden fragility — processes that break easily, depend on manual steps, or lack error handling",
+    description: "Tell us about challenges you face so we can identify where AI could reduce errors and manual workarounds in your daily work",
     questions: [
       {
         id: 7,
@@ -198,7 +198,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Time Savings",
     weight: 0, // Used for ROI estimation, not Readiness Rubric
-    description: "Estimate automation time savings potential",
+    description: "Describe the type of work you do so we can accurately estimate how much time AI could save you each week",
     questions: [
       {
         id: 11,
@@ -247,7 +247,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Revenue Uplift",
     weight: 0, // Used for ROI estimation, not Readiness Rubric
-    description: "Determine if saved time can convert to revenue generation",
+    description: "Help us understand if the time you save could create opportunities to generate additional revenue for the business",
     questions: [
       {
         id: 14,
@@ -295,7 +295,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Your Experience & Insights",
     weight: 0, // Used for qualitative analysis, not Readiness Rubric
-    description: "Share your experience and insights about this workflow",
+    description: "Share your hands-on knowledge about this process - you're the expert, and your insights are critical for identifying the best automation opportunities",
     questions: [
       {
         id: 17,
@@ -379,7 +379,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Time & Volume Data",
     weight: 0, // Used for ROI calculations, not Readiness Rubric
-    description: "Provide information about time spent and volume of work",
+    description: "Provide details about how often you perform this work so we can calculate the total time savings and ROI potential",
     questions: [
       {
         id: 28,
@@ -418,7 +418,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Quality Impact Module",
     weight: 0, // Used for ROI estimation, not Readiness Rubric (conditional section)
-    description: "Estimate quality improvement and error reduction potential (shown when quality impact is significant)",
+    description: "Tell us about errors or quality issues so we can show how AI could help you produce more accurate, consistent work",
     questions: [
       {
         id: 32,
