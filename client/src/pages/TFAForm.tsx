@@ -228,9 +228,6 @@ export default function TFAForm() {
                   {tfaSections[currentSection].description}
                 </p>
               )}
-              <p className="text-sm text-muted-foreground mt-1">
-                Weight: {tfaSections[currentSection].weight}% of total score ({tfaSections[currentSection].questions.length} questions)
-              </p>
             </div>
             
             <div className="space-y-8">

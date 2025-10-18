@@ -390,14 +390,6 @@ export default function PIFForm() {
                   {currentPIFSection.description}
                 </p>
               )}
-              {currentPIFSection.section === "Quality Impact Module" && !isErrorProne && (
-                <Alert className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    This section is not applicable based on your previous response. The workflow was not indicated as error-prone.
-                  </AlertDescription>
-                </Alert>
-              )}
             </div>
 
             <div className="space-y-8">
