@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
@@ -34,6 +35,7 @@ export default function PIFForm() {
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   const { data: pifData, isLoading, error } = useQuery<PIFData>({
     queryKey: [`/api/pif/shareable/${shareableId}`],
@@ -158,7 +160,7 @@ export default function PIFForm() {
 
   const { company, workflow } = pifData;
 
-  // Section definitions: 0 = Respondent Info, 1-8 = PIF sections
+  // Section definitions: 0 = Disclaimer, 1 = Respondent Info, 2-9 = PIF sections
   const sections = ALL_PIF_QUESTIONS.reduce((acc, q) => {
     if (!acc.find(s => s.name === q.section)) {
       acc.push({
@@ -169,9 +171,10 @@ export default function PIFForm() {
     return acc;
   }, [] as Array<{ name: string; questions: typeof ALL_PIF_QUESTIONS }>);
 
-  const totalSections = sections.length + 1; // +1 for respondent info
-  const isRespondentInfoSection = currentSection === 0;
-  const currentPIFSection = isRespondentInfoSection ? null : sections[currentSection - 1];
+  const totalSections = sections.length + 2; // +2 for disclaimer and respondent info
+  const isDisclaimerSection = currentSection === 0;
+  const isRespondentInfoSection = currentSection === 1;
+  const currentPIFSection = (isDisclaimerSection || isRespondentInfoSection) ? null : sections[currentSection - 2];
 
   // Check if Q32 indicates quality impact (yes means show Quality Impact module)
   const isErrorProne = answers['32'] === 'yes';
@@ -201,6 +204,17 @@ export default function PIFForm() {
 
   const handleNext = () => {
     if (currentSection === 0) {
+      // Disclaimer section
+      if (!disclaimerAccepted) {
+        toast({
+          title: "Acceptance required",
+          description: "Please check 'I understand' to continue.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else if (currentSection === 1) {
+      // Respondent Info section
       if (!respondentName.trim() || !respondentRole.trim() || !respondentResponsibilities.trim()) {
         toast({
           title: "Required fields",
@@ -211,7 +225,7 @@ export default function PIFForm() {
       }
     } else {
       // Validate required questions in current section before proceeding
-      const currentPIFSection = sections[currentSection - 1]; // -1 because section 0 is respondent info
+      const currentPIFSection = sections[currentSection - 2]; // -2 because section 0 is disclaimer, section 1 is respondent info
       if (currentPIFSection) {
         const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
           // Only Q17, Q18, Q19 are mandatory in Experience & Insights
@@ -287,7 +301,48 @@ export default function PIFForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {isRespondentInfoSection ? (
+        {isDisclaimerSection ? (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Welcome to the Process Insight Form</h2>
+              <div className="bg-muted/50 border rounded-lg p-6 space-y-4 text-sm">
+                <p>
+                  This form is part of Automat-IA's diagnostic process for identifying workflows that can benefit from artificial intelligence (AI) implementations.
+                </p>
+                <p>
+                  Its purpose is to collect your direct insights about how specific tasks are currently performed — including time spent, frequency, and common challenges — so we can model realistic improvements and prioritize solutions that truly make your work easier.
+                </p>
+                <p className="font-semibold">
+                  AI at Automat-IA is not about replacing people. It's about augmenting human work — reducing repetitive tasks, minimizing errors, and freeing time for higher-value activities.
+                </p>
+                <p>
+                  Your input is essential to ensure any AI solution we propose genuinely supports you and your team.
+                </p>
+                <p>
+                  All information you share will be treated as confidential, used only for analysis within the current project between Automat-IA and your company, and aggregated where possible before inclusion in any report. It will never be used to evaluate individual performance or shared outside this collaboration.
+                </p>
+                <p className="font-semibold">
+                  There are no right or wrong answers — we're looking for realism, not perfection.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 mt-6">
+              <Checkbox 
+                id="disclaimer-accept" 
+                checked={disclaimerAccepted}
+                onCheckedChange={(checked) => setDisclaimerAccepted(checked === true)}
+                data-testid="checkbox-disclaimer"
+              />
+              <Label 
+                htmlFor="disclaimer-accept" 
+                className="text-base font-medium cursor-pointer leading-relaxed"
+              >
+                I understand and agree to proceed with the survey
+              </Label>
+            </div>
+          </div>
+        ) : isRespondentInfoSection ? (
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold mb-4">About You</h2>

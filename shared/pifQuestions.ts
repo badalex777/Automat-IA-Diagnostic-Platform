@@ -83,7 +83,7 @@ export const PIF_SECTIONS: PIFSection[] = [
   {
     section: "Change Magnitude",
     weight: 20, // 20% of PIF contribution to Readiness Rubric
-    description: "Understand how much employee behavior, retraining, or adaptation will be needed when introducing automation/AI",
+    description: "Understand how the workflow may evolve and what learning opportunities will support successful adoption of automation/AI",
     questions: [
       {
         id: 4,
@@ -107,8 +107,8 @@ export const PIF_SECTIONS: PIFSection[] = [
         type: "radio",
         weight: 1,
         options: [
-          { value: "1", label: "Completely different", description: "Major shift in responsibilities" },
-          { value: "2", label: "Significant change", description: "New skills needed" },
+          { value: "1", label: "Completely different", description: "Significantly evolve my role" },
+          { value: "2", label: "Meaningful change" },
           { value: "3", label: "Moderate change", description: "Some adaptation required" },
           { value: "4", label: "Minor change", description: "Slight adjustment" },
           { value: "5", label: "Almost no change", description: "Business as usual" }

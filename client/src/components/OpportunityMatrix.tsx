@@ -54,6 +54,20 @@ export default function OpportunityMatrix({
   onOpportunityClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [displayData, setDisplayData] = useState<DataPoint[]>([]);
+
+  // Build stable color map based on ALL workflows (not just filtered)
+  const colorMap = useMemo(() => {
+    const allWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
+    const colors: Record<string, string> = {};
+    
+    allWorkflows.forEach((workflowId, index) => {
+      colors[workflowId] = workflowColors?.[workflowId] || WORKFLOW_COLORS[index % WORKFLOW_COLORS.length];
+    });
+    
+    return colors;
+  }, [opportunities, workflowColors]);
 
   const { dataPoints, workflowLegend } = useMemo(() => {
     // Create workflow name mapping
@@ -64,14 +78,6 @@ export default function OpportunityMatrix({
 
     // First filter opportunities based on selected filter
     const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
-
-    // Assign colors to workflows
-    const uniqueWorkflows = Array.from(new Set(filteredOpps.map(o => o.workflowId)));
-    const colorMap: Record<string, string> = {};
-    
-    uniqueWorkflows.forEach((workflowId, index) => {
-      colorMap[workflowId] = workflowColors?.[workflowId] || WORKFLOW_COLORS[index % WORKFLOW_COLORS.length];
-    });
 
     // Calculate raw scores for filtered opportunities
     const rawPoints = filteredOpps.map(opp => {
@@ -94,7 +100,7 @@ export default function OpportunityMatrix({
         workflowId: opp.workflowId,
         businessImpact,
         implementationEffort,
-        color: colorMap[opp.workflowId],
+        color: colorMap[opp.workflowId], // Use stable color map
       };
     });
 
@@ -133,15 +139,43 @@ export default function OpportunityMatrix({
       };
     });
 
-    // Create legend data with workflow names
-    const legend = uniqueWorkflows.map(wId => ({
+    // Create legend data with ALL workflow names (not just filtered)
+    const allUniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
+    const legend = allUniqueWorkflows.map(wId => ({
       workflowId: wId,
       workflowName: workflowMap[wId] || "Unknown",
       color: colorMap[wId],
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, workflows, readinessScores, workflowColors, companyContext, filterType]);
+  }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType]);
+
+  // Handle fade transitions when filter changes
+  useEffect(() => {
+    // No previous data - just populate immediately (initial render or recovery from empty)
+    if (displayData.length === 0) {
+      setDisplayData(dataPoints);
+      return;
+    }
+
+    // No new data - clear immediately
+    if (dataPoints.length === 0) {
+      setDisplayData([]);
+      return;
+    }
+
+    // Both have data - fade transition
+    // Start fade-out
+    setIsTransitioning(true);
+
+    // After fade-out completes, update data and fade in
+    const timer = setTimeout(() => {
+      setDisplayData(dataPoints);
+      setIsTransitioning(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [dataPoints]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -211,6 +245,10 @@ export default function OpportunityMatrix({
           <div 
             className="h-[500px]" 
             data-testid="chart-opportunity-matrix"
+            style={{
+              transition: 'opacity 300ms ease-in-out',
+              opacity: isTransitioning ? 0 : 1
+            }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
@@ -275,13 +313,13 @@ export default function OpportunityMatrix({
 
                 <Tooltip content={<CustomTooltip />} />
 
-                {/* Data points */}
+                {/* Data points - use displayData for smooth transitions */}
                 <Scatter 
-                  data={dataPoints} 
+                  data={displayData} 
                   onClick={handleClick}
                   className="cursor-pointer"
                 >
-                  {dataPoints.map((entry) => (
+                  {displayData.map((entry) => (
                     <Cell 
                       key={entry.id} 
                       fill={entry.color}
