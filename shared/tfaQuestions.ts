@@ -15,22 +15,22 @@ export const TFA_SECTIONS = [
   { 
     name: "System Environment", 
     weight: 25,
-    description: "Evaluate the technical infrastructure, cloud readiness, and system capabilities that support AI implementation"
+    description: "Help us understand your technical infrastructure so we can recommend AI solutions that integrate smoothly with your existing systems"
   },
   { 
     name: "Data Quality", 
     weight: 30,
-    description: "Assess data availability, structure, accuracy, and accessibility for effective AI training and operation"
+    description: "Share details about your data so we can determine if you have the necessary foundation for reliable AI performance"
   },
   { 
     name: "Integration Feasibility", 
     weight: 30,
-    description: "Determine how easily AI solutions can connect with existing systems, workflows, and business processes"
+    description: "Tell us about your system connectivity so we can assess integration complexity and plan the technical implementation path"
   },
   { 
     name: "Security/Compliance", 
     weight: 15,
-    description: "Verify security controls, data governance, and regulatory compliance requirements for AI deployment"
+    description: "Provide information about your security and compliance requirements so we can ensure AI solutions meet your organization's standards"
   },
 ];
 
