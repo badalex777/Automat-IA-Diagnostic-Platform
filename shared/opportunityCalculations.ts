@@ -356,8 +356,8 @@ export type MatrixFilterType =
   | "all-opportunities";  // Show everything
 
 /**
- * Filter opportunities by whether they have the required metric data (not toggle state)
- * This ensures filters show opportunities that CAN use those metrics, regardless of toggles
+ * Filter opportunities by their toggle states (errorMetricsEnabled, revenueMetricsEnabled)
+ * This controls which filter category an opportunity appears in based on active metrics
  */
 export function filterOpportunitiesByMetrics(
   opportunities: ImplementationOpportunity[],
@@ -365,27 +365,27 @@ export function filterOpportunitiesByMetrics(
 ): ImplementationOpportunity[] {
   switch (filterType) {
     case "time-only":
-      // Only opportunities without error or revenue data
+      // Only opportunities with both toggles disabled
       return opportunities.filter(
-        opp => !hasErrorMetrics(opp) && !hasRevenueMetrics(opp)
+        opp => !opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
       );
     
     case "time-error":
-      // Only opportunities with error data (and no revenue data)
+      // Only opportunities with error enabled and revenue disabled
       return opportunities.filter(
-        opp => hasErrorMetrics(opp) && !hasRevenueMetrics(opp)
+        opp => opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
       );
     
     case "time-revenue":
-      // Only opportunities with revenue data (and no error data)
+      // Only opportunities with revenue enabled and error disabled
       return opportunities.filter(
-        opp => !hasErrorMetrics(opp) && hasRevenueMetrics(opp)
+        opp => !opp.errorMetricsEnabled && opp.revenueMetricsEnabled
       );
     
     case "all-three":
-      // Only opportunities with both error and revenue data
+      // Only opportunities with both toggles enabled
       return opportunities.filter(
-        opp => hasErrorMetrics(opp) && hasRevenueMetrics(opp)
+        opp => opp.errorMetricsEnabled && opp.revenueMetricsEnabled
       );
     
     case "all-opportunities":
