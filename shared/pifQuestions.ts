@@ -206,18 +206,22 @@ export const PIF_SECTIONS: PIFSection[] = [
         section: "Time Savings",
         type: "radio",
         options: [
-          { value: "data_entry", label: "Data Entry & Validation", description: "Entering, checking, or verifying data" },
-          { value: "financial", label: "Financial Processing", description: "Invoice processing, payment handling, expense tracking" },
-          { value: "document", label: "Document Processing & Review", description: "Reading, extracting, or reviewing documents" },
-          { value: "operations", label: "Operations & Maintenance", description: "Monitoring systems, running checklists, routine maintenance" },
-          { value: "communication", label: "Communication & Coordination", description: "Emails, messages, scheduling" },
-          { value: "compliance", label: "Compliance & Validation", description: "Quality assurance, auditing, ensuring compliance" },
-          { value: "technical_support", label: "Technical/IT Support", description: "Troubleshooting, help desk, technical assistance" },
-          { value: "analysis", label: "Analysis & Reporting", description: "Data analysis, creating reports, generating insights" },
-          { value: "coordination", label: "Coordination & Scheduling", description: "Resource allocation, coordinating teams or activities" },
-          { value: "training", label: "Training & Knowledge Transfer", description: "Teaching, onboarding, knowledge sharing" },
-          { value: "creative", label: "Creative & Strategic Work", description: "Strategy, creative content, complex decision-making" },
-          { value: "other", label: "Other (specify in comments)", description: "Work type not covered above" }
+          { value: "sales_ops", label: "Sales Operations / CRM Administrator", description: "Sales Ops Analyst, CRM Specialist, Deal Desk Coordinator" },
+          { value: "customer_success", label: "Customer Success Manager / Analyst", description: "Retention Analyst, Account Manager Post-Sale" },
+          { value: "financial", label: "Financial Analyst / Strategic Accountant", description: "FP&A Analyst, Financial Controller" },
+          { value: "support", label: "Customer Support / Help Desk", description: "Tier 1 Support, IT Help Desk, CSR" },
+          { value: "procurement", label: "Procurement / Sourcing Specialist", description: "Purchasing Agent, Vendor Manager, Supply Chain Coordinator" },
+          { value: "marketing_ops", label: "Marketing Operations / Campaign Coordinator", description: "Marketing Ops, Email Campaign Manager, Content Coordinator" },
+          { value: "data_analyst", label: "Data Analyst / Business Intelligence", description: "BI Analyst, Data Ops, Reporting Specialist" },
+          { value: "hr", label: "HR Generalist / People Operations", description: "HR Admin, Payroll Specialist, Benefits Coordinator" },
+          { value: "finance_ops", label: "Accounts Payable / Receivable", description: "AP/AR Clerk, Invoice Processor, Collections Specialist" },
+          { value: "admin", label: "General Admin / Office Manager", description: "Office Administrator, Executive Assistant, General Clerk" },
+          { value: "it_ops", label: "IT Operations / Systems Administrator", description: "System Admin, IT Support, Infrastructure Manager" },
+          { value: "quality_assurance", label: "Quality Assurance / Process Auditor", description: "QA Specialist, Compliance Auditor, Process Analyst" },
+          { value: "inventory", label: "Inventory / Warehouse Coordinator", description: "Inventory Analyst, Stock Controller, Warehouse Admin" },
+          { value: "legal", label: "Legal / Compliance / Internal Audit", description: "Compliance Officer, Internal Auditor, Risk Manager" },
+          { value: "facilities", label: "Facilities / Operations Coordinator", description: "Facilities Manager, Office Coordinator, Logistics Admin" },
+          { value: "other", label: "Other / Unspecified Back-Office Role", description: "Not listed above" }
         ]
       },
       {
@@ -251,23 +255,6 @@ export const PIF_SECTIONS: PIFSection[] = [
     questions: [
       {
         id: 14,
-        question: "Who gets the time back from this AI implementation?",
-        section: "Revenue Uplift",
-        type: "radio",
-        options: [
-          { value: "sales_ops", label: "Sales Operations / CRM Administrator", description: "Sales Ops Analyst, CRM Specialist, Deal Desk Coordinator" },
-          { value: "customer_success", label: "Customer Success Manager / Analyst", description: "Retention Analyst, Account Manager Post-Sale" },
-          { value: "financial", label: "Financial Analyst / Strategic Accountant", description: "FP&A Analyst, Financial Controller" },
-          { value: "support", label: "Customer Support / Help Desk", description: "Tier 1 Support, IT Help Desk, CSR" },
-          { value: "procurement", label: "Procurement / Sourcing Specialist", description: "Purchasing Agent, Vendor Manager, Supply Chain Coordinator" },
-          { value: "hr", label: "HR Generalist / People Operations", description: "HR Admin, Payroll Specialist, Benefits Coordinator" },
-          { value: "admin", label: "General Admin / Office Manager", description: "Office Administrator, Executive Assistant, General Clerk" },
-          { value: "legal", label: "Legal / Compliance / Internal Audit", description: "Compliance Officer, Internal Auditor, Risk Manager" },
-          { value: "other", label: "Other / Unspecified Back-Office Role", description: "Not listed above - defaults to 0% for conservative estimates" }
-        ]
-      },
-      {
-        id: 15,
         question: "What is the relationship between current capacity and available opportunities?",
         section: "Revenue Uplift",
         type: "radio",
@@ -279,7 +266,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 16,
+        id: 15,
         question: "How does more time translate to more revenue?",
         section: "Revenue Uplift",
         type: "radio",
