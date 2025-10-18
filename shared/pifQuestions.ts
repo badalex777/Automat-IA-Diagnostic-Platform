@@ -627,6 +627,7 @@ export function extractROIInputs(responses: Record<string, string>): {
 
 // Extract qualitative responses
 export function extractQualitativeResponses(responses: Record<string, string>): {
+  role?: string; // Q11: Role selection for revenue uplift calculations
   toolsUsed?: string;
   toolLimitations?: string;
   timeWasters?: string;
@@ -640,16 +641,17 @@ export function extractQualitativeResponses(responses: Record<string, string>): 
   additionalContext?: string;
 } {
   return {
-    toolsUsed: responses['17'] || undefined,
-    toolLimitations: responses['18'] || undefined,
-    timeWasters: responses['19'] || undefined,
-    automationWish: responses['20'] || undefined,
-    typicalOutcome: responses['21'] || undefined,
-    keyDifficulties: responses['22'] || undefined,
-    personalSteps: responses['23'] || undefined,
-    criticalKnowledge: responses['24'] || undefined,
-    impactOfDelays: responses['25'] || undefined,
-    exceptions: responses['26'] || undefined,
+    role: responses['11'] || undefined, // Q11: Role selection (merged from old Q14)
+    toolsUsed: responses['20'] || undefined,
+    toolLimitations: responses['21'] || undefined,
+    timeWasters: responses['22'] || undefined,
+    automationWish: responses['23'] || undefined,
+    typicalOutcome: responses['24'] || undefined,
+    keyDifficulties: responses['25'] || undefined,
+    personalSteps: responses['17'] || undefined,
+    criticalKnowledge: responses['18'] || undefined,
+    impactOfDelays: responses['26'] || undefined,
+    exceptions: responses['19'] || undefined,
     additionalContext: responses['27'] || undefined,
   };
 }
