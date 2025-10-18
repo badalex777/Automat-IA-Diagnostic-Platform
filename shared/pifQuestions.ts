@@ -108,7 +108,7 @@ export const PIF_SECTIONS: PIFSection[] = [
         weight: 1,
         options: [
           { value: "1", label: "Completely different", description: "Significantly evolve my role" },
-          { value: "2", label: "Meaningful change" },
+          { value: "2", label: "Meaningful change", description: "Develop new capabilities" },
           { value: "3", label: "Moderate change", description: "Some adaptation required" },
           { value: "4", label: "Minor change", description: "Slight adjustment" },
           { value: "5", label: "Almost no change", description: "Business as usual" }

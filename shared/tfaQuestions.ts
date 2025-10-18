@@ -12,10 +12,26 @@ export interface TFAQuestion {
 }
 
 export const TFA_SECTIONS = [
-  { name: "System Environment", weight: 25 },
-  { name: "Data Quality", weight: 30 },
-  { name: "Integration Feasibility", weight: 30 },
-  { name: "Security/Compliance", weight: 15 },
+  { 
+    name: "System Environment", 
+    weight: 25,
+    description: "Evaluate the technical infrastructure, cloud readiness, and system capabilities that support AI implementation"
+  },
+  { 
+    name: "Data Quality", 
+    weight: 30,
+    description: "Assess data availability, structure, accuracy, and accessibility for effective AI training and operation"
+  },
+  { 
+    name: "Integration Feasibility", 
+    weight: 30,
+    description: "Determine how easily AI solutions can connect with existing systems, workflows, and business processes"
+  },
+  { 
+    name: "Security/Compliance", 
+    weight: 15,
+    description: "Verify security controls, data governance, and regulatory compliance requirements for AI deployment"
+  },
 ];
 
 export interface QuestionWithImpact {
@@ -350,6 +366,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
 export const tfaSections = TFA_SECTIONS.map(section => ({
   section: section.name,
   weight: section.weight,
+  description: section.description,
   questions: TFA_QUESTIONS.filter(q => q.section === section.name),
 }));
 

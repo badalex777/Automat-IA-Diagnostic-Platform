@@ -13,7 +13,7 @@ import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { getAllPIFQuestions } from "@shared/pifQuestions";
+import { getAllPIFQuestions, PIF_SECTIONS } from "@shared/pifQuestions";
 import type { Workflow, Company } from "@shared/schema";
 
 interface PIFData {
@@ -161,15 +161,7 @@ export default function PIFForm() {
   const { company, workflow } = pifData;
 
   // Section definitions: 0 = Disclaimer, 1 = Respondent Info, 2-9 = PIF sections
-  const sections = ALL_PIF_QUESTIONS.reduce((acc, q) => {
-    if (!acc.find(s => s.name === q.section)) {
-      acc.push({
-        name: q.section,
-        questions: ALL_PIF_QUESTIONS.filter(sq => sq.section === q.section)
-      });
-    }
-    return acc;
-  }, [] as Array<{ name: string; questions: typeof ALL_PIF_QUESTIONS }>);
+  const sections = PIF_SECTIONS;
 
   const totalSections = sections.length + 2; // +2 for disclaimer and respondent info
   const isDisclaimerSection = currentSection === 0;
@@ -392,8 +384,13 @@ export default function PIFForm() {
         ) : currentPIFSection ? (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{currentPIFSection.name}</h2>
-              {currentPIFSection.name === "Quality Impact" && !isErrorProne && (
+              <h2 className="text-xl font-semibold">{currentPIFSection.section}</h2>
+              {currentPIFSection.description && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {currentPIFSection.description}
+                </p>
+              )}
+              {currentPIFSection.section === "Quality Impact Module" && !isErrorProne && (
                 <Alert className="mt-4">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>

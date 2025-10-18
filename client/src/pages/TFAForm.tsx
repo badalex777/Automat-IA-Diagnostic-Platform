@@ -223,6 +223,11 @@ export default function TFAForm() {
               <h2 className="text-xl font-semibold" data-testid="text-section-title">
                 Section {currentSection + 1}: {tfaSections[currentSection].section}
               </h2>
+              {tfaSections[currentSection].description && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {tfaSections[currentSection].description}
+                </p>
+              )}
               <p className="text-sm text-muted-foreground mt-1">
                 Weight: {tfaSections[currentSection].weight}% of total score ({tfaSections[currentSection].questions.length} questions)
               </p>
