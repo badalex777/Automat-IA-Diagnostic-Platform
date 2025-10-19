@@ -54,6 +54,16 @@ export async function generateCompanySnapshot(
       const pifData = pifRes.ok ? await pifRes.json() : null;
       const opportunities = oppRes.ok ? await oppRes.json() : [];
 
+      console.log(`[Snapshot] Workflow ${workflow.name}:`, {
+        hasTFA: !!tfa,
+        pifData: pifData ? {
+          hasResponses: !!pifData.responses,
+          responsesLength: pifData.responses?.length,
+          hasAggregated: !!pifData.aggregated,
+          aggregatedType: typeof pifData.aggregated
+        } : 'null',
+      });
+
       return {
         workflow,
         tfa,
@@ -717,7 +727,7 @@ function hasTFAData(tfa: TFAAssessment | null): boolean {
 }
 
 function hasPIFData(pifData: PIFData | null): boolean {
-  return pifData !== null && pifData.responses.length > 0;
+  return pifData !== null && pifData.responses !== undefined && pifData.responses.length > 0;
 }
 
 function generateTFASection(tfa: TFAAssessment | null, t: any, language: 'en' | 'es'): string {
@@ -1027,8 +1037,11 @@ function generatePIFSection(pifData: PIFData | null, t: any, language: 'en' | 'e
     `;
   }
 
-  const pifResponses = pifData!.responses;
-  const aggregated = pifData!.aggregated;
+  const pifResponses = pifData!.responses || [];
+  // Use aggregated scores from API, or calculate if missing/incomplete
+  const aggregated = (pifData!.aggregated && pifData!.aggregated.processClarity) 
+    ? pifData!.aggregated 
+    : calculateAggregatedPIFScores(pifResponses);
   
   return `
     <div class="subsection">
@@ -1219,7 +1232,8 @@ function generateReadinessSection(
   });
 
   // Use aggregated scores from API, or calculate if missing
-  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifData!.responses);
+  const pifResponses = pifData!.responses || [];
+  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifResponses);
   const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const feasibilityClass = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '-');
@@ -1316,7 +1330,8 @@ function generateOpportunityMatrixes(
   });
 
   // Use aggregated scores from API, or calculate if missing
-  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifData!.responses);
+  const pifResponses = pifData!.responses || [];
+  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifResponses);
   const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const companyContext: CompanyContext = {
