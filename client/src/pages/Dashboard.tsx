@@ -25,7 +25,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error loading companies",
+        title: t.toast.errorLoading,
         description: error.message,
         variant: "destructive",
       });
@@ -48,13 +48,13 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       toast({
-        title: "Company created",
-        description: "The company has been successfully added.",
+        title: t.toast.companyCreated,
+        description: t.toast.companyCreatedDesc,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t.toast.error,
         description: error.message,
         variant: "destructive",
       });

@@ -30,6 +30,9 @@ export interface Translations {
     scoringGuide: string;
     unknownCompany: string;
     unknownIndustry: string;
+    searchWorkflows: string;
+    noOpportunities: string;
+    noOpportunitiesWithAssessments: string;
   };
 
   // Navigation
@@ -321,8 +324,23 @@ export interface Translations {
     businessImpactSaved: string;
     businessImpactSavedDesc: string;
     errorLoading: string;
+    errorLoadingAssessment: string;
     errorSaving: string;
     errorDeleting: string;
+    errorUpdating: string;
+    error: string;
+    success: string;
+    responseDeleted: string;
+    responseDeletedDesc: string;
+    deleteFailed: string;
+  };
+
+  // Tabs
+  tabs: {
+    technicalFeasibility: string;
+    processInsights: string;
+    readinessRubric: string;
+    opportunities: string;
   };
 
   // Buttons and Actions
@@ -713,6 +731,9 @@ const en: Translations = {
     scoringGuide: "Scoring Guide",
     unknownCompany: "Unknown Company",
     unknownIndustry: "Unknown",
+    searchWorkflows: "Search workflows...",
+    noOpportunities: "No opportunities yet. Create opportunities in workflow detail pages.",
+    noOpportunitiesWithAssessments: "No opportunities with completed TFA and PIF assessments. Complete assessments to see opportunities here.",
   },
   nav: {
     dashboard: "Dashboard",
@@ -971,8 +992,21 @@ const en: Translations = {
     businessImpactSaved: "Business impact saved",
     businessImpactSavedDesc: "The business impact data has been successfully saved.",
     errorLoading: "Error loading data",
+    errorLoadingAssessment: "Error loading assessment data",
     errorSaving: "Error saving data",
     errorDeleting: "Error deleting item",
+    errorUpdating: "Error updating data",
+    error: "Error",
+    success: "Success",
+    responseDeleted: "Response deleted",
+    responseDeletedDesc: "The PIF response has been deleted successfully.",
+    deleteFailed: "Delete failed",
+  },
+  tabs: {
+    technicalFeasibility: "Technical Feasibility",
+    processInsights: "Process Insights",
+    readinessRubric: "Readiness Rubric",
+    opportunities: "Opportunities",
   },
   actions: {
     addCompany: "Add Company",
@@ -1337,6 +1371,9 @@ const es: Translations = {
     scoringGuide: "Guía de Puntuación",
     unknownCompany: "Empresa Desconocida",
     unknownIndustry: "Desconocido",
+    searchWorkflows: "Buscar flujos de trabajo...",
+    noOpportunities: "Aún no hay oportunidades. Cree oportunidades en las páginas de detalle del flujo de trabajo.",
+    noOpportunitiesWithAssessments: "No hay oportunidades con evaluaciones TFA y PIF completadas. Complete las evaluaciones para ver las oportunidades aquí.",
   },
   nav: {
     dashboard: "Panel",
@@ -1595,8 +1632,21 @@ const es: Translations = {
     businessImpactSaved: "Impacto empresarial guardado",
     businessImpactSavedDesc: "Los datos de impacto empresarial se han guardado exitosamente.",
     errorLoading: "Error al cargar datos",
+    errorLoadingAssessment: "Error al cargar datos de evaluación",
     errorSaving: "Error al guardar datos",
     errorDeleting: "Error al eliminar elemento",
+    errorUpdating: "Error al actualizar datos",
+    error: "Error",
+    success: "Éxito",
+    responseDeleted: "Respuesta eliminada",
+    responseDeletedDesc: "La respuesta PIF ha sido eliminada exitosamente.",
+    deleteFailed: "Error al eliminar",
+  },
+  tabs: {
+    technicalFeasibility: "Viabilidad Técnica",
+    processInsights: "Perspectivas del Proceso",
+    readinessRubric: "Rúbrica de Preparación",
+    opportunities: "Oportunidades",
   },
   actions: {
     addCompany: "Agregar Empresa",

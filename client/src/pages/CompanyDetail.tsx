@@ -261,7 +261,7 @@ export default function CompanyDetail() {
   useEffect(() => {
     if (assessmentsError) {
       toast({
-        title: "Error loading assessment data",
+        title: t.toast.errorLoadingAssessment,
         description: assessmentsError.message,
         variant: "destructive",
       });
@@ -506,7 +506,7 @@ export default function CompanyDetail() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search workflows..."
+                  placeholder={t.common.searchWorkflows}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -567,8 +567,8 @@ export default function CompanyDetail() {
               <div className="bg-card rounded-lg border border-card-border p-6">
                 <p className="text-muted-foreground text-center py-8">
                   {opportunities.length === 0 
-                    ? "No opportunities yet. Create opportunities in workflow detail pages." 
-                    : "No opportunities with completed TFA and PIF assessments. Complete assessments to see opportunities here."}
+                    ? t.common.noOpportunities
+                    : t.common.noOpportunitiesWithAssessments}
                 </p>
               </div>
             ) : (

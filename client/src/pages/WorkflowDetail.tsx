@@ -226,7 +226,7 @@ export default function WorkflowDetail() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error updating opportunity",
+        title: t.toast.errorUpdating,
         description: error.message,
         variant: "destructive",
       });
@@ -240,13 +240,13 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: "Opportunity deleted",
-        description: "The implementation opportunity has been deleted successfully.",
+        title: t.toast.opportunityDeleted,
+        description: t.toast.opportunityDeletedDesc,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error deleting opportunity",
+        title: t.toast.errorDeleting,
         description: error.message,
         variant: "destructive",
       });
@@ -359,10 +359,10 @@ export default function WorkflowDetail() {
         )}
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
-            <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
-            <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
-            <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
+            <TabsTrigger value="tfa" data-testid="tab-tfa">{t.tabs.technicalFeasibility}</TabsTrigger>
+            <TabsTrigger value="pif" data-testid="tab-pif">{t.tabs.processInsights}</TabsTrigger>
+            <TabsTrigger value="readiness" data-testid="tab-readiness">{t.tabs.readinessRubric}</TabsTrigger>
+            <TabsTrigger value="opportunities" data-testid="tab-opportunities">{t.tabs.opportunities}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tfa" className="space-y-6">
