@@ -21,9 +21,33 @@ function formatCurrency(value: number): string {
   return `$${value.toFixed(0)}`;
 }
 
+function getFilterExplanation(filterType: string): string | null {
+  switch (filterType) {
+    case "time-error":
+      return "When error reduction metrics are enabled, the scoring weights are redistributed to account for quality improvements. The business impact is calculated as: (ROI Score × 45%) + (Hours Score × 30%) + (Error Score × 25%). This means error reduction contributes 25% to the total score, while time savings (ROI + Hours) still dominates at 75%.";
+    case "time-revenue":
+      return "When revenue uplift metrics are enabled, the scoring weights are redistributed to account for growth opportunities. The business impact is calculated as: (ROI Score × 45%) + (Hours Score × 30%) + (Revenue Score × 25%). This means revenue uplift contributes 25% to the total score, while time savings (ROI + Hours) still dominates at 75%.";
+    case "all-three":
+      return "When both error reduction and revenue uplift metrics are enabled, all four components contribute to the score. The business impact is calculated as: (ROI Score × 40%) + (Hours Score × 25%) + (Error Score × 20%) + (Revenue Score × 15%). Time savings remains the largest factor at 65% combined, with quality and growth adding 35%.";
+    default:
+      return null;
+  }
+}
+
 function ScoringGuideTable({ guide }: { guide: ScoringGuideTable }) {
+  const explanation = getFilterExplanation(guide.filterType);
+  
   return (
     <div className="space-y-3">
+      {explanation && (
+        <div className="flex items-start gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+          <Info className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+          <p className="text-sm text-foreground leading-relaxed">
+            {explanation}
+          </p>
+        </div>
+      )}
+      
       <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
         <Info className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
         <div className="text-sm text-muted-foreground">
