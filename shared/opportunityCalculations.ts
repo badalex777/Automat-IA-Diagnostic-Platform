@@ -98,52 +98,33 @@ export interface CompanyContext {
 
 
 /**
- * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE
+ * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE with ADDITIVE BONUSES
  * Higher score = better business impact
  * 
  * Uses company financial context to calculate relative impact:
- * - ROI as % of annual revenue
- * - Hours saved converted to FTE (hours/40), normalized against company's total employees
+ * - ROI as % of annual revenue × 10 multiplier
+ * - FTE savings as % of total employees × 10 multiplier
  * 
- * TWO CALCULATION MODES:
+ * UNIFIED ADDITIVE MODEL (consistent across all views):
+ * - Base Score: (ROI 60% + Hours 40%) = 0-100 points from core business value
+ * - Error Bonus (if toggle ON): + 0-30 points (errorScore × 0.3, capped at 30)
+ * - Revenue Bonus (if toggle ON): + 0-30 points (revenueScore × 0.3, capped at 30)
+ * - Max possible: 160 points (exceptional with all metrics strong)
  * 
- * 1. ADDITIVE MODE (useAdditiveBonus=true, for "all-opportunities" view):
- *    - Base: ROI 60% + Hours 40% = 100%
- *    - Error bonus (if active): + Error 25% on top
- *    - Revenue bonus (if active): + Revenue 25% on top
- *    - Max possible: 150% (when both bonuses active)
- *    - Ensures toggling ON always increases score
+ * Revenue metrics use enhanced 30x multiplier for revenue uplift to ensure
+ * revenue growth has meaningful impact on business score.
  * 
- * 2. REDISTRIBUTIVE MODE (useAdditiveBonus=false, for filtered category views):
- *    Base Case (both toggles OFF):
- *    - Annual ROI: 60%
- *    - Annual Hours Saved: 40%
- *    Total: 100%
- * 
- *    Error Toggle ON (revenue OFF):
- *    - Annual ROI: 45%
- *    - Annual Hours Saved: 30%
- *    - Error Impact: 25%
- *    Total: 100%
- * 
- *    Revenue Toggle ON (error OFF):
- *    - Annual ROI: 45%
- *    - Annual Hours Saved: 30%
- *    - Revenue Impact: 25%
- *    Total: 100%
- * 
- *    Both Toggles ON:
- *    - Annual ROI: 40%
- *    - Annual Hours Saved: 25%
- *    - Error Impact: 20%
- *    - Revenue Impact: 15%
- *    Total: 100%
+ * This ensures:
+ * - Core business value (ROI + FTE) never gets penalized
+ * - Error/Revenue are true bonuses that add value
+ * - Toggling metrics always has appropriate impact (5-30 points each)
+ * - Scores are consistent across all matrix views
  */
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
   toggles: ToggleState,
   companyContext?: CompanyContext,
-  useAdditiveBonus: boolean = false
+  useAdditiveBonus: boolean = true // Always true now, kept for backwards compatibility
 ): number {
   const annualRoi = parseFloat(opportunity.annualRoi || "0");
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
@@ -152,8 +133,7 @@ export function calculateBusinessImpact(
   const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
   const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
   
-  // Calculate company-relative metrics (0-100)
-  // If no company context, fall back to absolute normalization
+  // Calculate company-relative base metrics (0-100)
   let roiScore = 0;
   let hoursScore = 0;
   
@@ -175,88 +155,53 @@ export function calculateBusinessImpact(
     hoursScore = normalizeToScale(fteSavings, 5);
   }
 
-  // Determine weights based on active toggles and calculation mode
-  let roiWeight = 0.60;
-  let hoursWeight = 0.40;
-  let errorWeight = 0;
-  let revenueWeight = 0;
+  // Base score: ROI 60% + Hours 40% = foundation (0-100 points)
+  const baseScore = (roiScore * 0.60) + (hoursScore * 0.40);
 
-  const errorActive = toggles.errorMetrics;
-  const revenueActive = toggles.revenueMetrics;
-
-  if (useAdditiveBonus) {
-    // ADDITIVE MODE: Base metrics stay at 100%, bonuses add on top
-    roiWeight = 0.60;
-    hoursWeight = 0.40;
-    // Bonuses are added, not redistributed
-    errorWeight = errorActive ? 0.25 : 0;
-    revenueWeight = revenueActive ? 0.25 : 0;
-  } else {
-    // REDISTRIBUTIVE MODE: Weights sum to 100%
-    if (errorActive && revenueActive) {
-      // Both toggles ON
-      roiWeight = 0.40;
-      hoursWeight = 0.25;
-      errorWeight = 0.20;
-      revenueWeight = 0.15;
-    } else if (errorActive) {
-      // Only error toggle ON
-      roiWeight = 0.45;
-      hoursWeight = 0.30;
-      errorWeight = 0.25;
-    } else if (revenueActive) {
-      // Only revenue toggle ON
-      roiWeight = 0.45;
-      hoursWeight = 0.30;
-      revenueWeight = 0.25;
-    }
-    // else: base case with default weights (60/40)
-  }
-
-  // Calculate error impact if active
-  let errorScore = 0;
-  if (errorActive) {
+  // Calculate error bonus if active (0-30 points, capped)
+  let errorBonus = 0;
+  if (toggles.errorMetrics) {
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
     const errorPctScore = errorPct; // Already 0-100
     // Normalize errors avoided to 0-100 (1000 errors = 100)
     const errorsAvoidedScore = normalizeToScale(errorsAvoided, 1000);
-    errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
+    const errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
+    // Error bonus: proportional to error score, capped at 30 points
+    errorBonus = Math.min(errorScore * 0.3, 30);
   }
 
-  // Calculate revenue impact if active
-  let revenueScore = 0;
-  if (revenueActive) {
+  // Calculate revenue bonus if active (0-30 points, capped)
+  let revenueBonus = 0;
+  if (toggles.revenueMetrics) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
     
-    // Use company-relative scoring
     let hoursReallocatedScore = 0;
     let revenueUpliftScore = 0;
     
-    // Hours Reallocated: convert to FTE and normalize against total employees
+    // Hours Reallocated: convert to FTE and normalize against total employees with 10x multiplier
     const hoursReallocatedFTE = hoursReallocated / 2080; // Annual hours to FTE
     if (companyEmployees > 0) {
-      hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 100, 100);
+      hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 1000, 100);
     } else {
       hoursReallocatedScore = normalizeToScale(hoursReallocatedFTE, 5);
     }
     
+    // Revenue Uplift: as % of company revenue with 30x multiplier (enhanced for impact)
     if (companyRevenue > 0) {
-      revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 100, 100);
+      revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 3000, 100);
     } else {
       revenueUpliftScore = normalizeToScale(revenueUplift, 2000000);
     }
     
-    revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
+    const revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
+    // Revenue bonus: proportional to revenue score, capped at 30 points  
+    revenueBonus = Math.min(revenueScore * 0.3, 30);
   }
 
-  // Calculate total impact with redistributed weights
-  const totalImpact = 
-    (roiScore * roiWeight) +
-    (hoursScore * hoursWeight) +
-    (errorScore * errorWeight) +
-    (revenueScore * revenueWeight);
+  // Total impact: base score + bonuses
+  const totalImpact = baseScore + errorBonus + revenueBonus;
 
   return Math.round(totalImpact * 100) / 100; // Round to 2 decimals
 }
@@ -535,119 +480,51 @@ export function calculateScoringGuide(
 }
 
 /**
- * Recalculate Business Impact for a specific filter view
- * This redistributes weights to only the relevant metrics for fair comparison
+ * Calculate Business Impact for a specific filter view
+ * Now uses same ADDITIVE logic as main function for consistency
+ * Filter type only determines which opportunities appear, not how they're scored
  */
 export function calculateBusinessImpactForFilter(
   opportunity: ImplementationOpportunity,
   filterType: MatrixFilterType,
   companyContext?: CompanyContext
 ): number {
-  const annualRoi = parseFloat(opportunity.annualRoi || "0");
-  const fteSavings = parseFloat(opportunity.fteSavings || "0");
+  // Determine toggle state based on filter type
+  let toggles: ToggleState;
   
-  // Parse company context
-  const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
-  const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
-  
-  // Calculate company-relative metrics (0-100) with 10x multiplier
-  let roiScore = 0;
-  let hoursScore = 0;
-  
-  if (companyRevenue > 0) {
-    // ROI as % of annual revenue × 10 multiplier, capped at 100
-    roiScore = Math.min((annualRoi / companyRevenue) * 1000, 100);
-  } else {
-    roiScore = normalizeToScale(annualRoi, 1000000);
-  }
-  
-  if (companyEmployees > 0) {
-    // FTE-based hours score × 10 multiplier, capped at 100
-    hoursScore = Math.min((fteSavings / companyEmployees) * 1000, 100);
-  } else {
-    hoursScore = normalizeToScale(fteSavings, 5);
-  }
-
-  // Calculate error impact
-  let errorScore = 0;
-  const errorPct = parseFloat(opportunity.errorReductionPct || "0");
-  const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
-  const errorPctScore = errorPct; // Already 0-100
-  const errorsAvoidedScore = normalizeToScale(errorsAvoided, 1000);
-  errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
-
-  // Calculate revenue impact
-  let revenueScore = 0;
-  const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
-  const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
-  
-  let hoursReallocatedScore = 0;
-  let revenueUpliftScore = 0;
-  
-  // Hours Reallocated: convert to FTE and normalize against total employees
-  const hoursReallocatedFTE = hoursReallocated / 2080; // Annual hours to FTE
-  if (companyEmployees > 0) {
-    hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 100, 100);
-  } else {
-    hoursReallocatedScore = normalizeToScale(hoursReallocatedFTE, 5);
-  }
-  
-  if (companyRevenue > 0) {
-    revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 100, 100);
-  } else {
-    revenueUpliftScore = normalizeToScale(revenueUplift, 2000000);
-  }
-  
-  revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
-
-  // Redistribute weights based on filter type
-  let totalImpact = 0;
-
   switch (filterType) {
     case "time-only":
-      // Only time savings metrics: ROI + Hours
-      totalImpact = 
-        (roiScore * 0.60) +
-        (hoursScore * 0.40);
+      // Both toggles OFF
+      toggles = { errorMetrics: false, revenueMetrics: false };
       break;
     
     case "time-error":
-      // Time + Error: keep time savings dominant (75% for ROI+Hours)
-      totalImpact = 
-        (roiScore * 0.45) +
-        (hoursScore * 0.30) +
-        (errorScore * 0.25);
+      // Error ON, revenue OFF
+      toggles = { errorMetrics: true, revenueMetrics: false };
       break;
     
     case "time-revenue":
-      // Time + Revenue: keep time savings dominant (75% for ROI+Hours)
-      totalImpact = 
-        (roiScore * 0.45) +
-        (hoursScore * 0.30) +
-        (revenueScore * 0.25);
+      // Revenue ON, error OFF
+      toggles = { errorMetrics: false, revenueMetrics: true };
       break;
     
     case "all-three":
-      // All metrics: time savings still dominant (65% for ROI+Hours)
-      totalImpact = 
-        (roiScore * 0.40) +
-        (hoursScore * 0.25) +
-        (errorScore * 0.20) +
-        (revenueScore * 0.15);
+      // Both toggles ON
+      toggles = { errorMetrics: true, revenueMetrics: true };
       break;
     
     case "all-opportunities":
-      // Use the opportunity's own toggle state with ADDITIVE bonuses
-      // This ensures toggling metrics ON always increases business impact
-      const toggles: ToggleState = {
+      // Use opportunity's own toggle state
+      toggles = {
         errorMetrics: opportunity.errorMetricsEnabled || false,
         revenueMetrics: opportunity.revenueMetricsEnabled || false
       };
-      return calculateBusinessImpact(opportunity, toggles, companyContext, true);
+      break;
     
     default:
-      totalImpact = 0;
+      toggles = { errorMetrics: false, revenueMetrics: false };
   }
 
-  return Math.round(totalImpact * 100) / 100; // Round to 2 decimals
+  // Use the unified ADDITIVE calculation
+  return calculateBusinessImpact(opportunity, toggles, companyContext, true);
 }
