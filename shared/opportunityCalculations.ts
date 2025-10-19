@@ -483,15 +483,18 @@ export function calculateScoringGuide(
       const combinedWeight = config.roiWeight + config.hoursWeight;
       const balancedComponentScore = targetScore / combinedWeight;
       
-      // roiScore = (ROI / companyRevenue) × 100
-      // So: ROI = (roiScore / 100) × companyRevenue
-      const requiredRoi = (balancedComponentScore / 100) * companyRevenue;
-      const requiredRoiPct = balancedComponentScore;
+      // With 10x multiplier:
+      // roiScore = (ROI / companyRevenue) × 1000
+      // So: ROI = (roiScore / 1000) × companyRevenue
+      const requiredRoi = (balancedComponentScore / 1000) * companyRevenue;
+      // requiredRoiPct represents the actual % of revenue (not the amplified score)
+      const requiredRoiPct = balancedComponentScore / 10;
       
-      // hoursScore = (FTE / companyEmployees) × 100
-      // So: FTE = (hoursScore / 100) × companyEmployees
-      const requiredFte = (balancedComponentScore / 100) * companyEmployees;
-      const requiredFtePct = balancedComponentScore;
+      // hoursScore = (FTE / companyEmployees) × 1000
+      // So: FTE = (hoursScore / 1000) × companyEmployees
+      const requiredFte = (balancedComponentScore / 1000) * companyEmployees;
+      // requiredFtePct represents the actual % of employees (not the amplified score)
+      const requiredFtePct = balancedComponentScore / 10;
       
       // Generate description
       let description = "Balanced impact";
