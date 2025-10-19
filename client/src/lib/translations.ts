@@ -570,6 +570,107 @@ export interface Translations {
       implementationEffortFormula: string;
     };
   };
+
+  // Company Snapshot
+  companySnapshot: {
+    title: string;
+    generatedOn: string;
+    notAvailable: string;
+    notCompleted: string;
+    workflowSection: string;
+    
+    // Header
+    header: {
+      companySnapshot: string;
+      financialContext: string;
+      generationDate: string;
+    };
+    
+    // TFA Section
+    tfaSection: {
+      title: string;
+      overallScore: string;
+      feasibilityBand: string;
+      criticalGaps: string;
+      keyStrengths: string;
+      roadmapRecommendations: string;
+      noGapsIdentified: string;
+      noStrengthsIdentified: string;
+    };
+    
+    // PIF Section
+    pifSection: {
+      title: string;
+      respondents: string;
+      operationalScores: string;
+      average: string;
+      range: string;
+      qualitativeInsights: string;
+      roiInputsSummary: string;
+      noQualitativeData: string;
+    };
+    
+    // Readiness Rubric
+    readinessSection: {
+      title: string;
+      combinedScore: string;
+      componentBreakdown: string;
+      feasibilityAssessment: string;
+      swotAnalysis: string;
+      strengths: string;
+      weaknesses: string;
+      opportunities: string;
+      threats: string;
+      requiresData: string;
+    };
+    
+    // Opportunities
+    opportunitiesSection: {
+      title: string;
+      annualRoi: string;
+      fteSavings: string;
+      businessImpactScore: string;
+      implementationEffortScore: string;
+      errorReduction: string;
+      revenueUplift: string;
+      noOpportunities: string;
+    };
+    
+    // Opportunity Matrix
+    matrixSection: {
+      title: string;
+      filterView: string;
+      quadrantInterpretation: string;
+      noMatrixData: string;
+    };
+    
+    // Calculation Transparency
+    transparency: {
+      title: string;
+      tfaScoring: string;
+      tfaScoringExplanation: string;
+      sectionWeights: string;
+      pifScoring: string;
+      pifScoringExplanation: string;
+      readinessFormula: string;
+      readinessFormulaExplanation: string;
+      businessImpactScoring: string;
+      businessImpactExplanation: string;
+      multiplierExplanation: string;
+      implementationEffort: string;
+      implementationEffortExplanation: string;
+      scoringGuideTables: string;
+      scoreInterpretation: string;
+      roiScoreGuide: string;
+      hoursScoreGuide: string;
+      errorScoreGuide: string;
+      revenueScoreGuide: string;
+      score100Meaning: string;
+      score50Meaning: string;
+      score20Meaning: string;
+      score10Meaning: string;
+    };
+  };
 }
 
 const en: Translations = {
@@ -1090,6 +1191,99 @@ const en: Translations = {
       implementationEffortFormula: "Implementation Effort = (Inverted Readiness × 0.40) + (Normalized Ramp-up × 0.25) + (Normalized Payback × 0.25) + (Normalized Training × 0.10). Where: Inverted Readiness = 100 - Readiness Score. Normalized Ramp-up: 0 at ≤3 months, 100 at ≥18 months, linear between. Normalized Payback: 0 at ≤6 months, 100 at ≥36 months, linear between. Normalized Training: 0 at ≤2 hours, 100 at ≥40 hours, linear between. Scale: 0-100 (lower = easier).",
     },
   },
+
+  companySnapshot: {
+    title: "Company Diagnostic Snapshot",
+    generatedOn: "Generated on",
+    notAvailable: "N/A",
+    notCompleted: "Not yet completed",
+    workflowSection: "Workflow",
+    
+    header: {
+      companySnapshot: "Company Diagnostic Snapshot",
+      financialContext: "Financial Context",
+      generationDate: "Generation Date",
+    },
+    
+    tfaSection: {
+      title: "Technical Feasibility Assessment (TFA)",
+      overallScore: "Overall TFA Score",
+      feasibilityBand: "Feasibility Band",
+      criticalGaps: "Critical Technical Gaps",
+      keyStrengths: "Key Technical Strengths",
+      roadmapRecommendations: "Implementation Roadmap Recommendations",
+      noGapsIdentified: "No critical gaps identified",
+      noStrengthsIdentified: "No key strengths identified",
+    },
+    
+    pifSection: {
+      title: "Process Insight Form (PIF)",
+      respondents: "Respondents",
+      operationalScores: "Operational Readiness Scores",
+      average: "Average",
+      range: "Range",
+      qualitativeInsights: "Representative Qualitative Insights",
+      roiInputsSummary: "ROI Inputs Summary",
+      noQualitativeData: "No qualitative insights available",
+    },
+    
+    readinessSection: {
+      title: "Readiness Rubric",
+      combinedScore: "Combined Readiness Score",
+      componentBreakdown: "Component Breakdown",
+      feasibilityAssessment: "Feasibility Assessment",
+      swotAnalysis: "SWOT Analysis",
+      strengths: "Strengths",
+      weaknesses: "Weaknesses",
+      opportunities: "Opportunities",
+      threats: "Threats",
+      requiresData: "Requires both TFA and PIF data for calculation",
+    },
+    
+    opportunitiesSection: {
+      title: "Implementation Opportunities",
+      annualRoi: "Annual ROI",
+      fteSavings: "FTE Savings",
+      businessImpactScore: "Business Impact Score",
+      implementationEffortScore: "Implementation Effort Score",
+      errorReduction: "Error Reduction",
+      revenueUplift: "Revenue Uplift",
+      noOpportunities: "No implementation opportunities defined for this workflow",
+    },
+    
+    matrixSection: {
+      title: "Opportunity Matrix",
+      filterView: "Filter View",
+      quadrantInterpretation: "Quadrant Interpretation",
+      noMatrixData: "Opportunity matrix unavailable - requires both TFA and PIF data",
+    },
+    
+    transparency: {
+      title: "Calculation Transparency",
+      tfaScoring: "TFA Scoring Methodology",
+      tfaScoringExplanation: "The Technical Feasibility Assessment uses a weighted scoring system across four critical dimensions. Each section contributes to the overall TFA score based on its relative importance to successful AI implementation.",
+      sectionWeights: "Section Weights: System Environment (25%), Data Quality (30%), Integration Feasibility (30%), Security & Compliance (15%)",
+      pifScoring: "PIF Scoring Methodology",
+      pifScoringExplanation: "The Process Insight Form calculates operational readiness by aggregating scores across three dimensions: Process Clarity, Change Magnitude, and Workflow Brittleness. Scores are normalized to a 0-100 scale and averaged across all respondents.",
+      readinessFormula: "Readiness Rubric Formula",
+      readinessFormulaExplanation: "Combined Readiness Score = (TFA Score × 60%) + (PIF Score × 40%). This formula weights technical feasibility higher because strong technical foundation is essential for successful AI implementation, while still ensuring operational readiness significantly influences the assessment.",
+      businessImpactScoring: "Business Impact Scoring",
+      businessImpactExplanation: "Business Impact scores are calculated relative to company size, ensuring opportunities are evaluated in proper business context. The scoring uses a company-relative formula to normalize impact scores.",
+      multiplierExplanation: "10× Multiplier: We use a 1000× multiplier to convert small percentages into meaningful 0-100 scores. For example, an opportunity saving 1% of company workforce scores 10, while 10% scores 100 (the maximum).",
+      implementationEffort: "Implementation Effort Scoring",
+      implementationEffortExplanation: "Implementation Effort combines readiness scores (40%), ramp-up period (25%), payback period (25%), and training requirements (10%) to estimate implementation complexity on a 0-100 scale where lower scores indicate easier implementation.",
+      scoringGuideTables: "Scoring Guide Tables",
+      scoreInterpretation: "Score Interpretation",
+      roiScoreGuide: "ROI Score Guide (Company-Relative)",
+      hoursScoreGuide: "Hours Saved Score Guide (Company-Relative)",
+      errorScoreGuide: "Error Reduction Score Guide (Company-Relative)",
+      revenueScoreGuide: "Revenue Uplift Score Guide (Company-Relative)",
+      score100Meaning: "Score 100 = 10% company impact (exceptional)",
+      score50Meaning: "Score 50 = 5% company impact (significant)",
+      score20Meaning: "Score 20 = 2% company impact (notable)",
+      score10Meaning: "Score 10 = 1% company impact (meaningful)",
+    },
+  },
 };
 
 const es: Translations = {
@@ -1608,6 +1802,99 @@ const es: Translations = {
       businessImpactAllFormula: "Impacto Empresarial = (Puntuación ROI × 0.40) + (Puntuación Horas × 0.30) + (Puntuación Error × 0.15) + (Puntuación Ingresos × 0.15). Modo más completo equilibrando eficiencia (70%), calidad (15%) y crecimiento (15%).",
       implementationEffort: "Esfuerzo de Implementación",
       implementationEffortFormula: "Esfuerzo de Implementación = (Preparación Invertida × 0.40) + (Rampa Normalizada × 0.25) + (Recuperación Normalizada × 0.25) + (Capacitación Normalizada × 0.10). Donde: Preparación Invertida = 100 - Puntuación de Preparación. Rampa Normalizada: 0 en ≤3 meses, 100 en ≥18 meses, lineal entre. Recuperación Normalizada: 0 en ≤6 meses, 100 en ≥36 meses, lineal entre. Capacitación Normalizada: 0 en ≤2 horas, 100 en ≥40 horas, lineal entre. Escala: 0-100 (menor = más fácil).",
+    },
+  },
+
+  companySnapshot: {
+    title: "Instantánea Diagnóstica de la Empresa",
+    generatedOn: "Generado el",
+    notAvailable: "N/D",
+    notCompleted: "Aún no completado",
+    workflowSection: "Flujo de Trabajo",
+    
+    header: {
+      companySnapshot: "Instantánea Diagnóstica de la Empresa",
+      financialContext: "Contexto Financiero",
+      generationDate: "Fecha de Generación",
+    },
+    
+    tfaSection: {
+      title: "Evaluación de Viabilidad Técnica (TFA)",
+      overallScore: "Puntuación General TFA",
+      feasibilityBand: "Banda de Viabilidad",
+      criticalGaps: "Brechas Técnicas Críticas",
+      keyStrengths: "Fortalezas Técnicas Clave",
+      roadmapRecommendations: "Recomendaciones de Hoja de Ruta de Implementación",
+      noGapsIdentified: "No se identificaron brechas críticas",
+      noStrengthsIdentified: "No se identificaron fortalezas clave",
+    },
+    
+    pifSection: {
+      title: "Formulario de Perspectiva del Proceso (PIF)",
+      respondents: "Encuestados",
+      operationalScores: "Puntuaciones de Preparación Operacional",
+      average: "Promedio",
+      range: "Rango",
+      qualitativeInsights: "Perspectivas Cualitativas Representativas",
+      roiInputsSummary: "Resumen de Entradas de ROI",
+      noQualitativeData: "No hay perspectivas cualitativas disponibles",
+    },
+    
+    readinessSection: {
+      title: "Rúbrica de Preparación",
+      combinedScore: "Puntuación Combinada de Preparación",
+      componentBreakdown: "Desglose de Componentes",
+      feasibilityAssessment: "Evaluación de Viabilidad",
+      swotAnalysis: "Análisis FODA",
+      strengths: "Fortalezas",
+      weaknesses: "Debilidades",
+      opportunities: "Oportunidades",
+      threats: "Amenazas",
+      requiresData: "Requiere datos de TFA y PIF para el cálculo",
+    },
+    
+    opportunitiesSection: {
+      title: "Oportunidades de Implementación",
+      annualRoi: "ROI Anual",
+      fteSavings: "Ahorro FTE",
+      businessImpactScore: "Puntuación de Impacto Empresarial",
+      implementationEffortScore: "Puntuación de Esfuerzo de Implementación",
+      errorReduction: "Reducción de Errores",
+      revenueUplift: "Aumento de Ingresos",
+      noOpportunities: "No hay oportunidades de implementación definidas para este flujo de trabajo",
+    },
+    
+    matrixSection: {
+      title: "Matriz de Oportunidades",
+      filterView: "Vista de Filtro",
+      quadrantInterpretation: "Interpretación de Cuadrante",
+      noMatrixData: "Matriz de oportunidades no disponible - requiere datos de TFA y PIF",
+    },
+    
+    transparency: {
+      title: "Transparencia de Cálculos",
+      tfaScoring: "Metodología de Puntuación TFA",
+      tfaScoringExplanation: "La Evaluación de Viabilidad Técnica utiliza un sistema de puntuación ponderada a través de cuatro dimensiones críticas. Cada sección contribuye a la puntuación general TFA basándose en su importancia relativa para la implementación exitosa de IA.",
+      sectionWeights: "Pesos de Sección: Entorno del Sistema (25%), Calidad de Datos (30%), Viabilidad de Integración (30%), Seguridad y Cumplimiento (15%)",
+      pifScoring: "Metodología de Puntuación PIF",
+      pifScoringExplanation: "El Formulario de Perspectiva del Proceso calcula la preparación operacional agregando puntuaciones a través de tres dimensiones: Claridad del Proceso, Magnitud del Cambio y Fragilidad del Flujo de Trabajo. Las puntuaciones se normalizan a una escala de 0-100 y se promedian entre todos los encuestados.",
+      readinessFormula: "Fórmula de Rúbrica de Preparación",
+      readinessFormulaExplanation: "Puntuación Combinada de Preparación = (Puntuación TFA × 60%) + (Puntuación PIF × 40%). Esta fórmula pondera la viabilidad técnica más alta porque una base técnica sólida es esencial para la implementación exitosa de IA, mientras asegura que la preparación operacional influya significativamente en la evaluación.",
+      businessImpactScoring: "Puntuación de Impacto Empresarial",
+      businessImpactExplanation: "Las puntuaciones de Impacto Empresarial se calculan en relación con el tamaño de la empresa, asegurando que las oportunidades se evalúen en el contexto empresarial adecuado. La puntuación utiliza una fórmula relativa a la empresa para normalizar las puntuaciones de impacto.",
+      multiplierExplanation: "Multiplicador 10×: Usamos un multiplicador de 1000× para convertir pequeños porcentajes en puntuaciones significativas de 0-100. Por ejemplo, una oportunidad que ahorra 1% de la fuerza laboral de la empresa puntúa 10, mientras que 10% puntúa 100 (el máximo).",
+      implementationEffort: "Puntuación de Esfuerzo de Implementación",
+      implementationEffortExplanation: "El Esfuerzo de Implementación combina puntuaciones de preparación (40%), período de rampa (25%), período de recuperación (25%) y requisitos de capacitación (10%) para estimar la complejidad de implementación en una escala de 0-100 donde puntuaciones más bajas indican implementación más fácil.",
+      scoringGuideTables: "Tablas de Guía de Puntuación",
+      scoreInterpretation: "Interpretación de Puntuación",
+      roiScoreGuide: "Guía de Puntuación ROI (Relativa a la Empresa)",
+      hoursScoreGuide: "Guía de Puntuación de Horas Ahorradas (Relativa a la Empresa)",
+      errorScoreGuide: "Guía de Puntuación de Reducción de Errores (Relativa a la Empresa)",
+      revenueScoreGuide: "Guía de Puntuación de Aumento de Ingresos (Relativa a la Empresa)",
+      score100Meaning: "Puntuación 100 = 10% de impacto en la empresa (excepcional)",
+      score50Meaning: "Puntuación 50 = 5% de impacto en la empresa (significativo)",
+      score20Meaning: "Puntuación 20 = 2% de impacto en la empresa (notable)",
+      score10Meaning: "Puntuación 10 = 1% de impacto en la empresa (significativo)",
     },
   },
 };

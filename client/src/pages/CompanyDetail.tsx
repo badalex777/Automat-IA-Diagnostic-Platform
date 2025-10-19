@@ -4,7 +4,7 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Search, Pencil, Check, X, BookOpen } from "lucide-react";
+import { ChevronLeft, Search, Pencil, Check, X, BookOpen, Download } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
@@ -20,16 +20,18 @@ import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
 import ScoringGuideDialog from "@/components/ScoringGuideDialog";
+import { generateCompanySnapshot } from "@/lib/companySnapshot";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
   const companyId = params?.id || '';
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [scoringGuideOpen, setScoringGuideOpen] = useState(false);
+  const [isGeneratingSnapshot, setIsGeneratingSnapshot] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -158,6 +160,41 @@ export default function CompanyDetail() {
   const handleCancelEdit = () => {
     setIsEditingName(false);
     setEditedName('');
+  };
+
+  const handleDownloadSnapshot = async () => {
+    if (!company) return;
+    
+    setIsGeneratingSnapshot(true);
+    try {
+      const htmlContent = await generateCompanySnapshot(companyId, language);
+      const filename = language === 'es'
+        ? `${company.name.replace(/\s+/g, '_')}_Instantanea_Diagnostica.html`
+        : `${company.name.replace(/\s+/g, '_')}_Diagnostic_Snapshot.html`;
+      
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: t.toast.success,
+        description: t.company.downloadSnapshot,
+      });
+    } catch (error) {
+      toast({
+        title: t.toast.error,
+        description: error instanceof Error ? error.message : 'Failed to generate snapshot',
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSnapshot(false);
+    }
   };
 
   const filteredWorkflows = workflows.filter(workflow =>
@@ -434,6 +471,17 @@ export default function CompanyDetail() {
                   company={company}
                   onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
                 />
+              )}
+              {company && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDownloadSnapshot}
+                  disabled={isGeneratingSnapshot}
+                  data-testid="button-download-snapshot"
+                >
+                  <Download className="h-5 w-5" />
+                </Button>
               )}
               <LanguageToggle />
               <ThemeToggle />
