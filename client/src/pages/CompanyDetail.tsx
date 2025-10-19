@@ -600,8 +600,12 @@ export default function CompanyDetail() {
                           <OpportunityCard
                             key={opportunity.id}
                             opportunity={opportunity}
-                            companyRevenue={company?.annualRevenue}
-                            companyEmployees={company?.totalEmployees}
+                            readinessScore={readinessScores[opportunity.workflowId] || 0}
+                            companyId={companyId}
+                            companyContext={{
+                              annualRevenue: company?.annualRevenue,
+                              totalEmployees: company?.totalEmployees,
+                            }}
                           />
                         ))}
                       </div>

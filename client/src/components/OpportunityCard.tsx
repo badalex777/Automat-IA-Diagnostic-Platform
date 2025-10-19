@@ -7,7 +7,6 @@ import { Switch } from "@/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Edit, Trash2, DollarSign, Clock, Users, TrendingUp, AlertTriangle } from "lucide-react";
 
 interface OpportunityCardProps {
@@ -35,7 +34,6 @@ export function OpportunityCard({
   onDelete,
 }: OpportunityCardProps) {
   const { toast } = useToast();
-  const { t } = useLanguage();
   
   // Use per-opportunity toggle state
   const toggles: ToggleState = {
@@ -62,8 +60,8 @@ export function OpportunityCard({
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: t.common.error,
-        description: error.message || t.toast.errorSaving,
+        title: "Error",
+        description: error.message || "Error saving changes",
       });
     },
   });
@@ -111,7 +109,7 @@ export function OpportunityCard({
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-muted-foreground">
               <DollarSign className="w-3 h-3" />
-              <span className="text-xs">{t.opportunities.annualRoi}</span>
+              <span className="text-xs">Annual ROI</span>
             </div>
             <p className="text-sm font-semibold" data-testid={`text-roi-${opportunity.id}`}>
               {formatCurrency(opportunity.annualRoi)}
@@ -121,7 +119,7 @@ export function OpportunityCard({
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Clock className="w-3 h-3" />
-              <span className="text-xs">{t.forms.hoursSavedPerWeek}</span>
+              <span className="text-xs">Hours/Week</span>
             </div>
             <p className="text-sm font-semibold" data-testid={`text-hours-${opportunity.id}`}>
               {formatNumber(opportunity.hoursSavedPerWeek, 1)} hrs
@@ -131,7 +129,7 @@ export function OpportunityCard({
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-muted-foreground">
               <Users className="w-3 h-3" />
-              <span className="text-xs">{t.opportunities.fteSaved}</span>
+              <span className="text-xs">FTE Saved</span>
             </div>
             <p className="text-sm font-semibold" data-testid={`text-fte-${opportunity.id}`}>
               {formatNumber(opportunity.fteSavings, 2)} FTE
@@ -142,7 +140,7 @@ export function OpportunityCard({
         {/* Scores */}
         <div className="grid grid-cols-2 gap-3 pt-2 border-t">
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t.labels.businessImpact}</p>
+            <p className="text-xs text-muted-foreground">Business Impact</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -157,7 +155,7 @@ export function OpportunityCard({
           </div>
           
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t.labels.implementationEffort}</p>
+            <p className="text-xs text-muted-foreground">Implementation Effort</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -175,13 +173,13 @@ export function OpportunityCard({
         {/* Metric Toggles */}
         {(opportunity.errorReductionPct || opportunity.revenueUpliftAnnual) && (
           <div className="space-y-2 pt-2 border-t">
-            <p className="text-xs font-medium text-muted-foreground">{t.opportunities.enableErrorMetrics}</p>
+            <p className="text-xs font-medium text-muted-foreground">Enable Error Metrics</p>
             
             {opportunity.errorReductionPct && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs">{t.opportunities.errorReduction}</span>
+                  <span className="text-xs">Error Reduction</span>
                 </div>
                 <Switch
                   checked={opportunity.errorMetricsEnabled ?? false}
@@ -198,7 +196,7 @@ export function OpportunityCard({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs">{t.opportunities.revenueUplift}</span>
+                  <span className="text-xs">Revenue Uplift</span>
                 </div>
                 <Switch
                   checked={opportunity.revenueMetricsEnabled ?? false}
@@ -225,7 +223,7 @@ export function OpportunityCard({
                 data-testid={`button-edit-${opportunity.id}`}
               >
                 <Edit className="w-3 h-3 mr-1" />
-                {t.common.edit}
+                Edit
               </Button>
             )}
             {onDelete && (
@@ -237,7 +235,7 @@ export function OpportunityCard({
                 data-testid={`button-delete-${opportunity.id}`}
               >
                 <Trash2 className="w-3 h-3 mr-1" />
-                {t.common.delete}
+                Delete
               </Button>
             )}
           </div>
