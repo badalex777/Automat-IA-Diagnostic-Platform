@@ -22,6 +22,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type WorkflowStatus = "tfa_only" | "tfa_readiness" | "complete";
 
@@ -35,18 +36,6 @@ interface WorkflowListItemProps {
   companyId: string;
 }
 
-const statusConfig = {
-  tfa_only: { label: "TFA Only", variant: "outline" as const, icon: Circle },
-  tfa_readiness: { label: "TFA + Readiness", variant: "secondary" as const, icon: Clock },
-  complete: { label: "Complete", variant: "default" as const, icon: CheckCircle2 },
-};
-
-const getFeasibilityBand = (score: number) => {
-  if (score >= 75) return { label: "High", variant: "default" as const };
-  if (score >= 50) return { label: "Moderate", variant: "secondary" as const };
-  return { label: "Low", variant: "destructive" as const };
-};
-
 export default function WorkflowListItem({
   id,
   name,
@@ -57,7 +46,21 @@ export default function WorkflowListItem({
   companyId,
 }: WorkflowListItemProps) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const statusConfig = {
+    tfa_only: { label: t.workflow.tfaOnly, variant: "outline" as const, icon: Circle },
+    tfa_readiness: { label: t.workflow.tfaReadiness, variant: "secondary" as const, icon: Clock },
+    complete: { label: t.workflow.complete, variant: "default" as const, icon: CheckCircle2 },
+  };
+
+  const getFeasibilityBand = (score: number) => {
+    if (score >= 75) return { label: t.tfa.feasibilityBands.high, variant: "default" as const };
+    if (score >= 50) return { label: t.tfa.feasibilityBands.moderate, variant: "secondary" as const };
+    return { label: t.tfa.feasibilityBands.low, variant: "destructive" as const };
+  };
+
   const statusInfo = statusConfig[status];
   const StatusIcon = statusInfo.icon;
   const feasibility = tfaScore !== undefined ? getFeasibilityBand(tfaScore) : null;
@@ -71,13 +74,13 @@ export default function WorkflowListItem({
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}`] });
       toast({
-        title: "Workflow deleted",
-        description: "The workflow has been successfully removed.",
+        title: t.toast.workflowDeleted,
+        description: t.toast.workflowDeletedDesc,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error deleting workflow",
+        title: t.toast.errorDeleting,
         description: error.message,
         variant: "destructive",
       });
@@ -111,7 +114,7 @@ export default function WorkflowListItem({
           <div className="flex items-center gap-4 flex-shrink-0">
             {tfaScore !== undefined && (
               <div className="text-right">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">TFA Score</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{t.tfa.score}</p>
                 <div className="flex items-center gap-2">
                   <p className="text-lg font-mono font-semibold" data-testid={`text-tfa-score-${id}`}>{tfaScore}</p>
                   {feasibility && <Badge variant={feasibility.variant} className="text-xs">{feasibility.label}</Badge>}
@@ -121,7 +124,7 @@ export default function WorkflowListItem({
 
             {annualBenefits !== undefined && (
               <div className="text-right">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Annual Benefits</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{t.labels.annualBenefitsValue}</p>
                 <p className="text-lg font-mono font-semibold" data-testid={`text-annual-benefits-${id}`}>
                   ${(annualBenefits / 1000).toFixed(0)}K
                 </p>
@@ -141,7 +144,7 @@ export default function WorkflowListItem({
                   data-testid={`menuitem-delete-workflow-${id}`}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Workflow
+                  {t.company.deleteWorkflow}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -152,19 +155,19 @@ export default function WorkflowListItem({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Workflow</AlertDialogTitle>
+            <AlertDialogTitle>{t.dialogs.deleteWorkflow}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{name}"? This will permanently remove the workflow and all associated assessments. This action cannot be undone.
+              {t.dialogs.deleteWorkflowDesc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete">{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete"
             >
-              Delete
+              {t.common.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

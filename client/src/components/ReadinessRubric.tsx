@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, AlertTriangle } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ReadinessRubricProps {
   rubric: ReadinessRubricScore;
@@ -58,6 +59,8 @@ function getFeasibilityIcon(band: ReadinessRubricScore['feasibilityBand']) {
 }
 
 export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
+  const { t } = useLanguage();
+  
   // Convert weighted contribution scores back to 0-100 scale for display
   // Components are stored as weighted contributions to total score, but we display them as percentages
   const componentWeightValues: Record<keyof ReadinessRubricScore['components'], number> = {
@@ -216,9 +219,9 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             <h3 className="text-2xl font-bold mb-2" data-testid="text-readiness-score">
               {rubric.totalScore}/100
             </h3>
-            <p className="text-sm text-muted-foreground">Combined Readiness Score</p>
+            <p className="text-sm text-muted-foreground">{t.readiness.combinedScore}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Technical (60%) + Operational (40%)
+              {t.rubric.technicalOperational}
             </p>
           </div>
           <Badge 
@@ -241,25 +244,25 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
 
       {/* Score Breakdown */}
       <Card className="p-6" data-testid="card-readiness-breakdown">
-        <h3 className="font-semibold text-lg mb-4">Score Components</h3>
+        <h3 className="font-semibold text-lg mb-4">{t.rubric.scoreComponents}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-muted/30 rounded-md p-4">
-            <p className="text-sm text-muted-foreground mb-1">Technical Feasibility (60%)</p>
+            <p className="text-sm text-muted-foreground mb-1">{t.rubric.technicalFoundation}</p>
             <p className="text-2xl font-bold" data-testid="text-tfa-score">{rubric.tfaScore}/100</p>
           </div>
           <div className="bg-muted/30 rounded-md p-4">
-            <p className="text-sm text-muted-foreground mb-1">Operational Readiness (40%)</p>
+            <p className="text-sm text-muted-foreground mb-1">{t.rubric.operationalReadiness}</p>
             <p className="text-2xl font-bold" data-testid="text-pif-score">{rubric.pifScore}/100</p>
           </div>
         </div>
 
         <div className="space-y-3">
-          <h4 className="font-semibold text-base mb-3">Detailed Components</h4>
+          <h4 className="font-semibold text-base mb-3">{t.rubric.detailedComponents}</h4>
           
           {/* TFA Components */}
           <div className="space-y-3">
-            <p className="text-sm font-medium text-muted-foreground">Technical Foundation (60%)</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.rubric.technicalFoundation}</p>
             {(['systemEnvironment', 'dataQuality', 'integrationFeasibility', 'securityCompliance'] as const).map((key) => {
               const displayScore = rubric.componentScores[key];
               return (
@@ -267,7 +270,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
                   <div className="flex items-center justify-between text-sm">
                     <span>{componentLabels[key]}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-xs">{componentWeights[key]} weight</span>
+                      <span className="text-muted-foreground text-xs">{componentWeights[key]} {t.labels.weight}</span>
                       <span className="font-medium">{displayScore}/100</span>
                     </div>
                   </div>
@@ -279,7 +282,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
 
           {/* PIF Components */}
           <div className="space-y-3 pt-4 border-t border-border">
-            <p className="text-sm font-medium text-muted-foreground">Operational Readiness (40%)</p>
+            <p className="text-sm font-medium text-muted-foreground">{t.rubric.operationalReadiness}</p>
             {(['processClarity', 'changeMagnitude', 'workflowBrittleness'] as const).map((key) => {
               const displayScore = rubric.componentScores[key];
               return (
@@ -287,7 +290,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
                   <div className="flex items-center justify-between text-sm">
                     <span>{componentLabels[key]}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-xs">{componentWeights[key]} weight</span>
+                      <span className="text-muted-foreground text-xs">{componentWeights[key]} {t.labels.weight}</span>
                       <span className="font-medium">{displayScore}/100</span>
                     </div>
                   </div>
@@ -302,7 +305,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
       {/* Executive Summary - SWOT Analysis */}
       <Card data-testid="card-executive-summary">
         <CardHeader>
-          <CardTitle>Executive Summary: SWOT Analysis</CardTitle>
+          <CardTitle>{t.rubric.executiveSummary}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Strengths */}
@@ -310,7 +313,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-green-600 dark:text-green-400">
                 <CheckCircle2 className="h-4 w-4" />
-                Strengths
+                {t.readiness.strengths}
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.strengths.map((strength, index) => (
@@ -327,7 +330,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-orange-600 dark:text-orange-400">
                 <AlertCircle className="h-4 w-4" />
-                Weaknesses
+                {t.readiness.weaknesses}
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.weaknesses.map((weakness, index) => (
@@ -344,7 +347,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-blue-600 dark:text-blue-400">
                 <TrendingUp className="h-4 w-4" />
-                Opportunities
+                {t.readiness.opportunities}
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.opportunities.map((opportunity, index) => (
@@ -361,7 +364,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-red-600 dark:text-red-400">
                 <AlertTriangle className="h-4 w-4" />
-                Threats
+                {t.readiness.threats}
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.threats.map((threat, index) => (
@@ -380,7 +383,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
         {/* Radar Chart - Component Comparison */}
         <Card data-testid="card-radar-chart">
           <CardHeader>
-            <CardTitle>Component Analysis</CardTitle>
+            <CardTitle>{t.rubric.componentAnalysis}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -406,7 +409,7 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
         {/* Pie Chart - Component Weights */}
         <Card data-testid="card-component-weights">
           <CardHeader>
-            <CardTitle>Component Weight Distribution</CardTitle>
+            <CardTitle>{t.rubric.componentWeights}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -444,17 +447,17 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
             
             {/* Weight Explanation */}
             <div className="mt-6 space-y-3 text-sm">
-              <h4 className="font-semibold">Why These Weights?</h4>
+              <h4 className="font-semibold">{t.rubric.whyTheseWeights}</h4>
               <div className="space-y-2 text-muted-foreground">
-                <p><strong>Data Quality (18%)</strong> and <strong>Integration Feasibility (18%)</strong> carry the most weight because they directly determine whether the AI can connect to existing systems and work with available data - the fundamental building blocks of any AI implementation.</p>
+                <p>{t.rubric.dataQualityWeight}</p>
                 
-                <p><strong>System Environment (15%)</strong> is critical as it encompasses the technical infrastructure, scalability, and backup capabilities that ensure the AI solution can run reliably.</p>
+                <p>{t.rubric.systemEnvWeight}</p>
                 
-                <p><strong>Security & Compliance (9%)</strong> addresses regulatory and security requirements that, while essential, are often more about verification than technical capability.</p>
+                <p>{t.rubric.securityWeight}</p>
                 
-                <p><strong>Process Clarity (8%)</strong> and <strong>Change Magnitude (8%)</strong> reflect operational readiness - clear processes reduce implementation complexity, while understanding change magnitude helps plan adoption strategies.</p>
+                <p>{t.rubric.clarityWeight}</p>
                 
-                <p><strong>Workflow Brittleness (6%)</strong> has the lowest weight as it indicates risk rather than capability, and can often be mitigated through careful design even in brittle workflows.</p>
+                <p>{t.rubric.brittlenessWeight}</p>
               </div>
             </div>
           </CardContent>

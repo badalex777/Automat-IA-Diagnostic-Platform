@@ -26,6 +26,7 @@ import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
@@ -45,6 +46,7 @@ export default function WorkflowDetail() {
   const companyId = params?.companyId || '';
   const workflowId = params?.workflowId || '';
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
@@ -95,7 +97,7 @@ export default function WorkflowDetail() {
   useEffect(() => {
     if (companyError) {
       toast({
-        title: "Error loading company",
+        title: t.toast.errorLoading,
         description: companyError.message,
         variant: "destructive",
       });
@@ -106,7 +108,7 @@ export default function WorkflowDetail() {
   useEffect(() => {
     if (workflowError) {
       toast({
-        title: "Error loading workflow",
+        title: t.toast.errorLoading,
         description: workflowError.message,
         variant: "destructive",
       });
@@ -117,7 +119,7 @@ export default function WorkflowDetail() {
   useEffect(() => {
     if (tfaError) {
       toast({
-        title: "Error loading TFA assessment",
+        title: t.toast.errorLoading,
         description: tfaError.message,
         variant: "destructive",
       });
@@ -128,7 +130,7 @@ export default function WorkflowDetail() {
   useEffect(() => {
     if (impactError) {
       toast({
-        title: "Error loading business impact",
+        title: t.toast.errorLoading,
         description: impactError.message,
         variant: "destructive",
       });
@@ -171,14 +173,14 @@ export default function WorkflowDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
       toast({
-        title: "Workflow renamed",
-        description: "The workflow name has been successfully updated.",
+        title: t.toast.workflowUpdated,
+        description: t.toast.workflowUpdatedDesc,
       });
       setIsEditingName(false);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error renaming workflow",
+        title: t.toast.errorSaving,
         description: error.message,
         variant: "destructive",
       });
@@ -193,15 +195,15 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: "Opportunity created",
-        description: "The implementation opportunity has been created successfully.",
+        title: t.toast.opportunityCreated,
+        description: t.toast.opportunityCreatedDesc,
       });
       setIsOpportunityDialogOpen(false);
       setEditingOpportunity(null);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error creating opportunity",
+        title: t.toast.errorSaving,
         description: error.message,
         variant: "destructive",
       });
@@ -216,8 +218,8 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: "Opportunity updated",
-        description: "The implementation opportunity has been updated successfully.",
+        title: t.toast.opportunityUpdated,
+        description: t.toast.opportunityUpdatedDesc,
       });
       setIsOpportunityDialogOpen(false);
       setEditingOpportunity(null);

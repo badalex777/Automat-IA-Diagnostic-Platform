@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { calculateScoringGuide, type ScoringGuideTable } from "@shared/opportunityCalculations";
 import { Info } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ScoringGuideDialogProps {
   open: boolean;
@@ -104,43 +105,43 @@ export default function ScoringGuideDialog({
   companyEmployees,
   companyName,
 }: ScoringGuideDialogProps) {
+  const { t } = useLanguage();
   const guides = calculateScoringGuide(companyRevenue, companyEmployees);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="dialog-scoring-guide">
         <DialogHeader>
-          <DialogTitle>Business Impact Scoring Guide</DialogTitle>
+          <DialogTitle>{t.dialogs.scoringGuide}</DialogTitle>
           <DialogDescription>
-            Understand what ROI and FTE savings produce different business impact scores for {companyName}
+            {t.dialogs.scoringGuideDesc}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="p-4 bg-muted/30 rounded-lg border">
-            <h3 className="font-semibold mb-2">Company Context</h3>
+            <h3 className="font-semibold mb-2">{t.scoringGuide.companyScoring}</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Annual Revenue:</span>
+                <span className="text-muted-foreground">{t.company.annualRevenue}:</span>
                 <span className="ml-2 font-medium">{formatCurrency(companyRevenue)}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Total Employees:</span>
+                <span className="text-muted-foreground">{t.company.totalEmployees}:</span>
                 <span className="ml-2 font-medium">{companyEmployees}</span>
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-3">
-              Scores shown assume balanced contributions from ROI and FTE savings. 
-              Opportunities can achieve these scores through different combinations.
+              {t.scoringGuide.filterExplanation}
             </p>
           </div>
 
           <Tabs defaultValue="time-only" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="time-only" data-testid="tab-time-only">Time Only</TabsTrigger>
-              <TabsTrigger value="time-error" data-testid="tab-time-error">Time + Error</TabsTrigger>
-              <TabsTrigger value="time-revenue" data-testid="tab-time-revenue">Time + Revenue</TabsTrigger>
-              <TabsTrigger value="all-three" data-testid="tab-all-three">All 3 Metrics</TabsTrigger>
+              <TabsTrigger value="time-only" data-testid="tab-time-only">{t.opportunities.filters.timeOnly}</TabsTrigger>
+              <TabsTrigger value="time-error" data-testid="tab-time-error">{t.opportunities.filters.timeError}</TabsTrigger>
+              <TabsTrigger value="time-revenue" data-testid="tab-time-revenue">{t.opportunities.filters.timeRevenue}</TabsTrigger>
+              <TabsTrigger value="all-three" data-testid="tab-all-three">{t.opportunities.filters.allThree}</TabsTrigger>
             </TabsList>
             
             {guides.map((guide) => (

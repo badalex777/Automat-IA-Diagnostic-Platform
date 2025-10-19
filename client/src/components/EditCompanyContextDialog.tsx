@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
 import type { Company } from "@shared/schema";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EditCompanyContextDialogProps {
   company: Company;
@@ -19,16 +20,15 @@ interface EditCompanyContextDialogProps {
   onSubmit?: (data: { 
     annualRevenue?: number;
     totalEmployees?: number;
-    annualLaborCosts?: number;
   }) => void;
 }
 
 export default function EditCompanyContextDialog({ company, trigger, onSubmit }: EditCompanyContextDialogProps) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     annualRevenue: '',
     totalEmployees: '',
-    annualLaborCosts: '',
   });
 
   useEffect(() => {
@@ -36,7 +36,6 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
       setFormData({
         annualRevenue: company.annualRevenue?.toString() || '',
         totalEmployees: company.totalEmployees?.toString() || '',
-        annualLaborCosts: company.annualLaborCosts?.toString() || '',
       });
     }
   }, [open, company]);
@@ -47,7 +46,6 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
     const submitData = {
       annualRevenue: formData.annualRevenue ? parseFloat(formData.annualRevenue) : undefined,
       totalEmployees: formData.totalEmployees ? parseInt(formData.totalEmployees) : undefined,
-      annualLaborCosts: formData.annualLaborCosts ? parseFloat(formData.annualLaborCosts) : undefined,
     };
     
     onSubmit?.(submitData);
@@ -64,26 +62,26 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
             data-testid="button-edit-company-context"
           >
             <Pencil className="h-4 w-4 mr-2" />
-            Edit Financial Context
+            {t.actions.editFinancialContext}
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Company Financial Context</DialogTitle>
+          <DialogTitle>{t.dialogs.editFinancialContext}</DialogTitle>
           <DialogDescription>
-            Update financial metrics to calibrate opportunity analysis for {company.name}
+            {t.dialogs.editFinancialContextDesc}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="annualRevenue">Annual Revenue ($)</Label>
+              <Label htmlFor="annualRevenue">{t.company.annualRevenue} ($)</Label>
               <Input
                 id="annualRevenue"
                 type="number"
                 step="0.01"
-                placeholder="e.g., 5000000"
+                placeholder={t.forms.annualRevenuePlaceholder}
                 value={formData.annualRevenue}
                 onChange={(e) => setFormData({ ...formData, annualRevenue: e.target.value })}
                 data-testid="input-edit-annual-revenue"
@@ -91,12 +89,12 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="totalEmployees">Total Employees</Label>
+              <Label htmlFor="totalEmployees">{t.company.totalEmployees}</Label>
               <Input
                 id="totalEmployees"
                 type="number"
                 step="1"
-                placeholder="e.g., 50"
+                placeholder={t.forms.totalEmployeesPlaceholder}
                 value={formData.totalEmployees}
                 onChange={(e) => setFormData({ ...formData, totalEmployees: e.target.value })}
                 data-testid="input-edit-total-employees"
@@ -104,25 +102,12 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="annualLaborCosts">Annual Labor Costs ($)</Label>
-            <Input
-              id="annualLaborCosts"
-              type="number"
-              step="0.01"
-              placeholder="e.g., 3000000"
-              value={formData.annualLaborCosts}
-              onChange={(e) => setFormData({ ...formData, annualLaborCosts: e.target.value })}
-              data-testid="input-edit-annual-labor-costs"
-            />
-          </div>
-          
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} data-testid="button-cancel-edit-context">
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button type="submit" data-testid="button-submit-edit-context">
-              Save Changes
+              {t.actions.saveChanges}
             </Button>
           </div>
         </form>

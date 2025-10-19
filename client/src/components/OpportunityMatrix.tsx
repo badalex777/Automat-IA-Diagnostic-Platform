@@ -12,6 +12,7 @@ import {
 } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
@@ -53,6 +54,7 @@ export default function OpportunityMatrix({
   companyContext,
   onOpportunityClick 
 }: OpportunityMatrixProps) {
+  const { t } = useLanguage();
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
@@ -209,26 +211,26 @@ export default function OpportunityMatrix({
     <Card data-testid="card-opportunity-matrix">
       <CardHeader>
         <div className="flex items-center justify-between gap-4">
-          <CardTitle>Opportunity Matrix</CardTitle>
+          <CardTitle>{t.matrix.title}</CardTitle>
           <Select value={filterType} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
-              <SelectValue placeholder="Filter by metrics" />
+              <SelectValue placeholder={t.labels.filterByMetrics} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all-opportunities" data-testid="filter-all-opportunities">
-                All Opportunities
+                {t.labels.allOpportunities}
               </SelectItem>
               <SelectItem value="time-only" data-testid="filter-time-only">
-                Time Savings Only
+                {t.opportunities.filters.timeOnly}
               </SelectItem>
               <SelectItem value="time-error" data-testid="filter-time-error">
-                Time + Error Reduction
+                {t.opportunities.filters.timeError}
               </SelectItem>
               <SelectItem value="time-revenue" data-testid="filter-time-revenue">
-                Time + Revenue Uplift
+                {t.opportunities.filters.timeRevenue}
               </SelectItem>
               <SelectItem value="all-three" data-testid="filter-all-three">
-                All 3 Metrics
+                {t.opportunities.filters.allThree}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -252,10 +254,10 @@ export default function OpportunityMatrix({
                 <XAxis 
                   type="number" 
                   dataKey="x" 
-                  name="Business Impact"
+                  name={t.matrix.xAxis}
                   domain={[0, 100]}
                   label={{ 
-                    value: 'Business Impact →', 
+                    value: `${t.matrix.xAxis} →`, 
                     position: 'bottom',
                     offset: 40,
                     className: "fill-foreground text-sm"
@@ -265,10 +267,10 @@ export default function OpportunityMatrix({
                 <YAxis 
                   type="number" 
                   dataKey="y" 
-                  name="Implementation Effort"
+                  name={t.matrix.yAxis}
                   domain={[0, 100]}
                   label={{ 
-                    value: 'Implementation Effort →', 
+                    value: `${t.matrix.yAxis} →`, 
                     angle: -90, 
                     position: 'left',
                     offset: 40,
@@ -293,16 +295,16 @@ export default function OpportunityMatrix({
 
                 {/* Quadrant labels */}
                 <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                  Nice-To-Haves
+                  {t.matrix.quadrants.lowHanging}
                 </text>
                 <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                  Quick Wins
+                  {t.matrix.quadrants.quickWins}
                 </text>
                 <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                  Deprioritize
+                  {t.matrix.quadrants.maybeNever}
                 </text>
                 <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
-                  Strategic Goals
+                  {t.matrix.quadrants.strategicBets}
                 </text>
 
                 <Tooltip content={<CustomTooltip />} />

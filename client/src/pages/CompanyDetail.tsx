@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Company, Workflow, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric } from "@shared/pifCalculations";
@@ -24,6 +25,7 @@ export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
   const companyId = params?.id || '';
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
@@ -47,7 +49,7 @@ export default function CompanyDetail() {
   useEffect(() => {
     if (companyError) {
       toast({
-        title: "Error loading company",
+        title: t.toast.errorLoading,
         description: companyError.message,
         variant: "destructive",
       });
@@ -58,7 +60,7 @@ export default function CompanyDetail() {
   useEffect(() => {
     if (workflowsError) {
       toast({
-        title: "Error loading workflows",
+        title: t.toast.errorLoading,
         description: workflowsError.message,
         variant: "destructive",
       });
@@ -77,13 +79,13 @@ export default function CompanyDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
       toast({
-        title: "Workflow created",
-        description: "The workflow has been successfully added.",
+        title: t.toast.workflowCreated,
+        description: t.toast.workflowCreatedDesc,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error creating workflow",
+        title: t.toast.errorSaving,
         description: error.message,
         variant: "destructive",
       });
@@ -99,14 +101,14 @@ export default function CompanyDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       toast({
-        title: "Company renamed",
-        description: "The company name has been successfully updated.",
+        title: t.toast.companyUpdated,
+        description: t.toast.companyUpdatedDesc,
       });
       setIsEditingName(false);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error renaming company",
+        title: t.toast.errorSaving,
         description: error.message,
         variant: "destructive",
       });
@@ -126,13 +128,13 @@ export default function CompanyDetail() {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/opportunities`] });
       toast({
-        title: "Company context updated",
-        description: "Financial metrics have been updated. Opportunity scores will recalculate automatically.",
+        title: t.toast.companyUpdated,
+        description: t.toast.companyUpdatedDesc,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error updating company context",
+        title: t.toast.errorSaving,
         description: error.message,
         variant: "destructive",
       });
