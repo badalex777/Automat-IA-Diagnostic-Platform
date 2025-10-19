@@ -399,6 +399,137 @@ function hasRevenueMetrics(opp: ImplementationOpportunity): boolean {
   return revenue > 0;
 }
 
+export interface ScoringGuideEntry {
+  targetScore: number;
+  requiredRoi: number;          // Dollar amount
+  requiredRoiPct: number;        // Percentage of company revenue
+  requiredFte: number;           // FTE count
+  requiredFtePct: number;        // Percentage of company employees
+  description: string;           // Human-readable description
+}
+
+export interface ScoringGuideTable {
+  filterName: string;
+  filterType: MatrixFilterType;
+  roiWeight: number;
+  hoursWeight: number;
+  errorWeight?: number;
+  revenueWeight?: number;
+  entries: ScoringGuideEntry[];
+}
+
+/**
+ * Generate scoring guide tables for a specific company
+ * Shows what ROI and FTE combinations produce different business impact scores
+ */
+export function calculateScoringGuide(
+  companyRevenue: number,
+  companyEmployees: number
+): ScoringGuideTable[] {
+  const guides: ScoringGuideTable[] = [];
+  
+  // Define filter configurations
+  const filterConfigs: Array<{
+    filterName: string;
+    filterType: MatrixFilterType;
+    roiWeight: number;
+    hoursWeight: number;
+    errorWeight?: number;
+    revenueWeight?: number;
+  }> = [
+    {
+      filterName: "Time Savings Only",
+      filterType: "time-only",
+      roiWeight: 0.60,
+      hoursWeight: 0.40,
+    },
+    {
+      filterName: "Time + Error Reduction",
+      filterType: "time-error",
+      roiWeight: 0.45,
+      hoursWeight: 0.30,
+      errorWeight: 0.25,
+    },
+    {
+      filterName: "Time + Revenue Uplift",
+      filterType: "time-revenue",
+      roiWeight: 0.45,
+      hoursWeight: 0.30,
+      revenueWeight: 0.25,
+    },
+    {
+      filterName: "All 3 Metrics",
+      filterType: "all-three",
+      roiWeight: 0.40,
+      hoursWeight: 0.25,
+      errorWeight: 0.20,
+      revenueWeight: 0.15,
+    },
+  ];
+  
+  // For each filter configuration
+  for (const config of filterConfigs) {
+    const entries: ScoringGuideEntry[] = [];
+    
+    // Generate entries for scores 10, 20, 30, ..., 100
+    for (let targetScore = 10; targetScore <= 100; targetScore += 10) {
+      // For balanced scenario: assume equal contribution from ROI and Hours components
+      // targetScore = (roiScore × roiWeight) + (hoursScore × hoursWeight)
+      // For balanced: roiScore = hoursScore = X
+      // targetScore = X × (roiWeight + hoursWeight)
+      // X = targetScore / (roiWeight + hoursWeight)
+      
+      const combinedWeight = config.roiWeight + config.hoursWeight;
+      const balancedComponentScore = targetScore / combinedWeight;
+      
+      // roiScore = (ROI / companyRevenue) × 100
+      // So: ROI = (roiScore / 100) × companyRevenue
+      const requiredRoi = (balancedComponentScore / 100) * companyRevenue;
+      const requiredRoiPct = balancedComponentScore;
+      
+      // hoursScore = (FTE / companyEmployees) × 100
+      // So: FTE = (hoursScore / 100) × companyEmployees
+      const requiredFte = (balancedComponentScore / 100) * companyEmployees;
+      const requiredFtePct = balancedComponentScore;
+      
+      // Generate description
+      let description = "Balanced impact";
+      if (targetScore <= 20) {
+        description = "Small process improvement";
+      } else if (targetScore <= 40) {
+        description = "Moderate automation opportunity";
+      } else if (targetScore <= 60) {
+        description = "Significant workflow transformation";
+      } else if (targetScore <= 80) {
+        description = "Department-level automation";
+      } else {
+        description = "Enterprise-wide transformation";
+      }
+      
+      entries.push({
+        targetScore,
+        requiredRoi: Math.round(requiredRoi),
+        requiredRoiPct: Math.round(requiredRoiPct * 10) / 10,
+        requiredFte: Math.round(requiredFte * 10) / 10,
+        requiredFtePct: Math.round(requiredFtePct * 10) / 10,
+        description,
+      });
+    }
+    
+    guides.push({
+      filterName: config.filterName,
+      filterType: config.filterType,
+      roiWeight: config.roiWeight,
+      hoursWeight: config.hoursWeight,
+      errorWeight: config.errorWeight,
+      revenueWeight: config.revenueWeight,
+      entries,
+    });
+  }
+  
+  return guides;
+}
+
 /**
  * Recalculate Business Impact for a specific filter view
  * This redistributes weights to only the relevant metrics for fair comparison
