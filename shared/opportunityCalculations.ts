@@ -94,7 +94,6 @@ function normalizeToScale(value: number | null | undefined, maxReference: number
 export interface CompanyContext {
   annualRevenue?: number | string | null;
   totalEmployees?: number | string | null;
-  annualLaborCosts?: number | string | null;
 }
 
 

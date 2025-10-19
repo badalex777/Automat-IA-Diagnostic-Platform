@@ -107,23 +107,14 @@ export default function OpportunityMatrix({
       };
     });
 
-    // Within-category normalization: find max Business Impact and normalize
-    const maxBusinessImpact = Math.max(...rawPoints.map(p => p.businessImpact), 0);
-    
-    // Only normalize if we have meaningful scores (max > 20)
-    // This prevents over-inflation of very low scores
-    const shouldNormalize = maxBusinessImpact > 20 && filterType !== "all-opportunities";
-    
+    // Use absolute business impact scores (no relative normalization)
     const points: DataPoint[] = rawPoints.map(point => {
-      // Normalize Business Impact to make best opportunity reach ~100
-      let normalizedImpact = point.businessImpact;
-      if (shouldNormalize && maxBusinessImpact > 0) {
-        normalizedImpact = (point.businessImpact / maxBusinessImpact) * 100;
-      }
+      // Use absolute business impact (already company-relative via % of revenue and % of employees)
+      const businessImpact = point.businessImpact;
       
-      // Determine quadrant based on normalized scores
+      // Determine quadrant based on absolute scores
       const isLowEffort = point.implementationEffort < 50;
-      const isHighImpact = normalizedImpact >= 50;
+      const isHighImpact = businessImpact >= 50;
       let quadrant: string;
       if (isLowEffort && isHighImpact) quadrant = "Quick Wins";
       else if (!isLowEffort && isHighImpact) quadrant = "Strategic Goals";
@@ -135,7 +126,7 @@ export default function OpportunityMatrix({
         name: point.name,
         workflowId: point.workflowId,
         workflowName: workflowMap[point.workflowId] || "Unknown",
-        x: normalizedImpact,
+        x: businessImpact,
         y: point.implementationEffort,
         quadrant,
         color: point.color,
