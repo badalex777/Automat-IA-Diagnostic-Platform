@@ -547,19 +547,20 @@ export function calculateBusinessImpactForFilter(
   const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
   const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
   
-  // Calculate company-relative metrics (0-100)
+  // Calculate company-relative metrics (0-100) with 10x multiplier
   let roiScore = 0;
   let hoursScore = 0;
   
   if (companyRevenue > 0) {
-    roiScore = Math.min((annualRoi / companyRevenue) * 100, 100);
+    // ROI as % of annual revenue × 10 multiplier, capped at 100
+    roiScore = Math.min((annualRoi / companyRevenue) * 1000, 100);
   } else {
     roiScore = normalizeToScale(annualRoi, 1000000);
   }
   
   if (companyEmployees > 0) {
-    // FTE-based hours score
-    hoursScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+    // FTE-based hours score × 10 multiplier, capped at 100
+    hoursScore = Math.min((fteSavings / companyEmployees) * 1000, 100);
   } else {
     hoursScore = normalizeToScale(fteSavings, 5);
   }
