@@ -158,17 +158,18 @@ export function calculateBusinessImpact(
   let hoursScore = 0;
   
   if (companyRevenue > 0) {
-    // ROI as % of annual revenue, capped at 100
-    roiScore = Math.min((annualRoi / companyRevenue) * 100, 100);
+    // ROI as % of annual revenue × 10 multiplier, capped at 100
+    // 10% ROI = score 100 (exceptional workflow automation)
+    roiScore = Math.min((annualRoi / companyRevenue) * 1000, 100);
   } else {
     // Fallback: normalize to $1M
     roiScore = normalizeToScale(annualRoi, 1000000);
   }
   
   if (companyEmployees > 0) {
-    // FTE savings as % of total employees, capped at 100
-    // This is the Hours score (FTE-based normalization)
-    hoursScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+    // FTE savings as % of total employees × 10 multiplier, capped at 100
+    // 10% FTE = score 100 (exceptional workforce efficiency)
+    hoursScore = Math.min((fteSavings / companyEmployees) * 1000, 100);
   } else {
     // Fallback: normalize to 5 FTE
     hoursScore = normalizeToScale(fteSavings, 5);
