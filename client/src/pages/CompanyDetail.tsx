@@ -464,7 +464,7 @@ export default function CompanyDetail() {
                   onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
                 />
               )}
-              {company && (
+              {company && opportunities.length > 0 && (
                 <Button
                   variant="ghost"
                   size="icon"

@@ -706,17 +706,31 @@ function generateWorkflowSection(
 ): string {
   const { workflow, tfa, pifData, opportunities } = data;
 
-  return `
-    <div class="workflow-section">
-      <div class="workflow-title">${workflow.name}</div>
-      ${workflow.description ? `<div class="workflow-description">${workflow.description}</div>` : ''}
-      
-      ${generateTFASection(tfa, t, language)}
-      ${generatePIFSection(pifData, t, language)}
-      ${generateReadinessSection(tfa, pifData, t, language)}
-      ${generateOpportunityMatrixes(opportunities, tfa, pifData, company, workflow, t, language)}
-    </div>
-  `;
+  try {
+    return `
+      <div class="workflow-section">
+        <div class="workflow-title">${workflow.name}</div>
+        ${workflow.description ? `<div class="workflow-description">${workflow.description}</div>` : ''}
+        
+        ${generateTFASection(tfa, t, language)}
+        ${generatePIFSection(pifData, t, language)}
+        ${generateReadinessSection(tfa, pifData, t, language)}
+        ${generateOpportunityMatrixes(opportunities, tfa, pifData, company, workflow, t, language)}
+      </div>
+    `;
+  } catch (error) {
+    console.error(`[Snapshot] Error generating section for workflow ${workflow.name}:`, error);
+    return `
+      <div class="workflow-section">
+        <div class="workflow-title">${workflow.name}</div>
+        ${workflow.description ? `<div class="workflow-description">${workflow.description}</div>` : ''}
+        <div style="padding: 20px; background: #1f2937; border-left: 3px solid #ef4444; color: #fca5a5; margin: 20px 0;">
+          <p><strong>Error generating workflow snapshot</strong></p>
+          <p style="margin-top: 8px; font-size: 14px;">This workflow's data could not be processed. Please ensure all assessment forms are completed.</p>
+        </div>
+      </div>
+    `;
+  }
 }
 
 function hasTFAData(tfa: TFAAssessment | null): boolean {
@@ -1039,9 +1053,8 @@ function generatePIFSection(pifData: PIFData | null, t: any, language: 'en' | 'e
 
   const pifResponses = pifData!.responses || [];
   // Use aggregated scores from API, or calculate if missing/incomplete
-  const aggregated = (pifData!.aggregated && pifData!.aggregated.processClarity) 
-    ? pifData!.aggregated 
-    : calculateAggregatedPIFScores(pifResponses);
+  const hasValidAggregated = pifData!.aggregated?.processClarity !== undefined;
+  const aggregated = hasValidAggregated ? pifData!.aggregated : calculateAggregatedPIFScores(pifResponses);
   
   return `
     <div class="subsection">
@@ -1233,7 +1246,8 @@ function generateReadinessSection(
 
   // Use aggregated scores from API, or calculate if missing
   const pifResponses = pifData!.responses || [];
-  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifResponses);
+  const hasValidAggregated = pifData!.aggregated?.processClarity !== undefined;
+  const aggregatedPIF = hasValidAggregated ? pifData!.aggregated : calculateAggregatedPIFScores(pifResponses);
   const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const feasibilityClass = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '-');
@@ -1331,7 +1345,8 @@ function generateOpportunityMatrixes(
 
   // Use aggregated scores from API, or calculate if missing
   const pifResponses = pifData!.responses || [];
-  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifResponses);
+  const hasValidAggregated = pifData!.aggregated?.processClarity !== undefined;
+  const aggregatedPIF = hasValidAggregated ? pifData!.aggregated : calculateAggregatedPIFScores(pifResponses);
   const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const companyContext: CompanyContext = {
