@@ -97,30 +97,6 @@ export interface CompanyContext {
   annualLaborCosts?: number | string | null;
 }
 
-/**
- * Calculate actual hourly rate from employee salary and overhead
- * Matches ROI Calculator methodology: (Annual Salary × Overhead) ÷ 2,080 hours
- * 
- * @param employeeAnnualSalary - Yearly compensation for employees performing this work
- * @param overheadMultiplier - Cost multiplier (typically 1.2-1.5), defaults to 1.3
- * @returns Hourly rate in dollars, or 50 as fallback if salary not provided
- */
-function calculateHourlyRate(
-  employeeAnnualSalary?: number | string | null,
-  overheadMultiplier?: number | string | null
-): number {
-  const salary = parseFloat(employeeAnnualSalary?.toString() || "0");
-  const overhead = parseFloat(overheadMultiplier?.toString() || "1.3");
-  
-  if (salary <= 0) {
-    // Fallback to $50/hour if no salary data provided
-    return 50;
-  }
-  
-  // ROI Calculator formula: (Annual Salary × Overhead) ÷ 2,080 annual hours
-  const ANNUAL_WORKING_HOURS = 2080;
-  return (salary * overhead) / ANNUAL_WORKING_HOURS;
-}
 
 /**
  * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE
@@ -128,9 +104,7 @@ function calculateHourlyRate(
  * 
  * Uses company financial context to calculate relative impact:
  * - ROI as % of annual revenue
- * - Hours saved as % of annual labor costs (converted to $ using actual hourly rate)
- * 
- * Note: FTE removed from scoring (it's just hours/40, redundant metric)
+ * - Hours saved converted to FTE (hours/40), normalized against company's total employees
  * 
  * TWO CALCULATION MODES:
  * 
@@ -174,17 +148,14 @@ export function calculateBusinessImpact(
 ): number {
   const annualRoi = parseFloat(opportunity.annualRoi || "0");
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
-  const annualHours = parseFloat(opportunity.annualHoursSaved || "0");
   
   // Parse company context
   const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
   const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
-  const companyLaborCosts = parseFloat(companyContext?.annualLaborCosts?.toString() || "0");
   
   // Calculate company-relative metrics (0-100)
   // If no company context, fall back to absolute normalization
   let roiScore = 0;
-  let fteScore = 0;
   let hoursScore = 0;
   
   if (companyRevenue > 0) {
@@ -197,21 +168,11 @@ export function calculateBusinessImpact(
   
   if (companyEmployees > 0) {
     // FTE savings as % of total employees, capped at 100
-    fteScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+    // This is the Hours score (FTE-based normalization)
+    hoursScore = Math.min((fteSavings / companyEmployees) * 100, 100);
   } else {
     // Fallback: normalize to 5 FTE
-    fteScore = normalizeToScale(fteSavings, 5);
-  }
-  
-  if (companyLaborCosts > 0) {
-    // Convert hours to dollar value using actual hourly rate
-    // Then calculate as % of annual labor costs
-    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
-    const hoursDollarValue = annualHours * hourlyRate;
-    hoursScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
-  } else {
-    // Fallback: normalize to 10k hours
-    hoursScore = normalizeToScale(annualHours, 10000);
+    hoursScore = normalizeToScale(fteSavings, 5);
   }
 
   // Determine weights based on active toggles and calculation mode
@@ -273,12 +234,12 @@ export function calculateBusinessImpact(
     let hoursReallocatedScore = 0;
     let revenueUpliftScore = 0;
     
-    if (companyLaborCosts > 0) {
-      const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
-      const hoursDollarValue = hoursReallocated * hourlyRate;
-      hoursReallocatedScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+    // Hours Reallocated: convert to FTE and normalize against total employees
+    const hoursReallocatedFTE = hoursReallocated / 2080; // Annual hours to FTE
+    if (companyEmployees > 0) {
+      hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 100, 100);
     } else {
-      hoursReallocatedScore = normalizeToScale(hoursReallocated, 10000);
+      hoursReallocatedScore = normalizeToScale(hoursReallocatedFTE, 5);
     }
     
     if (companyRevenue > 0) {
@@ -290,7 +251,7 @@ export function calculateBusinessImpact(
     revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
   }
 
-  // Calculate total impact with redistributed weights (FTE removed)
+  // Calculate total impact with redistributed weights
   const totalImpact = 
     (roiScore * roiWeight) +
     (hoursScore * hoursWeight) +
@@ -450,16 +411,13 @@ export function calculateBusinessImpactForFilter(
 ): number {
   const annualRoi = parseFloat(opportunity.annualRoi || "0");
   const fteSavings = parseFloat(opportunity.fteSavings || "0");
-  const annualHours = parseFloat(opportunity.annualHoursSaved || "0");
   
   // Parse company context
   const companyRevenue = parseFloat(companyContext?.annualRevenue?.toString() || "0");
   const companyEmployees = parseFloat(companyContext?.totalEmployees?.toString() || "0");
-  const companyLaborCosts = parseFloat(companyContext?.annualLaborCosts?.toString() || "0");
   
   // Calculate company-relative metrics (0-100)
   let roiScore = 0;
-  let fteScore = 0;
   let hoursScore = 0;
   
   if (companyRevenue > 0) {
@@ -469,17 +427,10 @@ export function calculateBusinessImpactForFilter(
   }
   
   if (companyEmployees > 0) {
-    fteScore = Math.min((fteSavings / companyEmployees) * 100, 100);
+    // FTE-based hours score
+    hoursScore = Math.min((fteSavings / companyEmployees) * 100, 100);
   } else {
-    fteScore = normalizeToScale(fteSavings, 5);
-  }
-  
-  if (companyLaborCosts > 0) {
-    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
-    const hoursDollarValue = annualHours * hourlyRate;
-    hoursScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
-  } else {
-    hoursScore = normalizeToScale(annualHours, 10000);
+    hoursScore = normalizeToScale(fteSavings, 5);
   }
 
   // Calculate error impact
@@ -498,12 +449,12 @@ export function calculateBusinessImpactForFilter(
   let hoursReallocatedScore = 0;
   let revenueUpliftScore = 0;
   
-  if (companyLaborCosts > 0) {
-    const hourlyRate = calculateHourlyRate(opportunity.employeeAnnualSalary, opportunity.overheadMultiplier);
-    const hoursDollarValue = hoursReallocated * hourlyRate;
-    hoursReallocatedScore = Math.min((hoursDollarValue / companyLaborCosts) * 100, 100);
+  // Hours Reallocated: convert to FTE and normalize against total employees
+  const hoursReallocatedFTE = hoursReallocated / 2080; // Annual hours to FTE
+  if (companyEmployees > 0) {
+    hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 100, 100);
   } else {
-    hoursReallocatedScore = normalizeToScale(hoursReallocated, 10000);
+    hoursReallocatedScore = normalizeToScale(hoursReallocatedFTE, 5);
   }
   
   if (companyRevenue > 0) {
@@ -514,12 +465,12 @@ export function calculateBusinessImpactForFilter(
   
   revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
 
-  // Redistribute weights based on filter type (FTE removed - it's just hours/40)
+  // Redistribute weights based on filter type
   let totalImpact = 0;
 
   switch (filterType) {
     case "time-only":
-      // Only time savings metrics: ROI + Hours (FTE removed as redundant)
+      // Only time savings metrics: ROI + Hours
       totalImpact = 
         (roiScore * 0.60) +
         (hoursScore * 0.40);

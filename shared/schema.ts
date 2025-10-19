@@ -96,8 +96,6 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   trainingHoursPerEmployee: decimal("training_hours_per_employee", { precision: 6, scale: 2 }),
   errorMetricsEnabled: boolean("error_metrics_enabled").default(false).notNull(),
   revenueMetricsEnabled: boolean("revenue_metrics_enabled").default(false).notNull(),
-  employeeAnnualSalary: decimal("employee_annual_salary", { precision: 12, scale: 2 }),
-  overheadMultiplier: decimal("overhead_multiplier", { precision: 4, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("implementation_opportunities_workflow_id_idx").on(table.workflowId),
@@ -194,8 +192,6 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
   rampupPeriodMonths: z.coerce.number().optional(),
   paybackPeriodMonths: z.coerce.number().optional(),
   trainingHoursPerEmployee: z.coerce.number().optional(),
-  employeeAnnualSalary: z.coerce.number().positive("Employee annual salary must be positive").optional(),
-  overheadMultiplier: z.coerce.number().min(1, "Overhead multiplier must be at least 1.0").max(3, "Overhead multiplier cannot exceed 3.0").optional(),
 });
 
 export const updateImplementationOpportunitySchema = insertImplementationOpportunitySchema.omit({ workflowId: true }).partial();

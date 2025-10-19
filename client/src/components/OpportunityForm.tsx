@@ -40,7 +40,6 @@ export function OpportunityForm({
       annualRoi: initialData?.annualRoi,
       hoursSavedPerWeek: initialData?.hoursSavedPerWeek,
       annualHoursSaved: initialData?.annualHoursSaved,
-      // fteSavings removed - auto-calculated from hours
       errorReductionPct: initialData?.errorReductionPct,
       errorsAvoidedAnnually: initialData?.errorsAvoidedAnnually,
       hoursReallocatedToRevenue: initialData?.hoursReallocatedToRevenue,
@@ -50,25 +49,11 @@ export function OpportunityForm({
       trainingHoursPerEmployee: initialData?.trainingHoursPerEmployee,
       errorMetricsEnabled: initialData?.errorMetricsEnabled ?? false,
       revenueMetricsEnabled: initialData?.revenueMetricsEnabled ?? false,
-      employeeAnnualSalary: initialData?.employeeAnnualSalary,
-      overheadMultiplier: initialData?.overheadMultiplier ?? 1.3,
     },
   });
 
   const errorMetricsEnabled = form.watch('errorMetricsEnabled');
   const revenueMetricsEnabled = form.watch('revenueMetricsEnabled');
-  const employeeAnnualSalary = form.watch('employeeAnnualSalary');
-  const overheadMultiplier = form.watch('overheadMultiplier');
-
-  // Calculate hourly rate for display
-  const calculateHourlyRate = () => {
-    const salary = parseFloat(employeeAnnualSalary?.toString() || "0");
-    const overhead = parseFloat(overheadMultiplier?.toString() || "1.3");
-    if (salary <= 0) {
-      return { rate: "50.00", isFallback: true };
-    }
-    return { rate: ((salary * overhead) / 2080).toFixed(2), isFallback: false };
-  };
 
   // Clear error metrics when toggle is disabled
   useEffect(() => {
@@ -108,8 +93,6 @@ export function OpportunityForm({
       trainingHoursPerEmployee: data.trainingHoursPerEmployee ? parseFloat(data.trainingHoursPerEmployee) : undefined,
       errorMetricsEnabled: data.errorMetricsEnabled ?? false,
       revenueMetricsEnabled: data.revenueMetricsEnabled ?? false,
-      employeeAnnualSalary: data.employeeAnnualSalary ? parseFloat(data.employeeAnnualSalary) : undefined,
-      overheadMultiplier: data.overheadMultiplier ? parseFloat(data.overheadMultiplier) : undefined,
     };
     onSubmit(converted);
   };
@@ -214,87 +197,6 @@ export function OpportunityForm({
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Labor Cost Data */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold">Labor Cost Data</h3>
-          <p className="text-xs text-muted-foreground">
-            Employee salary data from stakeholder interviews. Used to calculate actual hourly rate for accurate ROI scoring.
-          </p>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="employeeAnnualSalary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Employee Annual Salary ($)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="any"
-                      placeholder="e.g., 60000"
-                      data-testid="input-employee-salary"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Yearly compensation for employees performing this work
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="overheadMultiplier"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Overhead Multiplier</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number"
-                      step="0.1"
-                      min="1.0"
-                      max="3.0"
-                      placeholder="1.3"
-                      data-testid="input-overhead-multiplier"
-                      {...field}
-                      value={field.value || ""}
-                      onChange={e => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Cost multiplier (typically 1.2-1.5)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {(() => {
-            const result = calculateHourlyRate();
-            return (
-              <div className="bg-muted/50 rounded-md p-3 border border-border">
-                <p className="text-xs text-muted-foreground mb-1">
-                  {result.isFallback ? "Hourly Rate (Fallback)" : "Calculated Hourly Rate"}
-                </p>
-                <p className="text-lg font-semibold text-foreground">
-                  ${result.rate}/hour
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {result.isFallback 
-                    ? "Using $50/hour default (no salary data provided)" 
-                    : "Based on ROI Calculator formula: (Salary × Overhead) ÷ 2,080 hours"}
-                </p>
-              </div>
-            );
-          })()}
         </div>
 
         {/* Implementation Effort Metrics */}
