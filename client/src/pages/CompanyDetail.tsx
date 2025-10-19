@@ -4,7 +4,7 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Search, Pencil, Check, X } from "lucide-react";
+import { ChevronLeft, Search, Pencil, Check, X, BookOpen } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
@@ -17,6 +17,7 @@ import { calculateReadinessRubric } from "@shared/pifCalculations";
 import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
+import ScoringGuideDialog from "@/components/ScoringGuideDialog";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -25,6 +26,7 @@ export default function CompanyDetail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [scoringGuideOpen, setScoringGuideOpen] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -114,7 +116,6 @@ export default function CompanyDetail() {
     mutationFn: async (data: {
       annualRevenue?: number;
       totalEmployees?: number;
-      annualLaborCosts?: number;
     }) => {
       const res = await apiRequest('PATCH', `/api/companies/${companyId}`, data);
       return await res.json();
@@ -414,6 +415,17 @@ export default function CompanyDetail() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {company && company.annualRevenue && company.totalEmployees && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setScoringGuideOpen(true)}
+                  data-testid="button-scoring-guide"
+                >
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Scoring Guide
+                </Button>
+              )}
               {company && (
                 <EditCompanyContextDialog 
                   company={company}
@@ -467,7 +479,7 @@ export default function CompanyDetail() {
 
           <TabsContent value="opportunity-matrix" className="space-y-6">
             {/* Financial Context Prompt */}
-            {company && !company.annualRevenue && !company.totalEmployees && !company.annualLaborCosts && (
+            {company && !company.annualRevenue && !company.totalEmployees && (
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -475,7 +487,7 @@ export default function CompanyDetail() {
                       Add Financial Context for Better Insights
                     </h3>
                     <p className="text-sm text-amber-600/90 dark:text-amber-400/90">
-                      Company financial data (revenue, employees, labor costs) enables normalized opportunity scoring relative to company size. Without it, scores use absolute values which may not reflect true business impact.
+                      Company financial data (revenue, employees) enables normalized opportunity scoring relative to company size. Without it, scores use absolute values which may not reflect true business impact.
                     </p>
                   </div>
                   <EditCompanyContextDialog 
@@ -524,7 +536,6 @@ export default function CompanyDetail() {
                     companyContext={{
                       annualRevenue: company?.annualRevenue,
                       totalEmployees: company?.totalEmployees,
-                      annualLaborCosts: company?.annualLaborCosts,
                     }}
                   />
                 </div>
@@ -552,7 +563,6 @@ export default function CompanyDetail() {
                             companyContext={{
                               annualRevenue: company?.annualRevenue,
                               totalEmployees: company?.totalEmployees,
-                              annualLaborCosts: company?.annualLaborCosts,
                             }}
                           />
                         ))}
@@ -565,6 +575,16 @@ export default function CompanyDetail() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {company && company.annualRevenue && company.totalEmployees && (
+        <ScoringGuideDialog
+          open={scoringGuideOpen}
+          onOpenChange={setScoringGuideOpen}
+          companyRevenue={parseFloat(company.annualRevenue)}
+          companyEmployees={company.totalEmployees}
+          companyName={company.name}
+        />
+      )}
     </div>
   );
 }
