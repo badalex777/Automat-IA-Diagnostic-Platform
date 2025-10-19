@@ -9,6 +9,7 @@ import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { Company, Workflow, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
@@ -432,6 +433,7 @@ export default function CompanyDetail() {
                   onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
                 />
               )}
+              <LanguageToggle />
               <ThemeToggle />
               <CreateWorkflowDialog 
                 onSubmit={(data) => createWorkflowMutation.mutate(data)}

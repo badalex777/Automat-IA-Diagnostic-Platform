@@ -24,6 +24,7 @@ import { OpportunityForm } from "@/components/OpportunityForm";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity } from "@shared/schema";
@@ -338,7 +339,10 @@ export default function WorkflowDetail() {
                 {companyError ? 'Error loading company' : company?.name || (companyLoading ? 'Loading...' : 'Unknown')} • {workflow?.status || 'pending'}
               </p>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>

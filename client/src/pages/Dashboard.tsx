@@ -5,13 +5,16 @@ import type { Company } from "@shared/schema";
 import CompanyCard from "@/components/CompanyCard";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   
   const { data: companies = [], isLoading, error } = useQuery<Company[]>({
@@ -69,9 +72,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold" data-testid="text-page-title">Automat-IA Diagnostic Platform</h1>
-              <p className="text-sm text-muted-foreground mt-1">Manage AI implementation diagnostics across all companies</p>
+              <p className="text-sm text-muted-foreground mt-1">{t.dashboard.title}</p>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageToggle />
               <ThemeToggle />
               <CreateCompanyDialog 
                 onSubmit={(data) => createCompanyMutation.mutate(data)}
@@ -84,16 +88,16 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold mb-1">All Companies</h2>
+            <h2 className="text-lg font-semibold mb-1">{t.company.companies}</h2>
             <p className="text-sm text-muted-foreground">
-              {filteredCompanies.length} {filteredCompanies.length !== companies.length ? `of ${companies.length}` : ''} companies
+              {filteredCompanies.length} {filteredCompanies.length !== companies.length ? `${t.common.filter} ${companies.length}` : ''} {t.dashboard.companies.toLowerCase()}
             </p>
           </div>
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search companies..."
+              placeholder={t.dashboard.searchCompanies}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -104,14 +108,14 @@ export default function Dashboard() {
 
         {error ? (
           <div className="text-center py-12">
-            <p className="text-destructive mb-4">Failed to load companies</p>
+            <p className="text-destructive mb-4">{t.common.error}</p>
             <Button variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/companies'] })} data-testid="button-retry">
-              Retry
+              {t.common.search}
             </Button>
           </div>
         ) : isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading companies...</p>
+            <p className="text-muted-foreground">{t.common.loading}</p>
           </div>
         ) : (
           <>
@@ -130,13 +134,13 @@ export default function Dashboard() {
 
             {filteredCompanies.length === 0 && companies.length > 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No companies match your search</p>
+                <p className="text-muted-foreground">{t.dashboard.noCompanies}</p>
               </div>
             )}
 
             {companies.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">No companies yet</p>
+                <p className="text-muted-foreground mb-4">{t.dashboard.noCompanies}</p>
                 <CreateCompanyDialog 
                   onSubmit={(data) => createCompanyMutation.mutate(data)}
                 />
