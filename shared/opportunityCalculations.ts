@@ -505,9 +505,9 @@ export function calculateScoringGuide(
       } else if (targetScore <= 60) {
         description = "Significant workflow transformation";
       } else if (targetScore <= 80) {
-        description = "Department-level automation";
+        description = "Major workflow optimization";
       } else {
-        description = "Enterprise-wide transformation";
+        description = "Exceptional workflow automation";
       }
       
       entries.push({
