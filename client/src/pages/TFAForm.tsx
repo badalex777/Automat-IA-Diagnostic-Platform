@@ -7,12 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Languages } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { tfaSections } from "@shared/tfaQuestions";
+import { getUITranslation, getSectionTranslation, getQuestionTranslation, getGapMetadataTranslation } from "@shared/tfaTranslations";
 import type { TFAAssessment, Workflow, Company } from "@shared/schema";
 
 interface TFAData {
@@ -31,6 +33,21 @@ export default function TFAForm() {
   const [respondentName, setRespondentName] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
+  
+  // TFA-specific language state (independent from admin UI)
+  const [language, setLanguage] = useState<'en' | 'es'>(() => {
+    const saved = localStorage.getItem('tfa-language');
+    return (saved === 'es' || saved === 'en') ? saved : 'en';
+  });
+  
+  // Persist language choice to localStorage
+  useEffect(() => {
+    localStorage.setItem('tfa-language', language);
+  }, [language]);
+  
+  // Get translations
+  const t = getUITranslation(language);
+  const gapMeta = getGapMetadataTranslation(language);
 
   const { data: tfaData, isLoading, error } = useQuery<TFAData>({
     queryKey: [`/api/tfa/shareable/${shareableLink}`],
@@ -40,12 +57,12 @@ export default function TFAForm() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error loading assessment",
+        title: t.errorLoadingAssessment,
         description: error.message,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error, toast, t.errorLoadingAssessment]);
 
   const totalQuestions = tfaSections.reduce((acc, section) => acc + section.questions.length, 0);
   const answeredQuestions = Object.keys(answers).length;
@@ -68,7 +85,7 @@ export default function TFAForm() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Submission failed",
+        title: t.submissionFailed,
         description: error.message,
         variant: "destructive",
       });
@@ -78,16 +95,16 @@ export default function TFAForm() {
   const handleSubmit = () => {
     if (!respondentName.trim()) {
       toast({
-        title: "Name required",
-        description: "Please enter your name before submitting.",
+        title: t.nameRequired,
+        description: t.nameRequiredDescription,
         variant: "destructive",
       });
       return;
     }
     if (answeredQuestions < totalQuestions) {
       toast({
-        title: "Incomplete assessment",
-        description: "Please answer all questions before submitting.",
+        title: t.incompleteAssessment,
+        description: t.incompleteAssessmentDescription,
         variant: "destructive",
       });
       return;
@@ -106,8 +123,8 @@ export default function TFAForm() {
       
       if (missingGapDetails) {
         toast({
-          title: "Gap details required",
-          description: "Please provide why you couldn't answer and who might know for all 'Don't Know' questions.",
+          title: t.gapDetailsRequired,
+          description: t.gapDetailsRequiredDescription,
           variant: "destructive",
         });
         return;
@@ -130,7 +147,7 @@ export default function TFAForm() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading assessment...</p>
+        <p className="text-muted-foreground">{t.loadingAssessment}</p>
       </div>
     );
   }
@@ -138,7 +155,7 @@ export default function TFAForm() {
   if (!tfaData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Assessment not found</p>
+        <p className="text-muted-foreground">{t.assessmentNotFound}</p>
       </div>
     );
   }
@@ -166,9 +183,21 @@ export default function TFAForm() {
     <div className="min-h-screen bg-background">
       <div className="border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">Technical Feasibility Assessment</h1>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <Select value={language} onValueChange={(value: 'en' | 'es') => setLanguage(value)}>
+                  <SelectTrigger className="w-[180px]" data-testid="select-language">
+                    <Languages className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">{t.title}</h1>
               <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
               {workflow.description && (
                 <p className="text-sm text-muted-foreground mt-2" data-testid="text-workflow-description">{workflow.description}</p>
@@ -178,20 +207,18 @@ export default function TFAForm() {
           </div>
 
           <div className="bg-muted/50 rounded-lg p-4 mb-4 space-y-2">
-            <p className="text-sm font-medium">About This Assessment</p>
+            <p className="text-sm font-medium">{t.aboutAssessment}</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              This assessment is designed to evaluate the technical feasibility of automating the workflow described above. 
-              Your responses will help us understand the current state of data structure, process definition, and system capabilities.
+              {t.aboutDescription}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong>Important:</strong> This data is collected solely for technical feasibility analysis and workflow automation assessment purposes. 
-              It is <strong>not</strong> used for employee performance evaluation or any personnel-related decisions.
+              <strong>{language === 'en' ? 'Important:' : 'Importante:'}</strong> {t.importantNotice}
             </p>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Progress</span>
+              <span className="text-muted-foreground">{t.progress}</span>
               <span className="font-mono">{answeredQuestions} / {totalQuestions}</span>
             </div>
             <Progress value={progress} className="h-2" />
@@ -202,17 +229,17 @@ export default function TFAForm() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {currentSection === 0 && (
           <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border">
-            <Label htmlFor="respondent-name" className="text-sm font-medium">Your Name *</Label>
+            <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
             <Input
               id="respondent-name"
-              placeholder="Enter your full name"
+              placeholder={t.enterFullName}
               value={respondentName}
               onChange={(e) => setRespondentName(e.target.value)}
               className="mt-2"
               data-testid="input-respondent-name"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              This helps us track who completed the initial assessment and contact the right person for follow-ups.
+              {t.nameHelperText}
             </p>
           </div>
         )}
@@ -221,36 +248,43 @@ export default function TFAForm() {
           <>
             <div className="mb-6">
               <h2 className="text-xl font-semibold" data-testid="text-section-title">
-                Section {currentSection + 1}: {tfaSections[currentSection].section}
+                {t.section} {currentSection + 1}: {getSectionTranslation(tfaSections[currentSection].section, language).name}
               </h2>
               {tfaSections[currentSection].description && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  {tfaSections[currentSection].description}
+                  {getSectionTranslation(tfaSections[currentSection].section, language).description}
                 </p>
               )}
             </div>
             
             <div className="space-y-8">
-              {tfaSections[currentSection].questions.map((q) => (
-                <TFAQuestionCard
-                  key={q.id}
-                  questionNumber={q.id}
-                  question={q.question}
-                  weight={q.weight}
-                  options={q.options}
-                  value={answers[q.id.toString()]}
-                  onChange={(value) => setAnswers({ ...answers, [q.id.toString()]: value })}
-                />
-              ))}
+              {tfaSections[currentSection].questions.map((q) => {
+                const questionTranslation = getQuestionTranslation(q.id, language);
+                return (
+                  <TFAQuestionCard
+                    key={q.id}
+                    questionNumber={q.id}
+                    question={questionTranslation.question}
+                    weight={q.weight}
+                    options={q.options.map(opt => ({
+                      ...opt,
+                      label: questionTranslation.options[opt.value]?.label || opt.label,
+                      description: questionTranslation.options[opt.value]?.description || opt.description
+                    }))}
+                    value={answers[q.id.toString()]}
+                    onChange={(value) => setAnswers({ ...answers, [q.id.toString()]: value })}
+                  />
+                );
+              })}
             </div>
           </>
         ) : isGapDetailsSection ? (
           <div className="space-y-6">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold">Knowledge Gap Details</h2>
+              <h2 className="text-xl font-semibold">{t.knowledgeGapDetails}</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                You selected "Don't Know/Not Sure" for {gapQuestions.length} question{gapQuestions.length > 1 ? 's' : ''}. 
-                Please help us understand why and who might have this information.
+                {language === 'en' ? `You selected "Don't Know/Not Sure" for ${gapQuestions.length} ` : `Seleccionó "No sé / No estoy seguro" para ${gapQuestions.length} `}
+                {t.knowledgeGapDescription.replace('{s}', gapQuestions.length > 1 ? 's' : '')}
               </p>
             </div>
 
@@ -258,20 +292,21 @@ export default function TFAForm() {
               {gapQuestions.map((q) => {
                 if (!q) return null;
                 const questionId = q.id.toString();
+                const questionTranslation = getQuestionTranslation(q.id, language);
                 return (
                   <div key={questionId} className="p-4 border border-border rounded-lg space-y-4">
                     <div className="font-medium text-sm">
-                      Question {q.id}: {q.question}
+                      {t.question} {q.id}: {questionTranslation.question}
                     </div>
                     
                     <div className="space-y-3">
                       <div>
                         <Label htmlFor={`gap-why-${questionId}`}>
-                          Why couldn't you answer this question? *
+                          {gapMeta.whyCantAnswer}
                         </Label>
                         <Textarea
                           id={`gap-why-${questionId}`}
-                          placeholder="e.g., I don't have access to this system, This is managed by another department..."
+                          placeholder={t.dontKnowGapPlaceholder}
                           value={gapDetails[questionId]?.why || ''}
                           onChange={(e) => setGapDetails({
                             ...gapDetails,
@@ -288,11 +323,11 @@ export default function TFAForm() {
                       
                       <div>
                         <Label htmlFor={`gap-who-${questionId}`}>
-                          Who might be able to provide this information? *
+                          {gapMeta.whoMightKnow}
                         </Label>
                         <Input
                           id={`gap-who-${questionId}`}
-                          placeholder="e.g., John Smith - IT Manager, Data Analytics Team..."
+                          placeholder={t.whoMightKnowPlaceholder}
                           value={gapDetails[questionId]?.whoMightKnow || ''}
                           onChange={(e) => setGapDetails({
                             ...gapDetails,
@@ -316,30 +351,30 @@ export default function TFAForm() {
           <div className="space-y-6">
             {!respondentName.trim() && (
               <div className="p-4 bg-muted/50 rounded-lg border border-border">
-                <Label htmlFor="respondent-name-final" className="text-sm font-medium">Your Name *</Label>
+                <Label htmlFor="respondent-name-final" className="text-sm font-medium">{t.yourName}</Label>
                 <Input
                   id="respondent-name-final"
-                  placeholder="Enter your full name"
+                  placeholder={t.enterFullName}
                   value={respondentName}
                   onChange={(e) => setRespondentName(e.target.value)}
                   className="mt-2"
                   data-testid="input-respondent-name-final"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Please enter your name before submitting the assessment.
+                  {t.pleaseEnterNameBeforeSubmitting}
                 </p>
               </div>
             )}
             <div>
-              <h2 className="text-xl font-semibold mb-2">Additional Comments</h2>
+              <h2 className="text-xl font-semibold mb-2">{t.additionalComments}</h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Please share any additional information, disclaimers, or context that might be relevant to this workflow's automation feasibility.
+                {t.additionalCommentsDescription}
               </p>
               <div className="space-y-2">
-                <Label htmlFor="comments">Comments (Optional)</Label>
+                <Label htmlFor="comments">{t.commentsOptional}</Label>
                 <Textarea
                   id="comments"
-                  placeholder="Enter any additional information, concerns, or context that might be helpful..."
+                  placeholder={t.commentsPlaceholder}
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
                   className="min-h-[150px]"
@@ -357,7 +392,7 @@ export default function TFAForm() {
             onClick={() => handleSectionChange(currentSection - 1)}
             data-testid="button-previous-section"
           >
-            Previous
+            {t.previous}
           </Button>
           <div className="flex gap-3">
             {!isFinalCommentsSection ? (
@@ -365,7 +400,7 @@ export default function TFAForm() {
                 onClick={() => handleSectionChange(currentSection + 1)}
                 data-testid="button-next-section"
               >
-                Next
+                {t.next}
               </Button>
             ) : (
               <Button 
@@ -373,7 +408,7 @@ export default function TFAForm() {
                 disabled={submitMutation.isPending}
                 data-testid="button-submit-tfa"
               >
-                {submitMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
+                {submitMutation.isPending ? t.submitting : t.submitAssessment}
               </Button>
             )}
           </div>

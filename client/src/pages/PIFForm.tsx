@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertCircle, ChevronLeft, ChevronRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getAllPIFQuestions, PIF_SECTIONS } from "@shared/pifQuestions";
+import { pifTranslations } from "@shared/pifTranslations";
 import type { Workflow, Company } from "@shared/schema";
 
 interface PIFData {
@@ -30,6 +32,18 @@ export default function PIFForm() {
   
   const ALL_PIF_QUESTIONS = getAllPIFQuestions();
   
+  // Language state with localStorage persistence (independent from admin UI)
+  const [language, setLanguage] = useState<'en' | 'es'>(() => {
+    const saved = localStorage.getItem("pif-language");
+    return (saved === 'en' || saved === 'es') ? saved : 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem("pif-language", language);
+  }, [language]);
+
+  const t = pifTranslations[language];
+  
   const [currentSection, setCurrentSection] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [respondentName, setRespondentName] = useState("");
@@ -45,12 +59,12 @@ export default function PIFForm() {
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error loading survey",
+        title: t.ui.errorLoadingSurvey,
         description: error.message,
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const submitMutation = useMutation({
     mutationFn: async (data: { 
@@ -74,7 +88,7 @@ export default function PIFForm() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Submission failed",
+        title: t.ui.submissionFailed,
         description: error.message,
         variant: "destructive",
       });
@@ -84,8 +98,8 @@ export default function PIFForm() {
   const handleSubmit = () => {
     if (!respondentName.trim()) {
       toast({
-        title: "Name required",
-        description: "Please enter your name before submitting.",
+        title: t.ui.nameRequired,
+        description: t.ui.nameRequiredDescription,
         variant: "destructive",
       });
       return;
@@ -93,8 +107,8 @@ export default function PIFForm() {
 
     if (!respondentRole.trim()) {
       toast({
-        title: "Role required",
-        description: "Please enter your role before submitting.",
+        title: t.ui.roleRequired,
+        description: t.ui.roleRequiredDescription,
         variant: "destructive",
       });
       return;
@@ -102,8 +116,8 @@ export default function PIFForm() {
 
     if (!respondentResponsibilities.trim()) {
       toast({
-        title: "Responsibilities required",
-        description: "Please describe your responsibilities before submitting.",
+        title: t.ui.responsibilitiesRequired,
+        description: t.ui.responsibilitiesRequiredDescription,
         variant: "destructive",
       });
       return;
@@ -127,8 +141,8 @@ export default function PIFForm() {
 
     if (missingAnswers.length > 0) {
       toast({
-        title: "Incomplete survey",
-        description: `Please answer all required questions. ${missingAnswers.length} question(s) remaining.`,
+        title: t.ui.incompleteSurvey,
+        description: `${t.ui.incompleteSurveyDescription} ${missingAnswers.length} ${t.ui.requiredQuestionsDescription.split('.')[0]}.`,
         variant: "destructive",
       });
       return;
@@ -145,7 +159,7 @@ export default function PIFForm() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading survey...</p>
+        <p className="text-muted-foreground">{t.ui.loadingSurvey}</p>
       </div>
     );
   }
@@ -153,7 +167,7 @@ export default function PIFForm() {
   if (!pifData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Survey not found</p>
+        <p className="text-muted-foreground">{t.ui.surveyNotFound}</p>
       </div>
     );
   }
@@ -199,8 +213,8 @@ export default function PIFForm() {
       // Disclaimer section
       if (!disclaimerAccepted) {
         toast({
-          title: "Acceptance required",
-          description: "Please check 'I understand' to continue.",
+          title: t.ui.acceptanceRequired,
+          description: t.ui.acceptanceRequiredDescription,
           variant: "destructive",
         });
         return;
@@ -209,8 +223,8 @@ export default function PIFForm() {
       // Respondent Info section
       if (!respondentName.trim() || !respondentRole.trim() || !respondentResponsibilities.trim()) {
         toast({
-          title: "Required fields",
-          description: "Please enter your name, role, and responsibilities before continuing.",
+          title: t.ui.requiredFields,
+          description: t.ui.requiredFieldsDescription,
           variant: "destructive",
         });
         return;
@@ -237,8 +251,8 @@ export default function PIFForm() {
         
         if (missingSectionAnswers.length > 0) {
           toast({
-            title: "Required questions",
-            description: `Please answer all required questions in this section before continuing. ${missingSectionAnswers.length} question(s) remaining.`,
+            title: t.ui.requiredQuestions,
+            description: `${t.ui.requiredQuestionsDescription} ${missingSectionAnswers.length} question(s) remaining.`,
             variant: "destructive",
           });
           return;
@@ -272,20 +286,34 @@ export default function PIFForm() {
       <div className="border-b border-border">
         <div className="max-w-4xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-pif-title">Process Insight Form</h1>
+            <div className="flex-1">
+              <h1 className="text-2xl font-semibold" data-testid="text-pif-title">{t.ui.title}</h1>
               <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
               {workflow.description && (
                 <p className="text-sm text-muted-foreground mt-2" data-testid="text-workflow-description">{workflow.description}</p>
               )}
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Languages className="w-4 h-4 text-muted-foreground" />
+                <Select value={language} onValueChange={(value: 'en' | 'es') => setLanguage(value)}>
+                  <SelectTrigger className="w-32" data-testid="select-language">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <ThemeToggle />
+            </div>
           </div>
           
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Section {currentSection + 1} of {totalSections}</span>
-              <span className="text-muted-foreground">{Math.round(progress)}% complete</span>
+              <span className="text-muted-foreground">{t.ui.section} {currentSection + 1} {t.ui.of} {totalSections}</span>
+              <span className="text-muted-foreground">{Math.round(progress)}% {t.ui.complete}</span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -296,25 +324,25 @@ export default function PIFForm() {
         {isDisclaimerSection ? (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-4">Welcome to the Process Insight Form</h2>
+              <h2 className="text-xl font-semibold mb-4">{t.disclaimer.welcome}</h2>
               <div className="bg-muted/50 border rounded-lg p-6 space-y-4 text-sm">
                 <p>
-                  This form is part of Automat-IA's diagnostic process for identifying workflows that can benefit from artificial intelligence (AI) implementations.
+                  {t.disclaimer.paragraph1}
                 </p>
                 <p>
-                  Its purpose is to collect your direct insights about how specific tasks are currently performed — including time spent, frequency, and common challenges — so we can model realistic improvements and prioritize solutions that truly make your work easier.
+                  {t.disclaimer.paragraph2}
                 </p>
                 <p className="font-semibold">
-                  AI at Automat-IA is not about replacing people. It's about augmenting human work — reducing repetitive tasks, minimizing errors, and freeing time for higher-value activities.
+                  {t.disclaimer.paragraph3}
                 </p>
                 <p>
-                  Your input is essential to ensure any AI solution we propose genuinely supports you and your team.
+                  {t.disclaimer.paragraph4}
                 </p>
                 <p>
-                  All information you share will be treated as confidential, used only for analysis within the current project between Automat-IA and your company, and aggregated where possible before inclusion in any report. It will never be used to evaluate individual performance or shared outside this collaboration.
+                  {t.disclaimer.paragraph5}
                 </p>
                 <p className="font-semibold">
-                  There are no right or wrong answers — we're looking for realism, not perfection.
+                  {t.disclaimer.paragraph6}
                 </p>
               </div>
             </div>
@@ -330,52 +358,52 @@ export default function PIFForm() {
                 htmlFor="disclaimer-accept" 
                 className="text-base font-medium cursor-pointer leading-relaxed"
               >
-                I understand and agree to proceed with the survey
+                {t.disclaimer.checkboxLabel}
               </Label>
             </div>
           </div>
         ) : isRespondentInfoSection ? (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-4">About You</h2>
+              <h2 className="text-xl font-semibold mb-4">{t.respondentInfo.title}</h2>
               <p className="text-sm text-muted-foreground mb-6">
-                Your insights about this workflow are valuable. Please tell us about yourself and your experience with this process.
+                {t.respondentInfo.description}
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="respondent-name">Your Name *</Label>
+                <Label htmlFor="respondent-name">{t.respondentInfo.nameLabel} *</Label>
                 <Input
                   id="respondent-name"
                   data-testid="input-respondent-name"
                   value={respondentName}
                   onChange={(e) => setRespondentName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder={t.respondentInfo.namePlaceholder}
                   className="mt-1.5"
                 />
               </div>
 
               <div>
-                <Label htmlFor="respondent-role">Your Role *</Label>
+                <Label htmlFor="respondent-role">{t.respondentInfo.roleLabel} *</Label>
                 <Input
                   id="respondent-role"
                   data-testid="input-respondent-role"
                   value={respondentRole}
                   onChange={(e) => setRespondentRole(e.target.value)}
-                  placeholder="e.g., Operations Manager, Team Lead, Process Owner"
+                  placeholder={t.respondentInfo.rolePlaceholder}
                   className="mt-1.5"
                 />
               </div>
 
               <div>
-                <Label htmlFor="respondent-responsibilities">Your Responsibilities on {workflow.name} *</Label>
+                <Label htmlFor="respondent-responsibilities">{t.respondentInfo.responsibilitiesLabel} *</Label>
                 <Textarea
                   id="respondent-responsibilities"
                   data-testid="input-respondent-responsibilities"
                   value={respondentResponsibilities}
                   onChange={(e) => setRespondentResponsibilities(e.target.value)}
-                  placeholder="Briefly describe your involvement with this workflow..."
+                  placeholder={t.respondentInfo.responsibilitiesPlaceholder}
                   className="mt-1.5 min-h-24"
                 />
               </div>
@@ -384,96 +412,118 @@ export default function PIFForm() {
         ) : currentPIFSection ? (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{currentPIFSection.section}</h2>
+              <h2 className="text-xl font-semibold">
+                {currentPIFSection.section === "Process Clarity" && t.sections.processClarity.name}
+                {currentPIFSection.section === "Change Magnitude" && t.sections.changeMagnitude.name}
+                {currentPIFSection.section === "Workflow Brittleness" && t.sections.workflowBrittleness.name}
+                {currentPIFSection.section === "Time Savings" && t.sections.timeSavings.name}
+                {currentPIFSection.section === "Revenue Uplift" && t.sections.revenueUplift.name}
+                {currentPIFSection.section === "Your Experience & Insights" && t.sections.experienceInsights.name}
+                {currentPIFSection.section === "Time & Volume Data" && t.sections.timeVolumeData.name}
+                {currentPIFSection.section === "Quality Impact Module" && t.sections.qualityImpactModule.name}
+              </h2>
               {currentPIFSection.description && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  {currentPIFSection.description}
+                  {currentPIFSection.section === "Process Clarity" && t.sections.processClarity.description}
+                  {currentPIFSection.section === "Change Magnitude" && t.sections.changeMagnitude.description}
+                  {currentPIFSection.section === "Workflow Brittleness" && t.sections.workflowBrittleness.description}
+                  {currentPIFSection.section === "Time Savings" && t.sections.timeSavings.description}
+                  {currentPIFSection.section === "Revenue Uplift" && t.sections.revenueUplift.description}
+                  {currentPIFSection.section === "Your Experience & Insights" && t.sections.experienceInsights.description}
+                  {currentPIFSection.section === "Time & Volume Data" && t.sections.timeVolumeData.description}
+                  {currentPIFSection.section === "Quality Impact Module" && t.sections.qualityImpactModule.description}
                 </p>
               )}
             </div>
 
             <div className="space-y-8">
-              {getVisibleQuestions(currentPIFSection.questions).map((question) => (
-                <div key={question.id} className="space-y-3">
-                  <Label className="text-base">
-                    Q{question.id}. {question.question}
-                    {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
-                    {(question.id === 17 || question.id === 18 || question.id === 19) && <span className="text-destructive ml-1">*</span>}
-                    {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 17 && question.id !== 18 && question.id !== 19 && <span className="text-muted-foreground ml-1">(Optional)</span>}
-                  </Label>
+              {getVisibleQuestions(currentPIFSection.questions).map((question) => {
+                const questionTranslation = t.questions[question.id];
+                return (
+                  <div key={question.id} className="space-y-3">
+                    <Label className="text-base">
+                      Q{question.id}. {questionTranslation?.question || question.question}
+                      {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                      {(question.id === 17 || question.id === 18 || question.id === 19) && <span className="text-destructive ml-1">*</span>}
+                      {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 17 && question.id !== 18 && question.id !== 19 && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                    </Label>
 
-                  {question.type === 'radio' && question.options && (
-                    <RadioGroup
-                      value={answers[question.id.toString()] || ""}
-                      onValueChange={(value) => setAnswers(prev => ({ ...prev, [question.id.toString()]: value }))}
-                    >
-                      {question.options.map((option, index) => {
-                        // For Q11, detect department headers from description prefix
-                        const isDepartmentHeader = question.id === 11 && 
-                          option.description && 
-                          option.description.includes(':') && 
-                          (index === 0 || 
-                           (question.options?.[index - 1]?.description?.split(':')[0] !== option.description.split(':')[0]));
-                        
-                        const departmentName = question.id === 11 && option.description 
-                          ? option.description.split(':')[0] 
-                          : null;
-                        
-                        return (
-                          <div key={option.value}>
-                            {isDepartmentHeader && departmentName && (
-                              <div className="font-semibold text-sm text-foreground mt-4 mb-2 first:mt-0">
-                                {departmentName}
-                              </div>
-                            )}
-                            <div className="flex items-start space-x-2">
-                              <RadioGroupItem 
-                                value={option.value.toString()} 
-                                id={`q${question.id}-${option.value}`}
-                                data-testid={`radio-q${question.id}-${option.value}`}
-                                className="mt-1"
-                              />
-                              <div className="flex-1">
-                                <Label 
-                                  htmlFor={`q${question.id}-${option.value}`}
-                                  className="font-normal cursor-pointer"
-                                >
-                                  {option.label}
-                                </Label>
-                                {option.description && (
-                                  <p className="text-sm text-muted-foreground mt-0.5">
-                                    {question.id === 11 ? option.description.split(':')[1]?.trim() : option.description}
-                                  </p>
-                                )}
+                    {question.type === 'radio' && question.options && (
+                      <RadioGroup
+                        value={answers[question.id.toString()] || ""}
+                        onValueChange={(value) => setAnswers(prev => ({ ...prev, [question.id.toString()]: value }))}
+                      >
+                        {question.options.map((option, index) => {
+                          // For Q11, detect department headers from description prefix
+                          const optionTranslation = questionTranslation?.options?.[option.value];
+                          const isDepartmentHeader = question.id === 11 && 
+                            option.description && 
+                            option.description.includes(':') && 
+                            (index === 0 || 
+                             (question.options?.[index - 1]?.description?.split(':')[0] !== option.description.split(':')[0]));
+                          
+                          const departmentName = question.id === 11 && optionTranslation?.description 
+                            ? optionTranslation.description.split(':')[0] 
+                            : (question.id === 11 && option.description ? option.description.split(':')[0] : null);
+                          
+                          return (
+                            <div key={option.value}>
+                              {isDepartmentHeader && departmentName && (
+                                <div className="font-semibold text-sm text-foreground mt-4 mb-2 first:mt-0">
+                                  {departmentName}
+                                </div>
+                              )}
+                              <div className="flex items-start space-x-2">
+                                <RadioGroupItem 
+                                  value={option.value.toString()} 
+                                  id={`q${question.id}-${option.value}`}
+                                  data-testid={`radio-q${question.id}-${option.value}`}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <Label 
+                                    htmlFor={`q${question.id}-${option.value}`}
+                                    className="font-normal cursor-pointer"
+                                  >
+                                    {optionTranslation?.label || option.label}
+                                  </Label>
+                                  {(optionTranslation?.description || option.description) && (
+                                    <p className="text-sm text-muted-foreground mt-0.5">
+                                      {question.id === 11 
+                                        ? (optionTranslation?.description || option.description).split(':')[1]?.trim() 
+                                        : (optionTranslation?.description || option.description)}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </RadioGroup>
-                  )}
+                          );
+                        })}
+                      </RadioGroup>
+                    )}
 
-                  {question.type === 'number' && (
-                    <Input
-                      type="number"
-                      data-testid={`input-q${question.id}`}
-                      value={answers[question.id.toString()] || ""}
-                      onChange={(e) => setAnswers(prev => ({ ...prev, [question.id.toString()]: e.target.value }))}
-                      placeholder={question.placeholder || "Enter a number"}
-                    />
-                  )}
+                    {question.type === 'number' && (
+                      <Input
+                        type="number"
+                        data-testid={`input-q${question.id}`}
+                        value={answers[question.id.toString()] || ""}
+                        onChange={(e) => setAnswers(prev => ({ ...prev, [question.id.toString()]: e.target.value }))}
+                        placeholder={questionTranslation?.placeholder || question.placeholder || "Enter a number"}
+                      />
+                    )}
 
-                  {(question.type === 'text' || question.type === 'textarea') && (
-                    <Textarea
-                      data-testid={`textarea-q${question.id}`}
-                      value={answers[question.id.toString()] || ""}
-                      onChange={(e) => setAnswers(prev => ({ ...prev, [question.id.toString()]: e.target.value }))}
-                      placeholder={question.placeholder || "Enter your response..."}
-                      className="min-h-24"
-                    />
-                  )}
-                </div>
-              ))}
+                    {(question.type === 'text' || question.type === 'textarea') && (
+                      <Textarea
+                        data-testid={`textarea-q${question.id}`}
+                        value={answers[question.id.toString()] || ""}
+                        onChange={(e) => setAnswers(prev => ({ ...prev, [question.id.toString()]: e.target.value }))}
+                        placeholder={questionTranslation?.placeholder || question.placeholder || "Enter your response..."}
+                        className="min-h-24"
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : null}
@@ -486,7 +536,7 @@ export default function PIFForm() {
             data-testid="button-back"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
-            Back
+            {t.ui.previous}
           </Button>
 
           {isLastSection ? (
@@ -495,14 +545,14 @@ export default function PIFForm() {
               disabled={submitMutation.isPending}
               data-testid="button-submit"
             >
-              {submitMutation.isPending ? "Submitting..." : "Submit Survey"}
+              {submitMutation.isPending ? t.ui.submitting : t.ui.submit}
             </Button>
           ) : (
             <Button
               onClick={handleNext}
               data-testid="button-next"
             >
-              Next
+              {t.ui.next}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           )}
