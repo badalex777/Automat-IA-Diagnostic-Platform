@@ -6,11 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
-import { Home, BookOpen } from "lucide-react";
+import { Home, BookOpen, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Documentation() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeSection, setActiveSection] = useState("platform-overview");
 
   const scrollToSection = (sectionId: string) => {
@@ -19,6 +19,233 @@ export default function Documentation() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handleDownload = () => {
+    const doc = t.documentation;
+    const filename = language === 'es' 
+      ? 'Automat-IA_Manual_de_Documentacion.html'
+      : 'Automat-IA_Documentation_Handbook.html';
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="${language}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${doc.title}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6; 
+      color: #1a1a1a; 
+      background: #ffffff;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 { font-size: 32px; margin: 40px 0 16px; color: #000; border-bottom: 3px solid #10b981; padding-bottom: 12px; }
+    h2 { font-size: 24px; margin: 32px 0 12px; color: #000; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+    h3 { font-size: 20px; margin: 24px 0 8px; color: #374151; }
+    h4 { font-size: 16px; margin: 16px 0 8px; color: #4b5563; font-weight: 600; }
+    p { margin: 12px 0; color: #374151; }
+    ul, ol { margin: 12px 0 12px 24px; color: #374151; }
+    li { margin: 6px 0; }
+    .section { margin: 40px 0; page-break-inside: avoid; }
+    .subsection { margin: 24px 0; page-break-inside: avoid; }
+    .formula { 
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      background: #f9fafb; 
+      padding: 16px; 
+      border-left: 4px solid #10b981; 
+      margin: 16px 0;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 4px 4px 4px 0;
+    }
+    .badge-very-high { background: #d1fae5; color: #065f46; }
+    .badge-high { background: #dbeafe; color: #1e40af; }
+    .badge-moderate { background: #fef3c7; color: #92400e; }
+    .badge-low { background: #fed7aa; color: #9a3412; }
+    .badge-very-low { background: #fecaca; color: #991b1b; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; }
+    th { background: #f9fafb; font-weight: 600; color: #000; }
+    .toc { background: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0; }
+    .toc ul { list-style: none; margin: 0; }
+    .toc li { margin: 8px 0; }
+    .toc a { color: #10b981; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    @media print {
+      body { padding: 20px; }
+      .section { page-break-before: auto; }
+      h1, h2 { page-break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Automat-IA ${doc.title}</h1>
+  
+  <div class="toc">
+    <h2>${doc.tableOfContents}</h2>
+    <ul>
+      <li><a href="#platform-overview">${doc.platformOverview.title}</a></li>
+      <li><a href="#user-journey">${doc.userJourney.title}</a></li>
+      <li><a href="#tfa-methodology">${doc.tfaMethodology.title}</a></li>
+      <li><a href="#pif-methodology">${doc.pifMethodology.title}</a></li>
+      <li><a href="#readiness-rubric">${doc.readinessRubric.title}</a></li>
+      <li><a href="#opportunity-matrix">${doc.opportunityMatrix.title}</a></li>
+      <li><a href="#roi-calculations">${doc.roiCalculations.title}</a></li>
+      <li><a href="#formulas-reference">${doc.formulasReference.title}</a></li>
+    </ul>
+  </div>
+
+  <div class="section" id="platform-overview">
+    <h2>${doc.platformOverview.title}</h2>
+    <p>${doc.platformOverview.purpose}</p>
+    <h3>${doc.platformOverview.keyBenefitsTitle}</h3>
+    <ul>
+      <li><strong>${doc.platformOverview.benefit1Title}:</strong> ${doc.platformOverview.benefit1Desc}</li>
+      <li><strong>${doc.platformOverview.benefit2Title}:</strong> ${doc.platformOverview.benefit2Desc}</li>
+      <li><strong>${doc.platformOverview.benefit3Title}:</strong> ${doc.platformOverview.benefit3Desc}</li>
+      <li><strong>${doc.platformOverview.benefit4Title}:</strong> ${doc.platformOverview.benefit4Desc}</li>
+    </ul>
+  </div>
+
+  <div class="section" id="user-journey">
+    <h2>${doc.userJourney.title}</h2>
+    <p>${doc.userJourney.intro}</p>
+    <ol>
+      <li><strong>${doc.userJourney.step1Title}:</strong> ${doc.userJourney.step1Desc}</li>
+      <li><strong>${doc.userJourney.step2Title}:</strong> ${doc.userJourney.step2Desc}</li>
+      <li><strong>${doc.userJourney.step3Title}:</strong> ${doc.userJourney.step3Desc}</li>
+      <li><strong>${doc.userJourney.step4Title}:</strong> ${doc.userJourney.step4Desc}</li>
+      <li><strong>${doc.userJourney.step5Title}:</strong> ${doc.userJourney.step5Desc}</li>
+      <li><strong>${doc.userJourney.step6Title}:</strong> ${doc.userJourney.step6Desc}</li>
+    </ol>
+  </div>
+
+  <div class="section" id="tfa-methodology">
+    <h2>${doc.tfaMethodology.title}</h2>
+    <p>${doc.tfaMethodology.overview}</p>
+    <h3>${doc.tfaMethodology.sectionsTitle}</h3>
+    <ul>
+      <li><strong>${doc.tfaMethodology.section1}:</strong> 25% ${doc.tfaMethodology.weight} (6 ${doc.tfaMethodology.questions})</li>
+      <li><strong>${doc.tfaMethodology.section2}:</strong> 30% ${doc.tfaMethodology.weight} (5 ${doc.tfaMethodology.questions})</li>
+      <li><strong>${doc.tfaMethodology.section3}:</strong> 30% ${doc.tfaMethodology.weight} (6 ${doc.tfaMethodology.questions})</li>
+      <li><strong>${doc.tfaMethodology.section4}:</strong> 15% ${doc.tfaMethodology.weight} (4 ${doc.tfaMethodology.questions})</li>
+    </ul>
+    <h3>${doc.tfaMethodology.scoringTitle}</h3>
+    <p>${doc.tfaMethodology.scoringDesc}</p>
+    <h3>${doc.tfaMethodology.bandsTitle}</h3>
+    <p>
+      <span class="badge badge-very-high">${doc.tfaMethodology.veryHigh}</span>
+      <span class="badge badge-high">${doc.tfaMethodology.high}</span>
+      <span class="badge badge-moderate">${doc.tfaMethodology.moderate}</span>
+      <span class="badge badge-low">${doc.tfaMethodology.low}</span>
+      <span class="badge badge-very-low">${doc.tfaMethodology.veryLow}</span>
+    </p>
+  </div>
+
+  <div class="section" id="pif-methodology">
+    <h2>${doc.pifMethodology.title}</h2>
+    <p>${doc.pifMethodology.overview}</p>
+    <h3>${doc.pifMethodology.sectionsTitle}</h3>
+    <ul>
+      <li><strong>${doc.pifMethodology.section1}:</strong> ${doc.pifMethodology.section1Desc}</li>
+      <li><strong>${doc.pifMethodology.section2}:</strong> ${doc.pifMethodology.section2Desc}</li>
+      <li><strong>${doc.pifMethodology.section3}:</strong> ${doc.pifMethodology.section3Desc}</li>
+      <li><strong>${doc.pifMethodology.section4}:</strong> ${doc.pifMethodology.section4Desc}</li>
+      <li><strong>${doc.pifMethodology.section5}:</strong> ${doc.pifMethodology.section5Desc}</li>
+      <li><strong>${doc.pifMethodology.section6}:</strong> ${doc.pifMethodology.section6Desc}</li>
+      <li><strong>${doc.pifMethodology.section7}:</strong> ${doc.pifMethodology.section7Desc}</li>
+      <li><strong>${doc.pifMethodology.section8}:</strong> ${doc.pifMethodology.section8Desc}</li>
+    </ul>
+  </div>
+
+  <div class="section" id="readiness-rubric">
+    <h2>${doc.readinessRubric.title}</h2>
+    <p>${doc.readinessRubric.overview}</p>
+    <div class="formula">${doc.readinessRubric.formula}</div>
+    <h3>${doc.readinessRubric.componentsTitle}</h3>
+    <ul>
+      <li>${doc.readinessRubric.component1}</li>
+      <li>${doc.readinessRubric.component2}</li>
+      <li>${doc.readinessRubric.component3}</li>
+      <li>${doc.readinessRubric.component4}</li>
+      <li>${doc.readinessRubric.component5}</li>
+      <li>${doc.readinessRubric.component6}</li>
+      <li>${doc.readinessRubric.component7}</li>
+    </ul>
+  </div>
+
+  <div class="section" id="opportunity-matrix">
+    <h2>${doc.opportunityMatrix.title}</h2>
+    <p>${doc.opportunityMatrix.overview}</p>
+    <h3>${doc.opportunityMatrix.scoringTitle}</h3>
+    <p>${doc.opportunityMatrix.scoringDesc}</p>
+    <div class="formula">
+${doc.opportunityMatrix.roiFormula}<br/>
+${doc.opportunityMatrix.fteFormula}<br/>
+${doc.opportunityMatrix.capFormula}
+    </div>
+    <h3>${doc.opportunityMatrix.filterViewsTitle}</h3>
+    <ul>
+      <li><strong>${doc.opportunityMatrix.view1}:</strong> ${doc.opportunityMatrix.view1Desc}</li>
+      <li><strong>${doc.opportunityMatrix.view2}:</strong> ${doc.opportunityMatrix.view2Desc}</li>
+      <li><strong>${doc.opportunityMatrix.view3}:</strong> ${doc.opportunityMatrix.view3Desc}</li>
+      <li><strong>${doc.opportunityMatrix.view4}:</strong> ${doc.opportunityMatrix.view4Desc}</li>
+    </ul>
+  </div>
+
+  <div class="section" id="roi-calculations">
+    <h2>${doc.roiCalculations.title}</h2>
+    <h3>${doc.roiCalculations.annualRoiTitle}</h3>
+    <div class="formula">${doc.roiCalculations.annualRoiFormula}</div>
+    <h3>${doc.roiCalculations.fteSavingsTitle}</h3>
+    <div class="formula">${doc.roiCalculations.fteSavingsFormula}</div>
+    <h3>${doc.roiCalculations.impactScoreTitle}</h3>
+    <div class="formula">
+${doc.roiCalculations.impactScoreFormula1}<br/>
+${doc.roiCalculations.impactScoreFormula2}
+    </div>
+  </div>
+
+  <div class="section" id="formulas-reference">
+    <h2>${doc.formulasReference.title}</h2>
+    <h3>${doc.formulasReference.tfaScoreTitle}</h3>
+    <div class="formula">${doc.formulasReference.tfaScoreFormula}</div>
+    <h3>${doc.formulasReference.pifScoreTitle}</h3>
+    <div class="formula">${doc.formulasReference.pifScoreFormula}</div>
+    <h3>${doc.formulasReference.readinessScoreTitle}</h3>
+    <div class="formula">${doc.formulasReference.readinessScoreFormula}</div>
+    <h3>${doc.formulasReference.businessImpactTitle}</h3>
+    <div class="formula">
+${doc.formulasReference.businessImpactFormula1}<br/>
+${doc.formulasReference.businessImpactFormula2}<br/>
+${doc.formulasReference.businessImpactFormula3}
+    </div>
+  </div>
+
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const tocSections = [
@@ -52,6 +279,14 @@ export default function Documentation() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleDownload}
+                data-testid="button-download-handbook"
+              >
+                <Download className="h-5 w-5" />
+              </Button>
               <LanguageToggle />
               <ThemeToggle />
             </div>
