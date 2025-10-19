@@ -407,29 +407,49 @@ export default function PIFForm() {
                       value={answers[question.id.toString()] || ""}
                       onValueChange={(value) => setAnswers(prev => ({ ...prev, [question.id.toString()]: value }))}
                     >
-                      {question.options.map((option) => (
-                        <div key={option.value} className="flex items-start space-x-2">
-                          <RadioGroupItem 
-                            value={option.value.toString()} 
-                            id={`q${question.id}-${option.value}`}
-                            data-testid={`radio-q${question.id}-${option.value}`}
-                            className="mt-1"
-                          />
-                          <div className="flex-1">
-                            <Label 
-                              htmlFor={`q${question.id}-${option.value}`}
-                              className="font-normal cursor-pointer"
-                            >
-                              {option.label}
-                            </Label>
-                            {option.description && (
-                              <p className="text-sm text-muted-foreground mt-0.5">
-                                {option.description}
-                              </p>
+                      {question.options.map((option, index) => {
+                        // For Q11, detect department headers from description prefix
+                        const isDepartmentHeader = question.id === 11 && 
+                          option.description && 
+                          option.description.includes(':') && 
+                          (index === 0 || 
+                           (question.options?.[index - 1]?.description?.split(':')[0] !== option.description.split(':')[0]));
+                        
+                        const departmentName = question.id === 11 && option.description 
+                          ? option.description.split(':')[0] 
+                          : null;
+                        
+                        return (
+                          <div key={option.value}>
+                            {isDepartmentHeader && departmentName && (
+                              <div className="font-semibold text-sm text-foreground mt-4 mb-2 first:mt-0">
+                                {departmentName}
+                              </div>
                             )}
+                            <div className="flex items-start space-x-2">
+                              <RadioGroupItem 
+                                value={option.value.toString()} 
+                                id={`q${question.id}-${option.value}`}
+                                data-testid={`radio-q${question.id}-${option.value}`}
+                                className="mt-1"
+                              />
+                              <div className="flex-1">
+                                <Label 
+                                  htmlFor={`q${question.id}-${option.value}`}
+                                  className="font-normal cursor-pointer"
+                                >
+                                  {option.label}
+                                </Label>
+                                {option.description && (
+                                  <p className="text-sm text-muted-foreground mt-0.5">
+                                    {question.id === 11 ? option.description.split(':')[1]?.trim() : option.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </RadioGroup>
                   )}
 

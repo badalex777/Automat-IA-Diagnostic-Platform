@@ -202,26 +202,41 @@ export const PIF_SECTIONS: PIFSection[] = [
     questions: [
       {
         id: 11,
-        question: "Which of these best describes the work you perform in this step?",
+        question: "Which of these best describes the primary work you perform in this step?",
         section: "Time Savings",
         type: "radio",
         options: [
-          { value: "sales_ops", label: "Sales Operations / CRM Administrator", description: "Sales Ops Analyst, CRM Specialist, Deal Desk Coordinator" },
-          { value: "customer_success", label: "Customer Success Manager / Analyst", description: "Retention Analyst, Account Manager Post-Sale" },
-          { value: "financial", label: "Financial Analyst / Strategic Accountant", description: "FP&A Analyst, Financial Controller" },
-          { value: "support", label: "Customer Support / Help Desk", description: "Tier 1 Support, IT Help Desk, CSR" },
-          { value: "procurement", label: "Procurement / Sourcing Specialist", description: "Purchasing Agent, Vendor Manager, Supply Chain Coordinator" },
-          { value: "marketing_ops", label: "Marketing Operations / Campaign Coordinator", description: "Marketing Ops, Email Campaign Manager, Content Coordinator" },
-          { value: "data_analyst", label: "Data Analyst / Business Intelligence", description: "BI Analyst, Data Ops, Reporting Specialist" },
-          { value: "hr", label: "HR Generalist / People Operations", description: "HR Admin, Payroll Specialist, Benefits Coordinator" },
-          { value: "finance_ops", label: "Accounts Payable / Receivable", description: "AP/AR Clerk, Invoice Processor, Collections Specialist" },
-          { value: "admin", label: "General Admin / Office Manager", description: "Office Administrator, Executive Assistant, General Clerk" },
-          { value: "it_ops", label: "IT Operations / Systems Administrator", description: "System Admin, IT Support, Infrastructure Manager" },
-          { value: "quality_assurance", label: "Quality Assurance / Process Auditor", description: "QA Specialist, Compliance Auditor, Process Analyst" },
-          { value: "inventory", label: "Inventory / Warehouse Coordinator", description: "Inventory Analyst, Stock Controller, Warehouse Admin" },
-          { value: "legal", label: "Legal / Compliance / Internal Audit", description: "Compliance Officer, Internal Auditor, Risk Manager" },
-          { value: "facilities", label: "Facilities / Operations Coordinator", description: "Facilities Manager, Office Coordinator, Logistics Admin" },
-          { value: "other", label: "Other / Unspecified Back-Office Role", description: "Not listed above" }
+          // Finance & Accounting
+          { value: "financial", label: "Financial Analyst / Strategic Accountant", description: "Finance & Accounting: FP&A Analyst, Financial Controller" },
+          { value: "finance_ops", label: "Accounts Payable / Receivable", description: "Finance & Accounting: AP/AR Clerk, Invoice Processor, Collections Specialist" },
+          
+          // Sales & Customer Operations
+          { value: "sales_ops", label: "Sales Operations / CRM Administrator", description: "Sales & Customer Operations: Sales Ops Analyst, CRM Specialist, Deal Desk Coordinator" },
+          { value: "customer_success", label: "Customer Success Manager / Analyst", description: "Sales & Customer Operations: Retention Analyst, Account Manager Post-Sale" },
+          { value: "support", label: "Customer Support / Help Desk", description: "Sales & Customer Operations: Tier 1 Support, IT Help Desk, CSR" },
+          
+          // Operations & Logistics
+          { value: "procurement", label: "Procurement / Sourcing Specialist", description: "Operations & Logistics: Purchasing Agent, Vendor Manager, Supply Chain Coordinator" },
+          { value: "inventory", label: "Inventory / Warehouse Coordinator", description: "Operations & Logistics: Inventory Analyst, Stock Controller, Warehouse Admin" },
+          { value: "facilities", label: "Facilities / Operations Coordinator", description: "Operations & Logistics: Facilities Manager, Office Coordinator, Logistics Admin" },
+          
+          // HR & Administration
+          { value: "hr", label: "HR Generalist / People Operations", description: "HR & Administration: HR Admin, Payroll Specialist, Benefits Coordinator" },
+          { value: "admin", label: "General Admin / Office Manager", description: "HR & Administration: Office Administrator, Executive Assistant, General Clerk" },
+          
+          // IT & Data
+          { value: "it_ops", label: "IT Operations / Systems Administrator", description: "IT & Data: System Admin, IT Support, Infrastructure Manager" },
+          { value: "data_analyst", label: "Data Analyst / Business Intelligence", description: "IT & Data: BI Analyst, Data Ops, Reporting Specialist" },
+          
+          // Marketing & Growth
+          { value: "marketing_ops", label: "Marketing Operations / Campaign Coordinator", description: "Marketing & Growth: Marketing Ops, Email Campaign Manager, Content Coordinator" },
+          
+          // Compliance & Quality
+          { value: "quality_assurance", label: "Quality Assurance / Process Auditor", description: "Compliance & Quality: QA Specialist, Compliance Auditor, Process Analyst" },
+          { value: "legal", label: "Legal / Compliance / Internal Audit", description: "Compliance & Quality: Compliance Officer, Internal Auditor, Risk Manager" },
+          
+          // Other
+          { value: "other", label: "Other / Unspecified Back-Office Role", description: "Other: Not listed above" }
         ]
       },
       {
