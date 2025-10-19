@@ -394,7 +394,7 @@ export default function CompanyDetail() {
           <Link href="/">
             <Button variant="ghost" size="sm" className="mb-3" data-testid="button-back">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Back to Dashboard
+              {t.common.backToDashboard}
             </Button>
           </Link>
           <div className="flex items-center justify-between">
@@ -435,7 +435,7 @@ export default function CompanyDetail() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-semibold" data-testid="text-company-name">
-                    {companyLoading ? 'Loading...' : company?.name || 'Unknown Company'}
+                    {companyLoading ? t.common.loadingEllipsis : company?.name || t.common.unknownCompany}
                   </h1>
                   {!companyLoading && company && (
                     <Button
@@ -451,7 +451,7 @@ export default function CompanyDetail() {
                 </div>
               )}
               <p className="text-sm text-muted-foreground mt-1">
-                {company?.industry || 'Unknown'} • {workflows.length} workflows
+                {company?.industry || t.common.unknownIndustry} • {workflows.length} {t.company.workflows.toLowerCase()}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -463,7 +463,7 @@ export default function CompanyDetail() {
                   data-testid="button-scoring-guide"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
-                  Scoring Guide
+                  {t.common.scoringGuide}
                 </Button>
               )}
               {company && (

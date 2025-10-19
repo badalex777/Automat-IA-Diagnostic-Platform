@@ -13,6 +13,7 @@ export interface Translations {
     search: string;
     filter: string;
     loading: string;
+    loadingEllipsis: string;
     error: string;
     success: string;
     required: string;
@@ -20,10 +21,15 @@ export interface Translations {
     yes: string;
     no: string;
     back: string;
+    backToDashboard: string;
     next: string;
     submit: string;
     download: string;
     close: string;
+    platformName: string;
+    scoringGuide: string;
+    unknownCompany: string;
+    unknownIndustry: string;
   };
 
   // Navigation
@@ -36,6 +42,7 @@ export interface Translations {
   // Dashboard
   dashboard: {
     title: string;
+    subtitle: string;
     companies: string;
     workflows: string;
     opportunities: string;
@@ -77,6 +84,10 @@ export interface Translations {
     createOpportunity: string;
     shareTfaLink: string;
     sharePifLink: string;
+    backToCompany: string;
+    unknownWorkflow: string;
+    errorLoadingWorkflow: string;
+    errorLoadingCompany: string;
   };
 
   // TFA (Technical Feasibility Assessment)
@@ -685,6 +696,7 @@ const en: Translations = {
     search: "Search",
     filter: "Filter",
     loading: "Loading...",
+    loadingEllipsis: "Loading...",
     error: "Error",
     success: "Success",
     required: "Required",
@@ -692,10 +704,15 @@ const en: Translations = {
     yes: "Yes",
     no: "No",
     back: "Back",
+    backToDashboard: "Back to Dashboard",
     next: "Next",
     submit: "Submit",
     download: "Download",
     close: "Close",
+    platformName: "Automat-IA Diagnostic Platform",
+    scoringGuide: "Scoring Guide",
+    unknownCompany: "Unknown Company",
+    unknownIndustry: "Unknown",
   },
   nav: {
     dashboard: "Dashboard",
@@ -704,6 +721,7 @@ const en: Translations = {
   },
   dashboard: {
     title: "AI Implementation Diagnostics",
+    subtitle: "Manage AI feasibility assessments for client companies",
     companies: "Companies",
     workflows: "Workflows",
     opportunities: "Opportunities",
@@ -741,6 +759,10 @@ const en: Translations = {
     createOpportunity: "Create Opportunity",
     shareTfaLink: "Share TFA Link",
     sharePifLink: "Share PIF Link",
+    backToCompany: "Back to Company",
+    unknownWorkflow: "Unknown Workflow",
+    errorLoadingWorkflow: "Error loading workflow",
+    errorLoadingCompany: "Error loading company",
   },
   tfa: {
     title: "Technical Feasibility Assessment",
@@ -1298,6 +1320,7 @@ const es: Translations = {
     search: "Buscar",
     filter: "Filtrar",
     loading: "Cargando...",
+    loadingEllipsis: "Cargando...",
     error: "Error",
     success: "Éxito",
     required: "Requerido",
@@ -1305,10 +1328,15 @@ const es: Translations = {
     yes: "Sí",
     no: "No",
     back: "Atrás",
+    backToDashboard: "Volver al Panel",
     next: "Siguiente",
     submit: "Enviar",
     download: "Descargar",
     close: "Cerrar",
+    platformName: "Plataforma de Diagnóstico Automat-IA",
+    scoringGuide: "Guía de Puntuación",
+    unknownCompany: "Empresa Desconocida",
+    unknownIndustry: "Desconocido",
   },
   nav: {
     dashboard: "Panel",
@@ -1317,6 +1345,7 @@ const es: Translations = {
   },
   dashboard: {
     title: "Diagnósticos de Implementación de IA",
+    subtitle: "Gestionar evaluaciones de viabilidad de IA para empresas clientes",
     companies: "Empresas",
     workflows: "Flujos de Trabajo",
     opportunities: "Oportunidades",
@@ -1354,6 +1383,10 @@ const es: Translations = {
     createOpportunity: "Crear Oportunidad",
     shareTfaLink: "Compartir Enlace TFA",
     sharePifLink: "Compartir Enlace PIF",
+    backToCompany: "Volver a la Empresa",
+    unknownWorkflow: "Flujo de Trabajo Desconocido",
+    errorLoadingWorkflow: "Error al cargar el flujo de trabajo",
+    errorLoadingCompany: "Error al cargar la empresa",
   },
   tfa: {
     title: "Evaluación de Viabilidad Técnica",

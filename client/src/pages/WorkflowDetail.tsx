@@ -281,7 +281,7 @@ export default function WorkflowDetail() {
           <Link href={`/company/${companyId}`}>
             <Button variant="ghost" size="sm" className="mb-3" data-testid="button-back-company">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              Back to Company
+              {t.workflow.backToCompany}
             </Button>
           </Link>
           <div className="flex items-center justify-between w-full">
@@ -322,7 +322,7 @@ export default function WorkflowDetail() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">
-                    {workflowError ? 'Error loading workflow' : workflowLoading ? 'Loading...' : workflow?.name || 'Unknown Workflow'}
+                    {workflowError ? t.workflow.errorLoadingWorkflow : workflowLoading ? t.common.loadingEllipsis : workflow?.name || t.workflow.unknownWorkflow}
                   </h1>
                   {!workflowLoading && workflow && (
                     <Button
@@ -338,7 +338,7 @@ export default function WorkflowDetail() {
                 </div>
               )}
               <p className="text-sm text-muted-foreground mt-1">
-                {companyError ? 'Error loading company' : company?.name || (companyLoading ? 'Loading...' : 'Unknown')} • {workflow?.status || 'pending'}
+                {companyError ? t.workflow.errorLoadingCompany : company?.name || (companyLoading ? t.common.loadingEllipsis : t.common.unknownIndustry)} • {workflow?.status || 'pending'}
               </p>
             </div>
             <div className="flex items-center gap-3">
