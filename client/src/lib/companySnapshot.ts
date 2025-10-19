@@ -596,7 +596,8 @@ function generateTFASection(tfa: TFAAssessment | null, t: any, language: 'en' | 
 
   const feasibilityBand = getFeasibilityBand(tfa.score);
   const bandClass = feasibilityBand.toLowerCase().replace(/\s+/g, '-');
-  const bandText = t.readinessRubric[`${feasibilityBand.toLowerCase().replace(/\s+/g, '')}Feasibility`] || feasibilityBand;
+  const bandKey = feasibilityBand.toLowerCase().replace(/\s+/g, '');
+  const bandText = t.tfa.feasibilityBands[bandKey as keyof typeof t.tfa.feasibilityBands] || feasibilityBand;
 
   return `
     <div class="subsection">
@@ -726,7 +727,8 @@ function generateReadinessSection(
   const readiness = calculateReadinessRubric(tfa.score || 0, tfaSectionScores, aggregatedPIF);
 
   const feasibilityClass = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '-');
-  const bandText = t.readinessRubric[`${readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '')}Feasibility`] || readiness.feasibilityBand;
+  const bandKey = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '');
+  const bandText = t.tfa.feasibilityBands[bandKey as keyof typeof t.tfa.feasibilityBands] || readiness.feasibilityBand;
 
   return `
     <div class="subsection">
