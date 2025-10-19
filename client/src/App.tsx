@@ -12,12 +12,14 @@ import TFAForm from "@/pages/TFAForm";
 import TFAThankYou from "@/pages/TFAThankYou";
 import PIFForm from "@/pages/PIFForm";
 import PIFThankYou from "@/pages/PIFThankYou";
+import Documentation from "@/pages/Documentation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
+      <Route path="/documentation" component={Documentation} />
       <Route path="/company/:id" component={CompanyDetail} />
       <Route path="/company/:companyId/workflow/:workflowId" component={WorkflowDetail} />
       <Route path="/tfa/:shareableLink/thank-you" component={TFAThankYou} />

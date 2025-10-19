@@ -8,9 +8,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Link } from "wouter";
 
 export default function Dashboard() {
   const { toast } = useToast();
@@ -75,6 +76,11 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground mt-1">{t.dashboard.title}</p>
             </div>
             <div className="flex items-center gap-3">
+              <Link href="/documentation">
+                <Button variant="ghost" size="icon" data-testid="button-documentation">
+                  <BookOpen className="h-5 w-5" />
+                </Button>
+              </Link>
               <LanguageToggle />
               <ThemeToggle />
               <CreateCompanyDialog 

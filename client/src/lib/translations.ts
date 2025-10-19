@@ -392,6 +392,184 @@ export interface Translations {
     medium: string;
     high: string;
   };
+
+  // Documentation
+  documentation: {
+    title: string;
+    tableOfContents: string;
+    
+    // Platform Overview
+    platformOverview: {
+      title: string;
+      purpose: string;
+      purposeContent: string;
+      targetUsers: string;
+      targetUsersContent: string;
+      keyBenefits: string;
+      benefit1: string;
+      benefit2: string;
+      benefit3: string;
+      benefit4: string;
+      workflowProgression: string;
+      workflowProgressionContent: string;
+    };
+    
+    // User Journey
+    userJourney: {
+      title: string;
+      intro: string;
+      step1Title: string;
+      step1Content: string;
+      step2Title: string;
+      step2Content: string;
+      step3Title: string;
+      step3Content: string;
+      step4Title: string;
+      step4Content: string;
+      step5Title: string;
+      step5Content: string;
+      step6Title: string;
+      step6Content: string;
+    };
+    
+    // TFA Methodology
+    tfaMethodology: {
+      title: string;
+      intro: string;
+      questionsStructure: string;
+      questionsStructureContent: string;
+      sectionWeights: string;
+      systemEnvironment: string;
+      dataQuality: string;
+      integrationFeasibility: string;
+      securityCompliance: string;
+      scoringAlgorithm: string;
+      scoringAlgorithmContent: string;
+      feasibilityBands: string;
+      veryHigh: string;
+      high: string;
+      moderate: string;
+      low: string;
+      veryLow: string;
+      gapDetection: string;
+      gapDetectionContent: string;
+      executiveSummary: string;
+      executiveSummaryContent: string;
+    };
+    
+    // PIF Methodology
+    pifMethodology: {
+      title: string;
+      intro: string;
+      questionsStructure: string;
+      questionsStructureContent: string;
+      sections: string;
+      section1: string;
+      section2: string;
+      section3: string;
+      section4: string;
+      section5: string;
+      section6: string;
+      section7: string;
+      section8: string;
+      operationalScores: string;
+      operationalScoresContent: string;
+      roiDataExtraction: string;
+      roiDataExtractionContent: string;
+      qualitativeInsights: string;
+      qualitativeInsightsContent: string;
+      multiRespondent: string;
+      multiRespondentContent: string;
+    };
+    
+    // Readiness Rubric
+    readinessRubric: {
+      title: string;
+      intro: string;
+      weightingFormula: string;
+      weightingFormulaContent: string;
+      componentBreakdown: string;
+      component1: string;
+      component2: string;
+      component3: string;
+      component4: string;
+      component5: string;
+      component6: string;
+      component7: string;
+      feasibilityBanding: string;
+      feasibilityBandingContent: string;
+      swotAnalysis: string;
+      swotAnalysisContent: string;
+    };
+    
+    // Opportunity Matrix
+    opportunityMatrix: {
+      title: string;
+      intro: string;
+      businessImpactScoring: string;
+      businessImpactScoringContent: string;
+      multiplierExplanation: string;
+      multiplierExplanationContent: string;
+      filterViews: string;
+      filter1Title: string;
+      filter1Content: string;
+      filter2Title: string;
+      filter2Content: string;
+      filter3Title: string;
+      filter3Content: string;
+      filter4Title: string;
+      filter4Content: string;
+      scatterPlotInterpretation: string;
+      scatterPlotInterpretationContent: string;
+      quadrants: string;
+      quadrant1: string;
+      quadrant2: string;
+      quadrant3: string;
+      quadrant4: string;
+    };
+    
+    // ROI Calculations
+    roiCalculations: {
+      title: string;
+      intro: string;
+      annualRoiFormula: string;
+      annualRoiFormulaContent: string;
+      fteSavingsFormula: string;
+      fteSavingsFormulaContent: string;
+      businessImpactScoring: string;
+      businessImpactScoringContent: string;
+      implementationEffort: string;
+      implementationEffortContent: string;
+    };
+    
+    // Formulas Reference
+    formulasReference: {
+      title: string;
+      intro: string;
+      tfaScore: string;
+      tfaScoreFormula: string;
+      readinessScore: string;
+      readinessScoreFormula: string;
+      roiScore: string;
+      roiScoreFormula: string;
+      hoursScore: string;
+      hoursScoreFormula: string;
+      errorScore: string;
+      errorScoreFormula: string;
+      revenueScore: string;
+      revenueScoreFormula: string;
+      businessImpactBase: string;
+      businessImpactBaseFormula: string;
+      businessImpactError: string;
+      businessImpactErrorFormula: string;
+      businessImpactRevenue: string;
+      businessImpactRevenueFormula: string;
+      businessImpactAll: string;
+      businessImpactAllFormula: string;
+      implementationEffort: string;
+      implementationEffortFormula: string;
+    };
+  };
 }
 
 const en: Translations = {
@@ -744,6 +922,174 @@ const en: Translations = {
     medium: "Medium",
     high: "High",
   },
+  documentation: {
+    title: "Platform Handbook",
+    tableOfContents: "Table of Contents",
+    
+    platformOverview: {
+      title: "Platform Overview",
+      purpose: "Purpose",
+      purposeContent: "Automat-IA is a comprehensive diagnostic platform designed to help consultants systematically evaluate AI implementation opportunities within client organizations. Our platform empowers consultants to gather technical and operational data, calculate business impact, and identify automation opportunities that augment human capabilities—enabling workers to focus on higher-value activities.",
+      targetUsers: "Target Users",
+      targetUsersContent: "Technical consultants, business analysts, and implementation specialists working with client organizations to assess AI readiness and identify automation opportunities. The platform serves as a bridge between technical assessment and business strategy.",
+      keyBenefits: "Key Benefits",
+      benefit1: "Structured Assessment: Systematic evaluation framework combining technical feasibility (TFA) and operational insights (PIF)",
+      benefit2: "Data-Driven Decisions: Company-relative scoring ensures opportunities are evaluated in proper business context",
+      benefit3: "Stakeholder Alignment: Bilingual support and shareable links enable multi-stakeholder participation",
+      benefit4: "Actionable Roadmaps: Comprehensive scoring, SWOT analysis, and opportunity prioritization guide implementation strategy",
+      workflowProgression: "Workflow Progression",
+      workflowProgressionContent: "Each workflow advances through defined stages: TFA Only → TFA + Readiness → Readiness + Impact → Complete. This progression ensures consultants gather necessary data before making strategic recommendations.",
+    },
+    
+    userJourney: {
+      title: "User Journey",
+      intro: "The consultant workflow follows a systematic progression from company creation through comprehensive analysis:",
+      step1Title: "Step 1: Company Creation",
+      step1Content: "Create a company profile with essential financial context (annual revenue, total employees). This context powers company-relative scoring throughout the platform.",
+      step2Title: "Step 2: Workflow Definition",
+      step2Content: "Define specific workflows within the company to evaluate for automation potential. Each workflow is assessed independently with its own TFA, PIF, readiness score, and opportunities.",
+      step3Title: "Step 3: Technical Feasibility Assessment (TFA)",
+      step3Content: "Generate a shareable TFA link and send it to technical stakeholders. The TFA evaluates technical foundation across 21 questions in 4 sections: System Environment (25%), Data Quality (30%), Integration Feasibility (30%), and Security/Compliance (15%). Results include a 0-100 score, feasibility band classification, knowledge gap detection, and executive summary.",
+      step4Title: "Step 4: Process Insight Form (PIF)",
+      step4Content: "Generate shareable PIF links and send to process participants. The PIF collects operational insights across 40 questions in 8 sections, capturing operational readiness scores (Process Clarity, Change Magnitude, Workflow Brittleness), ROI data (time/volume metrics from Q28-Q31, quality impact from Q39-Q41), and qualitative insights. Multiple respondents can provide input, with variance tracking showing alignment levels.",
+      step5Title: "Step 5: Readiness Rubric Analysis",
+      step5Content: "View the combined readiness score calculated as 60% TFA + 40% PIF. The rubric breaks down all 7 components with their individual weights, provides feasibility band classification, and generates a comprehensive SWOT analysis identifying strengths, weaknesses, opportunities, and threats.",
+      step6Title: "Step 6: Opportunity Identification & Prioritization",
+      step6Content: "Create implementation opportunities specifying ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. View the Opportunity Matrix scatter plot showing Business Impact (X-axis) vs Implementation Effort (Y-axis). Use 4 filter views to analyze opportunities by metric category. Download a comprehensive company snapshot with all assessment data and recommendations.",
+    },
+    
+    tfaMethodology: {
+      title: "TFA Methodology",
+      intro: "The Technical Feasibility Assessment (TFA) evaluates the technical foundation required for successful AI implementation. It is designed to be completed by technical stakeholders who understand the systems, data, and infrastructure involved in the workflow.",
+      questionsStructure: "Questions Structure",
+      questionsStructureContent: "21 questions organized across 4 technical sections. Each question uses a 1-5 scoring scale where 5 represents optimal readiness and 1 represents significant technical barriers. Respondents can also select 'Don't Know' to flag knowledge gaps, triggering metadata capture for gap resolution.",
+      sectionWeights: "Section Weights",
+      systemEnvironment: "System Environment (25%): Infrastructure, deployment models, API availability, programmatic access, system performance, and change management processes",
+      dataQuality: "Data Quality (30%): Data availability, structure, cleanliness, volume, labeling quality, and historical tracking",
+      integrationFeasibility: "Integration Feasibility (30%): Technical integration capabilities, vendor cooperation, data exchange formats, latency tolerance, and monitoring infrastructure",
+      securityCompliance: "Security & Compliance (15%): Security requirements, data privacy standards, compliance frameworks, audit trails, and regulatory constraints",
+      scoringAlgorithm: "Scoring Algorithm",
+      scoringAlgorithmContent: "TFA Score = Weighted average across all sections, normalized to 0-100 scale. Formula: TFA = [(System Environment × 0.25) + (Data Quality × 0.30) + (Integration Feasibility × 0.30) + (Security/Compliance × 0.15)]. Each section score is calculated as the average of its question scores, weighted by question importance. Knowledge gaps (Don't Know responses) are excluded from calculations but tracked separately for risk assessment.",
+      feasibilityBands: "Feasibility Bands",
+      veryHigh: "Very High Feasibility (80-100): Optimal technical foundation. Systems are modern, well-integrated, and AI-ready. Minimal technical barriers to implementation.",
+      high: "High Feasibility (65-79): Strong technical foundation with minor gaps. Implementation is viable with manageable technical adjustments.",
+      moderate: "Moderate Feasibility (50-64): Adequate technical foundation with notable gaps. Implementation requires focused technical investments and system improvements.",
+      low: "Low Feasibility (35-49): Limited technical foundation. Significant infrastructure improvements required before AI implementation is viable.",
+      veryLow: "Very Low Feasibility (<35): Insufficient technical foundation. Major system upgrades and technical investments needed. Consider fundamental infrastructure improvements before pursuing AI automation.",
+      gapDetection: "Knowledge Gap Detection",
+      gapDetectionContent: "When respondents select 'Don't Know', the system captures metadata: (1) Why the question cannot be answered, (2) Who might have this information. This creates an actionable knowledge gap inventory, identifying information needed before proceeding with implementation. High-impact questions with gaps are flagged as critical blockers.",
+      executiveSummary: "Executive Summary Generation",
+      executiveSummaryContent: "The TFA generates an executive summary highlighting: Overall feasibility assessment with band classification, Critical technical gaps that must be addressed, Key technical strengths to leverage, Implementation roadmap prioritizing gap resolution and infrastructure improvements. This summary translates technical data into strategic guidance for decision-makers.",
+    },
+    
+    pifMethodology: {
+      title: "PIF Methodology",
+      intro: "The Process Insight Form (PIF) gathers operational readiness data and ROI inputs directly from the people who perform the work. Unlike the technical TFA, the PIF captures the human dimension: process clarity, change readiness, time/volume data, and quality metrics.",
+      questionsStructure: "Questions Structure",
+      questionsStructureContent: "40 questions across 8 distinct sections. The first 3 sections calculate operational readiness scores; the middle sections capture ROI data; the final sections gather qualitative insights and experience feedback.",
+      sections: "Eight Sections",
+      section1: "Process Clarity (Q1-Q3): Standardization, sequence consistency, documentation availability",
+      section2: "Change Magnitude (Q4-Q6): Rule stability, workflow impact, technology adoption comfort",
+      section3: "Workflow Brittleness (Q7-Q11): Error frequency, downstream impact, recovery complexity, system dependencies, manual intervention needs",
+      section4: "Time Savings Opportunities (Q12-Q19): Frequency, repetitive tasks, time consumption, automation potential",
+      section5: "Revenue Uplift Potential (Q20-Q27): Capacity constraints, speed impact, customer experience effects, competitive advantages",
+      section6: "Experience & Insights (Q28-Q33): Frustrations, ideal improvements, missing support",
+      section7: "Time & Volume Data (Q34-Q38): Cycle time, weekly volume, seasonal patterns, resource requirements",
+      section8: "Quality Impact Data (Q39-Q43): Error rates, error costs, rework needs, customer satisfaction effects",
+      operationalScores: "Operational Readiness Scores",
+      operationalScoresContent: "Three operational scores contribute to the Readiness Rubric: Process Clarity Score (20% weight): Average of Q1-Q3, measuring standardization and documentation. Change Magnitude Score (20% weight): Average of Q4-Q6, with inverse scoring for Q4 (higher change frequency = lower readiness). Workflow Brittleness Score (8% weight): Average of Q7-Q11, with inverse scoring (higher brittleness = lower readiness). These scores combine with TFA to form the comprehensive Readiness Rubric.",
+      roiDataExtraction: "ROI Data Extraction",
+      roiDataExtractionContent: "Critical ROI inputs are extracted from specific questions: Time/Volume Metrics (Q34-Q38): Cycle time per instance, weekly volume processed, seasonal/temporal patterns, FTE count dedicated to workflow. Quality Impact Metrics (Q39-Q43): Current error rate percentage, financial cost per error, hours spent on rework, customer satisfaction impact. These inputs power opportunity ROI calculations and enable consultants to quantify business impact with real operational data.",
+      qualitativeInsights: "Qualitative Insights Capture",
+      qualitativeInsightsContent: "Open-ended questions (Q28-Q33, Q42-Q43) capture rich qualitative data: Current frustrations and pain points, Ideal state descriptions from practitioners, Missing capabilities or support needs, Customer and stakeholder impact narratives. This qualitative data informs opportunity descriptions and helps consultants understand the human context behind the numbers.",
+      multiRespondent: "Multi-Respondent Aggregation",
+      multiRespondentContent: "Multiple process participants can complete the PIF for the same workflow. The platform aggregates responses showing: Average scores across respondents, Variance indicators (Low/Moderate/High), Individual respondent details with their roles and perspectives. High variance signals misalignment or different process experiences, prompting deeper investigation before implementation planning.",
+    },
+    
+    readinessRubric: {
+      title: "Readiness Rubric",
+      intro: "The Readiness Rubric combines technical feasibility (TFA) and operational readiness (PIF) into a comprehensive assessment of implementation readiness. This weighted formula ensures both technical capability and organizational readiness are evaluated.",
+      weightingFormula: "Weighting Formula",
+      weightingFormulaContent: "Readiness Score = (TFA Score × 60%) + (PIF Score × 40%). Technical feasibility receives higher weight (60%) because without technical foundation, even operationally ready processes cannot be automated. The 40% PIF weight ensures operational factors significantly influence overall readiness—recognizing that technical capability alone does not guarantee successful implementation.",
+      componentBreakdown: "Seven Component Breakdown",
+      component1: "Data Quality (18%): Highest individual weight. Without quality data, AI solutions cannot function reliably. This component directly determines AI performance.",
+      component2: "Integration Feasibility (18%): Equally critical. Systems must connect seamlessly for automation to work. Poor integration creates fragile implementations.",
+      component3: "System Environment (15%): Infrastructure foundation. Modern, scalable systems support sustainable AI solutions.",
+      component4: "Process Clarity (12%): Standardized processes are easier to automate. High clarity reduces implementation complexity and improves solution quality.",
+      component5: "Change Magnitude (12%): Understanding change scope informs adoption planning. Lower magnitude typically means faster, smoother implementations.",
+      component6: "Security & Compliance (9%): Essential but often verification rather than capability. Organizations either meet standards or have clear remediation paths.",
+      component7: "Workflow Brittleness (6%): Lowest weight. Indicates risk rather than capability. Even brittle workflows can be automated with careful design.",
+      feasibilityBanding: "Feasibility Banding",
+      feasibilityBandingContent: "The combined readiness score is classified into the same bands as TFA: Very High (80-100), High (65-79), Moderate (50-64), Low (35-49), Very Low (<35). However, the combined score reflects both technical and operational dimensions, providing a more holistic implementation readiness assessment.",
+      swotAnalysis: "SWOT Analysis Generation",
+      swotAnalysisContent: "The platform automatically generates a SWOT analysis based on component scores: Strengths: Components scoring above 75, highlighting ready capabilities. Weaknesses: Components scoring below 50, identifying areas requiring improvement. Opportunities: High-scoring areas where quick wins are possible. Threats: Low-scoring areas that could derail implementation if not addressed. This framework translates scores into strategic insights for stakeholders.",
+    },
+    
+    opportunityMatrix: {
+      title: "Opportunity Matrix",
+      intro: "The Opportunity Matrix visualizes implementation opportunities on a scatter plot with Business Impact (X-axis) vs Implementation Effort (Y-axis). This prioritization framework helps consultants and stakeholders identify which opportunities to pursue first.",
+      businessImpactScoring: "Business Impact Scoring (X-axis, 0-100)",
+      businessImpactScoringContent: "Business Impact is scored relative to company size, ensuring opportunities are evaluated in proper business context. A $100K ROI means different things for a $1M company vs a $100M company. The scoring uses company-relative formulas with a 10× multiplier to create meaningful scores.",
+      multiplierExplanation: "10× Multiplier Explanation",
+      multiplierExplanationContent: "The platform uses a 10× multiplier (actually 1000 multiplier = 10×100 to convert to percentage then scale) to translate small percentages into meaningful 0-100 scores. Example: A workflow saving 1 FTE in a 100-employee company: FTE Savings = 1, Total Employees = 100. Raw percentage = 1%, which would score only 1/100. With multiplier: Score = (1 / 100) × 1000 = 10 (capped at 100). This ensures even modest but meaningful opportunities receive appropriate scores. A 10% impact (very significant) scores 100, while a 1% impact (notable) scores 10.",
+      filterViews: "Four Filter Views",
+      filter1Title: "1. Time Savings Only (Base Mode)",
+      filter1Content: "Business Impact = (ROI Score × 60%) + (Hours Score × 40%). Focuses purely on labor hour reductions. This is the simplest scoring mode, used when error reduction and revenue uplift are not applicable or not tracked.",
+      filter2Title: "2. Time + Error Reduction",
+      filter2Content: "Business Impact = (ROI Score × 45%) + (Hours Score × 30%) + (Error Score × 25%). When error reduction metrics are enabled, scoring redistributes to account for quality improvements. Error reduction receives 25% weight, recognizing its business value while keeping time savings dominant at 75%.",
+      filter3Title: "3. Time + Revenue Uplift",
+      filter3Content: "Business Impact = (ROI Score × 45%) + (Hours Score × 30%) + (Revenue Score × 25%). When revenue uplift metrics are enabled, scoring redistributes to account for growth opportunities. Revenue receives 25% weight, recognizing strategic value while keeping efficiency gains primary at 75%.",
+      filter4Title: "4. All Three Metrics",
+      filter4Content: "Business Impact = (ROI Score × 40%) + (Hours Score × 30%) + (Error Score × 15%) + (Revenue Score × 15%). The most comprehensive mode, balancing efficiency (70%), quality (15%), and growth (15%). Use when opportunities deliver value across multiple dimensions.",
+      scatterPlotInterpretation: "Scatter Plot Interpretation",
+      scatterPlotInterpretationContent: "The matrix divides into four quadrants based on median values: Quick Wins (High Impact, Low Effort): Prioritize immediately. These deliver strong results with manageable implementation complexity. Strategic Bets (High Impact, High Effort): Long-term strategic projects. Significant business value justifies higher implementation investment. Nice-to-Haves (Low Impact, Low Effort): Consider after higher priorities. Easy to implement but limited business impact. Deprioritize (Low Impact, High Effort): Avoid unless strategic reasons exist. Poor ROI relative to implementation complexity.",
+      quadrants: "Quadrant Definitions",
+      quadrant1: "Quick Wins: High business impact, low implementation effort. These opportunities should be prioritized for immediate action.",
+      quadrant2: "Strategic Bets: High business impact, high implementation effort. Valuable long-term investments requiring significant resources and planning.",
+      quadrant3: "Nice-to-Haves: Low business impact, low implementation effort. Easy wins but limited strategic value. Pursue after higher priorities.",
+      quadrant4: "Deprioritize: Low business impact, high implementation effort. Avoid unless non-financial strategic drivers exist.",
+    },
+    
+    roiCalculations: {
+      title: "ROI Calculations",
+      intro: "The platform calculates ROI and business impact using company-relative formulas that account for organization size and financial context.",
+      annualRoiFormula: "Annual ROI Formula",
+      annualRoiFormulaContent: "Annual ROI = (Annual Hours Saved × Hourly Labor Cost) - Implementation Costs. Where: Annual Hours Saved = Hours per Week × 52 weeks, Hourly Labor Cost = (Total Company Labor Costs / Total Employees) / 2080 hours. Implementation costs include training, ramp-up, and integration expenses captured in opportunity details.",
+      fteSavingsFormula: "FTE Savings Formula",
+      fteSavingsFormulaContent: "FTE Savings = Annual Hours Saved / 2080 hours. This represents the full-time equivalent headcount liberated to focus on higher-value work. Critical note: FTE savings does not mean job elimination. It represents capacity reallocation, enabling employees to augment their capabilities and contribute to more strategic initiatives.",
+      businessImpactScoring: "Business Impact Scoring (Company-Relative)",
+      businessImpactScoringContent: "ROI Score = (Annual ROI / Company Annual Revenue) × 1000, capped at 100. Example: $50K ROI for $5M company = (50,000 / 5,000,000) × 1000 = 10. A 10% ROI (very high) scores 100, 5% scores 50, 2% scores 20, 1% scores 10. Hours Score = (FTE Savings / Total Employees) × 1000, capped at 100. Example: 2 FTE saved for 200-employee company = (2 / 200) × 1000 = 10. A 10% workforce impact (exceptional) scores 100, 1% scores 10. This ensures opportunities are evaluated relative to company size, not absolute dollars.",
+      implementationEffort: "Implementation Effort Calculation (Y-axis, 0-100)",
+      implementationEffortContent: "Implementation Effort = (Inverted Readiness × 40%) + (Ramp-up Period × 25%) + (Payback Period × 25%) + (Training Hours × 10%). Inverted Readiness (40% weight): Higher readiness = lower effort. A workflow with 80 readiness has effort contribution of (100-80) × 0.40 = 8. Ramp-up Period (25% weight): 3 months = 0, 18+ months = 100, linear scaling between. Payback Period (25% weight): 6 months = 0, 36+ months = 100, linear scaling between. Training Hours (10% weight): 2 hours/employee = 0, 40+ hours = 100, linear scaling between. This multi-factor formula captures true implementation complexity.",
+    },
+    
+    formulasReference: {
+      title: "Formulas Reference",
+      intro: "Complete reference of all scoring and calculation formulas used throughout the platform.",
+      tfaScore: "TFA Score (Technical Feasibility Assessment)",
+      tfaScoreFormula: "TFA Score = [(Σ System Environment questions / count) × 0.25] + [(Σ Data Quality questions / count) × 0.30] + [(Σ Integration Feasibility questions / count) × 0.30] + [(Σ Security/Compliance questions / count) × 0.15]. Scale: 0-100. Questions scored 1-5, 'Don't Know' excluded from calculations.",
+      readinessScore: "Readiness Score (Combined TFA + PIF)",
+      readinessScoreFormula: "Readiness Score = (TFA Score × 0.60) + (PIF Score × 0.40). Where PIF Score = (Process Clarity × 0.20) + (Change Magnitude × 0.20) + (Workflow Brittleness × 0.08). Note: PIF weights are relative to the 40% PIF contribution. Scale: 0-100.",
+      roiScore: "ROI Score (Company-Relative)",
+      roiScoreFormula: "ROI Score = MIN(100, (Annual ROI / Company Annual Revenue) × 1000). Example: $100K ROI, $10M revenue = (100,000 / 10,000,000) × 1000 = 10. Scoring guide: 10% = 100, 5% = 50, 2% = 20, 1% = 10.",
+      hoursScore: "Hours Score (Company-Relative)",
+      hoursScoreFormula: "Hours Score = MIN(100, (FTE Savings / Total Employees) × 1000). Where FTE Savings = Annual Hours Saved / 2080. Example: 1 FTE saved, 100 employees = (1 / 100) × 1000 = 10. Scoring guide: 10% = 100, 5% = 50, 1% = 10.",
+      errorScore: "Error Reduction Score (Company-Relative)",
+      errorScoreFormula: "Error Score = MIN(100, (Annual Error Cost Avoided / Company Annual Revenue) × 1000). Where Annual Error Cost Avoided = Errors Avoided × Cost per Error. Scoring follows same company-relative pattern as ROI and Hours.",
+      revenueScore: "Revenue Uplift Score (Company-Relative)",
+      revenueScoreFormula: "Revenue Score = MIN(100, (Annual Revenue Uplift / Company Annual Revenue) × 1000). Scoring follows same company-relative pattern as ROI and Hours.",
+      businessImpactBase: "Business Impact - Time Only",
+      businessImpactBaseFormula: "Business Impact = (ROI Score × 0.60) + (Hours Score × 0.40). Used when neither error nor revenue metrics are enabled. Pure efficiency focus.",
+      businessImpactError: "Business Impact - Time + Error",
+      businessImpactErrorFormula: "Business Impact = (ROI Score × 0.45) + (Hours Score × 0.30) + (Error Score × 0.25). Used when error reduction metrics are enabled. Quality contributes 25%.",
+      businessImpactRevenue: "Business Impact - Time + Revenue",
+      businessImpactRevenueFormula: "Business Impact = (ROI Score × 0.45) + (Hours Score × 0.30) + (Revenue Score × 0.25). Used when revenue uplift metrics are enabled. Growth contributes 25%.",
+      businessImpactAll: "Business Impact - All Three Metrics",
+      businessImpactAllFormula: "Business Impact = (ROI Score × 0.40) + (Hours Score × 0.30) + (Error Score × 0.15) + (Revenue Score × 0.15). Most comprehensive mode balancing efficiency (70%), quality (15%), and growth (15%).",
+      implementationEffort: "Implementation Effort",
+      implementationEffortFormula: "Implementation Effort = (Inverted Readiness × 0.40) + (Normalized Ramp-up × 0.25) + (Normalized Payback × 0.25) + (Normalized Training × 0.10). Where: Inverted Readiness = 100 - Readiness Score. Normalized Ramp-up: 0 at ≤3 months, 100 at ≥18 months, linear between. Normalized Payback: 0 at ≤6 months, 100 at ≥36 months, linear between. Normalized Training: 0 at ≤2 hours, 100 at ≥40 hours, linear between. Scale: 0-100 (lower = easier).",
+    },
+  },
 };
 
 const es: Translations = {
@@ -1095,6 +1441,174 @@ const es: Translations = {
     low: "Bajo",
     medium: "Medio",
     high: "Alto",
+  },
+  documentation: {
+    title: "Manual de la Plataforma",
+    tableOfContents: "Tabla de Contenidos",
+    
+    platformOverview: {
+      title: "Descripción General de la Plataforma",
+      purpose: "Propósito",
+      purposeContent: "Automat-IA es una plataforma de diagnóstico integral diseñada para ayudar a los consultores a evaluar sistemáticamente las oportunidades de implementación de IA dentro de las organizaciones cliente. Nuestra plataforma empodera a los consultores para recopilar datos técnicos y operacionales, calcular el impacto empresarial e identificar oportunidades de automatización que aumentan las capacidades humanas, permitiendo que los trabajadores se enfoquen en actividades de mayor valor.",
+      targetUsers: "Usuarios Objetivo",
+      targetUsersContent: "Consultores técnicos, analistas de negocios y especialistas en implementación que trabajan con organizaciones cliente para evaluar la preparación de IA e identificar oportunidades de automatización. La plataforma sirve como puente entre la evaluación técnica y la estrategia empresarial.",
+      keyBenefits: "Beneficios Clave",
+      benefit1: "Evaluación Estructurada: Marco de evaluación sistemático que combina viabilidad técnica (TFA) y perspectivas operacionales (PIF)",
+      benefit2: "Decisiones Basadas en Datos: La puntuación relativa a la empresa asegura que las oportunidades se evalúen en el contexto empresarial adecuado",
+      benefit3: "Alineación de Partes Interesadas: Soporte bilingüe y enlaces compartibles permiten la participación de múltiples partes interesadas",
+      benefit4: "Hojas de Ruta Accionables: Puntuación integral, análisis FODA y priorización de oportunidades guían la estrategia de implementación",
+      workflowProgression: "Progresión del Flujo de Trabajo",
+      workflowProgressionContent: "Cada flujo de trabajo avanza a través de etapas definidas: Solo TFA → TFA + Preparación → Preparación + Impacto → Completo. Esta progresión asegura que los consultores recopilen los datos necesarios antes de hacer recomendaciones estratégicas.",
+    },
+    
+    userJourney: {
+      title: "Recorrido del Usuario",
+      intro: "El flujo de trabajo del consultor sigue una progresión sistemática desde la creación de la empresa hasta el análisis integral:",
+      step1Title: "Paso 1: Creación de Empresa",
+      step1Content: "Cree un perfil de empresa con contexto financiero esencial (ingresos anuales, total de empleados). Este contexto impulsa la puntuación relativa de la empresa en toda la plataforma.",
+      step2Title: "Paso 2: Definición de Flujo de Trabajo",
+      step2Content: "Defina flujos de trabajo específicos dentro de la empresa para evaluar el potencial de automatización. Cada flujo de trabajo se evalúa de forma independiente con su propio TFA, PIF, puntuación de preparación y oportunidades.",
+      step3Title: "Paso 3: Evaluación de Viabilidad Técnica (TFA)",
+      step3Content: "Genere un enlace TFA compartible y envíelo a las partes interesadas técnicas. El TFA evalúa la base técnica a través de 21 preguntas en 4 secciones: Entorno del Sistema (25%), Calidad de Datos (30%), Viabilidad de Integración (30%) y Seguridad/Cumplimiento (15%). Los resultados incluyen una puntuación de 0-100, clasificación de banda de viabilidad, detección de brechas de conocimiento y resumen ejecutivo.",
+      step4Title: "Paso 4: Formulario de Perspectivas del Proceso (PIF)",
+      step4Content: "Genere enlaces PIF compartibles y envíelos a los participantes del proceso. El PIF recopila perspectivas operacionales a través de 40 preguntas en 8 secciones, capturando puntuaciones de preparación operacional (Claridad del Proceso, Magnitud del Cambio, Fragilidad del Flujo de Trabajo), datos de ROI (métricas de tiempo/volumen de P28-P31, impacto de calidad de P39-P41) y perspectivas cualitativas. Múltiples encuestados pueden proporcionar información, con seguimiento de varianza que muestra niveles de alineación.",
+      step5Title: "Paso 5: Análisis de Rúbrica de Preparación",
+      step5Content: "Vea la puntuación de preparación combinada calculada como 60% TFA + 40% PIF. La rúbrica desglosa los 7 componentes con sus pesos individuales, proporciona clasificación de banda de viabilidad y genera un análisis FODA integral que identifica fortalezas, debilidades, oportunidades y amenazas.",
+      step6Title: "Paso 6: Identificación y Priorización de Oportunidades",
+      step6Content: "Cree oportunidades de implementación especificando datos de ROI, ahorro de tiempo, métricas opcionales de reducción de errores y métricas opcionales de aumento de ingresos. Vea el gráfico de dispersión de la Matriz de Oportunidades mostrando Impacto Empresarial (eje X) vs Esfuerzo de Implementación (eje Y). Use 4 vistas de filtro para analizar oportunidades por categoría de métrica. Descargue una instantánea integral de la empresa con todos los datos de evaluación y recomendaciones.",
+    },
+    
+    tfaMethodology: {
+      title: "Metodología TFA",
+      intro: "La Evaluación de Viabilidad Técnica (TFA) evalúa la base técnica requerida para una implementación exitosa de IA. Está diseñada para ser completada por partes interesadas técnicas que comprenden los sistemas, datos e infraestructura involucrados en el flujo de trabajo.",
+      questionsStructure: "Estructura de Preguntas",
+      questionsStructureContent: "21 preguntas organizadas en 4 secciones técnicas. Cada pregunta usa una escala de puntuación de 1-5 donde 5 representa preparación óptima y 1 representa barreras técnicas significativas. Los encuestados también pueden seleccionar 'No sé' para marcar brechas de conocimiento, activando la captura de metadatos para la resolución de brechas.",
+      sectionWeights: "Pesos de Sección",
+      systemEnvironment: "Entorno del Sistema (25%): Infraestructura, modelos de implementación, disponibilidad de API, acceso programático, rendimiento del sistema y procesos de gestión de cambios",
+      dataQuality: "Calidad de Datos (30%): Disponibilidad de datos, estructura, limpieza, volumen, calidad de etiquetado y seguimiento histórico",
+      integrationFeasibility: "Viabilidad de Integración (30%): Capacidades de integración técnica, cooperación de proveedores, formatos de intercambio de datos, tolerancia a la latencia e infraestructura de monitoreo",
+      securityCompliance: "Seguridad y Cumplimiento (15%): Requisitos de seguridad, estándares de privacidad de datos, marcos de cumplimiento, pistas de auditoría y restricciones regulatorias",
+      scoringAlgorithm: "Algoritmo de Puntuación",
+      scoringAlgorithmContent: "Puntuación TFA = Promedio ponderado en todas las secciones, normalizado a escala 0-100. Fórmula: TFA = [(Entorno del Sistema × 0.25) + (Calidad de Datos × 0.30) + (Viabilidad de Integración × 0.30) + (Seguridad/Cumplimiento × 0.15)]. La puntuación de cada sección se calcula como el promedio de las puntuaciones de sus preguntas, ponderadas por la importancia de la pregunta. Las brechas de conocimiento (respuestas 'No sé') se excluyen de los cálculos pero se rastrean por separado para la evaluación de riesgos.",
+      feasibilityBands: "Bandas de Viabilidad",
+      veryHigh: "Viabilidad Muy Alta (80-100): Base técnica óptima. Los sistemas son modernos, bien integrados y listos para IA. Barreras técnicas mínimas para la implementación.",
+      high: "Viabilidad Alta (65-79): Base técnica sólida con brechas menores. La implementación es viable con ajustes técnicos manejables.",
+      moderate: "Viabilidad Moderada (50-64): Base técnica adecuada con brechas notables. La implementación requiere inversiones técnicas enfocadas y mejoras del sistema.",
+      low: "Viabilidad Baja (35-49): Base técnica limitada. Se requieren mejoras significativas de infraestructura antes de que la implementación de IA sea viable.",
+      veryLow: "Viabilidad Muy Baja (<35): Base técnica insuficiente. Se necesitan actualizaciones importantes del sistema e inversiones técnicas. Considere mejoras fundamentales de infraestructura antes de buscar la automatización de IA.",
+      gapDetection: "Detección de Brechas de Conocimiento",
+      gapDetectionContent: "Cuando los encuestados seleccionan 'No sé', el sistema captura metadatos: (1) Por qué no se puede responder la pregunta, (2) Quién podría tener esta información. Esto crea un inventario de brechas de conocimiento accionable, identificando la información necesaria antes de proceder con la implementación. Las preguntas de alto impacto con brechas se marcan como bloqueadores críticos.",
+      executiveSummary: "Generación de Resumen Ejecutivo",
+      executiveSummaryContent: "El TFA genera un resumen ejecutivo destacando: Evaluación general de viabilidad con clasificación de banda, Brechas técnicas críticas que deben abordarse, Fortalezas técnicas clave para aprovechar, Hoja de ruta de implementación priorizando la resolución de brechas y mejoras de infraestructura. Este resumen traduce datos técnicos en orientación estratégica para tomadores de decisiones.",
+    },
+    
+    pifMethodology: {
+      title: "Metodología PIF",
+      intro: "El Formulario de Perspectivas del Proceso (PIF) recopila datos de preparación operacional y entradas de ROI directamente de las personas que realizan el trabajo. A diferencia del TFA técnico, el PIF captura la dimensión humana: claridad del proceso, preparación para el cambio, datos de tiempo/volumen y métricas de calidad.",
+      questionsStructure: "Estructura de Preguntas",
+      questionsStructureContent: "40 preguntas en 8 secciones distintas. Las primeras 3 secciones calculan puntuaciones de preparación operacional; las secciones medias capturan datos de ROI; las secciones finales recopilan perspectivas cualitativas y retroalimentación de experiencia.",
+      sections: "Ocho Secciones",
+      section1: "Claridad del Proceso (P1-P3): Estandarización, consistencia de secuencia, disponibilidad de documentación",
+      section2: "Magnitud del Cambio (P4-P6): Estabilidad de reglas, impacto del flujo de trabajo, comodidad con la adopción de tecnología",
+      section3: "Fragilidad del Flujo de Trabajo (P7-P11): Frecuencia de errores, impacto descendente, complejidad de recuperación, dependencias del sistema, necesidades de intervención manual",
+      section4: "Oportunidades de Ahorro de Tiempo (P12-P19): Frecuencia, tareas repetitivas, consumo de tiempo, potencial de automatización",
+      section5: "Potencial de Aumento de Ingresos (P20-P27): Restricciones de capacidad, impacto de velocidad, efectos de experiencia del cliente, ventajas competitivas",
+      section6: "Experiencia y Perspectivas (P28-P33): Frustraciones, mejoras ideales, apoyo faltante",
+      section7: "Datos de Tiempo y Volumen (P34-P38): Tiempo de ciclo, volumen semanal, patrones estacionales, requisitos de recursos",
+      section8: "Datos de Impacto de Calidad (P39-P43): Tasas de error, costos de error, necesidades de retrabajo, efectos de satisfacción del cliente",
+      operationalScores: "Puntuaciones de Preparación Operacional",
+      operationalScoresContent: "Tres puntuaciones operacionales contribuyen a la Rúbrica de Preparación: Puntuación de Claridad del Proceso (peso 20%): Promedio de P1-P3, midiendo estandarización y documentación. Puntuación de Magnitud del Cambio (peso 20%): Promedio de P4-P6, con puntuación inversa para P4 (mayor frecuencia de cambio = menor preparación). Puntuación de Fragilidad del Flujo de Trabajo (peso 8%): Promedio de P7-P11, con puntuación inversa (mayor fragilidad = menor preparación). Estas puntuaciones se combinan con TFA para formar la Rúbrica de Preparación integral.",
+      roiDataExtraction: "Extracción de Datos de ROI",
+      roiDataExtractionContent: "Las entradas críticas de ROI se extraen de preguntas específicas: Métricas de Tiempo/Volumen (P34-P38): Tiempo de ciclo por instancia, volumen semanal procesado, patrones estacionales/temporales, recuento de FTE dedicado al flujo de trabajo. Métricas de Impacto de Calidad (P39-P43): Porcentaje de tasa de error actual, costo financiero por error, horas dedicadas al retrabajo, impacto en la satisfacción del cliente. Estas entradas impulsan los cálculos de ROI de oportunidades y permiten a los consultores cuantificar el impacto empresarial con datos operacionales reales.",
+      qualitativeInsights: "Captura de Perspectivas Cualitativas",
+      qualitativeInsightsContent: "Las preguntas abiertas (P28-P33, P42-P43) capturan datos cualitativos ricos: Frustraciones y puntos de dolor actuales, Descripciones de estado ideal de los practicantes, Capacidades o necesidades de apoyo faltantes, Narrativas de impacto de clientes y partes interesadas. Estos datos cualitativos informan las descripciones de oportunidades y ayudan a los consultores a comprender el contexto humano detrás de los números.",
+      multiRespondent: "Agregación de Múltiples Encuestados",
+      multiRespondentContent: "Múltiples participantes del proceso pueden completar el PIF para el mismo flujo de trabajo. La plataforma agrega respuestas mostrando: Puntuaciones promedio entre encuestados, Indicadores de varianza (Baja/Moderada/Alta), Detalles de encuestados individuales con sus roles y perspectivas. La alta varianza señala desalineación o diferentes experiencias de proceso, impulsando una investigación más profunda antes de la planificación de implementación.",
+    },
+    
+    readinessRubric: {
+      title: "Rúbrica de Preparación",
+      intro: "La Rúbrica de Preparación combina viabilidad técnica (TFA) y preparación operacional (PIF) en una evaluación integral de preparación para implementación. Esta fórmula ponderada asegura que tanto la capacidad técnica como la preparación organizacional se evalúen.",
+      weightingFormula: "Fórmula de Ponderación",
+      weightingFormulaContent: "Puntuación de Preparación = (Puntuación TFA × 60%) + (Puntuación PIF × 40%). La viabilidad técnica recibe mayor peso (60%) porque sin base técnica, incluso los procesos operacionalmente listos no pueden ser automatizados. El peso del 40% PIF asegura que los factores operacionales influyan significativamente en la preparación general, reconociendo que la capacidad técnica por sí sola no garantiza una implementación exitosa.",
+      componentBreakdown: "Desglose de Siete Componentes",
+      component1: "Calidad de Datos (18%): Mayor peso individual. Sin datos de calidad, las soluciones de IA no pueden funcionar de manera confiable. Este componente determina directamente el rendimiento de la IA.",
+      component2: "Viabilidad de Integración (18%): Igualmente crítico. Los sistemas deben conectarse sin problemas para que la automatización funcione. La integración pobre crea implementaciones frágiles.",
+      component3: "Entorno del Sistema (15%): Base de infraestructura. Los sistemas modernos y escalables soportan soluciones de IA sostenibles.",
+      component4: "Claridad del Proceso (12%): Los procesos estandarizados son más fáciles de automatizar. La alta claridad reduce la complejidad de implementación y mejora la calidad de la solución.",
+      component5: "Magnitud del Cambio (12%): Comprender el alcance del cambio informa la planificación de adopción. Menor magnitud típicamente significa implementaciones más rápidas y fluidas.",
+      component6: "Seguridad y Cumplimiento (9%): Esencial pero a menudo verificación en lugar de capacidad. Las organizaciones cumplen con los estándares o tienen caminos de remediación claros.",
+      component7: "Fragilidad del Flujo de Trabajo (6%): Peso más bajo. Indica riesgo en lugar de capacidad. Incluso los flujos de trabajo frágiles pueden ser automatizados con diseño cuidadoso.",
+      feasibilityBanding: "Bandas de Viabilidad",
+      feasibilityBandingContent: "La puntuación de preparación combinada se clasifica en las mismas bandas que TFA: Muy Alta (80-100), Alta (65-79), Moderada (50-64), Baja (35-49), Muy Baja (<35). Sin embargo, la puntuación combinada refleja dimensiones tanto técnicas como operacionales, proporcionando una evaluación de preparación para implementación más holística.",
+      swotAnalysis: "Generación de Análisis FODA",
+      swotAnalysisContent: "La plataforma genera automáticamente un análisis FODA basado en puntuaciones de componentes: Fortalezas: Componentes con puntuación superior a 75, destacando capacidades listas. Debilidades: Componentes con puntuación inferior a 50, identificando áreas que requieren mejora. Oportunidades: Áreas de alta puntuación donde las victorias rápidas son posibles. Amenazas: Áreas de baja puntuación que podrían descarrilar la implementación si no se abordan. Este marco traduce puntuaciones en perspectivas estratégicas para las partes interesadas.",
+    },
+    
+    opportunityMatrix: {
+      title: "Matriz de Oportunidades",
+      intro: "La Matriz de Oportunidades visualiza oportunidades de implementación en un gráfico de dispersión con Impacto Empresarial (eje X) vs Esfuerzo de Implementación (eje Y). Este marco de priorización ayuda a consultores y partes interesadas a identificar qué oportunidades perseguir primero.",
+      businessImpactScoring: "Puntuación de Impacto Empresarial (eje X, 0-100)",
+      businessImpactScoringContent: "El Impacto Empresarial se puntúa en relación con el tamaño de la empresa, asegurando que las oportunidades se evalúen en el contexto empresarial adecuado. Un ROI de $100K significa cosas diferentes para una empresa de $1M vs una empresa de $100M. La puntuación usa fórmulas relativas a la empresa con un multiplicador de 10× para crear puntuaciones significativas.",
+      multiplierExplanation: "Explicación del Multiplicador 10×",
+      multiplierExplanationContent: "La plataforma usa un multiplicador de 10× (en realidad multiplicador de 1000 = 10×100 para convertir a porcentaje luego escalar) para traducir pequeños porcentajes en puntuaciones significativas de 0-100. Ejemplo: Un flujo de trabajo que ahorra 1 FTE en una empresa de 100 empleados: Ahorro FTE = 1, Total Empleados = 100. Porcentaje bruto = 1%, que puntuaría solo 1/100. Con multiplicador: Puntuación = (1 / 100) × 1000 = 10 (limitado a 100). Esto asegura que incluso oportunidades modestas pero significativas reciban puntuaciones apropiadas. Un impacto del 10% (muy significativo) puntúa 100, mientras que un impacto del 1% (notable) puntúa 10.",
+      filterViews: "Cuatro Vistas de Filtro",
+      filter1Title: "1. Solo Ahorro de Tiempo (Modo Base)",
+      filter1Content: "Impacto Empresarial = (Puntuación ROI × 60%) + (Puntuación Horas × 40%). Se enfoca puramente en reducciones de horas laborales. Este es el modo de puntuación más simple, usado cuando la reducción de errores y el aumento de ingresos no son aplicables o no se rastrean.",
+      filter2Title: "2. Tiempo + Reducción de Errores",
+      filter2Content: "Impacto Empresarial = (Puntuación ROI × 45%) + (Puntuación Horas × 30%) + (Puntuación Error × 25%). Cuando las métricas de reducción de errores están habilitadas, la puntuación se redistribuye para tener en cuenta las mejoras de calidad. La reducción de errores recibe 25% de peso, reconociendo su valor empresarial mientras mantiene el ahorro de tiempo dominante al 75%.",
+      filter3Title: "3. Tiempo + Aumento de Ingresos",
+      filter3Content: "Impacto Empresarial = (Puntuación ROI × 45%) + (Puntuación Horas × 30%) + (Puntuación Ingresos × 25%). Cuando las métricas de aumento de ingresos están habilitadas, la puntuación se redistribuye para tener en cuenta las oportunidades de crecimiento. Los ingresos reciben 25% de peso, reconociendo el valor estratégico mientras mantienen las ganancias de eficiencia primarias al 75%.",
+      filter4Title: "4. Las Tres Métricas",
+      filter4Content: "Impacto Empresarial = (Puntuación ROI × 40%) + (Puntuación Horas × 30%) + (Puntuación Error × 15%) + (Puntuación Ingresos × 15%). El modo más completo, equilibrando eficiencia (70%), calidad (15%) y crecimiento (15%). Use cuando las oportunidades entreguen valor en múltiples dimensiones.",
+      scatterPlotInterpretation: "Interpretación del Gráfico de Dispersión",
+      scatterPlotInterpretationContent: "La matriz se divide en cuatro cuadrantes basados en valores medianos: Victorias Rápidas (Alto Impacto, Bajo Esfuerzo): Priorice inmediatamente. Estos entregan resultados sólidos con complejidad de implementación manejable. Apuestas Estratégicas (Alto Impacto, Alto Esfuerzo): Proyectos estratégicos a largo plazo. El valor empresarial significativo justifica mayor inversión de implementación. Agradables de Tener (Bajo Impacto, Bajo Esfuerzo): Considere después de prioridades más altas. Fácil de implementar pero impacto empresarial limitado. Despriorizar (Bajo Impacto, Alto Esfuerzo): Evite a menos que existan razones estratégicas. ROI pobre relativo a la complejidad de implementación.",
+      quadrants: "Definiciones de Cuadrantes",
+      quadrant1: "Victorias Rápidas: Alto impacto empresarial, bajo esfuerzo de implementación. Estas oportunidades deben priorizarse para acción inmediata.",
+      quadrant2: "Apuestas Estratégicas: Alto impacto empresarial, alto esfuerzo de implementación. Inversiones valiosas a largo plazo que requieren recursos y planificación significativos.",
+      quadrant3: "Agradables de Tener: Bajo impacto empresarial, bajo esfuerzo de implementación. Victorias fáciles pero valor estratégico limitado. Perseguir después de prioridades más altas.",
+      quadrant4: "Despriorizar: Bajo impacto empresarial, alto esfuerzo de implementación. Evite a menos que existan impulsores estratégicos no financieros.",
+    },
+    
+    roiCalculations: {
+      title: "Cálculos de ROI",
+      intro: "La plataforma calcula el ROI y el impacto empresarial usando fórmulas relativas a la empresa que consideran el tamaño de la organización y el contexto financiero.",
+      annualRoiFormula: "Fórmula de ROI Anual",
+      annualRoiFormulaContent: "ROI Anual = (Horas Anuales Ahorradas × Costo Laboral por Hora) - Costos de Implementación. Donde: Horas Anuales Ahorradas = Horas por Semana × 52 semanas, Costo Laboral por Hora = (Costos Laborales Totales de la Empresa / Total Empleados) / 2080 horas. Los costos de implementación incluyen capacitación, rampa y gastos de integración capturados en detalles de oportunidad.",
+      fteSavingsFormula: "Fórmula de Ahorro FTE",
+      fteSavingsFormulaContent: "Ahorro FTE = Horas Anuales Ahorradas / 2080 horas. Esto representa el equivalente de personal de tiempo completo liberado para enfocarse en trabajo de mayor valor. Nota crítica: El ahorro FTE no significa eliminación de empleos. Representa reasignación de capacidad, permitiendo a los empleados aumentar sus capacidades y contribuir a iniciativas más estratégicas.",
+      businessImpactScoring: "Puntuación de Impacto Empresarial (Relativa a la Empresa)",
+      businessImpactScoringContent: "Puntuación ROI = (ROI Anual / Ingresos Anuales de la Empresa) × 1000, limitado a 100. Ejemplo: $50K ROI para empresa de $5M = (50,000 / 5,000,000) × 1000 = 10. Un ROI del 10% (muy alto) puntúa 100, 5% puntúa 50, 2% puntúa 20, 1% puntúa 10. Puntuación Horas = (Ahorro FTE / Total Empleados) × 1000, limitado a 100. Ejemplo: 2 FTE ahorrados para empresa de 200 empleados = (2 / 200) × 1000 = 10. Un impacto de fuerza laboral del 10% (excepcional) puntúa 100, 1% puntúa 10. Esto asegura que las oportunidades se evalúen en relación con el tamaño de la empresa, no dólares absolutos.",
+      implementationEffort: "Cálculo de Esfuerzo de Implementación (eje Y, 0-100)",
+      implementationEffortContent: "Esfuerzo de Implementación = (Preparación Invertida × 40%) + (Período de Rampa × 25%) + (Período de Recuperación × 25%) + (Horas de Capacitación × 10%). Preparación Invertida (peso 40%): Mayor preparación = menor esfuerzo. Un flujo de trabajo con preparación de 80 tiene contribución de esfuerzo de (100-80) × 0.40 = 8. Período de Rampa (peso 25%): 3 meses = 0, 18+ meses = 100, escalado lineal entre. Período de Recuperación (peso 25%): 6 meses = 0, 36+ meses = 100, escalado lineal entre. Horas de Capacitación (peso 10%): 2 horas/empleado = 0, 40+ horas = 100, escalado lineal entre. Esta fórmula multifactorial captura la verdadera complejidad de implementación.",
+    },
+    
+    formulasReference: {
+      title: "Referencia de Fórmulas",
+      intro: "Referencia completa de todas las fórmulas de puntuación y cálculo utilizadas en toda la plataforma.",
+      tfaScore: "Puntuación TFA (Evaluación de Viabilidad Técnica)",
+      tfaScoreFormula: "Puntuación TFA = [(Σ preguntas Entorno del Sistema / conteo) × 0.25] + [(Σ preguntas Calidad de Datos / conteo) × 0.30] + [(Σ preguntas Viabilidad de Integración / conteo) × 0.30] + [(Σ preguntas Seguridad/Cumplimiento / conteo) × 0.15]. Escala: 0-100. Preguntas puntuadas 1-5, 'No sé' excluido de cálculos.",
+      readinessScore: "Puntuación de Preparación (TFA + PIF Combinados)",
+      readinessScoreFormula: "Puntuación de Preparación = (Puntuación TFA × 0.60) + (Puntuación PIF × 0.40). Donde Puntuación PIF = (Claridad del Proceso × 0.20) + (Magnitud del Cambio × 0.20) + (Fragilidad del Flujo de Trabajo × 0.08). Nota: Los pesos PIF son relativos a la contribución del 40% PIF. Escala: 0-100.",
+      roiScore: "Puntuación ROI (Relativa a la Empresa)",
+      roiScoreFormula: "Puntuación ROI = MIN(100, (ROI Anual / Ingresos Anuales de la Empresa) × 1000). Ejemplo: $100K ROI, $10M ingresos = (100,000 / 10,000,000) × 1000 = 10. Guía de puntuación: 10% = 100, 5% = 50, 2% = 20, 1% = 10.",
+      hoursScore: "Puntuación de Horas (Relativa a la Empresa)",
+      hoursScoreFormula: "Puntuación de Horas = MIN(100, (Ahorro FTE / Total Empleados) × 1000). Donde Ahorro FTE = Horas Anuales Ahorradas / 2080. Ejemplo: 1 FTE ahorrado, 100 empleados = (1 / 100) × 1000 = 10. Guía de puntuación: 10% = 100, 5% = 50, 1% = 10.",
+      errorScore: "Puntuación de Reducción de Errores (Relativa a la Empresa)",
+      errorScoreFormula: "Puntuación de Error = MIN(100, (Costo Anual de Error Evitado / Ingresos Anuales de la Empresa) × 1000). Donde Costo Anual de Error Evitado = Errores Evitados × Costo por Error. La puntuación sigue el mismo patrón relativo a la empresa que ROI y Horas.",
+      revenueScore: "Puntuación de Aumento de Ingresos (Relativa a la Empresa)",
+      revenueScoreFormula: "Puntuación de Ingresos = MIN(100, (Aumento de Ingresos Anual / Ingresos Anuales de la Empresa) × 1000). La puntuación sigue el mismo patrón relativo a la empresa que ROI y Horas.",
+      businessImpactBase: "Impacto Empresarial - Solo Tiempo",
+      businessImpactBaseFormula: "Impacto Empresarial = (Puntuación ROI × 0.60) + (Puntuación Horas × 0.40). Usado cuando ni las métricas de error ni de ingresos están habilitadas. Enfoque de eficiencia pura.",
+      businessImpactError: "Impacto Empresarial - Tiempo + Error",
+      businessImpactErrorFormula: "Impacto Empresarial = (Puntuación ROI × 0.45) + (Puntuación Horas × 0.30) + (Puntuación Error × 0.25). Usado cuando las métricas de reducción de errores están habilitadas. La calidad contribuye 25%.",
+      businessImpactRevenue: "Impacto Empresarial - Tiempo + Ingresos",
+      businessImpactRevenueFormula: "Impacto Empresarial = (Puntuación ROI × 0.45) + (Puntuación Horas × 0.30) + (Puntuación Ingresos × 0.25). Usado cuando las métricas de aumento de ingresos están habilitadas. El crecimiento contribuye 25%.",
+      businessImpactAll: "Impacto Empresarial - Las Tres Métricas",
+      businessImpactAllFormula: "Impacto Empresarial = (Puntuación ROI × 0.40) + (Puntuación Horas × 0.30) + (Puntuación Error × 0.15) + (Puntuación Ingresos × 0.15). Modo más completo equilibrando eficiencia (70%), calidad (15%) y crecimiento (15%).",
+      implementationEffort: "Esfuerzo de Implementación",
+      implementationEffortFormula: "Esfuerzo de Implementación = (Preparación Invertida × 0.40) + (Rampa Normalizada × 0.25) + (Recuperación Normalizada × 0.25) + (Capacitación Normalizada × 0.10). Donde: Preparación Invertida = 100 - Puntuación de Preparación. Rampa Normalizada: 0 en ≤3 meses, 100 en ≥18 meses, lineal entre. Recuperación Normalizada: 0 en ≤6 meses, 100 en ≥36 meses, lineal entre. Capacitación Normalizada: 0 en ≤2 horas, 100 en ≥40 horas, lineal entre. Escala: 0-100 (menor = más fácil).",
+    },
   },
 };
 
