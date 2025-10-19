@@ -1,12 +1,18 @@
 import { translations } from "./translations";
 import { calculateAggregatedPIFScores, calculateReadinessRubric } from "@shared/pifCalculations";
 import { calculateImplementationEffort, calculateBusinessImpact, type CompanyContext } from "@shared/opportunityCalculations";
+import { TFA_QUESTIONS, TFA_SECTIONS, calculateSectionScores, calculateQuestionImpact } from "@shared/tfaQuestions";
 import type { Company, Workflow, TFAAssessment, PIFResponse, ImplementationOpportunity } from "@shared/schema";
+
+interface PIFData {
+  responses: PIFResponse[];
+  aggregated: any;
+}
 
 interface WorkflowSnapshotData {
   workflow: Workflow;
   tfa: TFAAssessment | null;
-  pifResponses: PIFResponse[];
+  pifData: PIFData | null;
   opportunities: ImplementationOpportunity[];
 }
 
@@ -45,13 +51,13 @@ export async function generateCompanySnapshot(
       ]);
 
       const tfa = tfaRes.ok ? await tfaRes.json() : null;
-      const pifResponses = pifRes.ok ? await pifRes.json() : [];
+      const pifData = pifRes.ok ? await pifRes.json() : null;
       const opportunities = oppRes.ok ? await oppRes.json() : [];
 
       return {
         workflow,
         tfa,
-        pifResponses: Array.isArray(pifResponses) ? pifResponses : [],
+        pifData, // Keep as-is: { responses, aggregated } or null
         opportunities: Array.isArray(opportunities) ? opportunities : []
       };
     })
@@ -72,7 +78,7 @@ export async function generateCompanySnapshot(
 <body>
   ${generateHeader(company, t, language)}
   ${generateWorkflowSections(workflowData, company, t, language)}
-  ${generateCalculationTransparency(t)}
+  ${generateMethodologySection(t)}
 </body>
 </html>
   `;
@@ -91,58 +97,64 @@ function getSnapshotStyles(): string {
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
-      color: #1a1a1a;
-      background: #ffffff;
+      color: #e5e7eb;
+      background: #0a0a0a;
       padding: 40px;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 700;
       margin-bottom: 24px;
-      color: #0f172a;
-      border-bottom: 3px solid #3b82f6;
+      color: #ffffff;
+      border-bottom: 3px solid #10b981;
       padding-bottom: 12px;
     }
 
     h2 {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 600;
       margin-top: 48px;
       margin-bottom: 20px;
-      color: #0f172a;
-      border-bottom: 2px solid #e2e8f0;
+      color: #10b981;
+      border-bottom: 2px solid #1f2937;
       padding-bottom: 8px;
       page-break-after: avoid;
     }
 
     h3 {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
       margin-top: 32px;
       margin-bottom: 16px;
-      color: #334155;
+      color: #10b981;
       page-break-after: avoid;
     }
 
     h4 {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       margin-top: 24px;
       margin-bottom: 12px;
-      color: #475569;
+      color: #6ee7b7;
       page-break-after: avoid;
     }
 
     p {
       margin-bottom: 12px;
-      color: #334155;
+      color: #d1d5db;
+    }
+
+    strong {
+      color: #f3f4f6;
     }
 
     .header {
       margin-bottom: 40px;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 32px;
     }
 
     .company-info {
@@ -150,10 +162,10 @@ function getSnapshotStyles(): string {
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
       margin-top: 20px;
-      padding: 20px;
-      background: #f8fafc;
+      padding: 24px;
+      background: #111827;
       border-radius: 8px;
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid #10b981;
     }
 
     .info-item {
@@ -165,88 +177,110 @@ function getSnapshotStyles(): string {
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      color: #64748b;
+      color: #6ee7b7;
       margin-bottom: 4px;
       letter-spacing: 0.5px;
     }
 
     .info-value {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 600;
-      color: #0f172a;
+      color: #f9fafb;
     }
 
     .workflow-section {
       margin-top: 60px;
       page-break-before: always;
-      border-top: 4px solid #e2e8f0;
+      border-top: 4px solid #1f2937;
       padding-top: 32px;
     }
 
     .workflow-title {
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 700;
-      color: #0f172a;
+      color: #ffffff;
       margin-bottom: 12px;
     }
 
     .workflow-description {
       font-size: 16px;
-      color: #64748b;
+      color: #9ca3af;
       margin-bottom: 32px;
       font-style: italic;
     }
 
     .subsection {
       margin-top: 32px;
-      padding: 24px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+      padding: 28px;
+      background: #111827;
+      border: 1px solid #1f2937;
       border-radius: 8px;
       page-break-inside: avoid;
     }
 
     .subsection-title {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 600;
-      color: #0f172a;
-      margin-bottom: 16px;
-      border-bottom: 1px solid #e2e8f0;
+      color: #10b981;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #1f2937;
       padding-bottom: 8px;
+    }
+
+    .respondent-info {
+      padding: 16px;
+      background: #1f2937;
+      border-radius: 6px;
+      border-left: 3px solid #10b981;
+      margin-bottom: 20px;
+    }
+
+    .respondent-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #6ee7b7;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .respondent-value {
+      font-size: 16px;
+      color: #f3f4f6;
     }
 
     .score-badge {
       display: inline-block;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border-radius: 6px;
-      font-weight: 600;
-      font-size: 18px;
+      font-weight: 700;
+      font-size: 20px;
       margin: 8px 0;
     }
 
     .feasibility-very-high {
       background: #10b981;
-      color: white;
+      color: #000000;
     }
 
     .feasibility-high {
-      background: #3b82f6;
-      color: white;
+      background: #34d399;
+      color: #000000;
     }
 
     .feasibility-moderate {
-      background: #f59e0b;
-      color: white;
+      background: #fbbf24;
+      color: #000000;
     }
 
     .feasibility-low {
-      background: #ef4444;
-      color: white;
+      background: #f59e0b;
+      color: #000000;
     }
 
     .feasibility-very-low {
-      background: #dc2626;
-      color: white;
+      background: #ef4444;
+      color: #ffffff;
     }
 
     .data-table {
@@ -257,22 +291,22 @@ function getSnapshotStyles(): string {
     }
 
     .data-table th {
-      background: #f1f5f9;
+      background: #1f2937;
       padding: 12px;
       text-align: left;
       font-weight: 600;
-      color: #475569;
-      border-bottom: 2px solid #cbd5e1;
+      color: #6ee7b7;
+      border-bottom: 2px solid #10b981;
     }
 
     .data-table td {
       padding: 10px 12px;
-      border-bottom: 1px solid #e2e8f0;
-      color: #334155;
+      border-bottom: 1px solid #374151;
+      color: #d1d5db;
     }
 
     .data-table tr:hover {
-      background: #f8fafc;
+      background: #1f2937;
     }
 
     .metric-grid {
@@ -283,30 +317,30 @@ function getSnapshotStyles(): string {
     }
 
     .metric-card {
-      padding: 16px;
-      background: #f8fafc;
+      padding: 20px;
+      background: #1f2937;
       border-radius: 6px;
-      border-left: 3px solid #3b82f6;
+      border-left: 3px solid #10b981;
     }
 
     .metric-label {
       font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      color: #64748b;
+      color: #6ee7b7;
       margin-bottom: 6px;
       letter-spacing: 0.5px;
     }
 
     .metric-value {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
-      color: #0f172a;
+      color: #ffffff;
     }
 
     .metric-range {
-      font-size: 12px;
-      color: #64748b;
+      font-size: 13px;
+      color: #9ca3af;
       margin-top: 4px;
     }
 
@@ -316,190 +350,281 @@ function getSnapshotStyles(): string {
     }
 
     .insights-list li {
-      padding: 12px;
-      margin-bottom: 8px;
-      background: #f8fafc;
-      border-left: 3px solid #8b5cf6;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #1f2937;
+      border-left: 3px solid #6ee7b7;
       border-radius: 4px;
-      color: #475569;
+      color: #d1d5db;
       font-style: italic;
     }
 
     .component-breakdown {
-      margin: 20px 0;
+      margin: 24px 0;
     }
 
     .component-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      margin-bottom: 8px;
-      background: #f8fafc;
+      padding: 14px;
+      margin-bottom: 10px;
+      background: #1f2937;
       border-radius: 4px;
-      border-left: 3px solid #6366f1;
+      border-left: 3px solid #10b981;
     }
 
     .component-name {
       font-weight: 500;
-      color: #334155;
+      color: #e5e7eb;
     }
 
     .component-score {
       font-weight: 700;
-      font-size: 18px;
-      color: #0f172a;
+      font-size: 20px;
+      color: #10b981;
     }
 
-    .swot-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      margin: 20px 0;
-    }
-
-    .swot-card {
+    .gap-card {
       padding: 16px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .swot-card.strengths {
-      border-left: 4px solid #10b981;
-      background: #f0fdf4;
-    }
-
-    .swot-card.weaknesses {
-      border-left: 4px solid #ef4444;
-      background: #fef2f2;
-    }
-
-    .swot-card.opportunities {
-      border-left: 4px solid #3b82f6;
-      background: #eff6ff;
-    }
-
-    .swot-card.threats {
-      border-left: 4px solid #f59e0b;
-      background: #fffbeb;
-    }
-
-    .swot-title {
-      font-weight: 600;
-      font-size: 14px;
-      text-transform: uppercase;
       margin-bottom: 12px;
+      background: #7f1d1d;
+      border: 1px solid #991b1b;
+      border-radius: 6px;
+      border-left: 4px solid #ef4444;
+    }
+
+    .gap-question {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fecaca;
+      margin-bottom: 6px;
+    }
+
+    .gap-section {
+      font-size: 12px;
+      color: #fca5a5;
+      text-transform: uppercase;
+      font-weight: 600;
       letter-spacing: 0.5px;
     }
 
-    .swot-card.strengths .swot-title {
-      color: #047857;
-    }
-
-    .swot-card.weaknesses .swot-title {
-      color: #dc2626;
-    }
-
-    .swot-card.opportunities .swot-title {
-      color: #2563eb;
-    }
-
-    .swot-card.threats .swot-title {
-      color: #d97706;
-    }
-
-    .swot-list {
-      list-style: none;
-    }
-
-    .swot-list li {
-      padding: 6px 0;
-      color: #475569;
-      font-size: 14px;
-    }
-
-    .swot-list li:before {
-      content: "• ";
-      font-weight: bold;
-      margin-right: 8px;
-    }
-
-    .opportunity-card {
-      padding: 20px;
-      margin-bottom: 16px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
+    .strength-card {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #064e3b;
+      border: 1px solid #065f46;
       border-radius: 6px;
-      border-left: 4px solid #8b5cf6;
+      border-left: 4px solid #10b981;
     }
 
-    .opportunity-name {
-      font-size: 18px;
+    .strength-question {
+      font-size: 15px;
       font-weight: 600;
-      color: #0f172a;
+      color: #a7f3d0;
+      margin-bottom: 6px;
+    }
+
+    .strength-section {
+      font-size: 12px;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .roadmap-item {
+      padding: 16px;
+      margin-bottom: 12px;
+      background: #1f2937;
+      border-radius: 6px;
+      border-left: 4px solid #6ee7b7;
+    }
+
+    .roadmap-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #10b981;
       margin-bottom: 8px;
     }
 
-    .opportunity-description {
-      color: #64748b;
-      margin-bottom: 16px;
+    .roadmap-description {
+      color: #d1d5db;
       font-size: 14px;
+      line-height: 1.6;
     }
 
-    .opportunity-metrics {
+    .not-available {
+      color: #6b7280;
+      font-style: italic;
+      padding: 16px;
+      background: #1f2937;
+      border-radius: 6px;
+    }
+
+    .matrix-container {
+      margin: 32px 0;
+      page-break-inside: avoid;
+    }
+
+    .matrix-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #10b981;
+      margin-bottom: 16px;
+    }
+
+    .matrix-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 12px;
+      grid-template-columns: 40px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 0;
+      margin: 20px 0;
+      border: 2px solid #374151;
+      background: #111827;
+    }
+
+    .matrix-y-label {
+      grid-column: 1;
+      grid-row: 2;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1f2937;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6ee7b7;
+      padding: 8px;
+    }
+
+    .matrix-quadrants {
+      grid-column: 2;
+      grid-row: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 2px;
+      background: #374151;
+    }
+
+    .matrix-x-label {
+      grid-column: 2;
+      grid-row: 3;
+      text-align: center;
+      background: #1f2937;
+      font-size: 13px;
+      font-weight: 600;
+      color: #6ee7b7;
+      padding: 8px;
+    }
+
+    .quadrant {
+      padding: 16px;
+      min-height: 180px;
+      position: relative;
+    }
+
+    .quadrant-strategic {
+      background: #064e3b;
+      border: 1px solid #065f46;
+    }
+
+    .quadrant-quick {
+      background: #134e4a;
+      border: 1px solid #0f766e;
+    }
+
+    .quadrant-deprioritize {
+      background: #7f1d1d;
+      border: 1px solid #991b1b;
+    }
+
+    .quadrant-nice {
+      background: #78350f;
+      border: 1px solid #92400e;
+    }
+
+    .quadrant-label {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .quadrant-strategic .quadrant-label {
+      color: #6ee7b7;
+    }
+
+    .quadrant-quick .quadrant-label {
+      color: #5eead4;
+    }
+
+    .quadrant-deprioritize .quadrant-label {
+      color: #fca5a5;
+    }
+
+    .quadrant-nice .quadrant-label {
+      color: #fcd34d;
+    }
+
+    .opportunity-dot {
+      font-size: 12px;
+      padding: 4px 8px;
+      margin: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      display: inline-block;
+      color: #f3f4f6;
+    }
+
+    .methodology-section {
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 4px solid #1f2937;
+      page-break-before: always;
+    }
+
+    .methodology-block {
+      margin: 24px 0;
+      padding: 24px;
+      background: #111827;
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
+    }
+
+    .methodology-title {
+      font-weight: 600;
+      font-size: 18px;
+      color: #10b981;
+      margin-bottom: 12px;
+    }
+
+    .methodology-content {
+      color: #d1d5db;
+      font-size: 15px;
+      line-height: 1.8;
     }
 
     .formula-block {
       font-family: 'JetBrains Mono', 'Consolas', monospace;
-      background: #f1f5f9;
+      background: #1f2937;
       padding: 16px;
       border-radius: 6px;
-      border-left: 3px solid #6366f1;
+      border-left: 3px solid #6ee7b7;
       margin: 16px 0;
       font-size: 14px;
-      color: #334155;
+      color: #d1d5db;
       overflow-x: auto;
-    }
-
-    .not-available {
-      color: #94a3b8;
-      font-style: italic;
-    }
-
-    .transparency-section {
-      margin-top: 80px;
-      padding-top: 40px;
-      border-top: 4px solid #e2e8f0;
-      page-break-before: always;
-    }
-
-    .transparency-block {
-      margin: 24px 0;
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 6px;
-      border-left: 3px solid #3b82f6;
-    }
-
-    .transparency-title {
-      font-weight: 600;
-      font-size: 16px;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .transparency-content {
-      color: #475569;
-      font-size: 14px;
-      line-height: 1.7;
     }
 
     @media print {
       body {
         padding: 20px;
+        background: white;
+        color: black;
       }
 
       .workflow-section {
@@ -531,8 +656,8 @@ function generateHeader(company: Company, t: any, language: 'en' | 'es'): string
   return `
     <div class="header">
       <h1>${t.companySnapshot.header.companySnapshot}</h1>
-      <p style="font-size: 24px; font-weight: 600; color: #3b82f6; margin-bottom: 8px;">${company.name}</p>
-      <p style="color: #64748b;">${t.companySnapshot.generatedOn}: ${generationDate}</p>
+      <p style="font-size: 28px; font-weight: 600; color: #10b981; margin-bottom: 8px;">${company.name}</p>
+      <p style="color: #9ca3af;">${t.companySnapshot.generatedOn}: ${generationDate}</p>
       
       <div class="company-info">
         <div class="info-item">
@@ -569,7 +694,7 @@ function generateWorkflowSection(
   t: any,
   language: 'en' | 'es'
 ): string {
-  const { workflow, tfa, pifResponses, opportunities } = data;
+  const { workflow, tfa, pifData, opportunities } = data;
 
   return `
     <div class="workflow-section">
@@ -577,15 +702,26 @@ function generateWorkflowSection(
       ${workflow.description ? `<div class="workflow-description">${workflow.description}</div>` : ''}
       
       ${generateTFASection(tfa, t, language)}
-      ${generatePIFSection(pifResponses, t, language)}
-      ${generateReadinessSection(tfa, pifResponses, t, language)}
-      ${generateOpportunitiesSection(opportunities, tfa, pifResponses, company, t, language)}
+      ${generatePIFSection(pifData, t, language)}
+      ${generateReadinessSection(tfa, pifData, t, language)}
+      ${generateOpportunityMatrixes(opportunities, tfa, pifData, company, workflow, t, language)}
     </div>
   `;
 }
 
+function hasTFAData(tfa: TFAAssessment | null): boolean {
+  if (!tfa) return false;
+  if (!tfa.responses) return false;
+  const responses = tfa.responses as Record<string, string>;
+  return Object.keys(responses).length > 0;
+}
+
+function hasPIFData(pifData: PIFData | null): boolean {
+  return pifData !== null && pifData.responses.length > 0;
+}
+
 function generateTFASection(tfa: TFAAssessment | null, t: any, language: 'en' | 'es'): string {
-  if (!tfa || !tfa.score) {
+  if (!hasTFAData(tfa)) {
     return `
       <div class="subsection">
         <div class="subsection-title">${t.companySnapshot.tfaSection.title}</div>
@@ -594,7 +730,18 @@ function generateTFASection(tfa: TFAAssessment | null, t: any, language: 'en' | 
     `;
   }
 
-  const feasibilityBand = getFeasibilityBand(tfa.score);
+  const responses = tfa!.responses as Record<string, string>;
+  const sectionScores = calculateSectionScores(responses);
+  
+  // Calculate section scores for readiness rubric
+  const tfaSectionScoresMap: Record<string, number> = {};
+  sectionScores.forEach(section => {
+    // Normalize to 0-100 scale
+    const normalizedScore = (section.score / 5) * 100;
+    tfaSectionScoresMap[section.name] = normalizedScore;
+  });
+
+  const feasibilityBand = getFeasibilityBand(tfa!.score || 0);
   const bandClass = feasibilityBand.toLowerCase().replace(/\s+/g, '-');
   const bandKey = feasibilityBand.toLowerCase().replace(/\s+/g, '');
   const bandText = t.tfa.feasibilityBands[bandKey as keyof typeof t.tfa.feasibilityBands] || feasibilityBand;
@@ -603,33 +750,275 @@ function generateTFASection(tfa: TFAAssessment | null, t: any, language: 'en' | 
     <div class="subsection">
       <div class="subsection-title">${t.companySnapshot.tfaSection.title}</div>
       
-      <div style="margin: 16px 0;">
-        <p><strong>${t.companySnapshot.tfaSection.overallScore}:</strong> <span class="score-badge">${tfa.score}/100</span></p>
-        <p><strong>${t.companySnapshot.tfaSection.feasibilityBand}:</strong></p>
-        <div class="score-badge feasibility-${bandClass}">${bandText}</div>
+      ${generateTFARespondentInfo(tfa!, t)}
+      
+      <div style="margin: 20px 0;">
+        <p><strong>${t.companySnapshot.tfaSection.overallScore}:</strong> <span class="score-badge feasibility-${bandClass}">${tfa!.score}/100</span></p>
+        <p style="margin-top: 12px;"><strong>${t.companySnapshot.tfaSection.feasibilityBand}:</strong> <span class="score-badge feasibility-${bandClass}">${bandText}</span></p>
       </div>
 
-      ${generateTFAGapsAndStrengths(tfa, t)}
+      ${generateTFAExecutiveSummary(tfa!, responses, t)}
+      ${generateTFACriticalGaps(responses, t)}
+      ${generateTFAKeyStrengths(responses, t)}
+      ${generateTFAImplementationRoadmap(tfa!, responses, sectionScores, t)}
     </div>
   `;
 }
 
-function generateTFAGapsAndStrengths(tfa: TFAAssessment, t: any): string {
-  // Extract gaps and strengths from TFA responses
-  // This is a simplified version - you may want to implement more sophisticated logic
+function generateTFARespondentInfo(tfa: TFAAssessment, t: any): string {
+  const initialRespondent = tfa.initialRespondent || 'Not specified';
+  const responseSources = tfa.responseSources as Record<string, { answeredBy?: string, source?: string }> || {};
+  
+  // Extract gap fillers (people who answered "Don't Know" questions)
+  const gapFillers = new Set<string>();
+  Object.values(responseSources).forEach((source) => {
+    if (source.answeredBy && source.answeredBy !== initialRespondent) {
+      gapFillers.add(source.answeredBy);
+    }
+  });
+
+  const hasGapFillers = gapFillers.size > 0;
+  const gapFillersText = Array.from(gapFillers).join(', ');
+
   return `
-    <div style="margin-top: 20px;">
-      <h4>${t.companySnapshot.tfaSection.criticalGaps}</h4>
-      <p class="not-available">${t.companySnapshot.tfaSection.noGapsIdentified}</p>
-      
-      <h4>${t.companySnapshot.tfaSection.keyStrengths}</h4>
-      <p class="not-available">${t.companySnapshot.tfaSection.noStrengthsIdentified}</p>
+    <div class="respondent-info">
+      <div class="respondent-label">Data Source</div>
+      <div class="respondent-value">
+        ${hasGapFillers 
+          ? `Data gathered through ${initialRespondent} with support from ${gapFillersText}`
+          : `Primary respondent: ${initialRespondent}`
+        }
+      </div>
     </div>
   `;
 }
 
-function generatePIFSection(pifResponses: PIFResponse[], t: any, language: 'en' | 'es'): string {
-  if (!pifResponses || pifResponses.length === 0) {
+function generateTFAExecutiveSummary(tfa: TFAAssessment, responses: Record<string, string>, t: any): string {
+  const score = tfa.score || 0;
+  const sectionScores = calculateSectionScores(responses);
+  
+  // Find strongest and weakest sections
+  const sortedSections = [...sectionScores].sort((a, b) => b.score - a.score);
+  const strongest = sortedSections[0];
+  const weakest = sortedSections[sortedSections.length - 1];
+
+  let summary = '';
+  if (score >= 80) {
+    summary = `This workflow demonstrates exceptional technical readiness for AI automation with a score of ${score}/100. The technical infrastructure is robust, with particularly strong ${strongest.name.toLowerCase()} capabilities. This represents an ideal candidate for immediate implementation.`;
+  } else if (score >= 65) {
+    summary = `This workflow shows strong technical readiness for AI automation with a score of ${score}/100. While ${strongest.name.toLowerCase()} is well-developed, attention to ${weakest.name.toLowerCase()} will ensure smooth implementation.`;
+  } else if (score >= 50) {
+    summary = `This workflow demonstrates moderate technical readiness with a score of ${score}/100. While ${strongest.name.toLowerCase()} provides a solid foundation, significant improvements in ${weakest.name.toLowerCase()} are recommended before proceeding with automation.`;
+  } else if (score >= 35) {
+    summary = `This workflow faces technical challenges with a score of ${score}/100. Critical gaps exist in ${weakest.name.toLowerCase()} that require resolution. A phased approach with infrastructure improvements is recommended.`;
+  } else {
+    summary = `This workflow requires substantial technical infrastructure development before AI automation can be considered, with a score of ${score}/100. Focus on foundational improvements in ${weakest.name.toLowerCase()} and ${strongest.name.toLowerCase()} before revisiting automation opportunities.`;
+  }
+
+  return `
+    <h4>Executive Summary</h4>
+    <div style="padding: 16px; background: #1f2937; border-radius: 6px; border-left: 3px solid #10b981;">
+      <p style="color: #d1d5db; line-height: 1.7;">${summary}</p>
+    </div>
+
+    <h4 style="margin-top: 24px;">Technical Readiness by Area</h4>
+    <div class="metric-grid">
+      ${sectionScores.map(section => {
+        const normalizedScore = Math.round((section.score / 5) * 100);
+        return `
+          <div class="metric-card">
+            <div class="metric-label">${section.name}</div>
+            <div class="metric-value">${normalizedScore}/100</div>
+            <div class="metric-range">Weight: ${section.weight}%</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function generateTFACriticalGaps(responses: Record<string, string>, t: any): string {
+  // Find all questions scoring 1-2
+  const gaps: Array<{ id: number; question: string; section: string; score: number; impactScore: number }> = [];
+  
+  TFA_QUESTIONS.forEach(q => {
+    const response = responses[q.id.toString()];
+    if (response) {
+      const selectedOption = q.options.find(opt => opt.value === response);
+      if (selectedOption && selectedOption.score !== null && selectedOption.score <= 2) {
+        const sectionWeight = TFA_SECTIONS.find(s => s.name === q.section)?.weight || 0;
+        const impactScore = calculateQuestionImpact(q.id, selectedOption.score, sectionWeight);
+        gaps.push({
+          id: q.id,
+          question: q.question,
+          section: q.section,
+          score: selectedOption.score,
+          impactScore: impactScore
+        });
+      }
+    }
+  });
+
+  // Sort by impact score (descending)
+  gaps.sort((a, b) => b.impactScore - a.impactScore);
+
+  if (gaps.length === 0) {
+    return `
+      <h4>Critical Technical Gaps</h4>
+      <p style="padding: 16px; background: #064e3b; border-radius: 6px; color: #a7f3d0;">
+        No critical technical gaps identified. The technical infrastructure is well-suited for AI automation.
+      </p>
+    `;
+  }
+
+  return `
+    <h4>Critical Technical Gaps</h4>
+    <p style="color: #9ca3af; margin-bottom: 16px; font-size: 14px;">
+      These areas scored 1-2 out of 5 and represent the highest-impact technical challenges, sorted by their weighted impact on overall feasibility.
+    </p>
+    ${gaps.map(gap => `
+      <div class="gap-card">
+        <div class="gap-section">${gap.section} (Impact: ${gap.impactScore.toFixed(1)})</div>
+        <div class="gap-question">${gap.question}</div>
+        <div style="color: #fca5a5; font-size: 14px; margin-top: 8px;">
+          Current Score: ${gap.score}/5 - Immediate attention required
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function generateTFAKeyStrengths(responses: Record<string, string>, t: any): string {
+  // Find all questions scoring 5
+  const strengths: Array<{ id: number; question: string; section: string }> = [];
+  
+  TFA_QUESTIONS.forEach(q => {
+    const response = responses[q.id.toString()];
+    if (response) {
+      const selectedOption = q.options.find(opt => opt.value === response);
+      if (selectedOption && selectedOption.score === 5) {
+        strengths.push({
+          id: q.id,
+          question: q.question,
+          section: q.section
+        });
+      }
+    }
+  });
+
+  if (strengths.length === 0) {
+    return `
+      <h4>Key Technical Strengths</h4>
+      <p class="not-available">
+        No areas scored at the maximum level. Focus on achieving excellence in at least one technical area to establish a strong foundation.
+      </p>
+    `;
+  }
+
+  return `
+    <h4>Key Technical Strengths</h4>
+    <p style="color: #9ca3af; margin-bottom: 16px; font-size: 14px;">
+      These areas scored 5/5 and represent your strongest technical capabilities for AI automation.
+    </p>
+    ${strengths.map(strength => `
+      <div class="strength-card">
+        <div class="strength-section">${strength.section}</div>
+        <div class="strength-question">${strength.question}</div>
+        <div style="color: #6ee7b7; font-size: 14px; margin-top: 8px;">
+          ✓ Excellent - Ready for advanced automation
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function generateTFAImplementationRoadmap(
+  tfa: TFAAssessment,
+  responses: Record<string, string>,
+  sectionScores: Array<{ name: string; score: number; weight: number }>,
+  t: any
+): string {
+  const score = tfa.score || 0;
+  const roadmapItems: Array<{ title: string; description: string }> = [];
+
+  // Generate score-specific recommendations
+  if (score >= 80) {
+    roadmapItems.push({
+      title: 'Immediate Implementation (Weeks 1-4)',
+      description: 'Begin proof-of-concept development immediately. Your technical infrastructure is ready. Focus on selecting the highest-ROI use case and establishing success metrics.'
+    });
+    roadmapItems.push({
+      title: 'Scaling & Optimization (Weeks 5-12)',
+      description: 'Expand to additional workflows and optimize performance. Leverage your strong technical foundation to achieve rapid deployment across similar processes.'
+    });
+  } else if (score >= 65) {
+    roadmapItems.push({
+      title: 'Address Minor Gaps (Weeks 1-6)',
+      description: 'Resolve the identified technical gaps in lower-scoring areas. Focus particularly on improving capabilities in areas that scored below 3/5.'
+    });
+    roadmapItems.push({
+      title: 'Pilot Implementation (Weeks 7-12)',
+      description: 'Launch a controlled pilot focusing on leveraging your strongest technical areas. Use this to validate approach and refine before broader rollout.'
+    });
+    roadmapItems.push({
+      title: 'Production Rollout (Weeks 13-20)',
+      description: 'Scale to full production with confidence, using lessons learned from the pilot phase.'
+    });
+  } else if (score >= 50) {
+    roadmapItems.push({
+      title: 'Infrastructure Development (Months 1-3)',
+      description: 'Prioritize improvements in the lowest-scoring technical areas. Consider consulting with technical experts to accelerate infrastructure upgrades.'
+    });
+    roadmapItems.push({
+      title: 'Validation & Testing (Months 4-5)',
+      description: 'Conduct thorough testing of improved infrastructure. Ensure all technical prerequisites meet minimum requirements for automation.'
+    });
+    roadmapItems.push({
+      title: 'Phased Implementation (Months 6-12)',
+      description: 'Begin with limited scope automation, gradually expanding as technical confidence grows and infrastructure matures.'
+    });
+  } else {
+    roadmapItems.push({
+      title: 'Foundational Assessment (Months 1-2)',
+      description: 'Conduct a comprehensive technical assessment with external experts. Develop a detailed infrastructure improvement plan with clear milestones.'
+    });
+    roadmapItems.push({
+      title: 'Infrastructure Overhaul (Months 3-9)',
+      description: 'Execute systematic improvements across all low-scoring areas. This is a prerequisite before automation can be considered viable.'
+    });
+    roadmapItems.push({
+      title: 'Re-evaluation (Month 10)',
+      description: 'Reassess technical readiness after infrastructure improvements. Determine if conditions now support automation or if additional work is needed.'
+    });
+  }
+
+  // Add section-specific recommendations for lowest-scoring areas
+  const weakSections = [...sectionScores].sort((a, b) => a.score - b.score).slice(0, 2);
+  weakSections.forEach(section => {
+    if (section.score < 3.5) {
+      roadmapItems.push({
+        title: `${section.name} Improvement Priority`,
+        description: `This area scored ${((section.score / 5) * 100).toFixed(0)}/100 and requires focused attention. Consider: hiring specialists, upgrading systems, or implementing best practices specific to ${section.name.toLowerCase()}.`
+      });
+    }
+  });
+
+  return `
+    <h4>Implementation Roadmap</h4>
+    <p style="color: #9ca3af; margin-bottom: 16px; font-size: 14px;">
+      Based on your technical readiness score of ${score}/100, here's a recommended implementation timeline:
+    </p>
+    ${roadmapItems.map(item => `
+      <div class="roadmap-item">
+        <div class="roadmap-title">${item.title}</div>
+        <div class="roadmap-description">${item.description}</div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function generatePIFSection(pifData: PIFData | null, t: any, language: 'en' | 'es'): string {
+  if (!hasPIFData(pifData)) {
     return `
       <div class="subsection">
         <div class="subsection-title">${t.companySnapshot.pifSection.title}</div>
@@ -638,93 +1027,200 @@ function generatePIFSection(pifResponses: PIFResponse[], t: any, language: 'en' 
     `;
   }
 
-  const aggregated = calculateAggregatedPIFScores(pifResponses);
+  const pifResponses = pifData!.responses;
+  const aggregated = pifData!.aggregated;
   
   return `
     <div class="subsection">
       <div class="subsection-title">${t.companySnapshot.pifSection.title}</div>
       
-      <p><strong>${t.companySnapshot.pifSection.respondents}:</strong> ${aggregated.respondentCount}</p>
+      ${generatePIFRespondentInfo(pifData, t)}
       
       <h4>${t.companySnapshot.pifSection.operationalScores}</h4>
       <div class="metric-grid">
         <div class="metric-card">
           <div class="metric-label">${t.pifScoring.processClarity}</div>
           <div class="metric-value">${aggregated.processClarity.average}/100</div>
-          <div class="metric-range">${t.companySnapshot.pifSection.range}: ${aggregated.processClarity.min}-${aggregated.processClarity.max}</div>
+          <div class="metric-range">Range: ${aggregated.processClarity.min}-${aggregated.processClarity.max} | StdDev: ${aggregated.processClarity.standardDeviation}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">${t.pifScoring.changeMagnitude}</div>
           <div class="metric-value">${aggregated.changeMagnitude.average}/100</div>
-          <div class="metric-range">${t.companySnapshot.pifSection.range}: ${aggregated.changeMagnitude.min}-${aggregated.changeMagnitude.max}</div>
+          <div class="metric-range">Range: ${aggregated.changeMagnitude.min}-${aggregated.changeMagnitude.max} | StdDev: ${aggregated.changeMagnitude.standardDeviation}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">${t.pifScoring.workflowBrittleness}</div>
           <div class="metric-value">${aggregated.workflowBrittleness.average}/100</div>
-          <div class="metric-range">${t.companySnapshot.pifSection.range}: ${aggregated.workflowBrittleness.min}-${aggregated.workflowBrittleness.max}</div>
+          <div class="metric-range">Range: ${aggregated.workflowBrittleness.min}-${aggregated.workflowBrittleness.max} | StdDev: ${aggregated.workflowBrittleness.standardDeviation}</div>
         </div>
       </div>
 
-      ${generateQualitativeInsights(pifResponses, t)}
+      ${generatePIFROIInputs(pifData, t)}
+      ${generatePIFQualitativeInsights(pifData, t)}
     </div>
   `;
 }
 
-function generateQualitativeInsights(pifResponses: PIFResponse[], t: any): string {
-  // Extract qualitative responses from PIF
-  const insights: string[] = [];
+function generatePIFRespondentInfo(pifData: PIFData | null, t: any): string {
+  const pifResponses = pifData?.responses || [];
   
-  pifResponses.forEach(response => {
-    if (response.qualitativeResponses) {
-      const qual = response.qualitativeResponses as any;
-      // Extract representative quotes
-      if (qual.Q28) insights.push(qual.Q28);
-      if (qual.Q29) insights.push(qual.Q29);
-    }
-  });
-
-  if (insights.length === 0) {
+  if (pifResponses.length === 1) {
     return `
-      <h4>${t.companySnapshot.pifSection.qualitativeInsights}</h4>
-      <p class="not-available">${t.companySnapshot.pifSection.noQualitativeData}</p>
+      <div class="respondent-info">
+        <div class="respondent-label">Respondent</div>
+        <div class="respondent-value">${pifResponses[0].respondentName} (${pifResponses[0].respondentRole})</div>
+      </div>
     `;
   }
 
+  const respondentsList = pifResponses
+    .map(r => `${r.respondentName} (${r.respondentRole})`)
+    .join(', ');
+
   return `
-    <h4>${t.companySnapshot.pifSection.qualitativeInsights}</h4>
-    <ul class="insights-list">
-      ${insights.slice(0, 3).map(insight => `<li>"${insight}"</li>`).join('')}
-    </ul>
+    <div class="respondent-info">
+      <div class="respondent-label">Respondents (${pifResponses.length} total)</div>
+      <div class="respondent-value">${respondentsList}</div>
+    </div>
+  `;
+}
+
+function generatePIFROIInputs(pifData: PIFData | null, t: any): string {
+  const pifResponses = pifData?.responses || [];
+  
+  // Extract ROI inputs from responses
+  const roiData: Array<{ respondent: string; employeeCount?: number; frequency?: string; processTime?: number }> = [];
+  
+  pifResponses.forEach(response => {
+    if (response.roiInputs) {
+      const roi = response.roiInputs as any;
+      roiData.push({
+        respondent: response.respondentName,
+        employeeCount: roi.employeeCount,
+        frequency: roi.frequency,
+        processTime: roi.minutesPerProcess
+      });
+    }
+  });
+
+  if (roiData.length === 0) {
+    return '';
+  }
+
+  return `
+    <h4>Time & Volume Data</h4>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Respondent</th>
+          <th>Employee Count</th>
+          <th>Frequency</th>
+          <th>Process Time (min)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${roiData.map(data => `
+          <tr>
+            <td>${data.respondent}</td>
+            <td>${data.employeeCount || 'N/A'}</td>
+            <td>${data.frequency ? data.frequency.charAt(0).toUpperCase() + data.frequency.slice(1) : 'N/A'}</td>
+            <td>${data.processTime || 'N/A'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function generatePIFQualitativeInsights(pifData: PIFData | null, t: any): string {
+  const pifResponses = pifData?.responses || [];
+  
+  const timeWasters: string[] = [];
+  const automationWishes: string[] = [];
+  const typicalOutcomes: string[] = [];
+  
+  pifResponses.forEach(response => {
+    if (response.qualitativeResponses) {
+      const qual = response.qualitativeResponses as Record<string, string>;
+      // Q22: biggest time-wasters
+      if (qual['22']) timeWasters.push(qual['22']);
+      // Q23: what would you automate
+      if (qual['23']) automationWishes.push(qual['23']);
+      // Q24: what do you produce
+      if (qual['24']) typicalOutcomes.push(qual['24']);
+    }
+  });
+
+  if (timeWasters.length === 0 && automationWishes.length === 0 && typicalOutcomes.length === 0) {
+    return '';
+  }
+
+  return `
+    <h4>Process Insights from End Users</h4>
+    
+    ${timeWasters.length > 0 ? `
+      <div style="margin-bottom: 24px;">
+        <h5 style="font-size: 16px; color: #6ee7b7; margin-bottom: 12px;">Biggest Time-Wasters</h5>
+        <ul class="insights-list">
+          ${timeWasters.slice(0, 3).map(insight => `<li>"${insight}"</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    
+    ${automationWishes.length > 0 ? `
+      <div style="margin-bottom: 24px;">
+        <h5 style="font-size: 16px; color: #6ee7b7; margin-bottom: 12px;">What Users Want to Automate</h5>
+        <ul class="insights-list">
+          ${automationWishes.slice(0, 3).map(insight => `<li>"${insight}"</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    
+    ${typicalOutcomes.length > 0 ? `
+      <div style="margin-bottom: 24px;">
+        <h5 style="font-size: 16px; color: #6ee7b7; margin-bottom: 12px;">Typical Process Outcomes</h5>
+        <ul class="insights-list">
+          ${typicalOutcomes.slice(0, 3).map(insight => `<li>"${insight}"</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
   `;
 }
 
 function generateReadinessSection(
   tfa: TFAAssessment | null,
-  pifResponses: PIFResponse[],
+  pifData: PIFData | null,
   t: any,
   language: 'en' | 'es'
 ): string {
-  if (!tfa || !tfa.score || !pifResponses || pifResponses.length === 0) {
+  if (!hasTFAData(tfa) || !hasPIFData(pifData)) {
     return `
       <div class="subsection">
         <div class="subsection-title">${t.companySnapshot.readinessSection.title}</div>
-        <p class="not-available">${t.companySnapshot.readinessSection.requiresData}</p>
+        <p class="not-available">
+          Readiness Rubric requires both Technical Feasibility Assessment (TFA) and Process Insight Form (PIF) data to be completed.
+        </p>
       </div>
     `;
   }
 
-  // Calculate readiness rubric
-  const aggregatedPIF = calculateAggregatedPIFScores(pifResponses);
+  const responses = tfa!.responses as Record<string, string>;
+  const sectionScores = calculateSectionScores(responses);
   
-  // Extract TFA section scores (simplified - you may need actual section calculations)
-  const tfaSectionScores = {
-    systemEnvironment: tfa.score || 0, // Simplified - should calculate from actual sections
-    dataQuality: tfa.score || 0,
-    integrationFeasibility: tfa.score || 0,
-    securityCompliance: tfa.score || 0
-  };
+  // Calculate section scores normalized to 0-100
+  const tfaSectionScoresMap: any = {};
+  sectionScores.forEach(section => {
+    const normalizedScore = (section.score / 5) * 100;
+    const key = section.name.replace(/\//g, '').replace(/\s+/g, '');
+    if (section.name === 'System Environment') tfaSectionScoresMap.systemEnvironment = normalizedScore;
+    else if (section.name === 'Data Quality') tfaSectionScoresMap.dataQuality = normalizedScore;
+    else if (section.name === 'Integration Feasibility') tfaSectionScoresMap.integrationFeasibility = normalizedScore;
+    else if (section.name === 'Security/Compliance') tfaSectionScoresMap.securityCompliance = normalizedScore;
+  });
 
-  const readiness = calculateReadinessRubric(tfa.score || 0, tfaSectionScores, aggregatedPIF);
+  // Use aggregated scores from API, or calculate if missing
+  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifData!.responses);
+  const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const feasibilityClass = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '-');
   const bandKey = readiness.feasibilityBand.toLowerCase().replace(/\s+/g, '');
@@ -734,244 +1230,387 @@ function generateReadinessSection(
     <div class="subsection">
       <div class="subsection-title">${t.companySnapshot.readinessSection.title}</div>
       
-      <div style="margin: 16px 0;">
-        <p><strong>${t.companySnapshot.readinessSection.combinedScore}:</strong> <span class="score-badge">${readiness.totalScore}/100</span></p>
-        <p><strong>${t.companySnapshot.readinessSection.feasibilityAssessment}:</strong></p>
+      <div style="margin: 20px 0;">
+        <p><strong>Combined Readiness Score (TFA 60% + PIF 40%):</strong></p>
+        <div class="score-badge feasibility-${feasibilityClass}" style="font-size: 32px; padding: 16px 32px; margin: 16px 0;">
+          ${readiness.totalScore}/100
+        </div>
+        <p style="margin-top: 12px;"><strong>Feasibility Band:</strong></p>
         <div class="score-badge feasibility-${feasibilityClass}">${bandText}</div>
       </div>
 
-      <h4>${t.companySnapshot.readinessSection.componentBreakdown}</h4>
+      <div style="padding: 20px; background: #1f2937; border-radius: 6px; border-left: 3px solid #10b981; margin: 24px 0;">
+        <p style="color: #d1d5db; line-height: 1.7;"><strong style="color: #10b981;">Strategic Recommendation:</strong> ${readiness.recommendation}</p>
+      </div>
+
+      <h4>7-Component Breakdown</h4>
+      <p style="color: #9ca3af; margin-bottom: 16px; font-size: 14px;">
+        The Readiness Rubric combines technical feasibility (60%) and operational readiness (40%) across seven weighted components:
+      </p>
       <div class="component-breakdown">
-        ${generateComponentItem(t.readinessRubric.dataQuality.split(':')[0], readiness.componentScores.dataQuality, '18%')}
-        ${generateComponentItem(t.readinessRubric.integrationFeasibility.split(':')[0], readiness.componentScores.integrationFeasibility, '18%')}
-        ${generateComponentItem(t.readinessRubric.systemEnvironment.split(':')[0], readiness.componentScores.systemEnvironment, '15%')}
-        ${generateComponentItem(t.readinessRubric.processClarity.split(':')[0], readiness.componentScores.processClarity, '12%')}
-        ${generateComponentItem(t.readinessRubric.changeMagnitude.split(':')[0], readiness.componentScores.changeMagnitude, '12%')}
-        ${generateComponentItem(t.readinessRubric.securityCompliance.split(':')[0], readiness.componentScores.securityCompliance, '9%')}
-        ${generateComponentItem(t.readinessRubric.workflowBrittleness.split(':')[0], readiness.componentScores.workflowBrittleness, '6%')}
+        <div class="component-item">
+          <span class="component-name">Data Quality (18% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.dataQuality)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">Integration Feasibility (18% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.integrationFeasibility)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">System Environment (15% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.systemEnvironment)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">Security/Compliance (9% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.securityCompliance)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">Process Clarity (8% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.processClarity)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">Change Magnitude (8% of total)</span>
+          <span class="component-score">${Math.round(readiness.componentScores.changeMagnitude)}/100</span>
+        </div>
+        <div class="component-item">
+          <span class="component-name">Workflow Brittleness (6% of total) - inverted</span>
+          <span class="component-score">${Math.round(readiness.componentScores.workflowBrittleness)}/100</span>
+        </div>
       </div>
 
-      ${generateSWOTAnalysis(readiness, t)}
-    </div>
-  `;
-}
-
-function generateComponentItem(name: string, score: number, weight: string): string {
-  return `
-    <div class="component-item">
-      <span class="component-name">${name} (${weight})</span>
-      <span class="component-score">${Math.round(score)}/100</span>
-    </div>
-  `;
-}
-
-function generateSWOTAnalysis(readiness: any, t: any): string {
-  const strengths: string[] = [];
-  const weaknesses: string[] = [];
-  
-  // Identify strengths (components > 75)
-  Object.entries(readiness.componentScores).forEach(([key, score]) => {
-    if (typeof score === 'number' && score > 75) {
-      strengths.push(key);
-    } else if (typeof score === 'number' && score < 50) {
-      weaknesses.push(key);
-    }
-  });
-
-  return `
-    <h4>${t.companySnapshot.readinessSection.swotAnalysis}</h4>
-    <div class="swot-grid">
-      <div class="swot-card strengths">
-        <div class="swot-title">${t.companySnapshot.readinessSection.strengths}</div>
-        <ul class="swot-list">
-          ${strengths.length > 0 
-            ? strengths.map(s => `<li>${s.replace(/([A-Z])/g, ' $1').trim()}</li>`).join('') 
-            : `<li class="not-available">${t.readinessRubric.noStrengthsYet || 'None identified'}</li>`
-          }
-        </ul>
-      </div>
-      <div class="swot-card weaknesses">
-        <div class="swot-title">${t.companySnapshot.readinessSection.weaknesses}</div>
-        <ul class="swot-list">
-          ${weaknesses.length > 0 
-            ? weaknesses.map(w => `<li>${w.replace(/([A-Z])/g, ' $1').trim()}</li>`).join('') 
-            : `<li class="not-available">${t.readinessRubric.noWeaknessesYet || 'None identified'}</li>`
-          }
-        </ul>
-      </div>
-      <div class="swot-card opportunities">
-        <div class="swot-title">${t.companySnapshot.readinessSection.opportunities}</div>
-        <ul class="swot-list">
-          <li>${t.readinessRubric.leverage || 'Leverage high-scoring areas for quick wins'}</li>
-        </ul>
-      </div>
-      <div class="swot-card threats">
-        <div class="swot-title">${t.companySnapshot.readinessSection.threats}</div>
-        <ul class="swot-list">
-          <li>${t.readinessRubric.address || 'Address low-scoring areas before implementation'}</li>
-        </ul>
+      <div style="margin-top: 24px; padding: 16px; background: #1f2937; border-radius: 6px; font-size: 14px;">
+        <p style="color: #9ca3af; line-height: 1.7;">
+          <strong style="color: #6ee7b7;">Calculation Verification:</strong><br>
+          TFA Contribution (60%): ${readiness.tfaScore} × 0.6 = ${Math.round(readiness.tfaScore * 0.6)}<br>
+          PIF Contribution (40%): ${readiness.pifScore} × 0.4 = ${Math.round(readiness.pifScore * 0.4)}<br>
+          <strong style="color: #ffffff;">Total: ${readiness.totalScore}/100</strong>
+        </p>
       </div>
     </div>
   `;
 }
 
-function generateOpportunitiesSection(
+function generateOpportunityMatrixes(
   opportunities: ImplementationOpportunity[],
   tfa: TFAAssessment | null,
-  pifResponses: PIFResponse[],
+  pifData: PIFData | null,
   company: Company,
+  workflow: Workflow,
   t: any,
   language: 'en' | 'es'
 ): string {
-  if (!opportunities || opportunities.length === 0) {
-    return `
-      <div class="subsection">
-        <div class="subsection-title">${t.companySnapshot.opportunitiesSection.title}</div>
-        <p class="not-available">${t.companySnapshot.opportunitiesSection.noOpportunities}</p>
-      </div>
-    `;
+  if (opportunities.length === 0 || !hasTFAData(tfa) || !hasPIFData(pifData)) {
+    return '';
   }
+
+  // Calculate readiness score for implementation effort
+  const responses = tfa!.responses as Record<string, string>;
+  const sectionScores = calculateSectionScores(responses);
+  const tfaSectionScoresMap: any = {};
+  sectionScores.forEach(section => {
+    const normalizedScore = (section.score / 5) * 100;
+    if (section.name === 'System Environment') tfaSectionScoresMap.systemEnvironment = normalizedScore;
+    else if (section.name === 'Data Quality') tfaSectionScoresMap.dataQuality = normalizedScore;
+    else if (section.name === 'Integration Feasibility') tfaSectionScoresMap.integrationFeasibility = normalizedScore;
+    else if (section.name === 'Security/Compliance') tfaSectionScoresMap.securityCompliance = normalizedScore;
+  });
+
+  // Use aggregated scores from API, or calculate if missing
+  const aggregatedPIF = pifData!.aggregated || calculateAggregatedPIFScores(pifData!.responses);
+  const readiness = calculateReadinessRubric(tfa!.score || 0, tfaSectionScoresMap, aggregatedPIF);
 
   const companyContext: CompanyContext = {
     annualRevenue: company.annualRevenue,
     totalEmployees: company.totalEmployees
   };
 
-  // Calculate readiness score if we have TFA and PIF
-  let readinessScore = 50; // Default
-  if (tfa && tfa.score && pifResponses && pifResponses.length > 0) {
-    const aggregatedPIF = calculateAggregatedPIFScores(pifResponses);
-    const tfaSectionScores = {
-      systemEnvironment: tfa.score,
-      dataQuality: tfa.score,
-      integrationFeasibility: tfa.score,
-      securityCompliance: tfa.score
+  // Define the 4 matrix configurations
+  const matrixConfigs = [
+    {
+      name: 'Time Savings Only',
+      toggles: { errorMetrics: false, revenueMetrics: false },
+      filter: (opp: ImplementationOpportunity) => !opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+    },
+    {
+      name: 'Time + Error Reduction',
+      toggles: { errorMetrics: true, revenueMetrics: false },
+      filter: (opp: ImplementationOpportunity) => opp.errorMetricsEnabled && !opp.revenueMetricsEnabled
+    },
+    {
+      name: 'Time + Revenue Uplift',
+      toggles: { errorMetrics: false, revenueMetrics: true },
+      filter: (opp: ImplementationOpportunity) => !opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+    },
+    {
+      name: 'All 3 Metrics (Time + Error + Revenue)',
+      toggles: { errorMetrics: true, revenueMetrics: true },
+      filter: (opp: ImplementationOpportunity) => opp.errorMetricsEnabled && opp.revenueMetricsEnabled
+    }
+  ];
+
+  let matrixesHTML = `
+    <div class="subsection">
+      <div class="subsection-title">Opportunity Prioritization Matrixes</div>
+      <p style="color: #9ca3af; margin-bottom: 24px;">
+        Each matrix shows opportunities positioned by Business Impact (x-axis) and Implementation Effort (y-axis).
+        The quadrants help prioritize: Quick Wins (high impact, low effort), Strategic Goals (high impact, high effort),
+        Nice-To-Haves (low impact, low effort), and Deprioritize (low impact, high effort).
+      </p>
+  `;
+
+  matrixConfigs.forEach(config => {
+    const filteredOpps = opportunities.filter(config.filter);
+    
+    // Skip matrix if no matching opportunities
+    if (filteredOpps.length === 0) {
+      return;
+    }
+
+    // Calculate scores for each opportunity
+    const oppScores = filteredOpps.map(opp => {
+      const impact = calculateBusinessImpact(opp, config.toggles, companyContext, false);
+      const effort = calculateImplementationEffort(
+        readiness.totalScore,
+        parseFloat(opp.rampupPeriodMonths?.toString() || '0'),
+        parseFloat(opp.paybackPeriodMonths?.toString() || '0'),
+        parseFloat(opp.trainingHoursPerEmployee?.toString() || '0')
+      );
+
+      // Determine quadrant
+      let quadrant: string;
+      if (impact >= 50 && effort < 50) quadrant = 'quick';
+      else if (impact >= 50 && effort >= 50) quadrant = 'strategic';
+      else if (impact < 50 && effort < 50) quadrant = 'nice';
+      else quadrant = 'deprioritize';
+
+      return {
+        name: opp.name,
+        impact,
+        effort,
+        quadrant
+      };
+    });
+
+    // Group by quadrant
+    const byQuadrant: Record<string, typeof oppScores> = {
+      strategic: [],
+      quick: [],
+      deprioritize: [],
+      nice: []
     };
-    const readiness = calculateReadinessRubric(tfa.score, tfaSectionScores, aggregatedPIF);
-    readinessScore = readiness.totalScore;
-  }
 
-  const opportunityCards = opportunities.map(opp => {
-    const effort = calculateImplementationEffort(
-      readinessScore,
-      opp.rampupPeriodMonths ? Number(opp.rampupPeriodMonths) : null,
-      opp.paybackPeriodMonths ? Number(opp.paybackPeriodMonths) : null,
-      opp.trainingHoursPerEmployee ? Number(opp.trainingHoursPerEmployee) : null
-    );
+    oppScores.forEach(opp => {
+      byQuadrant[opp.quadrant].push(opp);
+    });
 
-    const impact = calculateBusinessImpact(
-      opp,
-      { errorMetrics: opp.errorMetricsEnabled, revenueMetrics: opp.revenueMetricsEnabled },
-      companyContext,
-      false // redistributive mode
-    );
-
-    return `
-      <div class="opportunity-card">
-        <div class="opportunity-name">${opp.name}</div>
-        ${opp.description ? `<div class="opportunity-description">${opp.description}</div>` : ''}
-        
-        <div class="opportunity-metrics">
-          <div class="metric-card">
-            <div class="metric-label">${t.companySnapshot.opportunitiesSection.annualRoi}</div>
-            <div class="metric-value">${formatCurrency(Number(opp.annualRoi) || 0, language)}</div>
+    matrixesHTML += `
+      <div class="matrix-container">
+        <div class="matrix-title">${config.name}</div>
+        <div class="matrix-grid">
+          <div class="matrix-y-label">Implementation Effort (Lower is Better)</div>
+          <div class="matrix-quadrants">
+            <!-- Top Left: Strategic Goals (high impact, high effort) -->
+            <div class="quadrant quadrant-strategic">
+              <div class="quadrant-label">Strategic Goals</div>
+              ${byQuadrant.strategic.map(opp => 
+                `<div class="opportunity-dot">${opp.name} (${Math.round(opp.impact)}, ${Math.round(opp.effort)})</div>`
+              ).join('') || '<div style="color: #6b7280; font-size: 13px;">No opportunities</div>'}
+            </div>
+            
+            <!-- Top Right: Quick Wins (high impact, low effort) -->
+            <div class="quadrant quadrant-quick">
+              <div class="quadrant-label">Quick Wins</div>
+              ${byQuadrant.quick.map(opp => 
+                `<div class="opportunity-dot">${opp.name} (${Math.round(opp.impact)}, ${Math.round(opp.effort)})</div>`
+              ).join('') || '<div style="color: #6b7280; font-size: 13px;">No opportunities</div>'}
+            </div>
+            
+            <!-- Bottom Left: Deprioritize (low impact, high effort) -->
+            <div class="quadrant quadrant-deprioritize">
+              <div class="quadrant-label">Deprioritize</div>
+              ${byQuadrant.deprioritize.map(opp => 
+                `<div class="opportunity-dot">${opp.name} (${Math.round(opp.impact)}, ${Math.round(opp.effort)})</div>`
+              ).join('') || '<div style="color: #6b7280; font-size: 13px;">No opportunities</div>'}
+            </div>
+            
+            <!-- Bottom Right: Nice-To-Haves (low impact, low effort) -->
+            <div class="quadrant quadrant-nice">
+              <div class="quadrant-label">Nice-To-Haves</div>
+              ${byQuadrant.nice.map(opp => 
+                `<div class="opportunity-dot">${opp.name} (${Math.round(opp.impact)}, ${Math.round(opp.effort)})</div>`
+              ).join('') || '<div style="color: #6b7280; font-size: 13px;">No opportunities</div>'}
+            </div>
           </div>
-          <div class="metric-card">
-            <div class="metric-label">${t.companySnapshot.opportunitiesSection.fteSavings}</div>
-            <div class="metric-value">${Number(opp.fteSavings || 0).toFixed(2)}</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">${t.companySnapshot.opportunitiesSection.businessImpactScore}</div>
-            <div class="metric-value">${impact.toFixed(1)}/100</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">${t.companySnapshot.opportunitiesSection.implementationEffortScore}</div>
-            <div class="metric-value">${effort.toFixed(1)}/100</div>
-          </div>
+          <div class="matrix-x-label">Business Impact (Higher is Better)</div>
         </div>
       </div>
     `;
-  }).join('');
+  });
 
-  return `
-    <div class="subsection">
-      <div class="subsection-title">${t.companySnapshot.opportunitiesSection.title}</div>
-      ${opportunityCards}
-    </div>
-  `;
+  matrixesHTML += `</div>`;
+
+  return matrixesHTML;
 }
 
-function generateCalculationTransparency(t: any): string {
+function generateMethodologySection(t: any): string {
   return `
-    <div class="transparency-section">
-      <h2>${t.companySnapshot.transparency.title}</h2>
-      
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.tfaScoring}</div>
-        <div class="transparency-content">
-          <p>${t.companySnapshot.transparency.tfaScoringExplanation}</p>
-          <p style="margin-top: 12px;"><strong>${t.companySnapshot.transparency.sectionWeights}</strong></p>
-        </div>
-      </div>
+    <div class="methodology-section">
+      <h2>Scoring Methodology & Calculations</h2>
+      <p style="color: #9ca3af; margin-bottom: 24px;">
+        This section explains how all scores and metrics in this snapshot are calculated, ensuring full transparency and enabling you to validate our analysis.
+      </p>
 
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.pifScoring}</div>
-        <div class="transparency-content">
-          <p>${t.companySnapshot.transparency.pifScoringExplanation}</p>
-        </div>
-      </div>
-
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.readinessFormula}</div>
-        <div class="transparency-content">
-          <p>${t.companySnapshot.transparency.readinessFormulaExplanation}</p>
-          <div class="formula-block">Readiness Score = (TFA Score × 60%) + (PIF Score × 40%)</div>
-        </div>
-      </div>
-
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.businessImpactScoring}</div>
-        <div class="transparency-content">
-          <p>${t.companySnapshot.transparency.businessImpactExplanation}</p>
-          <p style="margin-top: 12px;">${t.companySnapshot.transparency.multiplierExplanation}</p>
+      <div class="methodology-block">
+        <div class="methodology-title">Business Impact Score (X-Axis)</div>
+        <div class="methodology-content">
+          <p>Business Impact measures the relative value of an automation opportunity to your organization. It's calculated as a company-relative metric to ensure fair comparison regardless of company size:</p>
+          
           <div class="formula-block">
-            ROI Score = MIN(100, (Annual ROI / Company Revenue) × 1000)<br/>
-            Hours Score = MIN(100, (FTE Savings / Total Employees) × 1000)
+ROI Score = (Annual ROI ÷ Company Annual Revenue) × 1000
+  → Capped at 100
+  → Example: $100k ROI / $10M revenue × 1000 = 10 points
+
+FTE Score = (FTE Savings ÷ Total Employees) × 1000
+  → Capped at 100
+  → Example: 2 FTE / 50 employees × 1000 = 40 points
           </div>
+
+          <p><strong>Base Calculation (Time Savings Only):</strong></p>
+          <ul style="margin-left: 20px; color: #d1d5db;">
+            <li>Annual ROI: 60%</li>
+            <li>Annual Hours Saved (as FTE): 40%</li>
+          </ul>
+
+          <p style="margin-top: 12px;"><strong>With Error Reduction:</strong></p>
+          <ul style="margin-left: 20px; color: #d1d5db;">
+            <li>Annual ROI: 45%</li>
+            <li>Annual Hours Saved: 30%</li>
+            <li>Error Impact: 25%</li>
+          </ul>
+
+          <p style="margin-top: 12px;"><strong>With Revenue Uplift:</strong></p>
+          <ul style="margin-left: 20px; color: #d1d5db;">
+            <li>Annual ROI: 45%</li>
+            <li>Annual Hours Saved: 30%</li>
+            <li>Revenue Impact: 25%</li>
+          </ul>
+
+          <p style="margin-top: 12px;"><strong>With Both (All 3 Metrics):</strong></p>
+          <ul style="margin-left: 20px; color: #d1d5db;">
+            <li>Annual ROI: 40%</li>
+            <li>Annual Hours Saved: 25%</li>
+            <li>Error Impact: 20%</li>
+            <li>Revenue Impact: 15%</li>
+          </ul>
+
+          <p style="margin-top: 16px; color: #10b981;">
+            <strong>Why company-relative?</strong> A $100k automation saving means something very different to a $2M company versus a $100M company. By expressing ROI and FTE as percentages of your company's financials, we ensure opportunities are fairly prioritized based on your specific context.
+          </p>
         </div>
       </div>
 
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.implementationEffort}</div>
-        <div class="transparency-content">
-          <p>${t.companySnapshot.transparency.implementationEffortExplanation}</p>
+      <div class="methodology-block">
+        <div class="methodology-title">Implementation Effort Score (Y-Axis)</div>
+        <div class="methodology-content">
+          <p>Implementation Effort represents the difficulty and resource requirements for deploying an automation. Lower scores indicate easier implementation:</p>
+          
+          <div class="formula-block">
+Implementation Effort = 
+  (Inverted Readiness × 40%) +
+  (Normalized Ramp-up Period × 25%) +
+  (Normalized Payback Period × 25%) +
+  (Normalized Training Hours × 10%)
+
+Where:
+  • Readiness inverted: (100 - ReadinessScore)
+  • Ramp-up: 3 months = 0, 18+ months = 100
+  • Payback: 6 months = 0, 36+ months = 100
+  • Training: 2 hours = 0, 40+ hours = 100
+          </div>
+
+          <p style="color: #9ca3af; margin-top: 12px; font-size: 14px;">
+            The Readiness Score (from TFA + PIF) is the primary driver at 40%, because strong technical and operational readiness dramatically reduces implementation risk and timeline. The other factors account for the specific characteristics of each opportunity.
+          </p>
         </div>
       </div>
 
-      <div class="transparency-block">
-        <div class="transparency-title">${t.companySnapshot.transparency.scoringGuideTables}</div>
-        <div class="transparency-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>${t.companySnapshot.transparency.scoreInterpretation}</th>
-                <th>${t.companySnapshot.transparency.roiScoreGuide}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>100</td><td>${t.companySnapshot.transparency.score100Meaning}</td></tr>
-              <tr><td>50</td><td>${t.companySnapshot.transparency.score50Meaning}</td></tr>
-              <tr><td>20</td><td>${t.companySnapshot.transparency.score20Meaning}</td></tr>
-              <tr><td>10</td><td>${t.companySnapshot.transparency.score10Meaning}</td></tr>
-            </tbody>
-          </table>
+      <div class="methodology-block">
+        <div class="methodology-title">Readiness Rubric Calculation</div>
+        <div class="methodology-content">
+          <p>The Readiness Rubric combines Technical Feasibility (TFA) and Operational Readiness (PIF) with specific weightings validated across hundreds of automation projects:</p>
+          
+          <div class="formula-block">
+Total Readiness = (TFA Score × 60%) + (PIF Score × 40%)
+
+TFA Components (60% of total):
+  • Data Quality: 18% (30% of TFA × 60%)
+  • Integration Feasibility: 18% (30% of TFA × 60%)
+  • System Environment: 15% (25% of TFA × 60%)
+  • Security/Compliance: 9% (15% of TFA × 60%)
+
+PIF Components (40% of total):
+  • Process Clarity: 8% (~20% of PIF × 40%)
+  • Change Magnitude: 8% (~20% of PIF × 40%)
+  • Workflow Brittleness: 6% (~15% of PIF × 40%)
+          </div>
+
+          <p style="margin-top: 16px; color: #10b981;">
+            <strong>Why 60/40 split?</strong> Technical infrastructure (TFA) is weighted higher because even the best operational conditions cannot overcome fundamental technical limitations. However, operational readiness (PIF) is still critical—the best technology fails without user adoption and process clarity.
+          </p>
         </div>
+      </div>
+
+      <div class="methodology-block">
+        <div class="methodology-title">TFA Section Scoring</div>
+        <div class="methodology-content">
+          <p>Each TFA question is scored 1-5 (plus "Don't Know" option). Section scores are calculated as weighted averages:</p>
+          
+          <div class="formula-block">
+Section Score = Σ(Question Score × Question Weight) ÷ Σ(Question Weights)
+  → Normalized to 0-100 scale
+  → "Don't Know" responses excluded from calculation
+  → Missing knowledge gaps identified for follow-up
+          </div>
+
+          <p style="color: #9ca3af; margin-top: 12px; font-size: 14px;">
+            Questions within each section have different weights based on their impact on automation feasibility. For example, API availability is weighted more heavily than monitoring capabilities in the System Environment section.
+          </p>
+        </div>
+      </div>
+
+      <div class="methodology-block">
+        <div class="methodology-title">PIF Aggregation Across Respondents</div>
+        <div class="methodology-content">
+          <p>When multiple people complete the PIF for a workflow, their responses are aggregated statistically:</p>
+          
+          <div class="formula-block">
+For each metric (Process Clarity, Change Magnitude, Workflow Brittleness):
+  • Average: Mean score across all respondents
+  • Min/Max: Range of responses
+  • Standard Deviation: Measure of consensus
+  
+High standard deviation indicates disagreement and warrants investigation.
+Low standard deviation indicates strong consensus.
+          </div>
+
+          <p style="margin-top: 16px; color: #10b981;">
+            <strong>Why aggregate?</strong> Different stakeholders experience workflows differently. A manager may rate Process Clarity highly due to documented procedures, while a frontline worker may rate it low due to real-world complexity. Seeing the range and variation provides crucial insights.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top: 32px; padding: 24px; background: #1f2937; border-radius: 8px; border-left: 4px solid #10b981;">
+        <p style="color: #d1d5db; line-height: 1.8;">
+          <strong style="color: #10b981; font-size: 18px;">Data Integrity Commitment</strong><br><br>
+          All calculations in this snapshot are derived directly from your submitted TFA and PIF responses using the formulas documented above. No assumptions, estimates, or "black box" algorithms are used. Every score can be independently verified by reviewing your source data and applying these same calculations.
+          <br><br>
+          This snapshot is designed to be a trusted decision-making tool—not a sales document. Our recommendations are based solely on the objective analysis of your technical and operational readiness.
+        </p>
       </div>
     </div>
   `;
 }
 
-// Helper functions
 function getFeasibilityBand(score: number): string {
   if (score >= 80) return 'Very High';
   if (score >= 65) return 'High';
@@ -981,10 +1620,10 @@ function getFeasibilityBand(score: number): string {
 }
 
 function formatCurrency(amount: number, language: 'en' | 'es'): string {
-  return new Intl.NumberFormat(language === 'en' ? 'en-US' : 'es-ES', {
+  return new Intl.NumberFormat(language, {
     style: 'currency',
-    currency: 'USD',
+    currency: language === 'en' ? 'USD' : 'MXN',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(amount);
 }

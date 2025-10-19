@@ -618,10 +618,13 @@ export default function CompanyDetail() {
         </Tabs>
       </div>
 
-      {scoringGuideOpen && (
+      {scoringGuideOpen && company && (
         <ScoringGuideDialog 
           open={scoringGuideOpen}
           onOpenChange={setScoringGuideOpen}
+          companyRevenue={parseFloat(company.annualRevenue || '0')}
+          companyEmployees={company.totalEmployees || 0}
+          companyName={company.name}
         />
       )}
     </div>
