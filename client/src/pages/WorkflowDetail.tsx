@@ -24,9 +24,7 @@ import { OpportunityForm } from "@/components/OpportunityForm";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
@@ -46,7 +44,6 @@ export default function WorkflowDetail() {
   const companyId = params?.companyId || '';
   const workflowId = params?.workflowId || '';
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
@@ -97,46 +94,42 @@ export default function WorkflowDetail() {
   useEffect(() => {
     if (companyError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: companyError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyError]);
+  }, [companyError, toast]);
 
   useEffect(() => {
     if (workflowError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: workflowError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflowError]);
+  }, [workflowError, toast]);
 
   useEffect(() => {
     if (tfaError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: tfaError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tfaError]);
+  }, [tfaError, toast]);
 
   useEffect(() => {
     if (impactError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: impactError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [impactError]);
+  }, [impactError, toast]);
 
   const calculateSectionScores = () => {
     if (!tfaAssessment?.responses) return [];
@@ -173,14 +166,14 @@ export default function WorkflowDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}`] });
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
       toast({
-        title: t.toast.workflowUpdated,
-        description: t.toast.workflowUpdatedDesc,
+        title: "Workflow updated",
+        description: "Workflow has been updated successfully.",
       });
       setIsEditingName(false);
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving",
         description: error.message,
         variant: "destructive",
       });
@@ -195,15 +188,15 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: t.toast.opportunityCreated,
-        description: t.toast.opportunityCreatedDesc,
+        title: "Opportunity created",
+        description: "Implementation opportunity created successfully.",
       });
       setIsOpportunityDialogOpen(false);
       setEditingOpportunity(null);
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving",
         description: error.message,
         variant: "destructive",
       });
@@ -218,15 +211,15 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: t.toast.opportunityUpdated,
-        description: t.toast.opportunityUpdatedDesc,
+        title: "Opportunity updated",
+        description: "Implementation opportunity updated successfully.",
       });
       setIsOpportunityDialogOpen(false);
       setEditingOpportunity(null);
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorUpdating,
+        title: "Error updating",
         description: error.message,
         variant: "destructive",
       });
@@ -240,13 +233,13 @@ export default function WorkflowDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
       toast({
-        title: t.toast.opportunityDeleted,
-        description: t.toast.opportunityDeletedDesc,
+        title: "Opportunity deleted",
+        description: "Implementation opportunity deleted successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorDeleting,
+        title: "Error deleting",
         description: error.message,
         variant: "destructive",
       });
@@ -281,7 +274,7 @@ export default function WorkflowDetail() {
           <Link href={`/company/${companyId}`}>
             <Button variant="ghost" size="sm" className="mb-3" data-testid="button-back-company">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              {t.workflow.backToCompany}
+              Back to Company
             </Button>
           </Link>
           <div className="flex items-center justify-between w-full">
@@ -322,7 +315,7 @@ export default function WorkflowDetail() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-semibold" data-testid="text-workflow-title">
-                    {workflowError ? t.workflow.errorLoadingWorkflow : workflowLoading ? t.common.loadingEllipsis : workflow?.name || t.workflow.unknownWorkflow}
+                    {workflowError ? "Error loading workflow" : workflowLoading ? "Loading..." : workflow?.name || "Unknown Workflow"}
                   </h1>
                   {!workflowLoading && workflow && (
                     <Button
@@ -338,11 +331,10 @@ export default function WorkflowDetail() {
                 </div>
               )}
               <p className="text-sm text-muted-foreground mt-1">
-                {companyError ? t.workflow.errorLoadingCompany : company?.name || (companyLoading ? t.common.loadingEllipsis : t.common.unknownIndustry)} • {workflow?.status || 'pending'}
+                {companyError ? "Error loading company" : company?.name || (companyLoading ? "Loading..." : "Unknown")} • {workflow?.status || 'pending'}
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <LanguageToggle />
               <ThemeToggle />
             </div>
           </div>
@@ -359,10 +351,10 @@ export default function WorkflowDetail() {
         )}
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="tfa" data-testid="tab-tfa">{t.tabs.technicalFeasibility}</TabsTrigger>
-            <TabsTrigger value="pif" data-testid="tab-pif">{t.tabs.processInsights}</TabsTrigger>
-            <TabsTrigger value="readiness" data-testid="tab-readiness">{t.tabs.readinessRubric}</TabsTrigger>
-            <TabsTrigger value="opportunities" data-testid="tab-opportunities">{t.tabs.opportunities}</TabsTrigger>
+            <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
+            <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
+            <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
+            <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tfa" className="space-y-6">

@@ -5,17 +5,14 @@ import type { Company } from "@shared/schema";
 import CompanyCard from "@/components/CompanyCard";
 import CreateCompanyDialog from "@/components/CreateCompanyDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, BookOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "wouter";
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   
   const { data: companies = [], isLoading, error } = useQuery<Company[]>({
@@ -25,7 +22,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (error) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: error.message,
         variant: "destructive",
       });
@@ -48,13 +45,13 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       toast({
-        title: t.toast.companyCreated,
-        description: t.toast.companyCreatedDesc,
+        title: "Company created",
+        description: "The company has been created successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.error,
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -72,8 +69,8 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-page-title">{t.common.platformName}</h1>
-              <p className="text-sm text-muted-foreground mt-1">{t.dashboard.subtitle}</p>
+              <h1 className="text-2xl font-semibold" data-testid="text-page-title">Automat-IA Diagnostic Platform</h1>
+              <p className="text-sm text-muted-foreground mt-1">Manage AI feasibility assessments for client companies</p>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/documentation">
@@ -81,7 +78,6 @@ export default function Dashboard() {
                   <BookOpen className="h-5 w-5" />
                 </Button>
               </Link>
-              <LanguageToggle />
               <ThemeToggle />
               <CreateCompanyDialog 
                 onSubmit={(data) => createCompanyMutation.mutate(data)}
@@ -94,16 +90,16 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold mb-1">{t.company.companies}</h2>
+            <h2 className="text-lg font-semibold mb-1">Companies</h2>
             <p className="text-sm text-muted-foreground">
-              {filteredCompanies.length} {filteredCompanies.length !== companies.length ? `${t.common.filter} ${companies.length}` : ''} {t.dashboard.companies.toLowerCase()}
+              {filteredCompanies.length} {filteredCompanies.length !== companies.length ? `of ${companies.length}` : ''} companies
             </p>
           </div>
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={t.dashboard.searchCompanies}
+              placeholder="Search companies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -114,14 +110,14 @@ export default function Dashboard() {
 
         {error ? (
           <div className="text-center py-12">
-            <p className="text-destructive mb-4">{t.common.error}</p>
+            <p className="text-destructive mb-4">Error</p>
             <Button variant="outline" onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/companies'] })} data-testid="button-retry">
-              {t.common.search}
+              Retry
             </Button>
           </div>
         ) : isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">{t.common.loading}</p>
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         ) : (
           <>
@@ -140,13 +136,13 @@ export default function Dashboard() {
 
             {filteredCompanies.length === 0 && companies.length > 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">{t.dashboard.noCompanies}</p>
+                <p className="text-muted-foreground">No companies match your search.</p>
               </div>
             )}
 
             {companies.length === 0 && (
               <div className="text-center py-12">
-                <p className="text-muted-foreground mb-4">{t.dashboard.noCompanies}</p>
+                <p className="text-muted-foreground mb-4">No companies yet. Create one to get started.</p>
                 <CreateCompanyDialog 
                   onSubmit={(data) => createCompanyMutation.mutate(data)}
                 />

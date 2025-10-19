@@ -9,10 +9,8 @@ import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 import type { Company, Workflow, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric } from "@shared/pifCalculations";
@@ -26,7 +24,6 @@ export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
   const companyId = params?.id || '';
   const { toast } = useToast();
-  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
@@ -51,24 +48,22 @@ export default function CompanyDetail() {
   useEffect(() => {
     if (companyError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: companyError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyError]);
+  }, [companyError, toast]);
 
   useEffect(() => {
     if (workflowsError) {
       toast({
-        title: t.toast.errorLoading,
+        title: "Error loading data",
         description: workflowsError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workflowsError]);
+  }, [workflowsError, toast]);
 
   const createWorkflowMutation = useMutation({
     mutationFn: async (data: { name: string; description: string }) => {
@@ -81,13 +76,13 @@ export default function CompanyDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/workflows`] });
       toast({
-        title: t.toast.workflowCreated,
-        description: t.toast.workflowCreatedDesc,
+        title: "Workflow created",
+        description: "The workflow has been created successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving",
         description: error.message,
         variant: "destructive",
       });
@@ -103,14 +98,14 @@ export default function CompanyDetail() {
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}`] });
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       toast({
-        title: t.toast.companyUpdated,
-        description: t.toast.companyUpdatedDesc,
+        title: "Company updated",
+        description: "Company information has been updated successfully.",
       });
       setIsEditingName(false);
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving",
         description: error.message,
         variant: "destructive",
       });
@@ -130,13 +125,13 @@ export default function CompanyDetail() {
       queryClient.invalidateQueries({ queryKey: ['/api/companies'] });
       queryClient.invalidateQueries({ queryKey: [`/api/companies/${companyId}/opportunities`] });
       toast({
-        title: t.toast.companyUpdated,
-        description: t.toast.companyUpdatedDesc,
+        title: "Company updated",
+        description: "Company information has been updated successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving",
         description: error.message,
         variant: "destructive",
       });
@@ -167,10 +162,8 @@ export default function CompanyDetail() {
     
     setIsGeneratingSnapshot(true);
     try {
-      const htmlContent = await generateCompanySnapshot(companyId, language);
-      const filename = language === 'es'
-        ? `${company.name.replace(/\s+/g, '_')}_Instantanea_Diagnostica.html`
-        : `${company.name.replace(/\s+/g, '_')}_Diagnostic_Snapshot.html`;
+      const htmlContent = await generateCompanySnapshot(companyId, 'en');
+      const filename = `${company.name.replace(/\s+/g, '_')}_Diagnostic_Snapshot.html`;
       
       const blob = new Blob([htmlContent], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
@@ -183,12 +176,12 @@ export default function CompanyDetail() {
       URL.revokeObjectURL(url);
       
       toast({
-        title: t.toast.success,
-        description: t.company.downloadSnapshot,
+        title: "Success",
+        description: "Download Company Snapshot",
       });
     } catch (error) {
       toast({
-        title: t.toast.error,
+        title: "Error",
         description: error instanceof Error ? error.message : 'Failed to generate snapshot',
         variant: "destructive",
       });
@@ -261,13 +254,12 @@ export default function CompanyDetail() {
   useEffect(() => {
     if (assessmentsError) {
       toast({
-        title: t.toast.errorLoadingAssessment,
+        title: "Error loading assessment data",
         description: assessmentsError.message,
         variant: "destructive",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assessmentsError]);
+  }, [assessmentsError, toast]);
 
   // Calculate readiness scores for each workflow
   const readinessScores = useMemo(() => {
@@ -394,7 +386,7 @@ export default function CompanyDetail() {
           <Link href="/">
             <Button variant="ghost" size="sm" className="mb-3" data-testid="button-back">
               <ChevronLeft className="h-4 w-4 mr-1" />
-              {t.common.backToDashboard}
+              Back to Dashboard
             </Button>
           </Link>
           <div className="flex items-center justify-between">
@@ -435,7 +427,7 @@ export default function CompanyDetail() {
               ) : (
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-semibold" data-testid="text-company-name">
-                    {companyLoading ? t.common.loadingEllipsis : company?.name || t.common.unknownCompany}
+                    {companyLoading ? "Loading..." : company?.name || "Unknown Company"}
                   </h1>
                   {!companyLoading && company && (
                     <Button
@@ -451,7 +443,7 @@ export default function CompanyDetail() {
                 </div>
               )}
               <p className="text-sm text-muted-foreground mt-1">
-                {company?.industry || t.common.unknownIndustry} • {workflows.length} {t.company.workflows.toLowerCase()}
+                {company?.industry || "Unknown"} • {workflows.length} workflows
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -463,7 +455,7 @@ export default function CompanyDetail() {
                   data-testid="button-scoring-guide"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
-                  {t.common.scoringGuide}
+                  Scoring Guide
                 </Button>
               )}
               {company && (
@@ -483,7 +475,6 @@ export default function CompanyDetail() {
                   <Download className="h-5 w-5" />
                 </Button>
               )}
-              <LanguageToggle />
               <ThemeToggle />
               <CreateWorkflowDialog 
                 onSubmit={(data) => createWorkflowMutation.mutate(data)}
@@ -506,7 +497,7 @@ export default function CompanyDetail() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder={t.common.searchWorkflows}
+                  placeholder="Search workflows..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -567,8 +558,8 @@ export default function CompanyDetail() {
               <div className="bg-card rounded-lg border border-card-border p-6">
                 <p className="text-muted-foreground text-center py-8">
                   {opportunities.length === 0 
-                    ? t.common.noOpportunities
-                    : t.common.noOpportunitiesWithAssessments}
+                    ? "No opportunities yet. Create opportunities in workflow detail pages."
+                    : "No opportunities with completed TFA and PIF assessments. Complete assessments to see opportunities here."}
                 </p>
               </div>
             ) : (
@@ -581,41 +572,36 @@ export default function CompanyDetail() {
                     </p>
                   </div>
 
-                  <OpportunityMatrix
+                  <OpportunityMatrix 
                     opportunities={filteredOpportunities}
                     workflows={workflows}
                     readinessScores={readinessScores}
-                    companyContext={{
-                      annualRevenue: company?.annualRevenue,
-                      totalEmployees: company?.totalEmployees,
-                    }}
+                    companyRevenue={company?.annualRevenue}
+                    companyEmployees={company?.totalEmployees}
                   />
                 </div>
 
                 <div className="space-y-6">
+                  <h2 className="text-xl font-semibold">All Opportunities</h2>
                   {workflowsWithOpportunities.map(({ workflow, opportunities: workflowOpps }) => (
                     <div key={workflow.id} className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold" data-testid={`text-workflow-name-${workflow.id}`}>
-                          {workflow.name}
-                        </h3>
+                      <div className="flex items-center gap-2">
                         <Link href={`/company/${companyId}/workflow/${workflow.id}`}>
-                          <Button variant="ghost" size="sm" data-testid={`button-view-workflow-${workflow.id}`}>
-                            View Workflow
-                          </Button>
+                          <h3 className="text-lg font-semibold hover:underline cursor-pointer">
+                            {workflow.name}
+                          </h3>
                         </Link>
+                        <span className="text-sm text-muted-foreground">
+                          ({workflowOpps.length} {workflowOpps.length === 1 ? 'opportunity' : 'opportunities'})
+                        </span>
                       </div>
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {workflowOpps.map(opp => (
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {workflowOpps.map((opportunity) => (
                           <OpportunityCard
-                            key={opp.id}
-                            opportunity={opp}
-                            readinessScore={readinessScores[opp.workflowId]}
-                            companyId={companyId}
-                            companyContext={{
-                              annualRevenue: company?.annualRevenue,
-                              totalEmployees: company?.totalEmployees,
-                            }}
+                            key={opportunity.id}
+                            opportunity={opportunity}
+                            companyRevenue={company?.annualRevenue}
+                            companyEmployees={company?.totalEmployees}
                           />
                         ))}
                       </div>
@@ -628,13 +614,10 @@ export default function CompanyDetail() {
         </Tabs>
       </div>
 
-      {company && company.annualRevenue && company.totalEmployees && (
-        <ScoringGuideDialog
+      {scoringGuideOpen && (
+        <ScoringGuideDialog 
           open={scoringGuideOpen}
           onOpenChange={setScoringGuideOpen}
-          companyRevenue={parseFloat(company.annualRevenue)}
-          companyEmployees={company.totalEmployees}
-          companyName={company.name}
         />
       )}
     </div>
