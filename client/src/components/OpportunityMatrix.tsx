@@ -2,14 +2,14 @@ import { useMemo, useState, useEffect } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, LabelList } from "recharts";
 import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
-  calculateOpportunityScore, 
-  type ToggleState, 
   type CompanyContext,
   type MatrixFilterType,
   filterOpportunitiesByMetrics,
   calculateBusinessImpactForFilter,
   calculateImplementationEffort,
-  normalizeBusinessImpactToDisplay
+  getQuadrant,
+  type ToggleState,
+  getFilterMaxScore
 } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -74,21 +74,34 @@ export default function OpportunityMatrix({
     return colors;
   }, [opportunities, workflowColors]);
 
+  // Determine max X-axis scale based on filter (100/125/150)
+  const maxImpactScale = useMemo(() => {
+    // Calculate what max scale we need based on filter type
+    let hasError = false;
+    let hasRevenue = false;
+    
+    const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
+    filteredOpps.forEach(opp => {
+      if (opp.errorMetricsEnabled) hasError = true;
+      if (opp.revenueMetricsEnabled) hasRevenue = true;
+    });
+    
+    return getFilterMaxScore({ errorMetrics: hasError, revenueMetrics: hasRevenue });
+  }, [opportunities, filterType]);
+
   const { dataPoints, workflowLegend } = useMemo(() => {
-    // Create workflow name mapping
     const workflowMap = workflows.reduce((acc, w) => {
       acc[w.id] = w.name;
       return acc;
     }, {} as Record<string, string>);
 
-    // First filter opportunities based on selected filter
+    // Filter opportunities based on selected filter
     const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
 
-    // Calculate raw scores for filtered opportunities
-    const rawPoints = filteredOpps.map(opp => {
+    // Calculate scores for filtered opportunities
+    const points: DataPoint[] = filteredOpps.map(opp => {
       const readinessScore = readinessScores[opp.workflowId];
       
-      // Calculate implementation effort (same for all filters)
       const implementationEffort = calculateImplementationEffort(
         readinessScore,
         parseFloat(opp.rampupPeriodMonths || "0"),
@@ -96,49 +109,30 @@ export default function OpportunityMatrix({
         parseFloat(opp.trainingHoursPerEmployee || "0")
       );
 
-      // Calculate business impact using filter-specific recalculation (0-160 internal range)
-      const rawBusinessImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
+      // Calculate ENHANCED impact (respects per-opportunity toggles, uses reweighting)
+      const enhancedImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
       
-      // Normalize to 0-100 display range
-      const businessImpact = normalizeBusinessImpactToDisplay(rawBusinessImpact);
+      // Determine quadrant using filter-specific max scale
+      const toggles: ToggleState = {
+        errorMetrics: opp.errorMetricsEnabled || false,
+        revenueMetrics: opp.revenueMetricsEnabled || false
+      };
+      const oppMaxScale = getFilterMaxScore(toggles);
+      const quadrant = getQuadrant(implementationEffort, enhancedImpact, oppMaxScale);
       
       return {
         id: opp.id,
         name: opp.name,
         workflowId: opp.workflowId,
-        businessImpact,
-        implementationEffort,
-        color: colorMap[opp.workflowId], // Use stable color map
-      };
-    });
-
-    // Use normalized business impact scores (0-100 display range)
-    const points: DataPoint[] = rawPoints.map(point => {
-      // Business impact already normalized to 0-100
-      const businessImpact = point.businessImpact;
-      
-      // Determine quadrant based on absolute scores
-      const isLowEffort = point.implementationEffort < 50;
-      const isHighImpact = businessImpact >= 50;
-      let quadrant: string;
-      if (isLowEffort && isHighImpact) quadrant = "Quick Wins";
-      else if (!isLowEffort && isHighImpact) quadrant = "Strategic Goals";
-      else if (isLowEffort && !isHighImpact) quadrant = "Nice-To-Haves";
-      else quadrant = "Deprioritize";
-      
-      return {
-        id: point.id,
-        name: point.name,
-        workflowId: point.workflowId,
-        workflowName: workflowMap[point.workflowId] || "Unknown",
-        x: businessImpact,
-        y: point.implementationEffort,
+        workflowName: workflowMap[opp.workflowId] || "Unknown",
+        x: enhancedImpact,
+        y: implementationEffort,
         quadrant,
-        color: point.color,
+        color: colorMap[opp.workflowId],
       };
     });
 
-    // Create legend data with ALL workflow names (not just filtered)
+    // Create legend
     const allUniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
     const legend = allUniqueWorkflows.map(wId => ({
       workflowId: wId,
@@ -205,8 +199,13 @@ export default function OpportunityMatrix({
   return (
     <Card data-testid="card-opportunity-matrix">
       <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          <CardTitle>{t.matrix.title}</CardTitle>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle>Enhanced Impact Matrix</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Reweighted scoring with dynamic scale ({maxImpactScale === 150 ? 'All 3 Metrics: 0-150' : maxImpactScale === 125 ? 'Two Metrics: 0-125' : 'Base Only: 0-100'})
+            </p>
+          </div>
           <Select value={filterType} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
               <SelectValue placeholder={t.labels.filterByMetrics} />
@@ -241,14 +240,15 @@ export default function OpportunityMatrix({
               <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 
-                {/* Axes */}
+                {/* Axes - Dynamic X-axis domain based on filter */}
                 <XAxis 
                   type="number" 
                   dataKey="x" 
                   name={t.matrix.xAxis}
-                  domain={[0, 100]}
+                  domain={[0, maxImpactScale]}
+                  ticks={maxImpactScale === 150 ? [0, 30, 60, 90, 120, 150] : maxImpactScale === 125 ? [0, 25, 50, 75, 100, 125] : [0, 25, 50, 75, 100]}
                   label={{ 
-                    value: `${t.matrix.xAxis} →`, 
+                    value: `${t.matrix.xAxis} (0-${maxImpactScale}) →`, 
                     position: 'bottom',
                     offset: 40,
                     className: "fill-foreground text-sm"
@@ -270,9 +270,9 @@ export default function OpportunityMatrix({
                   tick={{ className: "fill-muted-foreground text-xs" }}
                 />
 
-                {/* Quadrant dividers */}
+                {/* Quadrant dividers - Dynamic midpoint based on max scale */}
                 <ReferenceLine 
-                  x={50} 
+                  x={maxImpactScale / 2} 
                   stroke="hsl(var(--border))" 
                   strokeWidth={2}
                   strokeDasharray="5 5"

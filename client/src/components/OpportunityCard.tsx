@@ -1,5 +1,12 @@
 import type { ImplementationOpportunity } from "@shared/schema";
-import { calculateOpportunityScore, normalizeBusinessImpactToDisplay, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
+import { 
+  calculateOpportunityScore, 
+  calculateBaseImpact,
+  calculateEnhancedImpact,
+  type ToggleState, 
+  type CompanyContext,
+  getFilterMaxScore
+} from "@shared/opportunityCalculations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,17 +48,14 @@ export function OpportunityCard({
     revenueMetrics: opportunity.revenueMetricsEnabled ?? false,
   };
   
-  // Calculate raw score (0-160 internal range)
-  const rawScore = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext, true);
+  // Calculate full opportunity score (includes base and enhanced impacts)
+  const score = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext);
   
-  // Normalize business impact for display (0-100 range)
-  const normalizedBusinessImpact = normalizeBusinessImpactToDisplay(rawScore.businessImpact);
+  // Get max scale for this opportunity's configuration
+  const maxEnhancedScale = getFilterMaxScore(toggles);
   
-  // Final score with normalized business impact
-  const score = {
-    ...rawScore,
-    businessImpact: normalizedBusinessImpact,
-  };
+  // Determine if enhanced metrics are enabled
+  const hasEnhancedMetrics = toggles.errorMetrics || toggles.revenueMetrics;
   
   // Mutation to update toggle states
   const updateToggleMutation = useMutation({
@@ -147,33 +151,55 @@ export function OpportunityCard({
         </div>
 
         {/* Scores */}
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+        <div className="space-y-3 pt-2 border-t">
+          {/* Base Impact (Always visible) */}
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Business Impact</p>
+            <p className="text-xs text-muted-foreground">Base Impact (ROI + Time)</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${score.businessImpact}%` }}
+                  className="h-full bg-green-600 dark:bg-green-500 transition-all"
+                  style={{ width: `${score.baseImpact}%` }}
                 />
               </div>
-              <span className="text-xs font-medium" data-testid={`text-impact-score-${opportunity.id}`}>
-                {score.businessImpact.toFixed(0)}
+              <span className="text-xs font-medium" data-testid={`text-base-impact-${opportunity.id}`}>
+                {score.baseImpact.toFixed(0)}
               </span>
             </div>
           </div>
           
+          {/* Enhanced Impact (When toggles enabled) */}
+          {hasEnhancedMetrics && (
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">
+                Enhanced Impact (Max: {maxEnhancedScale})
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all"
+                    style={{ width: `${(score.businessImpact / maxEnhancedScale) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium" data-testid={`text-enhanced-impact-${opportunity.id}`}>
+                  {score.businessImpact.toFixed(0)}
+                </span>
+              </div>
+            </div>
+          )}
+          
+          {/* Implementation Effort */}
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Implementation Effort</p>
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${100 - score.implementationEffort}%` }}
+                  className="h-full bg-amber-600 dark:bg-amber-500 transition-all"
+                  style={{ width: `${score.implementationEffort}%` }}
                 />
               </div>
               <span className="text-xs font-medium" data-testid={`text-effort-score-${opportunity.id}`}>
-                {(100 - score.implementationEffort).toFixed(0)}
+                {score.implementationEffort.toFixed(0)}
               </span>
             </div>
           </div>

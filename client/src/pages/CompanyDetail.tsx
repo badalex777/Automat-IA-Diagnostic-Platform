@@ -4,9 +4,10 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Search, Pencil, Check, X, BookOpen, Download } from "lucide-react";
+import { ChevronLeft, Search, Pencil, Check, X, BookOpen } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
+import BaseImpactMatrix from "@/components/BaseImpactMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -18,7 +19,6 @@ import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
 import ScoringGuideDialog from "@/components/ScoringGuideDialog";
-import { generateCompanySnapshot } from "@/lib/companySnapshot";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -28,7 +28,6 @@ export default function CompanyDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [scoringGuideOpen, setScoringGuideOpen] = useState(false);
-  const [isGeneratingSnapshot, setIsGeneratingSnapshot] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -155,39 +154,6 @@ export default function CompanyDetail() {
   const handleCancelEdit = () => {
     setIsEditingName(false);
     setEditedName('');
-  };
-
-  const handleDownloadSnapshot = async () => {
-    if (!company) return;
-    
-    setIsGeneratingSnapshot(true);
-    try {
-      const htmlContent = await generateCompanySnapshot(companyId, 'en');
-      const filename = `${company.name.replace(/\s+/g, '_')}_Diagnostic_Snapshot.html`;
-      
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Success",
-        description: "Download Company Snapshot",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to generate snapshot',
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingSnapshot(false);
-    }
   };
 
   const filteredWorkflows = workflows.filter(workflow =>
@@ -464,17 +430,6 @@ export default function CompanyDetail() {
                   onSubmit={(data) => updateCompanyContextMutation.mutate(data)}
                 />
               )}
-              {company && opportunities.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDownloadSnapshot}
-                  disabled={isGeneratingSnapshot}
-                  data-testid="button-download-snapshot"
-                >
-                  <Download className="h-5 w-5" />
-                </Button>
-              )}
               <ThemeToggle />
               <CreateWorkflowDialog 
                 onSubmit={(data) => createWorkflowMutation.mutate(data)}
@@ -564,7 +519,7 @@ export default function CompanyDetail() {
               </div>
             ) : (
               <>
-                <div className="bg-card rounded-lg border border-card-border p-6 space-y-4">
+                <div className="space-y-4">
                   <div>
                     <h2 className="text-lg font-semibold">Opportunity Matrix</h2>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -572,13 +527,40 @@ export default function CompanyDetail() {
                     </p>
                   </div>
 
-                  <OpportunityMatrix 
-                    opportunities={filteredOpportunities}
-                    workflows={workflows}
-                    readinessScores={readinessScores}
-                    companyRevenue={company?.annualRevenue}
-                    companyEmployees={company?.totalEmployees}
-                  />
+                  <Tabs defaultValue="base-impact" className="w-full">
+                    <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+                      <TabsTrigger value="base-impact" data-testid="tab-base-impact">
+                        Base Impact
+                      </TabsTrigger>
+                      <TabsTrigger value="enhanced-impact" data-testid="tab-enhanced-impact">
+                        Enhanced Impact
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="base-impact" className="mt-4">
+                      <BaseImpactMatrix 
+                        opportunities={filteredOpportunities}
+                        workflows={workflows}
+                        readinessScores={readinessScores}
+                        companyContext={{
+                          annualRevenue: company?.annualRevenue,
+                          totalEmployees: company?.totalEmployees,
+                        }}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="enhanced-impact" className="mt-4">
+                      <OpportunityMatrix 
+                        opportunities={filteredOpportunities}
+                        workflows={workflows}
+                        readinessScores={readinessScores}
+                        companyContext={{
+                          annualRevenue: company?.annualRevenue,
+                          totalEmployees: company?.totalEmployees,
+                        }}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </div>
 
                 <div className="space-y-6">
