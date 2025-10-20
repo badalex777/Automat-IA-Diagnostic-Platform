@@ -140,8 +140,8 @@ export function calculateBaseImpact(
     // 10% ROI = score 100 (exceptional workflow automation)
     roiScore = Math.min((annualRoi / companyRevenue) * 1000, 100);
   } else {
-    // Fallback: normalize to $1M
-    roiScore = normalizeToScale(annualRoi, 1000000);
+    // Fallback: assume $1M revenue with same 10x multiplier logic
+    roiScore = Math.min((annualRoi / 1000000) * 1000, 100);
   }
   
   if (companyEmployees > 0) {
@@ -149,8 +149,8 @@ export function calculateBaseImpact(
     // 10% FTE = score 100 (exceptional workforce efficiency)
     hoursScore = Math.min((fteSavings / companyEmployees) * 1000, 100);
   } else {
-    // Fallback: normalize to 5 FTE
-    hoursScore = normalizeToScale(fteSavings, 5);
+    // Fallback: assume 100 employees with same 10x multiplier logic
+    hoursScore = Math.min((fteSavings / 100) * 1000, 100);
   }
 
   // Base score: ROI 60% + Hours 40% (always fixed, 0-100 range)
@@ -192,13 +192,15 @@ export function calculateEnhancedImpact(
   if (companyRevenue > 0) {
     roiScore = Math.min((annualRoi / companyRevenue) * 1000, 100);
   } else {
-    roiScore = normalizeToScale(annualRoi, 1000000);
+    // Fallback: assume $1M revenue with same 10x multiplier logic
+    roiScore = Math.min((annualRoi / 1000000) * 1000, 100);
   }
   
   if (companyEmployees > 0) {
     hoursScore = Math.min((fteSavings / companyEmployees) * 1000, 100);
   } else {
-    hoursScore = normalizeToScale(fteSavings, 5);
+    // Fallback: assume 100 employees with same 10x multiplier logic
+    hoursScore = Math.min((fteSavings / 100) * 1000, 100);
   }
 
   // Calculate error score if available (0-100)

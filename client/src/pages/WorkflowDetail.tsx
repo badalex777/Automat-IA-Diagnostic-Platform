@@ -792,6 +792,10 @@ export default function WorkflowDetail() {
                             key={opportunity.id}
                             opportunity={opportunity}
                             readinessScore={readinessScore}
+                            companyContext={{
+                              annualRevenue: company?.annualRevenue,
+                              totalEmployees: company?.totalEmployees,
+                            }}
                             onEdit={() => {
                               setEditingOpportunity(opportunity);
                               setIsOpportunityDialogOpen(true);
