@@ -539,15 +539,16 @@ export interface Translations {
       businessImpactScoringContent: string;
       multiplierExplanation: string;
       multiplierExplanationContent: string;
-      filterViews: string;
-      filter1Title: string;
-      filter1Content: string;
-      filter2Title: string;
-      filter2Content: string;
-      filter3Title: string;
-      filter3Content: string;
-      filter4Title: string;
-      filter4Content: string;
+      dualMatrixSystem: string;
+      dualMatrixIntro: string;
+      baseMatrixTitle: string;
+      baseMatrixContent: string;
+      enhancedMatrixTitle: string;
+      enhancedMatrixContent: string;
+      bonusCalculationTitle: string;
+      bonusCalculationContent: string;
+      matrixGuaranteeTitle: string;
+      matrixGuaranteeContent: string;
       scatterPlotInterpretation: string;
       scatterPlotInterpretationContent: string;
       quadrants: string;
@@ -587,14 +588,12 @@ export interface Translations {
       errorScoreFormula: string;
       revenueScore: string;
       revenueScoreFormula: string;
-      businessImpactBase: string;
-      businessImpactBaseFormula: string;
-      businessImpactError: string;
-      businessImpactErrorFormula: string;
-      businessImpactRevenue: string;
-      businessImpactRevenueFormula: string;
-      businessImpactAll: string;
-      businessImpactAllFormula: string;
+      baseImpactMatrix: string;
+      baseImpactMatrixFormula: string;
+      enhancedImpactMatrix: string;
+      enhancedImpactMatrixFormula: string;
+      bonusFormulas: string;
+      bonusFormulasExplanation: string;
       implementationEffort: string;
       implementationEffortFormula: string;
     };
@@ -1189,15 +1188,16 @@ const en: Translations = {
       businessImpactScoringContent: "Business Impact is scored relative to company size, ensuring opportunities are evaluated in proper business context. A $100K ROI means different things for a $1M company vs a $100M company. The scoring uses company-relative formulas with a 10× multiplier to create meaningful scores.",
       multiplierExplanation: "10× Multiplier Explanation",
       multiplierExplanationContent: "The platform uses a 10× multiplier (actually 1000 multiplier = 10×100 to convert to percentage then scale) to translate small percentages into meaningful 0-100 scores. Example: A workflow saving 1 FTE in a 100-employee company: FTE Savings = 1, Total Employees = 100. Raw percentage = 1%, which would score only 1/100. With multiplier: Score = (1 / 100) × 1000 = 10 (capped at 100). This ensures even modest but meaningful opportunities receive appropriate scores. A 10% impact (very significant) scores 100, while a 1% impact (notable) scores 10.",
-      filterViews: "Four Filter Views",
-      filter1Title: "1. Time Savings Only (Base Mode)",
-      filter1Content: "Business Impact = (ROI Score × 60%) + (Hours Score × 40%). Focuses purely on labor hour reductions. This is the simplest scoring mode, used when error reduction and revenue uplift are not applicable or not tracked.",
-      filter2Title: "2. Time + Error Reduction",
-      filter2Content: "Business Impact = (ROI Score × 45%) + (Hours Score × 30%) + (Error Score × 25%). When error reduction metrics are enabled, scoring redistributes to account for quality improvements. Error reduction receives 25% weight, recognizing its business value while keeping time savings dominant at 75%.",
-      filter3Title: "3. Time + Revenue Uplift",
-      filter3Content: "Business Impact = (ROI Score × 45%) + (Hours Score × 30%) + (Revenue Score × 25%). When revenue uplift metrics are enabled, scoring redistributes to account for growth opportunities. Revenue receives 25% weight, recognizing strategic value while keeping efficiency gains primary at 75%.",
-      filter4Title: "4. All Three Metrics",
-      filter4Content: "Business Impact = (ROI Score × 40%) + (Hours Score × 25%) + (Error Score × 20%) + (Revenue Score × 15%). The most comprehensive mode, balancing efficiency (65%), quality (20%), and growth (15%). Use when opportunities deliver value across multiple dimensions.",
+      dualMatrixSystem: "Dual-Matrix Scoring System",
+      dualMatrixIntro: "The platform uses TWO separate scoring matrices to evaluate opportunities: Base Impact Matrix (pure time savings comparison) and Enhanced Impact Matrix (with quality and growth bonuses). This dual-matrix approach provides both apples-to-apples comparison and comprehensive business value assessment.",
+      baseMatrixTitle: "Base Impact Matrix (0-100 Scale)",
+      baseMatrixContent: "Base Impact = (ROI Score × 60%) + (Hours Score × 40%). This fixed formula NEVER changes, providing consistent apples-to-apples comparison across all opportunities. The Base Matrix focuses purely on time savings efficiency, ensuring you can always compare opportunities on equal footing regardless of whether they include error reduction or revenue uplift. Every opportunity receives a Base Impact score on this standardized 0-100 scale.",
+      enhancedMatrixTitle: "Enhanced Impact Matrix (Dynamic 0-150 Scale)",
+      enhancedMatrixContent: "Enhanced Impact = Base Impact + Bonuses. The Enhanced Matrix uses an additive bonus model: it starts with the Base Impact score, then layers on bonuses for error reduction (+25 max) and revenue uplift (+25 max). This means Enhanced Impact is ALWAYS ≥ Base Impact—bonuses can only increase scores, never decrease them. The scale adjusts dynamically: Time Only = 0-100 (no bonuses), Time + Error or Time + Revenue = 0-125 (one +25 bonus), All Three Metrics = 0-150 (both bonuses).",
+      bonusCalculationTitle: "Bonus Calculation Details",
+      bonusCalculationContent: "Error Reduction Bonus: (Error Score × 25%) capped at +25 points. Revenue Uplift Bonus: (Revenue Score × 25%) capped at +25 points. These bonuses are added on top of the base 60/40 time savings score, not redistributed. Example: An opportunity with ROI Score = 60, Hours Score = 40, Error Score = 80 would have Base Impact = (60 × 0.60) + (40 × 0.40) = 52, Enhanced Impact = 52 + (80 × 0.25) = 52 + 20 = 72. The Enhanced score is always higher when bonuses apply.",
+      matrixGuaranteeTitle: "Key Guarantee: Enhanced ≥ Base Always",
+      matrixGuaranteeContent: "Because bonuses are additive (not redistributive), the Enhanced Impact Matrix ALWAYS scores opportunities equal to or higher than the Base Impact Matrix. This mathematical guarantee means you never lose the base time-savings comparison while gaining visibility into additional business value. Use Base Matrix for pure efficiency comparison, Enhanced Matrix for comprehensive business impact including quality and growth.",
       scatterPlotInterpretation: "Scatter Plot Interpretation",
       scatterPlotInterpretationContent: "The matrix divides into four quadrants based on median values: Quick Wins (High Impact, Low Effort): Prioritize immediately. These deliver strong results with manageable implementation complexity. Strategic Bets (High Impact, High Effort): Long-term strategic projects. Significant business value justifies higher implementation investment. Nice-to-Haves (Low Impact, Low Effort): Consider after higher priorities. Easy to implement but limited business impact. Deprioritize (Low Impact, High Effort): Avoid unless strategic reasons exist. Poor ROI relative to implementation complexity.",
       quadrants: "Quadrant Definitions",
@@ -1235,14 +1235,12 @@ const en: Translations = {
       errorScoreFormula: "Error Score = MIN(100, (Annual Error Cost Avoided / Company Annual Revenue) × 1000). Where Annual Error Cost Avoided = Errors Avoided × Cost per Error. Scoring follows same company-relative pattern as ROI and Hours.",
       revenueScore: "Revenue Uplift Score (Company-Relative)",
       revenueScoreFormula: "Revenue Score = MIN(100, (Annual Revenue Uplift / Company Annual Revenue) × 1000). Scoring follows same company-relative pattern as ROI and Hours.",
-      businessImpactBase: "Business Impact - Time Only",
-      businessImpactBaseFormula: "Business Impact = (ROI Score × 0.60) + (Hours Score × 0.40). Used when neither error nor revenue metrics are enabled. Pure efficiency focus.",
-      businessImpactError: "Business Impact - Time + Error",
-      businessImpactErrorFormula: "Business Impact = (ROI Score × 0.45) + (Hours Score × 0.30) + (Error Score × 0.25). Used when error reduction metrics are enabled. Quality contributes 25%.",
-      businessImpactRevenue: "Business Impact - Time + Revenue",
-      businessImpactRevenueFormula: "Business Impact = (ROI Score × 0.45) + (Hours Score × 0.30) + (Revenue Score × 0.25). Used when revenue uplift metrics are enabled. Growth contributes 25%.",
-      businessImpactAll: "Business Impact - All Three Metrics",
-      businessImpactAllFormula: "Business Impact = (ROI Score × 0.40) + (Hours Score × 0.25) + (Error Score × 0.20) + (Revenue Score × 0.15). Most comprehensive mode balancing efficiency (65%), quality (20%), and growth (15%).",
+      baseImpactMatrix: "Base Impact Matrix (Fixed 0-100 Scale)",
+      baseImpactMatrixFormula: "Base Impact = (ROI Score × 0.60) + (Hours Score × 0.40). This formula is FIXED and never changes, providing consistent apples-to-apples comparison across all opportunities regardless of error/revenue metrics. Scale: Always 0-100.",
+      enhancedImpactMatrix: "Enhanced Impact Matrix (Dynamic Scale)",
+      enhancedImpactMatrixFormula: "Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus. Where: Base Impact = (ROI Score × 0.60) + (Hours Score × 0.40), Error Bonus = (Error Score × 0.25) when enabled (max +25), Revenue Bonus = (Revenue Score × 0.25) when enabled (max +25). Scale: 0-100 (time only), 0-125 (one bonus), 0-150 (both bonuses). Key guarantee: Enhanced Impact ≥ Base Impact always, since bonuses are additive.",
+      bonusFormulas: "Additive Bonus Formulas",
+      bonusFormulasExplanation: "Error Reduction Bonus = MIN(25, Error Score × 0.25). Revenue Uplift Bonus = MIN(25, Revenue Score × 0.25). These bonuses are layered on top of the base 60/40 time-savings score. Example: ROI Score = 50, Hours Score = 60, Error Score = 80, Revenue Score = 40 → Base Impact = (50 × 0.60) + (60 × 0.40) = 54, Enhanced Impact = 54 + (80 × 0.25) + (40 × 0.25) = 54 + 20 + 10 = 84.",
       implementationEffort: "Implementation Effort",
       implementationEffortFormula: "Implementation Effort = (Inverted Readiness × 0.40) + (Normalized Ramp-up × 0.25) + (Normalized Payback × 0.25) + (Normalized Training × 0.10). Where: Inverted Readiness = 100 - Readiness Score. Normalized Ramp-up: 0 at ≤3 months, 100 at ≥18 months, linear between. Normalized Payback: 0 at ≤6 months, 100 at ≥36 months, linear between. Normalized Training: 0 at ≤2 hours, 100 at ≥40 hours, linear between. Scale: 0-100 (lower = easier).",
     },
@@ -1829,15 +1827,16 @@ const es: Translations = {
       businessImpactScoringContent: "El Impacto Empresarial se puntúa en relación con el tamaño de la empresa, asegurando que las oportunidades se evalúen en el contexto empresarial adecuado. Un ROI de $100K significa cosas diferentes para una empresa de $1M vs una empresa de $100M. La puntuación usa fórmulas relativas a la empresa con un multiplicador de 10× para crear puntuaciones significativas.",
       multiplierExplanation: "Explicación del Multiplicador 10×",
       multiplierExplanationContent: "La plataforma usa un multiplicador de 10× (en realidad multiplicador de 1000 = 10×100 para convertir a porcentaje luego escalar) para traducir pequeños porcentajes en puntuaciones significativas de 0-100. Ejemplo: Un flujo de trabajo que ahorra 1 FTE en una empresa de 100 empleados: Ahorro FTE = 1, Total Empleados = 100. Porcentaje bruto = 1%, que puntuaría solo 1/100. Con multiplicador: Puntuación = (1 / 100) × 1000 = 10 (limitado a 100). Esto asegura que incluso oportunidades modestas pero significativas reciban puntuaciones apropiadas. Un impacto del 10% (muy significativo) puntúa 100, mientras que un impacto del 1% (notable) puntúa 10.",
-      filterViews: "Cuatro Vistas de Filtro",
-      filter1Title: "1. Solo Ahorro de Tiempo (Modo Base)",
-      filter1Content: "Impacto Empresarial = (Puntuación ROI × 60%) + (Puntuación Horas × 40%). Se enfoca puramente en reducciones de horas laborales. Este es el modo de puntuación más simple, usado cuando la reducción de errores y el aumento de ingresos no son aplicables o no se rastrean.",
-      filter2Title: "2. Tiempo + Reducción de Errores",
-      filter2Content: "Impacto Empresarial = (Puntuación ROI × 45%) + (Puntuación Horas × 30%) + (Puntuación Error × 25%). Cuando las métricas de reducción de errores están habilitadas, la puntuación se redistribuye para tener en cuenta las mejoras de calidad. La reducción de errores recibe 25% de peso, reconociendo su valor empresarial mientras mantiene el ahorro de tiempo dominante al 75%.",
-      filter3Title: "3. Tiempo + Aumento de Ingresos",
-      filter3Content: "Impacto Empresarial = (Puntuación ROI × 45%) + (Puntuación Horas × 30%) + (Puntuación Ingresos × 25%). Cuando las métricas de aumento de ingresos están habilitadas, la puntuación se redistribuye para tener en cuenta las oportunidades de crecimiento. Los ingresos reciben 25% de peso, reconociendo el valor estratégico mientras mantienen las ganancias de eficiencia primarias al 75%.",
-      filter4Title: "4. Las Tres Métricas",
-      filter4Content: "Impacto Empresarial = (Puntuación ROI × 40%) + (Puntuación Horas × 25%) + (Puntuación Error × 20%) + (Puntuación Ingresos × 15%). El modo más completo, equilibrando eficiencia (65%), calidad (20%) y crecimiento (15%). Use cuando las oportunidades entreguen valor en múltiples dimensiones.",
+      dualMatrixSystem: "Sistema de Matriz Dual",
+      dualMatrixIntro: "La plataforma usa DOS matrices de puntuación separadas para evaluar oportunidades: Matriz de Impacto Base (comparación pura de ahorro de tiempo) y Matriz de Impacto Mejorado (con bonificaciones de calidad y crecimiento). Este enfoque de matriz dual proporciona tanto comparación de manzanas con manzanas como evaluación integral del valor empresarial.",
+      baseMatrixTitle: "Matriz de Impacto Base (Escala 0-100)",
+      baseMatrixContent: "Impacto Base = (Puntuación ROI × 60%) + (Puntuación Horas × 40%). Esta fórmula fija NUNCA cambia, proporcionando comparación consistente de manzanas con manzanas en todas las oportunidades. La Matriz Base se enfoca puramente en la eficiencia del ahorro de tiempo, asegurando que siempre pueda comparar oportunidades en igualdad de condiciones independientemente de si incluyen reducción de errores o aumento de ingresos. Cada oportunidad recibe una puntuación de Impacto Base en esta escala estandarizada de 0-100.",
+      enhancedMatrixTitle: "Matriz de Impacto Mejorado (Escala Dinámica 0-150)",
+      enhancedMatrixContent: "Impacto Mejorado = Impacto Base + Bonificaciones. La Matriz Mejorada usa un modelo de bonificación aditiva: comienza con la puntuación de Impacto Base, luego agrega bonificaciones por reducción de errores (+25 máx) y aumento de ingresos (+25 máx). Esto significa que el Impacto Mejorado SIEMPRE es ≥ Impacto Base: las bonificaciones solo pueden aumentar las puntuaciones, nunca disminuirlas. La escala se ajusta dinámicamente: Solo Tiempo = 0-100 (sin bonificaciones), Tiempo + Error o Tiempo + Ingresos = 0-125 (una bonificación +25), Las Tres Métricas = 0-150 (ambas bonificaciones).",
+      bonusCalculationTitle: "Detalles de Cálculo de Bonificaciones",
+      bonusCalculationContent: "Bonificación de Reducción de Errores: (Puntuación Error × 25%) limitado a +25 puntos. Bonificación de Aumento de Ingresos: (Puntuación Ingresos × 25%) limitado a +25 puntos. Estas bonificaciones se agregan además de la puntuación base de ahorro de tiempo 60/40, no se redistribuyen. Ejemplo: Una oportunidad con Puntuación ROI = 60, Puntuación Horas = 40, Puntuación Error = 80 tendría Impacto Base = (60 × 0.60) + (40 × 0.40) = 52, Impacto Mejorado = 52 + (80 × 0.25) = 52 + 20 = 72. La puntuación mejorada siempre es mayor cuando se aplican bonificaciones.",
+      matrixGuaranteeTitle: "Garantía Clave: Mejorado ≥ Base Siempre",
+      matrixGuaranteeContent: "Debido a que las bonificaciones son aditivas (no redistributivas), la Matriz de Impacto Mejorado SIEMPRE puntúa oportunidades igual o mayor que la Matriz de Impacto Base. Esta garantía matemática significa que nunca pierde la comparación base de ahorro de tiempo mientras gana visibilidad del valor empresarial adicional. Use Matriz Base para comparación de eficiencia pura, Matriz Mejorada para impacto empresarial integral incluyendo calidad y crecimiento.",
       scatterPlotInterpretation: "Interpretación del Gráfico de Dispersión",
       scatterPlotInterpretationContent: "La matriz se divide en cuatro cuadrantes basados en valores medianos: Victorias Rápidas (Alto Impacto, Bajo Esfuerzo): Priorice inmediatamente. Estos entregan resultados sólidos con complejidad de implementación manejable. Apuestas Estratégicas (Alto Impacto, Alto Esfuerzo): Proyectos estratégicos a largo plazo. El valor empresarial significativo justifica mayor inversión de implementación. Agradables de Tener (Bajo Impacto, Bajo Esfuerzo): Considere después de prioridades más altas. Fácil de implementar pero impacto empresarial limitado. Despriorizar (Bajo Impacto, Alto Esfuerzo): Evite a menos que existan razones estratégicas. ROI pobre relativo a la complejidad de implementación.",
       quadrants: "Definiciones de Cuadrantes",
@@ -1875,14 +1874,12 @@ const es: Translations = {
       errorScoreFormula: "Puntuación de Error = MIN(100, (Costo Anual de Error Evitado / Ingresos Anuales de la Empresa) × 1000). Donde Costo Anual de Error Evitado = Errores Evitados × Costo por Error. La puntuación sigue el mismo patrón relativo a la empresa que ROI y Horas.",
       revenueScore: "Puntuación de Aumento de Ingresos (Relativa a la Empresa)",
       revenueScoreFormula: "Puntuación de Ingresos = MIN(100, (Aumento de Ingresos Anual / Ingresos Anuales de la Empresa) × 1000). La puntuación sigue el mismo patrón relativo a la empresa que ROI y Horas.",
-      businessImpactBase: "Impacto Empresarial - Solo Tiempo",
-      businessImpactBaseFormula: "Impacto Empresarial = (Puntuación ROI × 0.60) + (Puntuación Horas × 0.40). Usado cuando ni las métricas de error ni de ingresos están habilitadas. Enfoque de eficiencia pura.",
-      businessImpactError: "Impacto Empresarial - Tiempo + Error",
-      businessImpactErrorFormula: "Impacto Empresarial = (Puntuación ROI × 0.45) + (Puntuación Horas × 0.30) + (Puntuación Error × 0.25). Usado cuando las métricas de reducción de errores están habilitadas. La calidad contribuye 25%.",
-      businessImpactRevenue: "Impacto Empresarial - Tiempo + Ingresos",
-      businessImpactRevenueFormula: "Impacto Empresarial = (Puntuación ROI × 0.45) + (Puntuación Horas × 0.30) + (Puntuación Ingresos × 0.25). Usado cuando las métricas de aumento de ingresos están habilitadas. El crecimiento contribuye 25%.",
-      businessImpactAll: "Impacto Empresarial - Las Tres Métricas",
-      businessImpactAllFormula: "Impacto Empresarial = (Puntuación ROI × 0.40) + (Puntuación Horas × 0.25) + (Puntuación Error × 0.20) + (Puntuación Ingresos × 0.15). Modo más completo equilibrando eficiencia (65%), calidad (20%) y crecimiento (15%).",
+      baseImpactMatrix: "Matriz de Impacto Base (Escala Fija 0-100)",
+      baseImpactMatrixFormula: "Impacto Base = (Puntuación ROI × 0.60) + (Puntuación Horas × 0.40). Esta fórmula es FIJA y nunca cambia, proporcionando comparación consistente de manzanas con manzanas en todas las oportunidades independientemente de las métricas de error/ingresos. Escala: Siempre 0-100.",
+      enhancedImpactMatrix: "Matriz de Impacto Mejorado (Escala Dinámica)",
+      enhancedImpactMatrixFormula: "Impacto Mejorado = Impacto Base + Bonificación Error + Bonificación Ingresos. Donde: Impacto Base = (Puntuación ROI × 0.60) + (Puntuación Horas × 0.40), Bonificación Error = (Puntuación Error × 0.25) cuando está habilitado (máx +25), Bonificación Ingresos = (Puntuación Ingresos × 0.25) cuando está habilitado (máx +25). Escala: 0-100 (solo tiempo), 0-125 (una bonificación), 0-150 (ambas bonificaciones). Garantía clave: Impacto Mejorado ≥ Impacto Base siempre, ya que las bonificaciones son aditivas.",
+      bonusFormulas: "Fórmulas de Bonificación Aditiva",
+      bonusFormulasExplanation: "Bonificación de Reducción de Errores = MIN(25, Puntuación Error × 0.25). Bonificación de Aumento de Ingresos = MIN(25, Puntuación Ingresos × 0.25). Estas bonificaciones se agregan además de la puntuación base de ahorro de tiempo 60/40. Ejemplo: Puntuación ROI = 50, Puntuación Horas = 60, Puntuación Error = 80, Puntuación Ingresos = 40 → Impacto Base = (50 × 0.60) + (60 × 0.40) = 54, Impacto Mejorado = 54 + (80 × 0.25) + (40 × 0.25) = 54 + 20 + 10 = 84.",
       implementationEffort: "Esfuerzo de Implementación",
       implementationEffortFormula: "Esfuerzo de Implementación = (Preparación Invertida × 0.40) + (Rampa Normalizada × 0.25) + (Recuperación Normalizada × 0.25) + (Capacitación Normalizada × 0.10). Donde: Preparación Invertida = 100 - Puntuación de Preparación. Rampa Normalizada: 0 en ≤3 meses, 100 en ≥18 meses, lineal entre. Recuperación Normalizada: 0 en ≤6 meses, 100 en ≥36 meses, lineal entre. Capacitación Normalizada: 0 en ≤2 horas, 100 en ≥40 horas, lineal entre. Escala: 0-100 (menor = más fácil).",
     },

@@ -796,35 +796,32 @@ ${doc.formulasReference.businessImpactFormula3}
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.filterViews}</h3>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.dualMatrixSystem}</h3>
+                        <p className="text-muted-foreground leading-relaxed mb-4">
+                          {t.documentation.opportunityMatrix.dualMatrixIntro}
+                        </p>
                         <div className="space-y-4">
-                          <div>
-                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.filter1Title}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.filter1Content}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs mt-2">
-                              Impact = (ROI × 0.60) + (Hours × 0.40)
+                          <div className="border border-border rounded-md p-4 bg-accent/5">
+                            <h4 className="font-semibold mb-2 text-primary">{t.documentation.opportunityMatrix.baseMatrixTitle}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed mb-2">{t.documentation.opportunityMatrix.baseMatrixContent}</p>
+                            <div className="bg-muted p-3 rounded-md font-mono text-xs">
+                              Base Impact = (ROI × 0.60) + (Hours × 0.40)
+                            </div>
+                          </div>
+                          <div className="border border-border rounded-md p-4 bg-primary/5">
+                            <h4 className="font-semibold mb-2 text-primary">{t.documentation.opportunityMatrix.enhancedMatrixTitle}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed mb-2">{t.documentation.opportunityMatrix.enhancedMatrixContent}</p>
+                            <div className="bg-muted p-3 rounded-md font-mono text-xs">
+                              Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus
                             </div>
                           </div>
                           <div>
-                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.filter2Title}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.filter2Content}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs mt-2">
-                              Impact = (ROI × 0.45) + (Hours × 0.30) + (Error × 0.25)
-                            </div>
+                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.bonusCalculationTitle}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.bonusCalculationContent}</p>
                           </div>
-                          <div>
-                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.filter3Title}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.filter3Content}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs mt-2">
-                              Impact = (ROI × 0.45) + (Hours × 0.30) + (Revenue × 0.25)
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.filter4Title}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.filter4Content}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs mt-2">
-                              Impact = (ROI × 0.40) + (Hours × 0.30) + (Error × 0.15) + (Revenue × 0.15)
-                            </div>
+                          <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5">
+                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.matrixGuaranteeTitle}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.matrixGuaranteeContent}</p>
                           </div>
                         </div>
                       </div>
@@ -997,37 +994,28 @@ ${doc.formulasReference.businessImpactFormula3}
                       
                       <Separator />
                       
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.businessImpactBase}</h3>
+                      <div className="border border-border rounded-md p-4 bg-accent/5">
+                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.baseImpactMatrix}</h3>
                         <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.businessImpactBaseFormula}
+                          {t.documentation.formulasReference.baseImpactMatrixFormula}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="border border-border rounded-md p-4 bg-primary/5">
+                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.enhancedImpactMatrix}</h3>
+                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
+                          {t.documentation.formulasReference.enhancedImpactMatrixFormula}
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.businessImpactError}</h3>
+                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.bonusFormulas}</h3>
                         <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.businessImpactErrorFormula}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.businessImpactRevenue}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.businessImpactRevenueFormula}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.businessImpactAll}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.businessImpactAllFormula}
+                          {t.documentation.formulasReference.bonusFormulasExplanation}
                         </div>
                       </div>
                       
