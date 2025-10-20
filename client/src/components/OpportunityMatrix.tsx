@@ -8,7 +8,8 @@ import {
   type MatrixFilterType,
   filterOpportunitiesByMetrics,
   calculateBusinessImpactForFilter,
-  calculateImplementationEffort
+  calculateImplementationEffort,
+  normalizeBusinessImpactToDisplay
 } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -56,7 +57,6 @@ export default function OpportunityMatrix({
 }: OpportunityMatrixProps) {
   const { t } = useLanguage();
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
 
   // Build stable color map based on ALL workflows (not just filtered)
@@ -96,8 +96,11 @@ export default function OpportunityMatrix({
         parseFloat(opp.trainingHoursPerEmployee || "0")
       );
 
-      // Calculate business impact using filter-specific recalculation
-      const businessImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
+      // Calculate business impact using filter-specific recalculation (0-160 internal range)
+      const rawBusinessImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
+      
+      // Normalize to 0-100 display range
+      const businessImpact = normalizeBusinessImpactToDisplay(rawBusinessImpact);
       
       return {
         id: opp.id,
@@ -109,9 +112,9 @@ export default function OpportunityMatrix({
       };
     });
 
-    // Use absolute business impact scores (no relative normalization)
+    // Use normalized business impact scores (0-100 display range)
     const points: DataPoint[] = rawPoints.map(point => {
-      // Use absolute business impact (already company-relative via % of revenue and % of employees)
+      // Business impact already normalized to 0-100
       const businessImpact = point.businessImpact;
       
       // Determine quadrant based on absolute scores
@@ -146,7 +149,7 @@ export default function OpportunityMatrix({
     return { dataPoints: points, workflowLegend: legend };
   }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType]);
 
-  // Handle fade transitions when filter changes
+  // Handle display data updates - immediate for data changes, fade for filter changes
   useEffect(() => {
     // No previous data - just populate immediately (initial render or recovery from empty)
     if (displayData.length === 0) {
@@ -160,17 +163,9 @@ export default function OpportunityMatrix({
       return;
     }
 
-    // Both have data - fade transition
-    // Start fade-out
-    setIsTransitioning(true);
-
-    // After fade-out completes, update data and fade in
-    const timer = setTimeout(() => {
-      setDisplayData(dataPoints);
-      setIsTransitioning(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
+    // Data changed (toggle updates, opportunity edits) - update immediately
+    // No transition needed for same-filter data updates
+    setDisplayData(dataPoints);
   }, [dataPoints]);
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -241,10 +236,6 @@ export default function OpportunityMatrix({
           <div 
             className="h-[500px]" 
             data-testid="chart-opportunity-matrix"
-            style={{
-              transition: 'opacity 300ms ease-in-out',
-              opacity: isTransitioning ? 0 : 1
-            }}
           >
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 60 }}>

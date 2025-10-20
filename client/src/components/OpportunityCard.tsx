@@ -1,5 +1,5 @@
 import type { ImplementationOpportunity } from "@shared/schema";
-import { calculateOpportunityScore, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
+import { calculateOpportunityScore, normalizeBusinessImpactToDisplay, type ToggleState, type CompanyContext } from "@shared/opportunityCalculations";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,8 +41,17 @@ export function OpportunityCard({
     revenueMetrics: opportunity.revenueMetricsEnabled ?? false,
   };
   
-  // Use additive bonuses so toggling metrics ON always increases business impact
-  const score = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext, true);
+  // Calculate raw score (0-160 internal range)
+  const rawScore = calculateOpportunityScore(opportunity, readinessScore, toggles, companyContext, true);
+  
+  // Normalize business impact for display (0-100 range)
+  const normalizedBusinessImpact = normalizeBusinessImpactToDisplay(rawScore.businessImpact);
+  
+  // Final score with normalized business impact
+  const score = {
+    ...rawScore,
+    businessImpact: normalizedBusinessImpact,
+  };
   
   // Mutation to update toggle states
   const updateToggleMutation = useMutation({

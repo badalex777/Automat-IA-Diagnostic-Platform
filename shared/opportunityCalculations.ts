@@ -13,10 +13,23 @@ export interface ToggleState {
 
 /**
  * Normalize ramp-up period to 0-100 scale
+ * 2 months or less = 0 (lowest effort)
+ * 12+ months = 100 (highest effort)
+ */
+function normalizeRampupPeriod(months: number | null | undefined): number {
+  if (!months || months <= 0) return 0;
+  if (months <= 2) return 0;
+  if (months >= 12) return 100;
+  // Linear scale between 2 and 12 months
+  return ((months - 2) / (12 - 2)) * 100;
+}
+
+/**
+ * Normalize payback period to 0-100 scale
  * 3 months or less = 0 (lowest effort)
  * 18+ months = 100 (highest effort)
  */
-function normalizeRampupPeriod(months: number | null | undefined): number {
+function normalizePaybackPeriod(months: number | null | undefined): number {
   if (!months || months <= 0) return 0;
   if (months <= 3) return 0;
   if (months >= 18) return 100;
@@ -25,40 +38,30 @@ function normalizeRampupPeriod(months: number | null | undefined): number {
 }
 
 /**
- * Normalize payback period to 0-100 scale
- * 6 months or less = 0 (lowest effort)
- * 36+ months = 100 (highest effort)
- */
-function normalizePaybackPeriod(months: number | null | undefined): number {
-  if (!months || months <= 0) return 0;
-  if (months <= 6) return 0;
-  if (months >= 36) return 100;
-  // Linear scale between 6 and 36 months
-  return ((months - 6) / (36 - 6)) * 100;
-}
-
-/**
  * Normalize training hours per employee to 0-100 scale
- * 2 hours or less = 0 (lowest effort)
- * 40+ hours = 100 (highest effort)
+ * 1 hour or less = 0 (lowest effort)
+ * 20+ hours = 100 (highest effort)
  */
 function normalizeTrainingHours(hours: number | null | undefined): number {
   if (!hours || hours <= 0) return 0;
-  if (hours <= 2) return 0;
-  if (hours >= 40) return 100;
-  // Linear scale between 2 and 40 hours
-  return ((hours - 2) / (40 - 2)) * 100;
+  if (hours <= 1) return 0;
+  if (hours >= 20) return 100;
+  // Linear scale between 1 and 20 hours
+  return ((hours - 1) / (20 - 1)) * 100;
 }
 
 /**
  * Calculate Implementation Effort Score (Y-axis)
  * Lower score = easier implementation
  * 
- * Formula:
- * - Readiness Score (inverted): 40%
- * - Ramp-up Period: 25%
+ * Formula (tightened ranges for more sensitive scoring):
+ * - Readiness Score (inverted): 30%
+ * - Ramp-up Period: 30%
  * - Payback Period: 25%
- * - Training Hours: 10%
+ * - Training Hours: 15%
+ * 
+ * Example: 12mo ramp-up + 20mo payback + 15hrs training + 35% readiness
+ * → 100 + 100 + 74 + 65 = 85 effort (Strategic Goals territory)
  */
 export function calculateImplementationEffort(
   readinessScore: number, // 0-100 from Readiness Rubric
@@ -73,10 +76,10 @@ export function calculateImplementationEffort(
   const trainingEffort = normalizeTrainingHours(trainingHoursPerEmployee);
 
   const effort = 
-    (readinessEffort * 0.40) +
-    (rampupEffort * 0.25) +
+    (readinessEffort * 0.30) +
+    (rampupEffort * 0.30) +
     (paybackEffort * 0.25) +
-    (trainingEffort * 0.10);
+    (trainingEffort * 0.15);
 
   return Math.round(effort * 100) / 100; // Round to 2 decimals
 }
@@ -98,27 +101,29 @@ export interface CompanyContext {
 
 
 /**
- * Calculate Business Impact Score (X-axis) - COMPANY-RELATIVE with ADDITIVE BONUSES
- * Higher score = better business impact
+ * BUSINESS IMPACT SCORING - ADDITIVE WITH NORMALIZED DISPLAY
  * 
- * Uses company financial context to calculate relative impact:
- * - ROI as % of annual revenue × 10 multiplier
- * - FTE savings as % of total employees × 10 multiplier
- * 
- * UNIFIED ADDITIVE MODEL (consistent across all views):
+ * Internal Calculation (0-160 range):
  * - Base Score: (ROI 60% + Hours 40%) = 0-100 points from core business value
  * - Error Bonus (if toggle ON): + 0-30 points (errorScore × 0.3, capped at 30)
  * - Revenue Bonus (if toggle ON): + 0-30 points (revenueScore × 0.3, capped at 30)
  * - Max possible: 160 points (exceptional with all metrics strong)
  * 
- * Revenue metrics use enhanced 30x multiplier for revenue uplift to ensure
- * revenue growth has meaningful impact on business score.
+ * Display Normalization (0-100 range):
+ * - All UI displays show: (rawScore / 160) × 100
+ * - This ensures familiar 0-100 scale while preserving additive bonuses
+ * - Use normalizeBusinessImpactToDisplay() for all UI rendering
  * 
- * This ensures:
- * - Core business value (ROI + FTE) never gets penalized
- * - Error/Revenue are true bonuses that add value
- * - Toggling metrics always has appropriate impact (5-30 points each)
- * - Scores are consistent across all matrix views
+ * Company Context:
+ * - ROI as % of annual revenue × 10 multiplier
+ * - FTE savings as % of total employees × 10 multiplier
+ * - Revenue uplift uses 30x multiplier for meaningful impact
+ * 
+ * Key Benefits:
+ * - Core business value (ROI + FTE) never penalized when bonuses added
+ * - Bonuses are truly additive - toggle ON always increases score
+ * - Normalized display keeps all scores in familiar 0-100 range
+ * - Consistent across all views (matrix, cards, filters)
  */
 export function calculateBusinessImpact(
   opportunity: ImplementationOpportunity,
@@ -207,7 +212,23 @@ export function calculateBusinessImpact(
 }
 
 /**
+ * Normalize Business Impact score for display (0-100 range)
+ * 
+ * Converts internal 0-160 additive score to familiar 0-100 display scale.
+ * Use this function for ALL UI rendering of business impact scores.
+ * 
+ * @param rawScore - Raw business impact score (0-160 range)
+ * @returns Normalized score (0-100 range)
+ */
+export function normalizeBusinessImpactToDisplay(rawScore: number): number {
+  const MAX_INTERNAL_SCORE = 160; // Base 100 + Error 30 + Revenue 30
+  const normalized = (rawScore / MAX_INTERNAL_SCORE) * 100;
+  return Math.round(normalized * 100) / 100; // Round to 2 decimals
+}
+
+/**
  * Determine which quadrant the opportunity falls into
+ * NOTE: Expects normalized 0-100 scores for both axes
  */
 export function getQuadrant(implementationEffort: number, businessImpact: number): OpportunityScore["quadrant"] {
   // Midpoints at 50
