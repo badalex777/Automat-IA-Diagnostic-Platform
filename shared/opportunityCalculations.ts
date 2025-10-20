@@ -160,18 +160,23 @@ export function calculateBaseImpact(
 }
 
 /**
- * ENHANCED BUSINESS IMPACT SCORING - REWEIGHTED BY FILTER
+ * ENHANCED BUSINESS IMPACT SCORING - ADDITIVE BONUS MODEL
  * 
- * Uses different weights based on which metrics are active:
- * - Time Only (60/40): ROI 60%, Hours 40% [max 100]
- * - Time + Error (45/30/25): ROI 45%, Hours 30%, Error 25% [max 125]
- * - Time + Revenue (45/30/25): ROI 45%, Hours 30%, Revenue 25% [max 125]
- * - All Three (40/25/20/15): ROI 40%, Hours 25%, Error 20%, Revenue 15% [max 150]
+ * Starts with base impact (ROI 60% + Hours 40%) and adds bonuses on top.
+ * This ensures Enhanced Impact is ALWAYS >= Base Impact.
  * 
- * Filter-specific max scores enable dynamic axis scaling:
- * - Matrix X-axis domain adjusts (0-100, 0-125, or 0-150)
- * - Opportunities with bonuses appear higher on axis
- * - Score magnitude reflects true weighted contribution
+ * Formula:
+ * - Base: ROI 60% + Hours 40% (max 100)
+ * - + Error Bonus: 25% when error metrics enabled
+ * - + Revenue Bonus: 25% when revenue metrics enabled
+ * 
+ * Max Scores:
+ * - Time Only: 100 (base only)
+ * - Time + Error: 125 (base + error bonus)
+ * - Time + Revenue: 125 (base + revenue bonus)
+ * - All Three: 150 (base + both bonuses)
+ * 
+ * Dynamic axis scaling adjusts matrix X-axis domain (0-100, 0-125, or 0-150)
  */
 export function calculateEnhancedImpact(
   opportunity: ImplementationOpportunity,
@@ -203,18 +208,22 @@ export function calculateEnhancedImpact(
     hoursScore = Math.min((fteSavings / 100) * 1000, 100);
   }
 
-  // Calculate error score if available (0-100)
-  let errorScore = 0;
+  // Start with base impact (same as Base Impact Matrix)
+  let totalImpact = (roiScore * 0.60) + (hoursScore * 0.40);
+
+  // Add error bonus if enabled (0-25 points)
   if (toggles.errorMetrics) {
     const errorPct = parseFloat(opportunity.errorReductionPct || "0");
     const errorsAvoided = opportunity.errorsAvoidedAnnually || 0;
     const errorPctScore = errorPct; // Already 0-100
     const errorsAvoidedScore = normalizeToScale(errorsAvoided, 1000);
-    errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
+    const errorScore = (errorPctScore * 0.5) + (errorsAvoidedScore * 0.5);
+    
+    // Add 25% of error score as bonus
+    totalImpact += (errorScore * 0.25);
   }
 
-  // Calculate revenue score if available (0-100)
-  let revenueScore = 0;
+  // Add revenue bonus if enabled (0-25 points)
   if (toggles.revenueMetrics) {
     const hoursReallocated = parseFloat(opportunity.hoursReallocatedToRevenue || "0");
     const revenueUplift = parseFloat(opportunity.revenueUpliftAnnual || "0");
@@ -226,33 +235,21 @@ export function calculateEnhancedImpact(
     if (companyEmployees > 0) {
       hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 1000, 100);
     } else {
-      hoursReallocatedScore = normalizeToScale(hoursReallocatedFTE, 5);
+      // Fallback: assume 100 employees with same 10x multiplier logic
+      hoursReallocatedScore = Math.min((hoursReallocatedFTE / 100) * 1000, 100);
     }
     
     if (companyRevenue > 0) {
       revenueUpliftScore = Math.min((revenueUplift / companyRevenue) * 3000, 100);
     } else {
-      revenueUpliftScore = normalizeToScale(revenueUplift, 2000000);
+      // Fallback: assume $1M revenue, 3x multiplier for revenue sensitivity
+      revenueUpliftScore = Math.min((revenueUplift / 1000000) * 3000, 100);
     }
     
-    revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
-  }
-
-  // Apply filter-specific weights
-  let totalImpact = 0;
-  
-  if (toggles.errorMetrics && toggles.revenueMetrics) {
-    // All Three: 40/25/20/15 (max 150)
-    totalImpact = (roiScore * 0.40) + (hoursScore * 0.25) + (errorScore * 0.20) + (revenueScore * 0.15);
-  } else if (toggles.errorMetrics) {
-    // Time + Error: 45/30/25 (max 125)
-    totalImpact = (roiScore * 0.45) + (hoursScore * 0.30) + (errorScore * 0.25);
-  } else if (toggles.revenueMetrics) {
-    // Time + Revenue: 45/30/25 (max 125)
-    totalImpact = (roiScore * 0.45) + (hoursScore * 0.30) + (revenueScore * 0.25);
-  } else {
-    // Time Only: 60/40 (max 100)
-    totalImpact = (roiScore * 0.60) + (hoursScore * 0.40);
+    const revenueScore = (hoursReallocatedScore * 0.4) + (revenueUpliftScore * 0.6);
+    
+    // Add 25% of revenue score as bonus
+    totalImpact += (revenueScore * 0.25);
   }
 
   return Math.round(totalImpact * 100) / 100;
@@ -261,12 +258,18 @@ export function calculateEnhancedImpact(
 /**
  * Get maximum possible score for a given filter type
  * Used for dynamic axis scaling in Enhanced Impact Matrix
+ * 
+ * Additive Bonus Model Max Scores:
+ * - Time Only: 100 (base: ROI 60% + Hours 40%)
+ * - Time + Error: 125 (base 100 + error bonus 25%)
+ * - Time + Revenue: 125 (base 100 + revenue bonus 25%)
+ * - All Three: 150 (base 100 + error 25% + revenue 25%)
  */
 export function getFilterMaxScore(toggles: ToggleState): number {
   if (toggles.errorMetrics && toggles.revenueMetrics) {
-    return 150; // All three metrics
+    return 150; // Base + both bonuses
   } else if (toggles.errorMetrics || toggles.revenueMetrics) {
-    return 125; // Two metrics
+    return 125; // Base + single bonus
   } else {
     return 100; // Base only
   }
@@ -444,35 +447,35 @@ export function calculateScoringGuide(
     maxScore: number;
   }> = [
     {
-      filterName: "Time Savings Only",
+      filterName: "Time Savings Only (Base Impact)",
       filterType: "time-only",
       roiWeight: 0.60,
       hoursWeight: 0.40,
       maxScore: 100,
     },
     {
-      filterName: "Time + Error Reduction",
+      filterName: "Time + Error Reduction (Additive Bonus)",
       filterType: "time-error",
-      roiWeight: 0.45,
-      hoursWeight: 0.30,
+      roiWeight: 0.60,
+      hoursWeight: 0.40,
       errorWeight: 0.25,
       maxScore: 125,
     },
     {
-      filterName: "Time + Revenue Uplift",
+      filterName: "Time + Revenue Uplift (Additive Bonus)",
       filterType: "time-revenue",
-      roiWeight: 0.45,
-      hoursWeight: 0.30,
+      roiWeight: 0.60,
+      hoursWeight: 0.40,
       revenueWeight: 0.25,
       maxScore: 125,
     },
     {
-      filterName: "All 3 Metrics",
+      filterName: "All 3 Metrics (Additive Bonuses)",
       filterType: "all-three",
-      roiWeight: 0.40,
-      hoursWeight: 0.25,
-      errorWeight: 0.20,
-      revenueWeight: 0.15,
+      roiWeight: 0.60,
+      hoursWeight: 0.40,
+      errorWeight: 0.25,
+      revenueWeight: 0.25,
       maxScore: 150,
     },
   ];
@@ -530,7 +533,7 @@ export function calculateScoringGuide(
 
 /**
  * Calculate Business Impact for a specific filter view in Enhanced Matrix
- * Respects per-opportunity toggle states and applies filter-specific reweighting
+ * Respects per-opportunity toggle states and applies additive bonuses
  */
 export function calculateBusinessImpactForFilter(
   opportunity: ImplementationOpportunity,
@@ -543,6 +546,6 @@ export function calculateBusinessImpactForFilter(
     revenueMetrics: opportunity.revenueMetricsEnabled || false
   };
 
-  // Use enhanced impact calculation with reweighting
+  // Use enhanced impact calculation with additive bonuses
   return calculateEnhancedImpact(opportunity, toggles, companyContext);
 }

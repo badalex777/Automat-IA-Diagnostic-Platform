@@ -25,11 +25,11 @@ function formatCurrency(value: number): string {
 function getFilterExplanation(filterType: string): string | null {
   switch (filterType) {
     case "time-error":
-      return "When error reduction metrics are enabled, the scoring weights are redistributed to account for quality improvements. The business impact is calculated as: (ROI Score × 45%) + (Hours Score × 30%) + (Error Score × 25%). This means error reduction contributes 25% to the total score, while time savings (ROI + Hours) still dominates at 75%.";
+      return "Additive Bonus Model: Starts with the base impact (ROI × 60% + Hours × 40% = 100 max) and adds an error reduction bonus worth up to 25 points. Total formula: Base Impact (0-100) + Error Bonus (0-25) = Enhanced Impact (0-125). This ensures opportunities with error metrics always score higher than base-only, never lower.";
     case "time-revenue":
-      return "When revenue uplift metrics are enabled, the scoring weights are redistributed to account for growth opportunities. The business impact is calculated as: (ROI Score × 45%) + (Hours Score × 30%) + (Revenue Score × 25%). This means revenue uplift contributes 25% to the total score, while time savings (ROI + Hours) still dominates at 75%.";
+      return "Additive Bonus Model: Starts with the base impact (ROI × 60% + Hours × 40% = 100 max) and adds a revenue uplift bonus worth up to 25 points. Total formula: Base Impact (0-100) + Revenue Bonus (0-25) = Enhanced Impact (0-125). This ensures opportunities with revenue metrics always score higher than base-only, never lower.";
     case "all-three":
-      return "When both error reduction and revenue uplift metrics are enabled, all four components contribute to the score. The business impact is calculated as: (ROI Score × 40%) + (Hours Score × 25%) + (Error Score × 20%) + (Revenue Score × 15%). Time savings remains the largest factor at 65% combined, with quality and growth adding 35%.";
+      return "Additive Bonus Model: Starts with the base impact (ROI × 60% + Hours × 40% = 100 max) and adds both error reduction (up to 25 points) and revenue uplift (up to 25 points) bonuses. Total formula: Base Impact (0-100) + Error Bonus (0-25) + Revenue Bonus (0-25) = Enhanced Impact (0-150). This rewards opportunities that deliver across all three value dimensions.";
     default:
       return null;
   }
@@ -119,6 +119,23 @@ export default function ScoringGuideDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <h3 className="font-semibold mb-3 text-primary">Dual-Matrix Scoring System</h3>
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium text-foreground">Base Impact Matrix:</span>
+                <span className="ml-2 text-muted-foreground">Fair apples-to-apples comparison using only ROI (60%) + Time Savings (40%). Fixed 0-100 scale for consistent opportunity comparison.</span>
+              </div>
+              <div>
+                <span className="font-medium text-foreground">Enhanced Impact Matrix:</span>
+                <span className="ml-2 text-muted-foreground">Starts with base impact, then adds bonuses for error reduction (+25%) and revenue uplift (+25%). Dynamic scale adjusts (0-100, 0-125, or 0-150) based on enabled metrics.</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 italic">
+                The additive bonus model ensures Enhanced Impact is always greater than or equal to Base Impact—bonuses can only increase scores, never decrease them.
+              </p>
+            </div>
+          </div>
+
           <div className="p-4 bg-muted/30 rounded-lg border">
             <h3 className="font-semibold mb-2">{t.scoringGuide.companyScoring}</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
