@@ -1111,7 +1111,7 @@ const en: Translations = {
       step5Title: "Step 5: Readiness Rubric Analysis",
       step5Content: "View the combined readiness score calculated as 60% TFA + 40% PIF. The rubric breaks down all 7 components with their individual weights, provides feasibility band classification, and generates a comprehensive SWOT analysis identifying strengths, weaknesses, opportunities, and threats.",
       step6Title: "Step 6: Opportunity Identification & Prioritization",
-      step6Content: "Create implementation opportunities specifying ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. View the Opportunity Matrix scatter plot showing Business Impact (X-axis) vs Implementation Effort (Y-axis). Use 4 filter views to analyze opportunities by metric category. Download a comprehensive company snapshot with all assessment data and recommendations.",
+      step6Content: "Create implementation opportunities specifying ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. View the Opportunity Matrix scatter plot showing Business Impact (X-axis) vs Implementation Effort (Y-axis). Compare opportunities using both Base Impact Matrix (pure time savings) and Enhanced Impact Matrix (with quality and growth bonuses). Download a comprehensive company snapshot with all assessment data and recommendations.",
     },
     
     tfaMethodology: {
