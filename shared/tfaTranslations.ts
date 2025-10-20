@@ -45,6 +45,8 @@ export interface TFATranslations {
     submitAssessment: string;
     nameRequired: string;
     nameRequiredDescription: string;
+    requiredQuestions: string;
+    requiredQuestionsDescription: string;
     incompleteAssessment: string;
     incompleteAssessmentDescription: string;
     gapDetailsRequired: string;
@@ -340,6 +342,8 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
       submitAssessment: "Submit Assessment",
       nameRequired: "Name required",
       nameRequiredDescription: "Please enter your name before submitting.",
+      requiredQuestions: "Required questions",
+      requiredQuestionsDescription: "Please answer all required questions in this section before continuing. {count} question(s) remaining.",
       incompleteAssessment: "Incomplete assessment",
       incompleteAssessmentDescription: "Please answer all questions before submitting.",
       gapDetailsRequired: "Gap details required",
@@ -633,6 +637,8 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
       submitAssessment: "Enviar Evaluación",
       nameRequired: "Nombre requerido",
       nameRequiredDescription: "Por favor ingrese su nombre antes de enviar.",
+      requiredQuestions: "Preguntas requeridas",
+      requiredQuestionsDescription: "Por favor responda todas las preguntas requeridas en esta sección antes de continuar. {count} pregunta(s) restante(s).",
       incompleteAssessment: "Evaluación incompleta",
       incompleteAssessmentDescription: "Por favor responda todas las preguntas antes de enviar.",
       gapDetailsRequired: "Detalles de brecha requeridos",

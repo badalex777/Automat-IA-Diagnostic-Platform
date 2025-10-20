@@ -144,6 +144,57 @@ export default function TFAForm() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleNext = () => {
+    // Validate respondent name if on first section
+    if (currentSection === 0 && !respondentName.trim()) {
+      toast({
+        title: t.nameRequired,
+        description: t.nameRequiredDescription,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate required questions in current section before proceeding
+    if (currentSection < tfaSections.length) {
+      const currentTFASection = tfaSections[currentSection];
+      const sectionQuestions = currentTFASection.questions;
+      const missingSectionAnswers = sectionQuestions.filter(q => !answers[q.id.toString()]);
+      
+      if (missingSectionAnswers.length > 0) {
+        toast({
+          title: t.requiredQuestions,
+          description: t.requiredQuestionsDescription.replace('{count}', missingSectionAnswers.length.toString()),
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Validate gap details if on gap details section
+    if (isGapDetailsSection) {
+      const gapQuestionIds = Object.entries(answers)
+        .filter(([, value]) => value === "0")
+        .map(([id]) => id);
+      
+      const missingGapDetails = gapQuestionIds.some(id => 
+        !gapDetails[id] || !gapDetails[id].why.trim() || !gapDetails[id].whoMightKnow.trim()
+      );
+      
+      if (missingGapDetails) {
+        toast({
+          title: t.gapDetailsRequired,
+          description: t.gapDetailsRequiredDescription,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    setCurrentSection(prev => Math.min(prev + 1, totalSections - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -397,7 +448,7 @@ export default function TFAForm() {
           <div className="flex gap-3">
             {!isFinalCommentsSection ? (
               <Button 
-                onClick={() => handleSectionChange(currentSection + 1)}
+                onClick={handleNext}
                 data-testid="button-next-section"
               >
                 {t.next}
