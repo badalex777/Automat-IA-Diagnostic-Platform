@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -12,14 +12,59 @@ import { Button } from "@/components/ui/button";
 export default function Documentation() {
   const { t, language } = useLanguage();
   const [activeSection, setActiveSection] = useState("platform-overview");
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const isScrollingToSection = useRef(false);
 
   const scrollToSection = (sectionId: string) => {
+    isScrollingToSection.current = true;
     setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => {
+        isScrollingToSection.current = false;
+      }, 1000);
     }
   };
+
+  useEffect(() => {
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      if (isScrollingToSection.current) return;
+      
+      const visibleSections = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => {
+          const aTop = a.boundingClientRect.top;
+          const bTop = b.boundingClientRect.top;
+          return Math.abs(aTop) - Math.abs(bTop);
+        });
+
+      if (visibleSections.length > 0) {
+        const topSection = visibleSections[0];
+        const sectionId = topSection.target.getAttribute('id');
+        if (sectionId) {
+          setActiveSection(sectionId);
+        }
+      }
+    };
+
+    observerRef.current = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '-100px 0px -60% 0px',
+      threshold: [0, 0.25, 0.5, 0.75, 1]
+    });
+
+    const sections = document.querySelectorAll('section[id]');
+    sections.forEach(section => {
+      observerRef.current?.observe(section);
+    });
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
 
   const handleDownload = () => {
     const doc = t.documentation;
