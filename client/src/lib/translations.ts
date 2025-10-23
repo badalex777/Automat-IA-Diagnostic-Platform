@@ -210,8 +210,8 @@ export interface Translations {
     quadrants: {
       quickWins: string;
       strategicBets: string;
-      lowHanging: string;
-      maybeNever: string;
+      niceToHave: string;
+      deprioritize: string;
     };
   };
 
@@ -891,8 +891,8 @@ const en: Translations = {
     quadrants: {
       quickWins: "Quick Wins",
       strategicBets: "Strategic Bets",
-      lowHanging: "Nice-to-Have",
-      maybeNever: "Deprioritize",
+      niceToHave: "Nice-to-Have",
+      deprioritize: "Deprioritize",
     },
   },
   forms: {
@@ -1108,7 +1108,7 @@ const en: Translations = {
       step5Title: "Step 5: Readiness Rubric Analysis",
       step5Content: "View the combined readiness score calculated as 60% TFA + 40% PIF. The rubric breaks down all 7 components with their individual weights, provides feasibility band classification, and generates a comprehensive SWOT analysis identifying strengths, weaknesses, opportunities, and threats.",
       step6Title: "Step 6: Opportunity Identification & Prioritization",
-      step6Content: "Create implementation opportunities specifying ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. View the Opportunity Matrix scatter plot showing Business Impact (X-axis) vs Implementation Effort (Y-axis). Compare opportunities using both Base Impact Matrix (pure time savings) and Enhanced Impact Matrix (with quality and growth bonuses). Download a comprehensive company snapshot with all assessment data and recommendations.",
+      step6Content: "Create implementation opportunities specifying ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. View the Opportunity Matrix scatter plot showing Business Impact (X-axis) vs Implementation Effort (Y-axis). Compare opportunities using both Base Impact Matrix (pure time savings) and Enhanced Impact Matrix (with quality and growth bonuses).",
     },
     
     tfaMethodology: {
@@ -1527,8 +1527,8 @@ const es: Translations = {
     quadrants: {
       quickWins: "Victorias Rápidas",
       strategicBets: "Apuestas Estratégicas",
-      lowHanging: "Agradables de Tener",
-      maybeNever: "Despriorizar",
+      niceToHave: "Agradables de Tener",
+      deprioritize: "Despriorizar",
     },
   },
   forms: {
@@ -1744,7 +1744,7 @@ const es: Translations = {
       step5Title: "Paso 5: Análisis de Rúbrica de Preparación",
       step5Content: "Vea la puntuación de preparación combinada calculada como 60% TFA + 40% PIF. La rúbrica desglosa los 7 componentes con sus pesos individuales, proporciona clasificación de banda de viabilidad y genera un análisis FODA integral que identifica fortalezas, debilidades, oportunidades y amenazas.",
       step6Title: "Paso 6: Identificación y Priorización de Oportunidades",
-      step6Content: "Cree oportunidades de implementación especificando datos de ROI, ahorro de tiempo, métricas opcionales de reducción de errores y métricas opcionales de aumento de ingresos. Vea el gráfico de dispersión de la Matriz de Oportunidades mostrando Impacto Empresarial (eje X) vs Esfuerzo de Implementación (eje Y). Use 4 vistas de filtro para analizar oportunidades por categoría de métrica. Descargue una instantánea integral de la empresa con todos los datos de evaluación y recomendaciones.",
+      step6Content: "Cree oportunidades de implementación especificando datos de ROI, ahorro de tiempo, métricas opcionales de reducción de errores y métricas opcionales de aumento de ingresos. Vea el gráfico de dispersión de la Matriz de Oportunidades mostrando Impacto Empresarial (eje X) vs Esfuerzo de Implementación (eje Y). Compare oportunidades usando tanto la Matriz de Impacto Base (ahorro de tiempo puro) como la Matriz de Impacto Mejorada (con bonificaciones de calidad y crecimiento).",
     },
     
     tfaMethodology: {

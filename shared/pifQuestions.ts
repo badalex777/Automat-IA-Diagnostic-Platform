@@ -499,7 +499,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 37,
-        question: "How well-suited is this work for AI quality improvement?",
+        question: "What type of work best describes this process?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
@@ -507,10 +507,10 @@ export const PIF_SECTIONS: PIFSection[] = [
           showWhen: "yes"
         },
         options: [
-          { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
-          { value: "pattern", label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
-          { value: "contextual", label: "Contextual judgment", description: "Requires understanding context and nuance" },
-          { value: "subjective", label: "Highly subjective", description: "Depends heavily on personal opinion or taste" }
+          { value: "rule_based", label: "Rule-based decisions", description: "Clear if/then rules" },
+          { value: "pattern", label: "Pattern recognition", description: "Identifying similarities or trends" },
+          { value: "contextual", label: "Contextual judgment", description: "Requires understanding unique situations" },
+          { value: "subjective", label: "Highly subjective", description: "Based on personal opinion or preferences" }
         ]
       },
       {

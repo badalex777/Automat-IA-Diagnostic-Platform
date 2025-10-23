@@ -752,12 +752,12 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       37: {
-        question: "¿Qué tan adecuado es este trabajo para la mejora de calidad con IA?",
+        question: "¿Qué tipo de trabajo describe mejor este proceso?",
         options: {
-          "rule_based": { label: "Decisiones basadas en reglas", description: "Reglas claras de si/entonces que pueden programarse" },
-          "pattern": { label: "Reconocimiento de patrones", description: "La IA puede aprender de ejemplos y detectar patrones" },
-          "contextual": { label: "Juicio contextual", description: "Requiere comprender contexto y matices" },
-          "subjective": { label: "Altamente subjetivo", description: "Depende en gran medida de opinión personal o gusto" }
+          "rule_based": { label: "Decisiones basadas en reglas", description: "Reglas claras de si/entonces" },
+          "pattern": { label: "Reconocimiento de patrones", description: "Identificar similitudes o tendencias" },
+          "contextual": { label: "Juicio contextual", description: "Requiere comprender situaciones únicas" },
+          "subjective": { label: "Altamente subjetivo", description: "Basado en opinión personal o preferencias" }
         }
       },
       38: {

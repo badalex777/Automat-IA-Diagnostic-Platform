@@ -21,7 +21,6 @@ interface CreateCompanyDialogProps {
     contact?: string;
     annualRevenue?: number;
     totalEmployees?: number;
-    annualLaborCosts?: number;
   }) => void;
 }
 
@@ -34,7 +33,6 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
     contact: '',
     annualRevenue: '',
     totalEmployees: '',
-    annualLaborCosts: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,7 +44,6 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       contact: formData.contact || undefined,
       annualRevenue: formData.annualRevenue ? parseFloat(formData.annualRevenue) : undefined,
       totalEmployees: formData.totalEmployees ? parseInt(formData.totalEmployees) : undefined,
-      annualLaborCosts: formData.annualLaborCosts ? parseFloat(formData.annualLaborCosts) : undefined,
     };
     
     onSubmit?.(submitData);
@@ -57,7 +54,6 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       contact: '',
       annualRevenue: '',
       totalEmployees: '',
-      annualLaborCosts: '',
     });
   };
 
@@ -145,19 +141,6 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
                   data-testid="input-total-employees"
                 />
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="annualLaborCosts">{t.forms.annualLaborCosts} ($)</Label>
-              <Input
-                id="annualLaborCosts"
-                type="number"
-                step="0.01"
-                placeholder={t.forms.annualLaborCostsPlaceholder}
-                value={formData.annualLaborCosts}
-                onChange={(e) => setFormData({ ...formData, annualLaborCosts: e.target.value })}
-                data-testid="input-annual-labor-costs"
-              />
             </div>
           </div>
           

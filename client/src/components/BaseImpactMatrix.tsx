@@ -228,7 +228,7 @@ export default function BaseImpactMatrix({
                 />
 
                 <text
-                  x="12%"
+                  x="25%"
                   y="25%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
@@ -236,11 +236,11 @@ export default function BaseImpactMatrix({
                   fontSize={14}
                   fontWeight={600}
                 >
-                  Maybe Never
+                  Deprioritize
                 </text>
 
                 <text
-                  x="12%"
+                  x="25%"
                   y="75%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
@@ -252,7 +252,7 @@ export default function BaseImpactMatrix({
                 </text>
 
                 <text
-                  x="88%"
+                  x="75%"
                   y="75%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
@@ -260,11 +260,11 @@ export default function BaseImpactMatrix({
                   fontSize={14}
                   fontWeight={600}
                 >
-                  Nice-To-Haves
+                  Nice-to-Have
                 </text>
 
                 <text
-                  x="88%"
+                  x="75%"
                   y="25%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
