@@ -762,7 +762,6 @@ const en: Translations = {
     editCompany: "Edit Company",
     deleteCompany: "Delete Company",
     confirmDelete: "Are you sure you want to delete this company? This action cannot be undone.",
-    downloadSnapshot: "Download Company Snapshot",
   },
   workflow: {
     name: "Workflow Name",
@@ -823,7 +822,7 @@ const en: Translations = {
     respondentInfo: "Respondent Information",
     yourName: "Your Name",
     yourRole: "Your Role",
-    yourResponsibilities: "Your Responsibilities in this Workflow",
+    yourResponsibilities: "Your Role in this Workflow: What specific tasks do you perform?",
     sections: {
       processClarity: "Process Clarity",
       changeMagnitude: "Change Magnitude",
@@ -892,8 +891,8 @@ const en: Translations = {
     quadrants: {
       quickWins: "Quick Wins",
       strategicBets: "Strategic Bets",
-      lowHanging: "Low-Hanging Fruit",
-      maybeNever: "Maybe Never",
+      lowHanging: "Nice-to-Have",
+      maybeNever: "Deprioritize",
     },
   },
   forms: {
@@ -905,8 +904,6 @@ const en: Translations = {
     contactPlaceholder: "Email, phone, or contact name",
     annualRevenuePlaceholder: "e.g., 5000000",
     totalEmployeesPlaceholder: "e.g., 250",
-    annualLaborCosts: "Annual Labor Costs",
-    annualLaborCostsPlaceholder: "e.g., 10000000",
     workflowName: "Workflow Name",
     workflowNamePlaceholder: "e.g., Invoice Processing Automation",
     workflowDescription: "Description",
@@ -1401,7 +1398,6 @@ const es: Translations = {
     editCompany: "Editar Empresa",
     deleteCompany: "Eliminar Empresa",
     confirmDelete: "¿Está seguro de que desea eliminar esta empresa? Esta acción no se puede deshacer.",
-    downloadSnapshot: "Descargar Instantánea de la Empresa",
   },
   workflow: {
     name: "Nombre del Flujo de Trabajo",
@@ -1462,7 +1458,7 @@ const es: Translations = {
     respondentInfo: "Información del Encuestado",
     yourName: "Su Nombre",
     yourRole: "Su Rol",
-    yourResponsibilities: "Sus Responsabilidades en este Flujo de Trabajo",
+    yourResponsibilities: "Su Rol en este Flujo de Trabajo: ¿Qué tareas específicas realiza?",
     sections: {
       processClarity: "Claridad del Proceso",
       changeMagnitude: "Magnitud del Cambio",
@@ -1531,8 +1527,8 @@ const es: Translations = {
     quadrants: {
       quickWins: "Victorias Rápidas",
       strategicBets: "Apuestas Estratégicas",
-      lowHanging: "Fruta al Alcance",
-      maybeNever: "Tal Vez Nunca",
+      lowHanging: "Agradables de Tener",
+      maybeNever: "Despriorizar",
     },
   },
   forms: {
@@ -1544,8 +1540,6 @@ const es: Translations = {
     contactPlaceholder: "Correo, teléfono o nombre de contacto",
     annualRevenuePlaceholder: "ej., 5000000",
     totalEmployeesPlaceholder: "ej., 250",
-    annualLaborCosts: "Costos Laborales Anuales",
-    annualLaborCostsPlaceholder: "ej., 10000000",
     workflowName: "Nombre del Flujo de Trabajo",
     workflowNamePlaceholder: "ej., Automatización de Procesamiento de Facturas",
     workflowDescription: "Descripción",

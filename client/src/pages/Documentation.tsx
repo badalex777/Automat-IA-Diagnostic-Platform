@@ -841,19 +841,19 @@ ${doc.formulasReference.businessImpactFormula3}
                         <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.quadrants}</h3>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 border border-border rounded-md bg-green-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-green-600 dark:text-green-400">Quick Wins</h4>
+                            <h4 className="font-semibold text-sm mb-1 text-green-600 dark:text-green-400 text-center">Quick Wins</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant1}</p>
                           </div>
                           <div className="p-3 border border-border rounded-md bg-blue-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-blue-600 dark:text-blue-400">Strategic Bets</h4>
+                            <h4 className="font-semibold text-sm mb-1 text-blue-600 dark:text-blue-400 text-center">Strategic Bets</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant2}</p>
                           </div>
                           <div className="p-3 border border-border rounded-md bg-yellow-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-yellow-600 dark:text-yellow-400">Nice-to-Haves</h4>
+                            <h4 className="font-semibold text-sm mb-1 text-yellow-600 dark:text-yellow-400 text-center">Nice-to-Have</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant3}</p>
                           </div>
                           <div className="p-3 border border-border rounded-md bg-red-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-red-600 dark:text-red-400">Deprioritize</h4>
+                            <h4 className="font-semibold text-sm mb-1 text-red-600 dark:text-red-400 text-center">Deprioritize</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant4}</p>
                           </div>
                         </div>
