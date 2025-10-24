@@ -228,7 +228,7 @@ export default function BaseImpactMatrix({
                 />
 
                 <text
-                  x="25%"
+                  x="33%"
                   y="25%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
@@ -240,8 +240,8 @@ export default function BaseImpactMatrix({
                 </text>
 
                 <text
-                  x="25%"
-                  y="75%"
+                  x="33%"
+                  y="67%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
                   opacity={0.4}
@@ -253,7 +253,7 @@ export default function BaseImpactMatrix({
 
                 <text
                   x="75%"
-                  y="75%"
+                  y="67%"
                   textAnchor="middle"
                   fill="hsl(var(--muted-foreground))"
                   opacity={0.4}
