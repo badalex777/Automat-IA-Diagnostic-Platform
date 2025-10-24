@@ -646,7 +646,7 @@ export default function WorkflowDetail() {
                 pifData.aggregated
               );
 
-              return <ReadinessRubric rubric={rubric} />;
+              return <ReadinessRubric rubric={rubric} workflowId={workflowId} />;
             })()}
           </TabsContent>
 

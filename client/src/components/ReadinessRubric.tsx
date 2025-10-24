@@ -5,9 +5,14 @@ import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, Al
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useQuery } from "@tanstack/react-query";
+import type { TFAAssessment, PIFResponse } from "@shared/schema";
+import { TFA_QUESTIONS, TFA_SECTIONS } from "@shared/tfaQuestions";
+import type { AggregatedPIFScores } from "@shared/pifCalculations";
 
 interface ReadinessRubricProps {
   rubric: ReadinessRubricScore;
+  workflowId: string;
 }
 
 const componentLabels: Record<keyof ReadinessRubricScore['components'], string> = {
@@ -58,11 +63,71 @@ function getFeasibilityIcon(band: ReadinessRubricScore['feasibilityBand']) {
   }
 }
 
-export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
+// Component-specific recommendations based on actual score thresholds
+const TFA_RECOMMENDATIONS: Record<string, string[]> = {
+  "System Environment": [
+    "Conduct comprehensive API availability audit across all integrated systems",
+    "Document current tech stack and create cloud migration roadmap with timeline",
+    "Establish vendor partnerships for API access and integration support",
+    "Implement API gateway for centralized access management and monitoring"
+  ],
+  "Data Quality": [
+    "Implement automated data validation rules at point of entry",
+    "Create data standardization procedures and governance framework",
+    "Establish master data management (MDM) for critical business entities",
+    "Deploy data quality monitoring dashboards with alerts"
+  ],
+  "Integration Feasibility": [
+    "Design integration architecture with robust error handling and fallback mechanisms",
+    "Create comprehensive integration testing environment",
+    "Implement monitoring for integration health, latency, and failure patterns",
+    "Document integration dependencies and establish rollback procedures"
+  ],
+  "Security/Compliance": [
+    "Conduct formal security risk assessment with compliance team",
+    "Implement role-based access controls (RBAC) before AI deployment",
+    "Establish data classification and handling procedures aligned with regulations",
+    "Create audit trails for all AI system interactions and obtain necessary approvals"
+  ]
+};
+
+const PIF_RECOMMENDATIONS: Record<string, string[]> = {
+  "Process Clarity": [
+    "Conduct process mapping workshops with actual workflow users",
+    "Create detailed standard operating procedures (SOPs) with visual flowcharts",
+    "Document process variations across teams and identify standardization opportunities",
+    "Establish process ownership and governance for ongoing documentation"
+  ],
+  "Change Magnitude": [
+    "Design phased rollout plan with extensive user training and support",
+    "Identify and empower change champions within the user community",
+    "Create comprehensive training materials with hands-on practice scenarios",
+    "Establish feedback loops and support channels during implementation"
+  ],
+  "Workflow Brittleness": [
+    "Build flexibility into AI solution to gracefully handle process variations",
+    "Implement manual override capabilities with clear escalation paths",
+    "Create exception handling procedures for edge cases and human escalation",
+    "Start with stable process areas and gradually expand automation scope"
+  ]
+};
+
+export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricProps) {
   const { t } = useLanguage();
   
+  // Fetch TFA assessment with question responses (with guards)
+  const { data: tfaAssessment } = useQuery<TFAAssessment>({
+    queryKey: [`/api/workflows/${workflowId}/tfa`],
+    enabled: !!workflowId,
+  });
+
+  // Fetch PIF responses with qualitative data (with guards)
+  const { data: pifData } = useQuery<{ responses: PIFResponse[]; aggregated: AggregatedPIFScores }>({
+    queryKey: [`/api/workflows/${workflowId}/pif`],
+    enabled: !!workflowId,
+  });
+  
   // Convert weighted contribution scores back to 0-100 scale for display
-  // Components are stored as weighted contributions to total score, but we display them as percentages
   const componentWeightValues: Record<keyof ReadinessRubricScore['components'], number> = {
     systemEnvironment: 0.15,
     dataQuality: 0.18,
@@ -103,112 +168,222 @@ export default function ReadinessRubric({ rubric }: ReadinessRubricProps) {
     color: item.color,
   }));
 
-  // Generate detailed SWOT analysis
-  const generateSWOTAnalysis = () => {
-    const componentScoresArray = Object.entries(rubric.componentScores).map(([key, value]) => ({
-      key: key as keyof ReadinessRubricScore['componentScores'],
-      score: value,
-      label: componentLabels[key as keyof ReadinessRubricScore['componentScores']],
-      weight: componentWeightValues[key as keyof ReadinessRubricScore['componentScores']]
-    }));
-    componentScoresArray.sort((a, b) => b.score - a.score);
-
+  // Generate intelligent SWOT analysis using actual TFA and PIF data
+  const generateIntelligentSWOT = () => {
     const strengths: string[] = [];
     const weaknesses: string[] = [];
     const opportunities: string[] = [];
     const threats: string[] = [];
 
-    // STRENGTHS: High-scoring components (>= 70)
-    const strongComponents = componentScoresArray.filter(c => c.score >= 70);
-    if (strongComponents.length > 0) {
-      const topStrengths = strongComponents.slice(0, 3).map(c => 
-        `${c.label} (${c.score}/100)`
-      ).join(', ');
-      strengths.push(`Strong foundation in ${topStrengths} provides a solid technical and operational base for AI implementation.`);
-      
-      if (rubric.tfaScore >= 70 && rubric.pifScore >= 70) {
-        strengths.push(`Balanced excellence with Technical Feasibility at ${rubric.tfaScore}/100 and Operational Readiness at ${rubric.pifScore}/100 demonstrates comprehensive preparedness.`);
-      } else if (rubric.tfaScore >= 70) {
-        strengths.push(`Robust technical foundation (${rubric.tfaScore}/100) indicates systems are well-positioned for AI integration.`);
-      } else if (rubric.pifScore >= 70) {
-        strengths.push(`Strong operational readiness (${rubric.pifScore}/100) shows teams are prepared for workflow changes and process adoption.`);
-      }
-    }
+    // === ANALYZE TFA RESPONSES ===
+    const tfaResponses = (tfaAssessment?.responses as Record<string, string | number>) || {};
     
-    if (rubric.totalScore >= 75) {
-      strengths.push(`Overall readiness score of ${rubric.totalScore}/100 indicates high likelihood of successful implementation with minimal friction.`);
-    }
+    // Group questions by section using canonical TFA_QUESTIONS
+    const sectionData: Record<string, { scores: number[]; questions: Array<{ id: number; text: string; score: number }> }> = {};
+    
+    TFA_SECTIONS.forEach(section => {
+      sectionData[section.name] = { scores: [], questions: [] };
+    });
 
-    // WEAKNESSES: Low-scoring components (< 60)
-    const weakComponents = componentScoresArray.filter(c => c.score < 60);
-    if (weakComponents.length > 0) {
-      weakComponents.forEach(c => {
-        if (c.score < 40) {
-          weaknesses.push(`Critical deficiency in ${c.label} (${c.score}/100) poses significant implementation barriers and requires immediate remediation.`);
-        } else {
-          weaknesses.push(`${c.label} scores ${c.score}/100, indicating gaps that need attention before full deployment.`);
+    TFA_QUESTIONS.forEach(q => {
+      const answer = tfaResponses[q.id];
+      if (answer !== undefined && answer !== null) {
+        const selectedOption = q.options.find(opt => opt.value === String(answer));
+        if (selectedOption && selectedOption.score !== null) {
+          const score = selectedOption.score;
+          sectionData[q.section].scores.push(score);
+          sectionData[q.section].questions.push({ id: q.id, text: q.question, score });
         }
-      });
+      }
+    });
+
+    // === ANALYZE PIF RESPONSES ===
+    const pifResponses = pifData?.responses || [];
+    const aggregatedPIF = pifData?.aggregated;
+
+    // Extract qualitative insights with respondent attribution
+    interface QualitativeInsight {
+      respondent: string;
+      role: string;
+      insight: string;
     }
 
-    const diff = Math.abs(rubric.tfaScore - rubric.pifScore);
-    if (diff > 25) {
-      if (rubric.tfaScore > rubric.pifScore) {
-        weaknesses.push(`Operational readiness (${rubric.pifScore}/100) lags behind technical capabilities (${rubric.tfaScore}/100) by ${diff} points, creating adoption risk.`);
-      } else {
-        weaknesses.push(`Technical foundation (${rubric.tfaScore}/100) trails operational readiness (${rubric.pifScore}/100) by ${diff} points, limiting implementation viability.`);
+    const qualitativeInsights: {
+      timeWasters: QualitativeInsight[];
+      difficulties: QualitativeInsight[];
+      exceptions: QualitativeInsight[];
+      improvements: QualitativeInsight[];
+    } = {
+      timeWasters: [],
+      difficulties: [],
+      exceptions: [],
+      improvements: []
+    };
+
+    pifResponses.forEach(response => {
+      const qual = (response.qualitativeResponses as Record<string, string>) || {};
+      const respondent = response.respondentName;
+      const role = response.respondentRole;
+
+      if (qual.timeWasters && qual.timeWasters.trim()) {
+        qualitativeInsights.timeWasters.push({ respondent, role, insight: qual.timeWasters });
+      }
+      if (qual.keyDifficulties && qual.keyDifficulties.trim()) {
+        qualitativeInsights.difficulties.push({ respondent, role, insight: qual.keyDifficulties });
+      }
+      if (qual.exceptions && qual.exceptions.trim()) {
+        qualitativeInsights.exceptions.push({ respondent, role, insight: qual.exceptions });
+      }
+      if (qual.automationWish && qual.automationWish.trim()) {
+        qualitativeInsights.improvements.push({ respondent, role, insight: qual.automationWish });
+      }
+    });
+
+    // === STRENGTHS ===
+    // Identify high-scoring TFA sections (>= 70)
+    Object.entries(sectionData).forEach(([sectionName, data]) => {
+      if (data.scores.length > 0) {
+        const avgScore = Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length / 5) * 100);
+        
+        if (avgScore >= 70) {
+          const topQuestions = data.questions
+            .filter(q => q.score >= 4)
+            .slice(0, 2)
+            .map(q => q.text.split(':')[0])
+            .join(' and ');
+          
+          if (topQuestions) {
+            strengths.push(`${sectionName} (${avgScore}/100): Strong foundation in ${topQuestions} enables smooth AI integration.`);
+          }
+        }
+      }
+    });
+
+    // PIF strengths with qualitative support
+    if (aggregatedPIF) {
+      if (aggregatedPIF.processClarity.average >= 70) {
+        const clarityInsight = qualitativeInsights.improvements[0];
+        if (clarityInsight) {
+          strengths.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100) - Well-documented workflows. ${clarityInsight.respondent} (${clarityInsight.role}): "${clarityInsight.insight}"`);
+        } else {
+          strengths.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100) - Clear, standardized processes provide predictable foundation for automation.`);
+        }
+      }
+
+      if (aggregatedPIF.changeMagnitude.average >= 70) {
+        strengths.push(`Change Readiness (${aggregatedPIF.changeMagnitude.average}/100) - Users demonstrate comfort with technology changes, enabling faster adoption.`);
       }
     }
 
-    // OPPORTUNITIES: Where strengths enable progress
-    if (rubric.totalScore >= 65 && rubric.totalScore < 80) {
-      opportunities.push(`With a moderate-to-good readiness score of ${rubric.totalScore}/100, starting with a pilot program in the strongest areas can demonstrate value while addressing gaps.`);
-    } else if (rubric.totalScore >= 80) {
-      opportunities.push(`Exceptional readiness score of ${rubric.totalScore}/100 enables immediate full-scale implementation with high confidence.`);
+    // === WEAKNESSES ===
+    // TFA weaknesses with component-specific recommendations
+    Object.entries(sectionData).forEach(([sectionName, data]) => {
+      if (data.scores.length > 0) {
+        const avgScore = Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length / 5) * 100);
+        
+        if (avgScore < 60) {
+          const criticalGaps = data.questions.filter(q => q.score <= 2);
+          const recommendations = TFA_RECOMMENDATIONS[sectionName] || [];
+          
+          if (criticalGaps.length > 0 && recommendations.length > 0) {
+            weaknesses.push(`${sectionName} (${avgScore}/100) - ${criticalGaps.length} critical gap${criticalGaps.length !== 1 ? 's' : ''}. Next step: ${recommendations[0]}`);
+          } else if (recommendations.length > 1) {
+            weaknesses.push(`${sectionName} (${avgScore}/100) requires attention. Recommendation: ${recommendations[1]}`);
+          }
+        }
+      }
+    });
+
+    // PIF weaknesses with component-specific recommendations
+    if (aggregatedPIF) {
+      if (aggregatedPIF.processClarity.average < 60) {
+        const recommendations = PIF_RECOMMENDATIONS["Process Clarity"];
+        weaknesses.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100): ${recommendations[0]}`);
+      }
+
+      if (aggregatedPIF.changeMagnitude.average < 60) {
+        const recommendations = PIF_RECOMMENDATIONS["Change Magnitude"];
+        weaknesses.push(`Change Magnitude (${aggregatedPIF.changeMagnitude.average}/100): ${recommendations[0]}`);
+      }
+
+      if (aggregatedPIF.workflowBrittleness.average < 60) {
+        const recommendations = PIF_RECOMMENDATIONS["Workflow Brittleness"];
+        const exceptionInsight = qualitativeInsights.exceptions[0];
+        if (exceptionInsight) {
+          weaknesses.push(`Workflow Brittleness (${aggregatedPIF.workflowBrittleness.average}/100): ${recommendations[0]} ${exceptionInsight.respondent} (${exceptionInsight.role}) reports: "${exceptionInsight.insight}"`);
+        } else {
+          weaknesses.push(`Workflow Brittleness (${aggregatedPIF.workflowBrittleness.average}/100): ${recommendations[0]}`);
+        }
+      }
     }
 
-    if (strongComponents.length >= 3) {
-      const strongestAreas = strongComponents.slice(0, 2).map(c => c.label).join(' and ');
-      opportunities.push(`Leverage excellence in ${strongestAreas} as proof points to build stakeholder confidence and secure buy-in.`);
+    // Fallback if no specific weaknesses identified but overall score is low
+    if (weaknesses.length === 0 && rubric.totalScore < 60) {
+      weaknesses.push(`Overall readiness (${rubric.totalScore}/100) requires improvement across multiple components before full AI deployment.`);
     }
 
-    if (rubric.componentScores.dataQuality >= 70 && rubric.componentScores.integrationFeasibility >= 70) {
-      opportunities.push(`Strong Data Quality (${rubric.componentScores.dataQuality}/100) and Integration Feasibility (${rubric.componentScores.integrationFeasibility}/100) create ideal conditions for rapid AI deployment.`);
+    // === OPPORTUNITIES ===
+    // Strategic synergies
+    if (rubric.componentScores.dataQuality >= 70 && rubric.componentScores.integrationFeasibility >= 60) {
+      opportunities.push(`Strong data quality (${rubric.componentScores.dataQuality}/100) + solid integration capabilities (${rubric.componentScores.integrationFeasibility}/100) = ideal conditions for data-driven AI deployment.`);
     }
 
-    const moderateComponents = componentScoresArray.filter(c => c.score >= 50 && c.score < 70);
-    if (moderateComponents.length > 0 && strongComponents.length > 0) {
-      opportunities.push(`Moderate components (${moderateComponents.map(c => c.label).join(', ')}) can be improved through targeted initiatives while building on existing strengths.`);
+    if (aggregatedPIF && aggregatedPIF.processClarity.average >= 65 && rubric.componentScores.systemEnvironment >= 65) {
+      opportunities.push(`Clear processes (${aggregatedPIF.processClarity.average}/100) on modern infrastructure (${rubric.componentScores.systemEnvironment}/100) enable rapid prototyping and iteration.`);
     }
 
-    // THREATS: Blockers and concerns
-    const criticalComponents = componentScoresArray.filter(c => c.score < 50);
-    if (criticalComponents.length > 0) {
-      criticalComponents.forEach(c => {
-        threats.push(`${c.label} at ${c.score}/100 represents a critical blocker that could derail implementation if not addressed.`);
-      });
+    // User-driven opportunities from qualitative insights
+    if (qualitativeInsights.improvements.length > 0) {
+      const topWish = qualitativeInsights.improvements[0];
+      opportunities.push(`Quick win identified by ${topWish.respondent} (${topWish.role}): "${topWish.insight}" - Address this to demonstrate immediate value.`);
     }
 
+    if (qualitativeInsights.timeWasters.length > 0) {
+      const topWaster = qualitativeInsights.timeWasters[0];
+      opportunities.push(`Time savings opportunity - ${topWaster.respondent} (${topWaster.role}) identifies: "${topWaster.insight}" - Automating this delivers measurable efficiency gains.`);
+    }
+
+    // Fallback opportunity
+    if (opportunities.length === 0 && rubric.totalScore >= 50) {
+      opportunities.push(`With moderate readiness (${rubric.totalScore}/100), starting with a focused pilot can demonstrate value while addressing gaps.`);
+    }
+
+    // === THREATS ===
+    // Critical TFA blockers
+    Object.entries(sectionData).forEach(([sectionName, data]) => {
+      const criticalGaps = data.questions.filter(q => q.score <= 2);
+      if (criticalGaps.length >= 2) {
+        const mitigation = TFA_RECOMMENDATIONS[sectionName]?.[0] || 'Conduct detailed technical assessment';
+        threats.push(`${sectionName}: ${criticalGaps.length} critical technical gaps. Mitigation required: ${mitigation}`);
+      }
+    });
+
+    // Security/Compliance threats
     if (rubric.componentScores.securityCompliance < 60) {
-      threats.push(`Security & Compliance concerns (${rubric.componentScores.securityCompliance}/100) may trigger regulatory issues or data privacy violations during deployment.`);
+      const securityRec = TFA_RECOMMENDATIONS["Security/Compliance"]?.[0] || 'Engage compliance team immediately';
+      threats.push(`Security & Compliance (${rubric.componentScores.securityCompliance}/100) may delay deployment. ${securityRec}`);
     }
 
-    if (rubric.componentScores.workflowBrittleness < 50) {
-      threats.push(`High Workflow Brittleness risk (${rubric.componentScores.workflowBrittleness}/100) suggests current processes may break under AI-driven changes.`);
+    // User adoption risks from qualitative data
+    if (qualitativeInsights.difficulties.length > 0) {
+      const topDifficulty = qualitativeInsights.difficulties[0];
+      threats.push(`Adoption risk - ${topDifficulty.respondent} (${topDifficulty.role}) highlights: "${topDifficulty.insight}" - Address during design phase.`);
     }
 
-    if (rubric.totalScore < 50) {
+    // Workflow brittleness threats
+    if (aggregatedPIF && aggregatedPIF.workflowBrittleness.average < 50 && qualitativeInsights.exceptions.length > 1) {
+      threats.push(`High process variability (${aggregatedPIF.workflowBrittleness.average}/100, ${qualitativeInsights.exceptions.length} respondents report exceptions) may require hybrid human-AI approach.`);
+    }
+
+    // Fallback threat if score is critically low
+    if (threats.length === 0 && rubric.totalScore < 40) {
       threats.push(`Overall low readiness (${rubric.totalScore}/100) indicates proceeding without major improvements will likely result in implementation failure.`);
-    }
-
-    if (rubric.tfaScore < 60 && rubric.pifScore < 60) {
-      threats.push(`Both technical and operational scores below 60 create compounding risks that require comprehensive preparation strategy.`);
     }
 
     return { strengths, weaknesses, opportunities, threats };
   };
 
-  const swotAnalysis = generateSWOTAnalysis();
+  const swotAnalysis = generateIntelligentSWOT();
 
   return (
     <div className="space-y-6">
