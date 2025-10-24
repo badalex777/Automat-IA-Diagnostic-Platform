@@ -377,12 +377,12 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       37: {
-        question: "How well-suited is this work for AI quality improvement?",
+        question: "How are decisions typically made in this process?",
         options: {
-          "rule_based": { label: "Rule-based decisions", description: "Clear if/then rules that can be programmed" },
-          "pattern": { label: "Pattern recognition", description: "AI can learn from examples and spot patterns" },
-          "contextual": { label: "Contextual judgment", description: "Requires understanding context and nuance" },
-          "subjective": { label: "Highly subjective", description: "Depends heavily on personal opinion or taste" }
+          "rule_based": { label: "Rule-based decisions", description: "Clear if/then rules" },
+          "pattern": { label: "Pattern recognition", description: "Identifying similarities or trends" },
+          "contextual": { label: "Contextual judgment", description: "Requires understanding unique situations" },
+          "subjective": { label: "Highly subjective", description: "Based on personal opinion or preferences" }
         }
       },
       38: {
