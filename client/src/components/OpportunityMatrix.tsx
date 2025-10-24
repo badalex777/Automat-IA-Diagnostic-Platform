@@ -285,13 +285,13 @@ export default function OpportunityMatrix({
                 />
 
                 {/* Quadrant labels */}
-                <text x="25%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                <text x="33%" y="67%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                   {t.matrix.quadrants.niceToHave}
                 </text>
-                <text x="75%" y="75%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                <text x="75%" y="67%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                   {t.matrix.quadrants.quickWins}
                 </text>
-                <text x="25%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
+                <text x="33%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">
                   {t.matrix.quadrants.deprioritize}
                 </text>
                 <text x="75%" y="25%" textAnchor="middle" className="fill-muted-foreground text-sm font-medium">

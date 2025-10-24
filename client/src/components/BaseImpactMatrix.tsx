@@ -248,7 +248,7 @@ export default function BaseImpactMatrix({
                   fontSize={14}
                   fontWeight={600}
                 >
-                  Quick Wins
+                  Nice-to-Have
                 </text>
 
                 <text
@@ -260,7 +260,7 @@ export default function BaseImpactMatrix({
                   fontSize={14}
                   fontWeight={600}
                 >
-                  Nice-to-Have
+                  Quick Wins
                 </text>
 
                 <text
