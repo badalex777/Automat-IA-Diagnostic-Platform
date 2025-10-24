@@ -64,6 +64,7 @@ function getFeasibilityIcon(band: ReadinessRubricScore['feasibilityBand']) {
 }
 
 // Component-specific recommendations based on actual score thresholds
+// Keys must match TFA_SECTIONS names exactly
 const TFA_RECOMMENDATIONS: Record<string, string[]> = {
   "System Environment": [
     "Conduct comprehensive API availability audit across all integrated systems",
