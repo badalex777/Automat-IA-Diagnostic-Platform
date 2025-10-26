@@ -1055,9 +1055,9 @@ const en: Translations = {
     integrationWeight: "Integration Feasibility is weighted heavily as it represents the technical capability to connect AI solutions with existing infrastructure.",
     systemEnvWeight: "System Environment (15%) is critical as it encompasses the technical infrastructure, scalability, and backup capabilities that ensure the AI solution can run reliably.",
     securityWeight: "Security & Compliance (9%) addresses regulatory and security requirements that, while essential, are often more about verification than technical capability.",
-    clarityWeight: "Process Clarity (8%) and Change Magnitude (8%) reflect operational readiness - clear processes reduce implementation complexity, while understanding change magnitude helps plan adoption strategies.",
+    clarityWeight: "Process Clarity (14.6%) and Change Magnitude (14.6%) reflect operational readiness - clear processes reduce implementation complexity, while understanding change magnitude helps plan adoption strategies.",
     changeMagWeight: "Change Magnitude helps quantify the organizational impact and adoption challenges.",
-    brittlenessWeight: "Workflow Brittleness (6%) has the lowest weight as it indicates risk rather than capability, and can often be mitigated through careful design even in brittle workflows.",
+    brittlenessWeight: "Workflow Brittleness (10.9%) has the lowest weight as it indicates risk rather than capability, and can often be mitigated through careful design even in brittle workflows.",
   },
   scoringGuide: {
     title: "Opportunity Scoring Guide",
@@ -1691,9 +1691,9 @@ const es: Translations = {
     integrationWeight: "La Viabilidad de Integración se pondera fuertemente ya que representa la capacidad técnica para conectar soluciones de IA con la infraestructura existente.",
     systemEnvWeight: "El Entorno del Sistema (15%) es crítico ya que abarca la infraestructura técnica, la escalabilidad y las capacidades de respaldo que aseguran que la solución de IA pueda funcionar de manera confiable.",
     securityWeight: "Seguridad y Cumplimiento (9%) aborda los requisitos regulatorios y de seguridad que, aunque esenciales, a menudo son más sobre verificación que capacidad técnica.",
-    clarityWeight: "La Claridad del Proceso (8%) y la Magnitud del Cambio (8%) reflejan la preparación operacional: los procesos claros reducen la complejidad de la implementación, mientras que comprender la magnitud del cambio ayuda a planificar estrategias de adopción.",
+    clarityWeight: "La Claridad del Proceso (14.6%) y la Magnitud del Cambio (14.6%) reflejan la preparación operacional: los procesos claros reducen la complejidad de la implementación, mientras que comprender la magnitud del cambio ayuda a planificar estrategias de adopción.",
     changeMagWeight: "La Magnitud del Cambio ayuda a cuantificar el impacto organizacional y los desafíos de adopción.",
-    brittlenessWeight: "La Fragilidad del Flujo de Trabajo (6%) tiene el peso más bajo ya que indica riesgo en lugar de capacidad, y a menudo se puede mitigar mediante un diseño cuidadoso incluso en flujos de trabajo frágiles.",
+    brittlenessWeight: "La Fragilidad del Flujo de Trabajo (10.9%) tiene el peso más bajo ya que indica riesgo en lugar de capacidad, y a menudo se puede mitigar mediante un diseño cuidadoso incluso en flujos de trabajo frágiles.",
   },
   scoringGuide: {
     title: "Guía de Puntuación de Oportunidades",

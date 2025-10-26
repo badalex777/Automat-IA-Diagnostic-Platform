@@ -108,9 +108,9 @@ export interface ReadinessRubricScore {
     integrationFeasibility: number; // 18% of total (30% of TFA × 60%)
     securityCompliance: number; // 9% of total (15% of TFA × 60%)
     // PIF components (40% total)
-    processClarity: number; // 8% of total (20% of PIF × 40%)
-    changeMagnitude: number; // 8% of total (20% of PIF × 40%)
-    workflowBrittleness: number; // 6% of total (15% of PIF × 40%) - adjusted to make 40% total
+    processClarity: number; // 14.6% of total (20/55 of PIF × 40%)
+    changeMagnitude: number; // 14.6% of total (20/55 of PIF × 40%)
+    workflowBrittleness: number; // 10.9% of total (15/55 of PIF × 40%)
   };
   feasibilityBand: 'Very High' | 'High' | 'Moderate' | 'Low' | 'Very Low';
   recommendation: string;
@@ -153,13 +153,13 @@ export function calculateReadinessRubric(
 
   // Component breakdown with actual weights (for verification)
   const components = {
-    systemEnvironment: Math.round(tfaSectionScores.systemEnvironment * 0.15), // 25% of 60%
-    dataQuality: Math.round(tfaSectionScores.dataQuality * 0.18), // 30% of 60%
-    integrationFeasibility: Math.round(tfaSectionScores.integrationFeasibility * 0.18), // 30% of 60%
-    securityCompliance: Math.round(tfaSectionScores.securityCompliance * 0.09), // 15% of 60%
-    processClarity: Math.round(aggregatedPIF.processClarity.average * 0.08), // ~20% of 40%
-    changeMagnitude: Math.round(aggregatedPIF.changeMagnitude.average * 0.08), // ~20% of 40%
-    workflowBrittleness: Math.round(aggregatedPIF.workflowBrittleness.average * 0.06), // ~15% of 40%
+    systemEnvironment: Math.round(tfaSectionScores.systemEnvironment * 0.15), // 25% of 60% = 15%
+    dataQuality: Math.round(tfaSectionScores.dataQuality * 0.18), // 30% of 60% = 18%
+    integrationFeasibility: Math.round(tfaSectionScores.integrationFeasibility * 0.18), // 30% of 60% = 18%
+    securityCompliance: Math.round(tfaSectionScores.securityCompliance * 0.09), // 15% of 60% = 9%
+    processClarity: Math.round(aggregatedPIF.processClarity.average * 0.14545454), // 20/55 of 40% = 14.6%
+    changeMagnitude: Math.round(aggregatedPIF.changeMagnitude.average * 0.14545454), // 20/55 of 40% = 14.6%
+    workflowBrittleness: Math.round(aggregatedPIF.workflowBrittleness.average * 0.10909091), // 15/55 of 40% = 10.9%
   };
 
   // Determine feasibility band
