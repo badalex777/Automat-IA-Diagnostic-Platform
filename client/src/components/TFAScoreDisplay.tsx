@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Calendar } from "lucide-react";
+import { format } from "date-fns";
 
 interface TFAScoreDisplayProps {
   score: number;
@@ -10,6 +11,7 @@ interface TFAScoreDisplayProps {
     score: number;
     weight: number;
   }[];
+  completedAt?: string | Date | null;
 }
 
 const getFeasibilityBand = (score: number) => {
@@ -52,7 +54,7 @@ const getFeasibilityBand = (score: number) => {
 
 const WEAKNESS_THRESHOLD = 2.5; // Scores below 2.5 are considered weak
 
-export default function TFAScoreDisplay({ score, sections }: TFAScoreDisplayProps) {
+export default function TFAScoreDisplay({ score, sections, completedAt }: TFAScoreDisplayProps) {
   const feasibility = getFeasibilityBand(score);
   const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (score / 100) * circumference;
@@ -61,6 +63,11 @@ export default function TFAScoreDisplay({ score, sections }: TFAScoreDisplayProp
   // Identify weak sections
   const weakSections = sections?.filter(s => s.score < WEAKNESS_THRESHOLD) || [];
   const hasWeaknesses = weakSections.length > 0;
+
+  // Format submission date
+  const formattedDate = completedAt 
+    ? format(new Date(completedAt), 'MMM d, yyyy')
+    : null;
 
   const getImprovementSuggestion = (sectionName: string) => {
     const suggestions: Record<string, string> = {
@@ -114,6 +121,12 @@ export default function TFAScoreDisplay({ score, sections }: TFAScoreDisplayProp
                 <FeasibilityIcon className="h-3 w-3" />
                 {feasibility.label}
               </Badge>
+              {formattedDate && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span data-testid="text-tfa-submission-date">Submitted {formattedDate}</span>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground mt-3" data-testid="text-feasibility-description">
                 {feasibility.description}
               </p>

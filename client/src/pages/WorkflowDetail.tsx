@@ -399,7 +399,8 @@ export default function WorkflowDetail() {
                         />
                         <TFAScoreDisplay 
                           score={tfaAssessment.score || 0} 
-                          sections={sectionScores} 
+                          sections={sectionScores}
+                          completedAt={tfaAssessment.completedAt}
                         />
                         <TFAVisualAnalytics sections={sectionScores} />
                       </>
