@@ -30,9 +30,9 @@ const componentWeights: Record<keyof ReadinessRubricScore['components'], string>
   dataQuality: '18%',
   integrationFeasibility: '18%',
   securityCompliance: '9%',
-  processClarity: '14.6%',
-  changeMagnitude: '14.6%',
-  workflowBrittleness: '10.9%',
+  processClarity: '15%',
+  changeMagnitude: '15%',
+  workflowBrittleness: '10%',
 };
 
 function getFeasibilityColor(band: ReadinessRubricScore['feasibilityBand']) {
@@ -135,9 +135,9 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
     dataQuality: 0.18,
     integrationFeasibility: 0.18,
     securityCompliance: 0.09,
-    processClarity: 0.14545454, // 20/55 of 40%
-    changeMagnitude: 0.14545454, // 20/55 of 40%
-    workflowBrittleness: 0.10909091, // 15/55 of 40%
+    processClarity: 0.15,
+    changeMagnitude: 0.15,
+    workflowBrittleness: 0.10,
   };
 
   // Prepare data for radar chart
@@ -160,9 +160,9 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
     { key: 'dataQuality', weight: 18, color: 'hsl(var(--chart-1))' },
     { key: 'integrationFeasibility', weight: 18, color: 'hsl(var(--chart-2))' },
     { key: 'systemEnvironment', weight: 15, color: 'hsl(var(--chart-3))' },
-    { key: 'processClarity', weight: 14.6, color: 'hsl(var(--chart-5))' },
-    { key: 'changeMagnitude', weight: 14.6, color: 'hsl(140 60% 45%)' },
-    { key: 'workflowBrittleness', weight: 10.9, color: 'hsl(200 60% 45%)' },
+    { key: 'processClarity', weight: 15, color: 'hsl(var(--chart-5))' },
+    { key: 'changeMagnitude', weight: 15, color: 'hsl(140 60% 45%)' },
+    { key: 'workflowBrittleness', weight: 10, color: 'hsl(200 60% 45%)' },
     { key: 'securityCompliance', weight: 9, color: 'hsl(var(--chart-4))' },
   ] as const).map(item => ({
     name: componentLabels[item.key],

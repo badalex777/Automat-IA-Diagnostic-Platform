@@ -108,9 +108,9 @@ export interface ReadinessRubricScore {
     integrationFeasibility: number; // 18% of total (30% of TFA × 60%)
     securityCompliance: number; // 9% of total (15% of TFA × 60%)
     // PIF components (40% total)
-    processClarity: number; // 14.6% of total (20/55 of PIF × 40%)
-    changeMagnitude: number; // 14.6% of total (20/55 of PIF × 40%)
-    workflowBrittleness: number; // 10.9% of total (15/55 of PIF × 40%)
+    processClarity: number; // 15% of total
+    changeMagnitude: number; // 15% of total
+    workflowBrittleness: number; // 10% of total
   };
   feasibilityBand: 'Very High' | 'High' | 'Moderate' | 'Low' | 'Very Low';
   recommendation: string;
@@ -128,13 +128,13 @@ export function calculateReadinessRubric(
   tfaSectionScores: TFASectionScores,
   aggregatedPIF: AggregatedPIFScores
 ): ReadinessRubricScore {
-  // PIF operational score (average of 3 components)
-  // Weights within PIF: Process Clarity 20%, Change Magnitude 20%, Workflow Brittleness 15%
-  // Normalized to 100%: 20/55 = 36.4%, 20/55 = 36.4%, 15/55 = 27.2%
+  // PIF operational score (weighted average of 3 components)
+  // Weights within PIF: Process Clarity 15%, Change Magnitude 15%, Workflow Brittleness 10% (of 40% total)
+  // Normalized to 100%: 15/40 = 37.5%, 15/40 = 37.5%, 10/40 = 25%
   const pifOperationalScore = Math.round(
-    (aggregatedPIF.processClarity.average * 0.364) +
-    (aggregatedPIF.changeMagnitude.average * 0.364) +
-    (aggregatedPIF.workflowBrittleness.average * 0.272)
+    (aggregatedPIF.processClarity.average * 0.375) +
+    (aggregatedPIF.changeMagnitude.average * 0.375) +
+    (aggregatedPIF.workflowBrittleness.average * 0.25)
   );
 
   // Combined score: TFA 60% + PIF 40%
@@ -157,9 +157,9 @@ export function calculateReadinessRubric(
     dataQuality: Math.round(tfaSectionScores.dataQuality * 0.18), // 30% of 60% = 18%
     integrationFeasibility: Math.round(tfaSectionScores.integrationFeasibility * 0.18), // 30% of 60% = 18%
     securityCompliance: Math.round(tfaSectionScores.securityCompliance * 0.09), // 15% of 60% = 9%
-    processClarity: Math.round(aggregatedPIF.processClarity.average * 0.14545454), // 20/55 of 40% = 14.6%
-    changeMagnitude: Math.round(aggregatedPIF.changeMagnitude.average * 0.14545454), // 20/55 of 40% = 14.6%
-    workflowBrittleness: Math.round(aggregatedPIF.workflowBrittleness.average * 0.10909091), // 15/55 of 40% = 10.9%
+    processClarity: Math.round(aggregatedPIF.processClarity.average * 0.15), // 15% of total
+    changeMagnitude: Math.round(aggregatedPIF.changeMagnitude.average * 0.15), // 15% of total
+    workflowBrittleness: Math.round(aggregatedPIF.workflowBrittleness.average * 0.10), // 10% of total
   };
 
   // Determine feasibility band
