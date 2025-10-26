@@ -16,13 +16,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreHorizontal, CheckCircle2, Clock, Circle, Trash2 } from "lucide-react";
+import { MoreHorizontal, CheckCircle2, Clock, Circle, Trash2, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { format } from "date-fns";
 
 type WorkflowStatus = "tfa_only" | "tfa_readiness" | "complete";
 
@@ -34,6 +35,8 @@ interface WorkflowListItemProps {
   tfaScore?: number;
   annualBenefits?: number;
   companyId: string;
+  tfaCompletedAt?: string | Date | null;
+  latestPifCompletedAt?: string | Date | null;
 }
 
 export default function WorkflowListItem({
@@ -44,10 +47,20 @@ export default function WorkflowListItem({
   tfaScore,
   annualBenefits,
   companyId,
+  tfaCompletedAt,
+  latestPifCompletedAt,
 }: WorkflowListItemProps) {
   const { toast } = useToast();
   const { t } = useLanguage();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Format dates
+  const formattedTfaDate = tfaCompletedAt 
+    ? format(new Date(tfaCompletedAt), 'MMM d, yyyy')
+    : null;
+  const formattedPifDate = latestPifCompletedAt
+    ? format(new Date(latestPifCompletedAt), 'MMM d, yyyy')
+    : null;
 
   const statusConfig = {
     tfa_only: { label: t.workflow.tfaOnly, variant: "outline" as const, icon: Circle },
@@ -108,7 +121,25 @@ export default function WorkflowListItem({
                 {statusInfo.label}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+            {description && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{description}</p>
+            )}
+            {(formattedTfaDate || formattedPifDate) && (
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                {formattedTfaDate && (
+                  <div className="flex items-center gap-1.5" data-testid={`text-tfa-date-${id}`}>
+                    <Calendar className="h-3 w-3" />
+                    <span>TFA: {formattedTfaDate}</span>
+                  </div>
+                )}
+                {formattedPifDate && (
+                  <div className="flex items-center gap-1.5" data-testid={`text-pif-date-${id}`}>
+                    <Calendar className="h-3 w-3" />
+                    <span>Latest PIF: {formattedPifDate}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-4 flex-shrink-0">

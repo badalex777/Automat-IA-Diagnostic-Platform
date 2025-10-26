@@ -114,7 +114,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/companies/:companyId/workflows", async (req, res) => {
     try {
       const workflows = await storage.getWorkflowsByCompany(req.params.companyId);
-      res.json(workflows);
+      
+      // Enrich workflows with TFA and PIF completion dates
+      const enrichedWorkflows = await Promise.all(workflows.map(async (workflow) => {
+        const tfa = await storage.getTFAByWorkflowId(workflow.id);
+        const pifResponses = await storage.getAllPIFResponsesForWorkflow(workflow.id);
+        
+        // Find latest PIF submission date
+        const latestPifDate = pifResponses.length > 0
+          ? pifResponses
+              .map(r => r.completedAt)
+              .filter((date): date is Date => date !== null && date !== undefined)
+              .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0]
+          : undefined;
+        
+        return {
+          ...workflow,
+          tfaCompletedAt: tfa?.completedAt || null,
+          latestPifCompletedAt: latestPifDate || null,
+        };
+      }));
+      
+      res.json(enrichedWorkflows);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
