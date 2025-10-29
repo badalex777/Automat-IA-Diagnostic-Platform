@@ -18,6 +18,8 @@ import {
 import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
 import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualitativeResponses } from "@shared/pifQuestions";
 import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
+import { aggregateCompanyDiagnosticData } from "./reportDataAggregator";
+import { generateExecutiveReport } from "./reportGenerator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Companies
@@ -107,6 +109,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Executive Report Generation
+  app.get("/api/companies/:id/executive-report", async (req, res) => {
+    try {
+      // Aggregate all diagnostic data for the company
+      const diagnosticData = await aggregateCompanyDiagnosticData(req.params.id);
+      
+      if (!diagnosticData) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+
+      // Validate that company has at least one complete opportunity
+      // (workflow with both TFA and PIF completed)
+      if (!diagnosticData.hasCompleteOpportunities) {
+        return res.status(400).json({ 
+          error: "Cannot generate report: Company must have at least one workflow with both TFA and PIF completed" 
+        });
+      }
+
+      // Generate the Word document
+      const buffer = await generateExecutiveReport(diagnosticData);
+
+      // Set headers for file download
+      const companyName = diagnosticData.company.name.replace(/[^a-z0-9]/gi, '_');
+      const filename = `Executive_Diagnostic_Report_${companyName}.docx`;
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', buffer.length);
+      
+      res.send(buffer);
+    } catch (error: any) {
+      console.error('Error generating executive report:', error);
+      res.status(500).json({ error: "Failed to generate executive report" });
     }
   });
 
