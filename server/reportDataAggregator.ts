@@ -1,20 +1,30 @@
-import { db } from "@db";
-import { companies, workflows, tfaAssessments, pifResponses, implementationOpportunities } from "@db/schema";
+import { db } from "./db";
+import { 
+  companies, 
+  workflows, 
+  tfaAssessments, 
+  pifResponses, 
+  implementationOpportunities,
+  type TFAAssessment,
+  type PIFResponse,
+  type ImplementationOpportunity,
+  type Company,
+  type Workflow
+} from "@shared/schema";
 import { eq, and, isNotNull } from "drizzle-orm";
-import { calculateReadinessRubric, aggregatePIFScores } from "../shared/pifCalculations";
-import { calculateOpportunityScore } from "../shared/opportunityCalculations";
-import { calculateTFASectionScores } from "../shared/tfaCalculations";
-import type { InsertTfaAssessment, InsertPifResponse, SelectImplementationOpportunity, SelectCompany, SelectWorkflow } from "@db/schema";
+import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
+import { calculateOpportunityScore } from "@shared/opportunityCalculations";
+import { calculateSectionScores } from "@shared/tfaQuestions";
 
 export interface DiagnosticData {
-  company: SelectCompany;
+  company: Company;
   workflows: WorkflowData[];
   diagnosticPeriod: { start: Date; end: Date };
   hasCompleteOpportunities: boolean;
 }
 
 export interface WorkflowData {
-  workflow: SelectWorkflow;
+  workflow: Workflow;
   tfa: TFAData | null;
   pifs: PIFData[];
   opportunities: OpportunityData[];
@@ -71,7 +81,7 @@ export interface PIFData {
 }
 
 export interface OpportunityData {
-  opportunity: SelectImplementationOpportunity;
+  opportunity: ImplementationOpportunity;
   roiMetrics: {
     annualRoi: number;
     fteSavings: number;
@@ -84,7 +94,7 @@ export interface OpportunityData {
   matrixPosition: {
     implementationEffort: number;
     baseImpact: number;
-    enhancedImpact: number;
+    businessImpact: number; // Enhanced impact
     quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
   };
 }
@@ -162,7 +172,16 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     // Process TFA data
     let tfaData: TFAData | null = null;
     if (tfa && tfa.completedAt) {
-      const sectionScores = calculateTFASectionScores(tfa.responses as Record<string, string>);
+      const sectionScoresArray = calculateSectionScores(tfa.responses as Record<string, string>);
+      
+      // Convert array to object
+      const sectionScores = {
+        systemEnvironment: sectionScoresArray.find(s => s.name === "System Environment")?.score || 0,
+        dataQuality: sectionScoresArray.find(s => s.name === "Data Quality")?.score || 0,
+        integrationFeasibility: sectionScoresArray.find(s => s.name === "Integration Feasibility")?.score || 0,
+        securityCompliance: sectionScoresArray.find(s => s.name === "Security & Compliance")?.score || 0,
+      };
+      
       tfaData = {
         id: tfa.id,
         score: tfa.score || 0,
@@ -194,6 +213,9 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         }
       }
 
+      const roiInputs = pif.roiInputs as any || {};
+      const qualitative = pif.qualitativeResponses as any || {};
+
       return {
         id: pif.id,
         respondentName: pif.respondentName,
@@ -206,24 +228,24 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
           workflowBrittleness: pif.workflowBrittleness || 0,
         },
         roiInputs: {
-          employeeCount: pif.employeeCount || 0,
-          frequency: pif.frequency || "unknown",
-          processesPerPeriod: pif.processesPerPeriod || 0,
-          minutesPerProcess: pif.minutesPerProcess || 0,
+          employeeCount: roiInputs.employeeCount || 0,
+          frequency: roiInputs.frequency || "unknown",
+          processesPerPeriod: roiInputs.processesPerPeriod || 0,
+          minutesPerProcess: roiInputs.minutesPerProcess || 0,
         },
         qualitativeInsights: {
-          role: pif.role,
-          personalSteps: pif.personalSteps,
-          criticalKnowledge: pif.criticalKnowledge,
-          exceptions: pif.exceptions,
-          toolsUsed: pif.toolsUsed,
-          toolLimitations: pif.toolLimitations,
-          timeWasters: pif.timeWasters,
-          automationWish: pif.automationWish,
-          typicalOutcome: pif.typicalOutcome,
-          keyDifficulties: pif.keyDifficulties,
-          impactOfDelays: pif.impactOfDelays,
-          additionalContext: pif.additionalContext,
+          role: qualitative.role || null,
+          personalSteps: qualitative.personalSteps || null,
+          criticalKnowledge: qualitative.criticalKnowledge || null,
+          exceptions: qualitative.exceptions || null,
+          toolsUsed: qualitative.toolsUsed || null,
+          toolLimitations: qualitative.toolLimitations || null,
+          timeWasters: qualitative.timeWasters || null,
+          automationWish: qualitative.automationWish || null,
+          typicalOutcome: qualitative.typicalOutcome || null,
+          keyDifficulties: qualitative.keyDifficulties || null,
+          impactOfDelays: qualitative.impactOfDelays || null,
+          additionalContext: qualitative.additionalContext || null,
         },
       };
     });
@@ -233,7 +255,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     if (tfaData && pifsData.length > 0) {
       hasCompleteOpportunities = true;
       
-      const aggregatedPIF = aggregatePIFScores(pifs);
+      const aggregatedPIF = calculateAggregatedPIFScores(pifs);
       const rubric = calculateReadinessRubric(
         tfaData.score,
         tfaData.sectionScores,
