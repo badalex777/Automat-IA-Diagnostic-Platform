@@ -4,7 +4,7 @@ import { useRoute, Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Search, Pencil, Check, X, BookOpen } from "lucide-react";
+import { ChevronLeft, Search, Pencil, Check, X, BookOpen, FileText } from "lucide-react";
 import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import BaseImpactMatrix from "@/components/BaseImpactMatrix";
@@ -131,6 +131,40 @@ export default function CompanyDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error saving",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const downloadReportMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/companies/${companyId}/executive-report`);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate report');
+      }
+      return response.blob();
+    },
+    onSuccess: (blob) => {
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Executive_Diagnostic_Report_${company?.name.replace(/[^a-z0-9]/gi, '_')}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Report generated",
+        description: "Executive Diagnostic Report has been downloaded successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error generating report",
         description: error.message,
         variant: "destructive",
       });
@@ -345,6 +379,27 @@ export default function CompanyDetail() {
     return workflowArray;
   }, [filteredOpportunities, workflows]);
 
+  // Check if company has at least one complete opportunity (workflow with both TFA and PIF completed)
+  const hasCompleteOpportunities = useMemo(() => {
+    if (!workflowAssessments) return false;
+    
+    const { tfaData, pifData } = workflowAssessments;
+    
+    // Check if any workflow has both completed TFA and at least one PIF response
+    return workflowIdsWithOpportunities.some(workflowId => {
+      const tfa = tfaData[workflowId];
+      const pif = pifData[workflowId];
+      
+      // Must have completed TFA assessment
+      if (!tfa || !tfa.completedAt) return false;
+      
+      // Must have at least one PIF response
+      if (!pif || !pif.responses || pif.responses.length === 0) return false;
+      
+      return true;
+    });
+  }, [workflowIdsWithOpportunities, workflowAssessments]);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b border-border">
@@ -422,6 +477,18 @@ export default function CompanyDetail() {
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
                   Scoring Guide
+                </Button>
+              )}
+              {company && hasCompleteOpportunities && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => downloadReportMutation.mutate()}
+                  disabled={downloadReportMutation.isPending}
+                  data-testid="button-generate-report"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  {downloadReportMutation.isPending ? 'Generating...' : 'Generate Executive Report'}
                 </Button>
               )}
               {company && (
