@@ -44,6 +44,53 @@ export default function CompanyDetail() {
     enabled: !!companyId,
   });
 
+  // Fetch TFA and PIF data for ALL workflows to check if report generation is possible
+  const { data: allWorkflowAssessments, isLoading: allAssessmentsLoading } = useQuery({
+    queryKey: [`/api/companies/${companyId}/all-workflow-assessments`, workflows.map(w => w.id)],
+    queryFn: async () => {
+      if (workflows.length === 0) {
+        return { tfaData: {}, pifData: {} };
+      }
+
+      try {
+        // Fetch TFA and PIF data in parallel for all workflows
+        const tfaPromises = workflows.map(async (workflow) => {
+          const response = await fetch(`/api/workflows/${workflow.id}/tfa`);
+          if (!response.ok) return { workflowId: workflow.id, data: null };
+          return { workflowId: workflow.id, data: await response.json() };
+        });
+
+        const pifPromises = workflows.map(async (workflow) => {
+          const response = await fetch(`/api/workflows/${workflow.id}/pif`);
+          if (!response.ok) return { workflowId: workflow.id, data: null };
+          return { workflowId: workflow.id, data: await response.json() };
+        });
+
+        const [tfaResults, pifResults] = await Promise.all([
+          Promise.all(tfaPromises),
+          Promise.all(pifPromises)
+        ]);
+
+        // Convert arrays to objects keyed by workflowId
+        const tfaData: Record<string, TFAAssessment | null> = {};
+        const pifData: Record<string, { responses: PIFResponse[]; aggregated: AggregatedPIFScores } | null> = {};
+
+        tfaResults.forEach(result => {
+          tfaData[result.workflowId] = result.data;
+        });
+
+        pifResults.forEach(result => {
+          pifData[result.workflowId] = result.data;
+        });
+
+        return { tfaData, pifData };
+      } catch (error) {
+        return { tfaData: {}, pifData: {} };
+      }
+    },
+    enabled: workflows.length > 0,
+  });
+
   useEffect(() => {
     if (companyError) {
       toast({
@@ -381,14 +428,14 @@ export default function CompanyDetail() {
 
   // Check if company has at least one complete opportunity (workflow with both TFA and PIF completed)
   const hasCompleteOpportunities = useMemo(() => {
-    if (!workflowAssessments) return false;
+    if (!allWorkflowAssessments) return false;
     
-    const { tfaData, pifData } = workflowAssessments;
+    const { tfaData, pifData } = allWorkflowAssessments;
     
-    // Check if any workflow has both completed TFA and at least one PIF response
-    return workflowIdsWithOpportunities.some(workflowId => {
-      const tfa = tfaData[workflowId];
-      const pif = pifData[workflowId];
+    // Check if ANY workflow has both completed TFA and at least one PIF response
+    return workflows.some(workflow => {
+      const tfa = tfaData[workflow.id];
+      const pif = pifData[workflow.id];
       
       // Must have completed TFA assessment
       if (!tfa || !tfa.completedAt) return false;
@@ -398,7 +445,7 @@ export default function CompanyDetail() {
       
       return true;
     });
-  }, [workflowIdsWithOpportunities, workflowAssessments]);
+  }, [workflows, allWorkflowAssessments]);
 
   return (
     <div className="min-h-screen bg-background">
