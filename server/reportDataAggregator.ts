@@ -12,9 +12,65 @@ import {
   type Workflow
 } from "@shared/schema";
 import { eq, and, isNotNull } from "drizzle-orm";
-import { calculateReadinessRubric, calculateAggregatedPIFScores, calculateSWOT } from "@shared/pifCalculations";
+import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
 import { calculateSectionScores } from "@shared/tfaQuestions";
+
+/**
+ * Generate SWOT analysis from readiness component scores
+ */
+function generateSWOT(readiness: ReadinessData) {
+  const strengths: string[] = [];
+  const weaknesses: string[] = [];
+  const opportunities: string[] = [];
+  const threats: string[] = [];
+
+  // Analyze component scores
+  const components = readiness.components;
+  
+  // Strengths: scores >= 70
+  if (components.systemEnvironment >= 70) strengths.push(`Strong system environment foundation (${Math.round(components.systemEnvironment)})`);
+  if (components.dataQuality >= 70) strengths.push(`High-quality data availability (${Math.round(components.dataQuality)})`);
+  if (components.integrationFeasibility >= 70) strengths.push(`Robust integration capabilities (${Math.round(components.integrationFeasibility)})`);
+  if (components.securityCompliance >= 70) strengths.push(`Strong security and compliance posture (${Math.round(components.securityCompliance)})`);
+  if (components.processClarity >= 70) strengths.push(`Well-documented processes (${Math.round(components.processClarity)})`);
+  if (components.changeMagnitude >= 70) strengths.push(`Manageable change requirements (${Math.round(components.changeMagnitude)})`);
+  if (components.workflowBrittleness >= 70) strengths.push(`Resilient workflow structure (${Math.round(components.workflowBrittleness)})`);
+
+  // Weaknesses: scores < 50
+  if (components.systemEnvironment < 50) weaknesses.push(`System environment limitations (${Math.round(components.systemEnvironment)})`);
+  if (components.dataQuality < 50) weaknesses.push(`Data quality concerns (${Math.round(components.dataQuality)})`);
+  if (components.integrationFeasibility < 50) weaknesses.push(`Integration challenges (${Math.round(components.integrationFeasibility)})`);
+  if (components.securityCompliance < 50) weaknesses.push(`Security/compliance gaps (${Math.round(components.securityCompliance)})`);
+  if (components.processClarity < 50) weaknesses.push(`Process documentation gaps (${Math.round(components.processClarity)})`);
+  if (components.changeMagnitude < 50) weaknesses.push(`Significant change requirements (${Math.round(components.changeMagnitude)})`);
+  if (components.workflowBrittleness < 50) weaknesses.push(`Brittle workflow dependencies (${Math.round(components.workflowBrittleness)})`);
+
+  // Opportunities: moderate scores (50-69) that could be improved
+  if (components.systemEnvironment >= 50 && components.systemEnvironment < 70) {
+    opportunities.push(`Enhance system environment capabilities through targeted upgrades`);
+  }
+  if (components.dataQuality >= 50 && components.dataQuality < 70) {
+    opportunities.push(`Improve data quality through governance initiatives`);
+  }
+  if (components.processClarity >= 50 && components.processClarity < 70) {
+    opportunities.push(`Standardize and document processes for scalability`);
+  }
+
+  // Threats: critical low scores that block progress
+  if (components.dataQuality < 40) threats.push(`Critical data quality issues may hinder automation success`);
+  if (components.integrationFeasibility < 40) threats.push(`Integration limitations pose significant implementation risk`);
+  if (components.securityCompliance < 40) threats.push(`Security/compliance gaps require immediate remediation`);
+  if (components.workflowBrittleness < 40) threats.push(`Workflow fragility may cause automation failures`);
+
+  // Ensure we have at least something in each category
+  if (strengths.length === 0) strengths.push(`Established baseline readiness for automation`);
+  if (opportunities.length === 0) opportunities.push(`Potential for incremental capability improvements`);
+  if (weaknesses.length === 0) weaknesses.push(`Minor areas for optimization identified`);
+  if (threats.length === 0) threats.push(`No critical blockers identified`);
+
+  return { strengths, weaknesses, opportunities, threats };
+}
 
 export interface DiagnosticData {
   company: Company;
@@ -390,10 +446,11 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   const totalCost = allOpportunities.reduce((sum, o) => sum + parseFloat(o.opportunity.implementationCost || "0"), 0);
   const averageRoi = totalCost > 0 ? ((totalAnnualBenefit / totalCost) * 100) : 0;
   
-  // Get unique functions list from workflows
+  // Get unique functions list from workflows - using workflow names as proxy since department field doesn't exist
   const uniqueFunctions = new Set<string>();
   workflowsData.forEach(w => {
-    if (w.workflow.department) uniqueFunctions.add(w.workflow.department);
+    // Extract function/department from workflow name or description
+    uniqueFunctions.add(w.workflow.name.split(' - ')[0] || w.workflow.name);
   });
   const functionsList = Array.from(uniqueFunctions).join(", ");
 
@@ -474,7 +531,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   const appendixB: AppendixBData[] = workflowsData
     .filter(w => w.readiness !== null)
     .map(w => {
-      const swot = calculateSWOT(w.readiness!);
+      const swot = generateSWOT(w.readiness!);
       return {
         workflowName: w.workflow.name,
         swotAnalysis: swot,
@@ -485,6 +542,9 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   const appendixF: AppendixFData[] = [];
   
   workflowsData.forEach(w => {
+    // Extract department/function from workflow name
+    const department = w.workflow.name.split(' - ')[0] || null;
+    
     // Add TFA provenance
     if (w.tfa) {
       const knowledgeGaps = Object.keys(w.tfa.gapMetadata || {});
@@ -493,7 +553,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         dataType: 'TFA',
         respondentName: w.tfa.initialRespondent,
         respondentRole: 'Technical Contact',
-        department: w.workflow.department,
+        department,
         collectionMethod: 'Technical Feasibility Assessment Form',
         submissionDate: w.tfa.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: knowledgeGaps.length > 0 ? `${knowledgeGaps.length} questions with gaps` : null,
@@ -507,7 +567,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         dataType: 'PIF',
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
-        department: w.workflow.department,
+        department,
         collectionMethod: 'Process Insights Form',
         submissionDate: pif.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: null,

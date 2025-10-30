@@ -4,6 +4,62 @@
 // Variables in [square_brackets] are left for manual analyst commentary
 
 /**
+ * Variable replacement utility
+ * Replaces {{variables}} with actual data values
+ * Converts commentary placeholders to [bracketed] format for manual fill-in
+ */
+export function replaceVariables(
+  template: string,
+  data: Record<string, any>,
+  commentaryKeys: string[] = []
+): string {
+  let result = template;
+
+  // First, convert commentary placeholders from {{key}} to [key]
+  commentaryKeys.forEach(key => {
+    const commentaryPattern = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    result = result.replace(commentaryPattern, `[${key}]`);
+  });
+
+  // Then replace data variables
+  Object.entries(data).forEach(([key, value]) => {
+    const pattern = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+    
+    // Format value based on type
+    let formattedValue = value;
+    if (typeof value === 'number') {
+      // Format currency if it looks like a money value
+      if (key.includes('benefit') || key.includes('cost') || key.includes('revenue')) {
+        formattedValue = value.toLocaleString('en-US', { 
+          minimumFractionDigits: 0, 
+          maximumFractionDigits: 0 
+        });
+      } else if (key.includes('percent') || key.includes('roi')) {
+        formattedValue = value.toFixed(1);
+      } else if (key.includes('payback') || key.includes('months')) {
+        formattedValue = Math.round(value).toString();
+      } else {
+        formattedValue = value.toLocaleString('en-US', { 
+          minimumFractionDigits: 0, 
+          maximumFractionDigits: 2 
+        });
+      }
+    }
+    
+    result = result.replace(pattern, String(formattedValue));
+  });
+
+  return result;
+}
+
+/**
+ * Format date as "MMM YYYY"
+ */
+export function formatDiagnosticDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+/**
  * COMPREHENSIVE VARIABLE MAPPING
  * ================================
  * This maps template {{variables}} to their database sources and calculations
