@@ -228,14 +228,24 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
                   </p>
                 </div>
 
-                {/* Respondent */}
-                {q.respondentName && (
+                {/* Knowledge Gap Disclaimer or Respondent */}
+                {q.isKnowledgeGap ? (
+                  <div className="rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 space-y-1">
+                    <p className="text-xs font-medium text-amber-900 dark:text-amber-200 flex items-center gap-1">
+                      <HelpCircle className="h-3 w-3" />
+                      Knowledge Gap
+                    </p>
+                    <p className="text-xs text-amber-800 dark:text-amber-300" data-testid={`text-knowledge-gap-disclaimer-${q.id}`}>
+                      No client respondent could provide information for this question. The Lead Analyst identified this as a knowledge gap and assigned a neutral score (3/5) to complete the diagnostic assessment.
+                    </p>
+                  </div>
+                ) : q.respondentName ? (
                   <div className="text-xs text-muted-foreground" data-testid={`text-respondent-${q.id}`}>
                     Answered by: {q.respondentName}
                     {q.respondentRole && ` (${q.respondentRole})`}
                     {q.source && ` · Source: ${q.source}`}
                   </div>
-                )}
+                ) : null}
 
                 {/* Recommendation */}
                 {q.recommendation && (
