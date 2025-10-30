@@ -132,7 +132,7 @@ The objective of this diagnostic was to help {{company_name}} identify, prioriti
 roadmap automation opportunities aligned with its business objectives and operational realities.
 
 The engagement analyzed {{total_workflows}} workflows, identifying {{total_opportunities}}
-valid automation opportunities with an estimated total annual benefit of ${{annual_benefit}},
+valid automation opportunities with an estimated total annual benefit of {{annual_benefit}},
 an average payback of {{payback_period}} months, and a conservative ROI of
 {{roi_percent}}%.
 
@@ -347,7 +347,7 @@ that are both technically feasible and financially justified.
 
 Total Workflows Analyzed: {{workflow_count}}
 Validated Automation Opportunities: {{opportunity_count}}
-Total Annual Benefit Potential: ${{annual_benefit}}
+Total Annual Benefit Potential: {{annual_benefit}}
 Average Payback Period: {{avg_payback}} months
 FTE saved: {{fte_savings}} FTEs
 
@@ -832,7 +832,7 @@ D.2 ROI Insights – {{workflow_name}} / {{opportunity_name}}
 (This section will be repeated for each opportunity with the following structure)
 
 Performance Summary. Under the conservative scenario, estimated annual benefit is
-${{annual_benefit}}, equivalent to {{fte_saved}} FTEs or approximately
+{{annual_benefit}}, equivalent to {{fte_saved}} FTEs or approximately
 {{annual_hours_saved}} hours per year, with an expected payback of {{payback_months}}
 months.
 

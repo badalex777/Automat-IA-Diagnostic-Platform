@@ -16,6 +16,8 @@ import {
   ShadingType,
   VerticalAlign,
   convertInchesToTwip,
+  Packer,
+  type IRunOptions,
 } from "docx";
 import { DiagnosticData } from "./reportDataAggregator";
 import {
@@ -73,7 +75,7 @@ function createTextParagraphs(text: string): Paragraph[] {
 /**
  * Create a heading paragraph
  */
-function createHeading(text: string, level: HeadingLevel): Paragraph {
+function createHeading(text: string, level: typeof HeadingLevel[keyof typeof HeadingLevel]): Paragraph {
   return new Paragraph({
     text,
     heading: level,
@@ -91,8 +93,7 @@ function createTable(
   const headerRow = new TableRow({
     children: headers.map((h, i) => new TableCell({
       children: [new Paragraph({
-        text: h,
-        bold: true,
+        children: [new TextRun({ text: h, bold: true })],
         alignment: AlignmentType.CENTER,
       })],
       shading: {
@@ -159,7 +160,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   ];
 
   // Generate document sections
-  const sections: Paragraph[] = [];
+  const sections: (Paragraph | Table | TableOfContents)[] = [];
 
   // ===== COVER PAGE =====
   sections.push(
@@ -263,15 +264,22 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   const readinessHeaders = ["Workflow", "Opportunity", "TFA Score", "PIF Score", "Readiness", "Band"];
   const readinessRows: string[][] = [];
   data.workflows.forEach(w => {
-    if (w.readiness) {
+    if (w.readiness && w.readiness.componentScores) {
+      const readiness = w.readiness;
+      const avgPIFScore = Math.round(
+        (readiness.componentScores.processClarity + 
+         readiness.componentScores.changeMagnitude + 
+         readiness.componentScores.workflowBrittleness) / 3
+      );
+      
       w.opportunities.forEach(opp => {
         readinessRows.push([
           w.workflow.name,
           opp.opportunity.name,
           Math.round(w.tfa?.score || 0) + "%",
-          Math.round((w.readiness.componentScores.processClarity + w.readiness.componentScores.changeMagnitude + w.readiness.componentScores.workflowBrittleness) / 3) + "%",
-          Math.round(w.readiness.totalScore) + "%",
-          w.readiness.feasibilityBand,
+          avgPIFScore + "%",
+          Math.round(readiness.totalScore) + "%",
+          readiness.feasibilityBand,
         ]);
       });
     }
@@ -581,6 +589,6 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   });
 
   // Convert to buffer
-  const buffer = await doc.toBuffer();
+  const buffer = await Packer.toBuffer(doc);
   return buffer;
 }
