@@ -45,8 +45,8 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       industry: formData.industry,
       contact: formData.contact || undefined,
       leadAnalystName: formData.leadAnalystName || undefined,
-      annualRevenue: formData.annualRevenue ? parseFloat(formData.annualRevenue) : undefined,
-      totalEmployees: formData.totalEmployees ? parseInt(formData.totalEmployees) : undefined,
+      annualRevenue: parseFloat(formData.annualRevenue),
+      totalEmployees: parseInt(formData.totalEmployees),
     };
     
     onSubmit?.(submitData);
@@ -123,7 +123,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
           
           <div className="border-t pt-4 space-y-4">
             <div className="space-y-1">
-              <h4 className="text-sm font-semibold">{t.company.financialContext} ({t.common.optional})</h4>
+              <h4 className="text-sm font-semibold">{t.company.financialContext}</h4>
               <p className="text-xs text-muted-foreground">
                 {t.dialogs.editFinancialContextDesc}
               </p>
@@ -131,7 +131,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="annualRevenue">{t.company.annualRevenue} ($)</Label>
+                <Label htmlFor="annualRevenue">{t.company.annualRevenue} ($) *</Label>
                 <Input
                   id="annualRevenue"
                   type="number"
@@ -139,12 +139,13 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
                   placeholder={t.forms.annualRevenuePlaceholder}
                   value={formData.annualRevenue}
                   onChange={(e) => setFormData({ ...formData, annualRevenue: e.target.value })}
+                  required
                   data-testid="input-annual-revenue"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="totalEmployees">{t.company.totalEmployees}</Label>
+                <Label htmlFor="totalEmployees">{t.company.totalEmployees} *</Label>
                 <Input
                   id="totalEmployees"
                   type="number"
@@ -152,6 +153,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
                   placeholder={t.forms.totalEmployeesPlaceholder}
                   value={formData.totalEmployees}
                   onChange={(e) => setFormData({ ...formData, totalEmployees: e.target.value })}
+                  required
                   data-testid="input-total-employees"
                 />
               </div>
