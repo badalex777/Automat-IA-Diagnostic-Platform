@@ -48,10 +48,6 @@ export default function KnowledgeGapWarning({
 }: KnowledgeGapWarningProps) {
   const { toast } = useToast();
   
-  // Debug logging
-  console.log('[DEBUG KnowledgeGapWarning] responseSources:', responseSources);
-  console.log('[DEBUG KnowledgeGapWarning] has marked gaps:', Object.entries(responseSources).some(([_, data]) => data && data.isKnowledgeGap === true));
-  
   // Initialize gapResponses with whoMightKnow from gapMetadata as answeredBy
   const [gapResponses, setGapResponses] = useState<Record<string, GapFormData>>(() => {
     const initial: Record<string, GapFormData> = {};

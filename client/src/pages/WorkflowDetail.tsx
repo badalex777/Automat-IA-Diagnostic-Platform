@@ -369,6 +369,8 @@ export default function WorkflowDetail() {
                 const responses = tfaAssessment.responses as Record<string, string>;
                 const gaps = detectKnowledgeGaps(responses);
                 const hasGaps = gaps.length > 0;
+                const responseSources = (tfaAssessment.responseSources as Record<string, any>) || {};
+                const hasMarkedGaps = Object.values(responseSources).some((data: any) => data && data.isKnowledgeGap === true);
                 const answeredCount = Object.keys(responses).filter(key => {
                   const value = responses[key];
                   return value && value !== '0'; // Exclude "Don't Know" (value "0")
@@ -376,7 +378,7 @@ export default function WorkflowDetail() {
 
                 return (
                   <>
-                    {hasGaps && (
+                    {(hasGaps || hasMarkedGaps) && (
                       <KnowledgeGapWarning
                         assessmentId={tfaAssessment.id}
                         workflowId={workflowId}
@@ -384,11 +386,11 @@ export default function WorkflowDetail() {
                         initialRespondent={tfaAssessment.initialRespondent || undefined}
                         leadAnalystName={company?.leadAnalystName}
                         gapMetadata={tfaAssessment.gapMetadata as Record<string, { why: string; whoMightKnow: string }> | undefined}
-                        responseSources={tfaAssessment.responseSources as Record<string, any> || undefined}
+                        responseSources={responseSources}
                       />
                     )}
 
-                    {!hasGaps && (
+                    {!hasGaps && !hasMarkedGaps && (
                       <>
                         <ResponseSourcesDisclaimer
                           initialRespondent={tfaAssessment.initialRespondent || undefined}

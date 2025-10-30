@@ -308,7 +308,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!assessment) {
         return res.status(404).json({ error: "Assessment not found" });
       }
-      console.log('[DEBUG] TFA responseSources:', JSON.stringify(assessment.responseSources, null, 2));
       res.json(assessment);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
