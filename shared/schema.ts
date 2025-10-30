@@ -145,11 +145,21 @@ export const tfaResponsesSchema = z.object({
 export const fillGapsSchema = z.object({
   gapResponses: z.record(z.string(), z.object({
     value: z.string().min(1, "Answer is required"),
-    answeredBy: z.string().min(1, "Answered by is required"),
-    answeredByRole: z.string().min(1, "Resolver role is required"),
+    answeredBy: z.string(), // Can be empty for actual knowledge gaps
+    answeredByRole: z.string(), // Can be empty for actual knowledge gaps
     reason: z.string().optional(),
     isKnowledgeGap: z.boolean().optional().default(false),
-  })),
+  }).refine(
+    (data) => {
+      // For actual knowledge gaps, no respondent data needed
+      if (data.isKnowledgeGap) return true;
+      // For resolved gaps, require respondent info
+      return data.answeredBy.trim().length > 0 && data.answeredByRole.trim().length > 0;
+    },
+    {
+      message: "For resolved gaps, both answeredBy and answeredByRole are required. For actual knowledge gaps, mark as isKnowledgeGap.",
+    }
+  )),
 });
 
 export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omit({

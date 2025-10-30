@@ -110,45 +110,44 @@ export default function KnowledgeGapWarning({
       return;
     }
 
-    // Check if answeredByRole is filled
-    const currentResponse = gapResponses[questionId];
-    if (!currentResponse?.answeredByRole || currentResponse.answeredByRole.trim() === '') {
-      toast({
-        title: "Resolver Role required",
-        description: "Please specify the Resolver Role before marking as knowledge gap.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setGapResponses(prev => ({
       ...prev,
       [questionId]: {
-        ...prev[questionId],
         value: '3', // Middle score
-        answeredBy: leadAnalystName,
-        reason: 'Marked as knowledge gap - information unavailable from any identified source',
+        answeredBy: '', // No respondent for actual knowledge gaps
+        answeredByRole: '', // No respondent role for actual knowledge gaps
+        reason: `Knowledge gap identified by ${leadAnalystName}`,
         isKnowledgeGap: true,
       },
     }));
 
     toast({
       title: "Knowledge gap marked",
-      description: `Question auto-filled with middle score (3) by ${leadAnalystName}.`,
+      description: `Question auto-filled with middle score (3). Gap identified by ${leadAnalystName}.`,
     });
   };
 
   const handleSubmit = () => {
-    // Validate all gaps have answer, answeredBy, and answeredByRole
+    // Validate all gaps have answer
+    // For actual knowledge gaps (isKnowledgeGap=true), answeredBy/answeredByRole not required
+    // For resolved gaps, answeredBy and answeredByRole are required
     const allGapsFilled = gaps.every(gap => {
       const response = gapResponses[gap.questionId.toString()];
-      return response?.value && response?.value !== "0" && response?.answeredBy && response?.answeredByRole;
+      if (!response?.value || response?.value === "0") {
+        return false; // Must have an answer
+      }
+      // If it's a knowledge gap, no respondent data needed
+      if (response.isKnowledgeGap) {
+        return true;
+      }
+      // For resolved gaps, require respondent info
+      return response?.answeredBy && response?.answeredByRole;
     });
 
     if (!allGapsFilled) {
       toast({
         title: "Incomplete information",
-        description: "Please select an answer, specify who provided it, and their role for each question.",
+        description: "Please select an answer for each question. For resolved gaps, specify who provided it and their role, or mark as knowledge gap.",
         variant: "destructive",
       });
       return;
