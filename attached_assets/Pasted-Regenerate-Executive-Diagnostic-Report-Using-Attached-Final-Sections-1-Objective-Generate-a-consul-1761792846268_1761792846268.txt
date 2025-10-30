@@ -1,0 +1,196 @@
+Regenerate Executive Diagnostic Report Using Attached Final Sections
+1. Objective
+
+Generate a consulting-grade Executive Diagnostic Report per company by inserting the attached, final section texts verbatim and auto-populating all variables from the diagnostic platform database. No paraphrasing. No template drift. Enforce professional tone and formatting.
+
+2. Authoritative Section Sources
+
+Use the attached files as the single source of truth for content. Insert them verbatim, only substituting tokenized variables and data tables/figures from the database.
+
+Confidentiality and Disclaimer Statement(prompt).pdf
+
+Executive Summary(prompt).pdf
+
+Methodology Overview (prompt).pdf
+
+Diagnostic Overview(prompt).pdf
+
+Findings and Analysis(prompt).pdf
+
+Automation Roadmap(prompt).pdf
+
+Appendix A(prompt).pdf
+
+Appendix D All Opportunities ROI Detailed Overview(prompt).pdf
+
+Appendix E – ROI Calculation Methodology(prompt).pdf
+
+If any cross-reference inside a section conflicts with the final appendix lettering used below, dynamically update the reference text at render time.
+
+3. Gating Conditions
+
+Only generate a report if:
+
+At least one workflow has a complete TFA and a complete PIF.
+
+At least one opportunity is positioned on the Opportunity Matrix.
+If conditions are not met, provide a clear, single-screen message in-app indicating what is missing.
+
+4. Document Order and Placement
+
+Cover page
+
+Executive Summary (verbatim from file, variables populated)
+
+Confidentiality and Disclaimer Statement (verbatim from file, variables populated)
+
+Table of Contents
+
+Methodology Overview (verbatim)
+
+Diagnostic Overview (verbatim)
+
+Findings and Analysis (verbatim)
+
+Automation Roadmap with Gantt table (verbatim)
+
+Conclusions and Next Steps [retain existing section if not replaced]
+
+Appendices in this order:
+
+Appendix A: Detailed Methodology
+
+Appendix B: Readiness SWOT Analysis [populate from DB if available]
+
+Appendix C: ROI Model and Benefit Components [populate from DB if available]
+
+Appendix D: All Opportunities ROI Detailed Overview
+
+Appendix E: ROI Calculation Methodology
+
+Appendix F: Data Provenance and Audit Trail [auto-generate from DB; see Section 9]
+
+Note on references: Where any attached text refers to “Appendix D: Data Provenance,” remap that reference to Appendix F at generation.
+
+5. Diagnostic Period Handling
+
+Diagnostic Period = month and year of download time, formatted as “MMM YYYY” (for example, “Oct 2025”). Insert wherever requested by tokens.
+
+6. Variable Tokenization and Data Mapping
+
+Replace all double-curly tokens with live values from the database. At minimum, support:
+
+Company and period
+
+{{company_name}}
+
+{{diagnostic_period}}
+
+Portfolio metrics
+
+{{total_workflows}}, {{workflow_count}}
+
+{{total_opportunities}}, {{opportunity_count}}
+
+{{annual_benefit}}, {{avg_payback}}, {{avg_roi}}
+
+{{fte_savings}}, {{hours_saved}}
+
+{{functions_list}} [comma-separated list of departments]
+
+Top 3 opportunities
+
+{{opportunity_1_name}}, {{opportunity_1_benefit}}, {{opportunity_1_payback}}, {{opportunity_1_fte}}
+
+Repeat for 2 and 3
+
+{{opportunity_1_roi}} may appear in Diagnostic Overview file; include if present in that file
+
+Readiness table
+
+{{tfa_n}}, {{pif_n}}, {{readiness_n}}, {{band_n}}, {{readiness_notes_n}} per row
+
+ROI table
+
+{{benefit_n}}, {{cost_n}}, {{fte_n}}, {{payback_n}} per opportunity
+
+Matrix distribution and visuals
+
+{{quickwin_list}}, {{quickwin_count}}, {{strategic_list}}, {{strategic_count}}, {{nice_list}}, {{nice_count}}, {{deprioritize_list}}, {{deprioritize_count}}
+
+{{base_matrix_image}}, {{enhanced_matrix_image}} [accept an image object or pre-rendered chart from platform]
+
+Roadmap
+
+{{quickwin_opportunities_table}}, {{foundational_opportunities_table}}, {{strategic_opportunities_table}}
+
+{{quickwin_commentary}}, {{foundational_commentary}}, {{strategic_commentary}}, {{roadmap_summary_commentary}}
+
+Render the 18-month Gantt table exactly as shown in the attached roadmap file, with shaded cells or block characters in a Word table.
+
+Narratives
+
+{{readiness_commentary}}, {{roi_commentary}}, {{matrix_distribution_commentary}}, {{executive_analysis_commentary}}
+
+Appendix D per-opportunity pages
+
+{{annual_benefit}}, {{implementation_cost}}, {{payback_months}}, {{net_benefit_y1}}, {{net_benefit_y3}}, {{net_benefit_y5}}, {{fte_saved}}, {{annual_hours_saved}}, {{weekly_hours_saved}}, {{errors_avoided}}, {{error_reduction_pct}}, {{revenue_uplift}}, {{hours_reallocated}}, {{ramp_months}}, {{dominant_component}}
+
+7. Exact Text Insertion Rules
+
+Insert the body text from each attached section verbatim. Do not rewrite, summarize, or alter phrasing. Only replace tokens.
+
+Preserve section headings, tables, bullets, and figure callouts as in the source files.
+
+Where an attached text includes bracketed editorial cues or token fields, keep the cue but populate any variables within it.
+
+8. Calculations and Formulas
+
+Implement ROI, payback, net benefit, FTE and hours conversions, and scenario adjustments exactly as specified in Appendix E. No deviations.
+
+Annual benefit components and normalization remain as defined in Appendix A and Appendix E.
+
+All figures in tables are modeled under the Conservative Scenario Framework unless a section explicitly says otherwise.
+
+9. Data Provenance and Audit Trail
+
+Auto-generate Appendix F with a table containing, per workflow and opportunity:
+
+Data type, collection method, respondent name and role, department, submission date
+
+Any midpoint substitutions, knowledge gap notes, follow-up owner and status
+Cross-link entries back to the relevant TFA/PIF records and interview IDs.
+
+10. Formatting, Headers, and File Output
+
+Place Executive Summary and Confidentiality & Disclaimer before the Table of Contents.
+
+Use consistent heading hierarchy and tables as in the attached files.
+
+Currency: format as $X,XXX with no decimals, unless a section shows decimals.
+
+Time units: months for payback, hours and FTEs as specified. Assume 2,080 hours per FTE.
+
+Rounding: nearest hundred for portfolio-level benefits in appendices where stated.
+
+Insert page headers and footers: “Prepared for {{company_name}} by Automat-IA | Confidential”.
+
+File name: “Automat-IA Executive Diagnostic – {{company_name}} – {{diagnostic_period}}.docx”.
+
+11. Sanitization and Quality Gates
+
+Overwrite any opportunity labels or notes in the DB that contain slang, profanity, or informal placeholders with sanitized, title-cased names from the opportunity metadata.
+
+Disallow empty narrative fields. If a narrative variable is empty, insert a neutral, single-sentence stub that contains no bracketed editorial language.
+
+Validate image tokens before export. If no matrix images are available, render the matrix tables and include a note “Matrix visual pending export”.
+
+12. Validation Checks Before Export
+
+All required tokens resolved.
+
+Appendix cross-references aligned with the numbering in Section 4.
+
+Conservative Scenario note present in ROI sections.
+
+Gantt roadmap table renders correctly across 0–18 months.
