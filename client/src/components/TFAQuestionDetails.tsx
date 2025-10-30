@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle2, AlertCircle, Info, Search } from "lucide-react";
+import { AlertTriangle, CheckCircle2, AlertCircle, Info, Search, HelpCircle } from "lucide-react";
 import { TFA_QUESTIONS, QUESTION_RECOMMENDATIONS } from "@shared/tfaQuestions";
 
 interface TFAQuestionDetailsProps {
@@ -13,6 +13,7 @@ interface TFAQuestionDetailsProps {
     respondentName: string;
     respondentRole?: string;
     source?: string;
+    isKnowledgeGap?: boolean;
   }>;
 }
 
@@ -49,6 +50,7 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
         respondentName: respondent?.respondentName,
         respondentRole: respondent?.respondentRole,
         source: respondent?.source,
+        isKnowledgeGap: respondent?.isKnowledgeGap || false,
         recommendation,
       };
     });
@@ -200,6 +202,12 @@ export function TFAQuestionDetails({ responses, respondents }: TFAQuestionDetail
                         {q.section}
                       </Badge>
                       <span className="text-xs text-muted-foreground">Q{q.id}</span>
+                      {q.isKnowledgeGap && (
+                        <Badge variant="secondary" className="gap-1 text-xs" data-testid={`badge-knowledge-gap-${q.id}`}>
+                          <HelpCircle className="h-3 w-3" />
+                          Knowledge Gap
+                        </Badge>
+                      )}
                     </div>
                     <CardTitle className="text-base" data-testid={`text-question-${q.id}`}>
                       {q.question}

@@ -438,9 +438,10 @@ export default function WorkflowDetail() {
                                 const sources = tfaAssessment.responseSources as Record<string, any> || {};
                                 return Object.keys(sources).map(questionId => ({
                                   questionId: parseInt(questionId),
-                                  respondentName: sources[questionId].respondentName || tfaAssessment.initialRespondent || 'Unknown',
-                                  respondentRole: sources[questionId].respondentRole,
+                                  respondentName: sources[questionId].answeredBy || sources[questionId].respondentName || tfaAssessment.initialRespondent || 'Unknown',
+                                  respondentRole: sources[questionId].answeredByRole || sources[questionId].respondentRole,
                                   source: sources[questionId].source,
+                                  isKnowledgeGap: sources[questionId].isKnowledgeGap || false,
                                 }));
                               })()}
                             />
