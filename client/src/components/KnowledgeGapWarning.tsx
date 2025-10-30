@@ -24,13 +24,16 @@ interface KnowledgeGapWarningProps {
   workflowId: string;
   gaps: KnowledgeGap[];
   initialRespondent?: string;
+  leadAnalystName?: string | null;
   gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
 }
 
 interface GapFormData {
   value: string;
   answeredBy: string;
+  answeredByRole: string;
   reason: string;
+  isKnowledgeGap?: boolean;
 }
 
 export default function KnowledgeGapWarning({ 
@@ -38,6 +41,7 @@ export default function KnowledgeGapWarning({
   workflowId,
   gaps, 
   initialRespondent,
+  leadAnalystName,
   gapMetadata = {}
 }: KnowledgeGapWarningProps) {
   const { toast } = useToast();
@@ -52,6 +56,7 @@ export default function KnowledgeGapWarning({
         initial[questionId] = {
           value: '',
           answeredBy: metadata.whoMightKnow || '', // Pre-fill with whoMightKnow
+          answeredByRole: '',
           reason: metadata.why || '', // We'll show this as read-only
         };
       }
@@ -82,9 +87,9 @@ export default function KnowledgeGapWarning({
     },
   });
 
-  const handleGapUpdate = (questionId: string, field: keyof GapFormData, value: string) => {
+  const handleGapUpdate = (questionId: string, field: keyof GapFormData, value: string | boolean) => {
     setGapResponses(prev => {
-      const currentData = prev[questionId] || { value: '', answeredBy: '', reason: '' };
+      const currentData = prev[questionId] || { value: '', answeredBy: '', answeredByRole: '', reason: '' };
       return {
         ...prev,
         [questionId]: {
@@ -95,17 +100,44 @@ export default function KnowledgeGapWarning({
     });
   };
 
+  const markAsKnowledgeGap = (questionId: string) => {
+    if (!leadAnalystName) {
+      toast({
+        title: "Lead Analyst not set",
+        description: "Cannot mark as knowledge gap without a Lead Analyst assigned to this company.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGapResponses(prev => ({
+      ...prev,
+      [questionId]: {
+        value: '3', // Middle score
+        answeredBy: leadAnalystName,
+        answeredByRole: 'Lead Analyst',
+        reason: 'Marked as knowledge gap - information unavailable from any identified source',
+        isKnowledgeGap: true,
+      },
+    }));
+
+    toast({
+      title: "Knowledge gap marked",
+      description: "Question auto-filled with middle score (3) by Lead Analyst.",
+    });
+  };
+
   const handleSubmit = () => {
-    // Validate all gaps have answer and answeredBy (reason is optional for additional context)
+    // Validate all gaps have answer, answeredBy, and answeredByRole
     const allGapsFilled = gaps.every(gap => {
       const response = gapResponses[gap.questionId.toString()];
-      return response?.value && response?.value !== "0" && response?.answeredBy;
+      return response?.value && response?.value !== "0" && response?.answeredBy && response?.answeredByRole;
     });
 
     if (!allGapsFilled) {
       toast({
         title: "Incomplete information",
-        description: "Please select an answer and specify who provided it for each question.",
+        description: "Please select an answer, specify who provided it, and their role for each question.",
         variant: "destructive",
       });
       return;
@@ -153,9 +185,33 @@ export default function KnowledgeGapWarning({
           {Object.entries(groupedGaps).map(([section, sectionGaps]) => (
             <div key={section} className="space-y-4">
               <h4 className="font-medium text-sm text-primary">{section}</h4>
-              {sectionGaps.map(gap => (
+              {sectionGaps.map(gap => {
+                const isMarkedAsGap = gapResponses[gap.questionId.toString()]?.isKnowledgeGap;
+                return (
                 <Card key={gap.questionId} className="p-4 bg-muted/30">
-                  <p className="text-sm font-medium mb-4">{gap.question}</p>
+                  <div className="flex items-start justify-between mb-4">
+                    <p className="text-sm font-medium flex-1">{gap.question}</p>
+                    {!isMarkedAsGap && leadAnalystName && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => markAsKnowledgeGap(gap.questionId.toString())}
+                        data-testid={`button-mark-gap-${gap.questionId}`}
+                        className="ml-4"
+                      >
+                        Mark as Knowledge Gap
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {isMarkedAsGap && (
+                    <Alert className="mb-4 bg-muted">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertDescription className="text-sm">
+                        Marked as knowledge gap - auto-filled with middle score (3) by {leadAnalystName}
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   
                   <div className="grid gap-4">
                     {/* Show "why" from initial respondent as read-only context */}
@@ -189,7 +245,7 @@ export default function KnowledgeGapWarning({
 
                     <div className="space-y-2">
                       <Label htmlFor={`answered-by-${gap.questionId}`}>
-                        Answered by (Name & Role) *
+                        Answered by (Name) *
                         {gapMetadata[gap.questionId.toString()]?.whoMightKnow && (
                           <span className="text-xs text-muted-foreground ml-2">
                             (Suggested: {gapMetadata[gap.questionId.toString()].whoMightKnow})
@@ -198,10 +254,25 @@ export default function KnowledgeGapWarning({
                       </Label>
                       <Input
                         id={`answered-by-${gap.questionId}`}
-                        placeholder="e.g., John Smith - IT Manager"
+                        placeholder="e.g., John Smith"
                         value={gapResponses[gap.questionId.toString()]?.answeredBy || ""}
                         onChange={(e) => handleGapUpdate(gap.questionId.toString(), 'answeredBy', e.target.value)}
                         data-testid={`input-gap-answeredby-${gap.questionId}`}
+                        disabled={isMarkedAsGap}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`answered-by-role-${gap.questionId}`}>
+                        Resolver Role *
+                      </Label>
+                      <Input
+                        id={`answered-by-role-${gap.questionId}`}
+                        placeholder="e.g., IT Manager, Lead Analyst"
+                        value={gapResponses[gap.questionId.toString()]?.answeredByRole || ""}
+                        onChange={(e) => handleGapUpdate(gap.questionId.toString(), 'answeredByRole', e.target.value)}
+                        data-testid={`input-gap-answeredbyrole-${gap.questionId}`}
+                        disabled={isMarkedAsGap}
                       />
                     </div>
 
@@ -214,11 +285,13 @@ export default function KnowledgeGapWarning({
                         onChange={(e) => handleGapUpdate(gap.questionId.toString(), 'reason', e.target.value)}
                         className="min-h-[60px]"
                         data-testid={`input-gap-reason-${gap.questionId}`}
+                        disabled={isMarkedAsGap}
                       />
                     </div>
                   </div>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           ))}
         </div>
