@@ -146,9 +146,9 @@ export const fillGapsSchema = z.object({
   gapResponses: z.record(z.string(), z.object({
     value: z.string().min(1, "Answer is required"),
     answeredBy: z.string().min(1, "Answered by is required"),
-    answeredByRole: z.string().optional(),
+    answeredByRole: z.string().min(1, "Resolver role is required"),
     reason: z.string().optional(),
-    isKnowledgeGap: z.boolean().default(false),
+    isKnowledgeGap: z.boolean().optional().default(false),
   })),
 });
 
