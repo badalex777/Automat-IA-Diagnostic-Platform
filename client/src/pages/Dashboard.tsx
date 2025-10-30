@@ -35,6 +35,7 @@ export default function Dashboard() {
       name: string; 
       industry: string; 
       contact?: string;
+      leadAnalystName?: string;
       annualRevenue?: number;
       totalEmployees?: number;
       annualLaborCosts?: number;

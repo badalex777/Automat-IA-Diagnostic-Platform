@@ -8,6 +8,7 @@ export const companies = pgTable("companies", {
   name: text("name").notNull(),
   industry: text("industry").notNull(),
   contact: text("contact"),
+  leadAnalystName: text("lead_analyst_name"),
   annualRevenue: decimal("annual_revenue", { precision: 15, scale: 2 }),
   totalEmployees: integer("total_employees"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -34,6 +35,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   comments: text("comments"),
   score: integer("score"),
   initialRespondent: text("initial_respondent"),
+  initialRespondentRole: text("initial_respondent_role"),
   responseSources: jsonb("response_sources").default({}),
   gapMetadata: jsonb("gap_metadata").default({}),
   completedAt: timestamp("completed_at"),
@@ -133,6 +135,7 @@ export const tfaResponsesSchema = z.object({
   responses: z.record(z.string(), z.string()),
   comments: z.string().optional(),
   initialRespondent: z.string().optional(),
+  initialRespondentRole: z.string().optional(),
   gapMetadata: z.record(z.string(), z.object({
     why: z.string(),
     whoMightKnow: z.string(),
@@ -143,7 +146,9 @@ export const fillGapsSchema = z.object({
   gapResponses: z.record(z.string(), z.object({
     value: z.string().min(1, "Answer is required"),
     answeredBy: z.string().min(1, "Answered by is required"),
-    reason: z.string().optional(), // Optional - consultant can add additional context
+    answeredByRole: z.string().optional(),
+    reason: z.string().optional(),
+    isKnowledgeGap: z.boolean().default(false),
   })),
 });
 

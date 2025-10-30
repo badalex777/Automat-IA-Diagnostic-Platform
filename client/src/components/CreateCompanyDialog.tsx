@@ -19,6 +19,7 @@ interface CreateCompanyDialogProps {
     name: string; 
     industry: string; 
     contact?: string;
+    leadAnalystName?: string;
     annualRevenue?: number;
     totalEmployees?: number;
   }) => void;
@@ -31,6 +32,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
     name: '',
     industry: '',
     contact: '',
+    leadAnalystName: '',
     annualRevenue: '',
     totalEmployees: '',
   });
@@ -42,6 +44,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       name: formData.name,
       industry: formData.industry,
       contact: formData.contact || undefined,
+      leadAnalystName: formData.leadAnalystName || undefined,
       annualRevenue: formData.annualRevenue ? parseFloat(formData.annualRevenue) : undefined,
       totalEmployees: formData.totalEmployees ? parseInt(formData.totalEmployees) : undefined,
     };
@@ -52,6 +55,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       name: '', 
       industry: '', 
       contact: '',
+      leadAnalystName: '',
       annualRevenue: '',
       totalEmployees: '',
     });
@@ -104,6 +108,16 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
               onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
               rows={3}
               data-testid="input-contact"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="leadAnalyst">Lead Analyst Name</Label>
+            <Input
+              id="leadAnalyst"
+              placeholder="Primary analyst managing this diagnostic"
+              value={formData.leadAnalystName}
+              onChange={(e) => setFormData({ ...formData, leadAnalystName: e.target.value })}
+              data-testid="input-lead-analyst"
             />
           </div>
           
