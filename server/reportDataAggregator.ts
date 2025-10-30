@@ -138,6 +138,13 @@ export interface AppendixFData {
   collectionMethod: string;
   submissionDate: string;
   knowledgeGaps: string | null;
+  knowledgeGapDetails?: Array<{
+    questionId: number;
+    resolvedBy: string;
+    resolverRole: string;
+    isKnowledgeGap: boolean;
+    resolvedAt: string;
+  }>;
 }
 
 export interface WorkflowData {
@@ -547,7 +554,43 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     
     // Add TFA provenance
     if (w.tfa) {
-      const knowledgeGaps = Object.keys(w.tfa.gapMetadata || {});
+      const gapMetadata = w.tfa.gapMetadata || {};
+      const responseSources = w.tfa.responseSources || {};
+      const initialGapsCount = Object.keys(gapMetadata).length;
+      
+      // Identify resolved gaps and knowledge gaps from responseSources
+      const knowledgeGapDetails: Array<{
+        questionId: number;
+        resolvedBy: string;
+        resolverRole: string;
+        isKnowledgeGap: boolean;
+        resolvedAt: string;
+      }> = [];
+      
+      Object.keys(responseSources).forEach(questionId => {
+        const source = responseSources[questionId];
+        if (source.answeredBy && source.answeredByRole) {
+          knowledgeGapDetails.push({
+            questionId: parseInt(questionId),
+            resolvedBy: source.answeredBy,
+            resolverRole: source.answeredByRole,
+            isKnowledgeGap: source.isKnowledgeGap || false,
+            resolvedAt: source.answeredAt || '',
+          });
+        }
+      });
+      
+      const markedAsKnowledgeGapCount = knowledgeGapDetails.filter(d => d.isKnowledgeGap).length;
+      const resolvedByOthersCount = knowledgeGapDetails.filter(d => !d.isKnowledgeGap).length;
+      
+      let gapSummary = null;
+      if (initialGapsCount > 0) {
+        const parts = [];
+        if (resolvedByOthersCount > 0) parts.push(`${resolvedByOthersCount} resolved by SMEs`);
+        if (markedAsKnowledgeGapCount > 0) parts.push(`${markedAsKnowledgeGapCount} marked as knowledge gaps`);
+        gapSummary = `${initialGapsCount} initial gaps: ${parts.join(', ')}`;
+      }
+      
       appendixF.push({
         workflowName: w.workflow.name,
         dataType: 'TFA',
@@ -556,7 +599,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         department,
         collectionMethod: 'Technical Feasibility Assessment Form',
         submissionDate: w.tfa.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        knowledgeGaps: knowledgeGaps.length > 0 ? `${knowledgeGaps.length} questions with gaps` : null,
+        knowledgeGaps: gapSummary,
+        knowledgeGapDetails: knowledgeGapDetails.length > 0 ? knowledgeGapDetails : undefined,
       });
     }
 
