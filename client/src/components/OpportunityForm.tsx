@@ -41,6 +41,8 @@ export function OpportunityForm({
       description: initialData?.description || "",
       annualRoi: initialData?.annualRoi,
       implementationCost: initialData?.implementationCost,
+      cumulativeNetBenefit3Year: initialData?.cumulativeNetBenefit3Year,
+      cumulativeNetBenefit5Year: initialData?.cumulativeNetBenefit5Year,
       hoursSavedPerWeek: initialData?.hoursSavedPerWeek,
       annualHoursSaved: initialData?.annualHoursSaved,
       errorReductionPct: initialData?.errorReductionPct,
@@ -85,6 +87,8 @@ export function OpportunityForm({
       ...data,
       annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
       implementationCost: data.implementationCost ? parseFloat(data.implementationCost) : undefined,
+      cumulativeNetBenefit3Year: data.cumulativeNetBenefit3Year ? parseFloat(data.cumulativeNetBenefit3Year) : undefined,
+      cumulativeNetBenefit5Year: data.cumulativeNetBenefit5Year ? parseFloat(data.cumulativeNetBenefit5Year) : undefined,
       hoursSavedPerWeek,
       annualHoursSaved,
       fteSavings, // Auto-calculated from hours
@@ -201,6 +205,52 @@ export function OpportunityForm({
               </FormItem>
             )}
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="cumulativeNetBenefit3Year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>3-Year Cumulative Net Benefit</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      step="any"
+                      placeholder="e.g., 135000"
+                      data-testid="input-net-benefit-3year"
+                      {...field}
+                      value={field.value || ""}
+                      onChange={e => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cumulativeNetBenefit5Year"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>5-Year Cumulative Net Benefit</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      step="any"
+                      placeholder="e.g., 235000"
+                      data-testid="input-net-benefit-5year"
+                      {...field}
+                      value={field.value || ""}
+                      onChange={e => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
