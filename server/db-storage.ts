@@ -131,6 +131,7 @@ export class DbStorage implements IStorage {
     score?: number, 
     comments?: string, 
     initialRespondent?: string,
+    initialRespondentRole?: string,
     gapMetadata?: Record<string, { why: string; whoMightKnow: string }>
   ): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
@@ -143,6 +144,9 @@ export class DbStorage implements IStorage {
     if (initialRespondent !== undefined) {
       updateData.initialRespondent = initialRespondent;
     }
+    if (initialRespondentRole !== undefined) {
+      updateData.initialRespondentRole = initialRespondentRole;
+    }
     if (gapMetadata !== undefined) {
       updateData.gapMetadata = gapMetadata;
     }
@@ -150,7 +154,7 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
-  async fillTFAGaps(id: string, gapResponses: Record<string, { value: string, answeredBy: string, reason: string }>, updatedResponses: Record<string, string>, updatedScore: number): Promise<TFAAssessment | undefined> {
+  async fillTFAGaps(id: string, gapResponses: Record<string, { value: string, answeredBy: string, answeredByRole?: string, reason?: string, isKnowledgeGap?: boolean }>, updatedResponses: Record<string, string>, updatedScore: number): Promise<TFAAssessment | undefined> {
     const assessment = await this.getTFAAssessment(id);
     if (!assessment) return undefined;
 
@@ -160,7 +164,9 @@ export class DbStorage implements IStorage {
     for (const [questionId, gapData] of Object.entries(gapResponses)) {
       currentSources[questionId] = {
         answeredBy: gapData.answeredBy,
-        reason: gapData.reason,
+        answeredByRole: gapData.answeredByRole || null,
+        reason: gapData.reason || null,
+        isKnowledgeGap: gapData.isKnowledgeGap || false,
         answeredAt: new Date().toISOString(),
       };
     }

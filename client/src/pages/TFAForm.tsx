@@ -31,6 +31,7 @@ export default function TFAForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
+  const [respondentRole, setRespondentRole] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
   
@@ -73,6 +74,7 @@ export default function TFAForm() {
       responses: Record<string, string>; 
       comments?: string; 
       initialRespondent?: string;
+      initialRespondentRole?: string;
       gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
     }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
@@ -97,6 +99,14 @@ export default function TFAForm() {
       toast({
         title: t.nameRequired,
         description: t.nameRequiredDescription,
+        variant: "destructive",
+      });
+      return;
+    }
+    if (!respondentRole.trim()) {
+      toast({
+        title: language === 'en' ? "Role required" : "Rol requerido",
+        description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
         variant: "destructive",
       });
       return;
@@ -135,6 +145,7 @@ export default function TFAForm() {
       responses: answers, 
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
+      initialRespondentRole: respondentRole.trim(),
       gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
@@ -145,11 +156,19 @@ export default function TFAForm() {
   };
 
   const handleNext = () => {
-    // Validate respondent name if on first section
+    // Validate respondent name and role if on first section
     if (currentSection === 0 && !respondentName.trim()) {
       toast({
         title: t.nameRequired,
         description: t.nameRequiredDescription,
+        variant: "destructive",
+      });
+      return;
+    }
+    if (currentSection === 0 && !respondentRole.trim()) {
+      toast({
+        title: language === 'en' ? "Role required" : "Rol requerido",
+        description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
         variant: "destructive",
       });
       return;
@@ -279,19 +298,39 @@ export default function TFAForm() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         {currentSection === 0 && (
-          <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border">
-            <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
-            <Input
-              id="respondent-name"
-              placeholder={t.enterFullName}
-              value={respondentName}
-              onChange={(e) => setRespondentName(e.target.value)}
-              className="mt-2"
-              data-testid="input-respondent-name"
-            />
-            <p className="text-xs text-muted-foreground mt-2">
-              {t.nameHelperText}
-            </p>
+          <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+            <div>
+              <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
+              <Input
+                id="respondent-name"
+                placeholder={t.enterFullName}
+                value={respondentName}
+                onChange={(e) => setRespondentName(e.target.value)}
+                className="mt-2"
+                data-testid="input-respondent-name"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                {t.nameHelperText}
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="respondent-role" className="text-sm font-medium">
+                {language === 'en' ? 'Your Role/Title' : 'Su Rol/Título'}
+              </Label>
+              <Input
+                id="respondent-role"
+                placeholder={language === 'en' ? 'e.g., IT Director, Operations Manager' : 'ej., Director de TI, Gerente de Operaciones'}
+                value={respondentRole}
+                onChange={(e) => setRespondentRole(e.target.value)}
+                className="mt-2"
+                data-testid="input-respondent-role"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                {language === 'en' 
+                  ? 'Your role helps us understand your perspective on technical capabilities' 
+                  : 'Su rol nos ayuda a comprender su perspectiva sobre las capacidades técnicas'}
+              </p>
+            </div>
           </div>
         )}
 

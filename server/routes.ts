@@ -353,7 +353,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tfa/shareable/:shareableId/submit", async (req, res) => {
     try {
       const validatedData = tfaResponsesSchema.parse(req.body);
-      const { responses, comments, initialRespondent, gapMetadata } = validatedData;
+      const { responses, comments, initialRespondent, initialRespondentRole, gapMetadata } = validatedData;
 
       // Get assessment by shareableId
       const assessment = await storage.getTFAByShareableId(req.params.shareableId);
@@ -393,7 +393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const sectionScores = calculateSectionScores(responses);
 
       // Update TFA with responses and mark as complete with all data in one operation
-      await storage.updateTFAResponses(assessment.id, responses, score, comments, initialRespondent, gapMetadata);
+      await storage.updateTFAResponses(assessment.id, responses, score, comments, initialRespondent, initialRespondentRole, gapMetadata);
       const updatedAssessment = await storage.completeTFA(assessment.id, score, comments);
       
       if (!updatedAssessment) {
