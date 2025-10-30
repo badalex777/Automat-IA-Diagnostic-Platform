@@ -83,6 +83,7 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   name: text("name").notNull(),
   description: text("description"),
   annualRoi: decimal("annual_roi", { precision: 12, scale: 2 }),
+  implementationCost: decimal("implementation_cost", { precision: 12, scale: 2 }),
   hoursSavedPerWeek: decimal("hours_saved_per_week", { precision: 8, scale: 2 }),
   annualHoursSaved: decimal("annual_hours_saved", { precision: 10, scale: 2 }),
   fteSavings: decimal("fte_savings", { precision: 6, scale: 2 }),
@@ -180,6 +181,7 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
   createdAt: true,
 }).extend({
   annualRoi: z.coerce.number().optional(),
+  implementationCost: z.coerce.number().positive("Implementation cost must be positive"),
   hoursSavedPerWeek: z.coerce.number().optional(),
   annualHoursSaved: z.coerce.number().optional(),
   fteSavings: z.coerce.number().optional(),
