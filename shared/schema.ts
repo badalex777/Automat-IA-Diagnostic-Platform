@@ -110,8 +110,8 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
   createdAt: true,
 }).extend({
-  annualRevenue: z.coerce.number().positive("Annual revenue must be positive").optional(),
-  totalEmployees: z.coerce.number().int().positive("Total employees must be a positive whole number").optional(),
+  annualRevenue: z.coerce.number().positive("Annual revenue must be positive"),
+  totalEmployees: z.coerce.number().int().positive("Total employees must be a positive whole number"),
 });
 
 export const updateCompanySchema = insertCompanySchema.partial();

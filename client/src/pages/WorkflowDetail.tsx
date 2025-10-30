@@ -436,13 +436,41 @@ export default function WorkflowDetail() {
                               responses={responses}
                               respondents={(() => {
                                 const sources = tfaAssessment.responseSources as Record<string, any> || {};
-                                return Object.keys(sources).map(questionId => ({
-                                  questionId: parseInt(questionId),
-                                  respondentName: sources[questionId].answeredBy || sources[questionId].respondentName || tfaAssessment.initialRespondent || 'Unknown',
-                                  respondentRole: sources[questionId].answeredByRole || sources[questionId].respondentRole,
-                                  source: sources[questionId].source,
-                                  isKnowledgeGap: sources[questionId].isKnowledgeGap || false,
-                                }));
+                                const respondentsArray: Array<{
+                                  questionId: number;
+                                  respondentName: string;
+                                  respondentRole?: string;
+                                  source?: string;
+                                  isKnowledgeGap?: boolean;
+                                }> = [];
+                                
+                                // For each answered question, determine respondent info
+                                Object.keys(responses).forEach(questionId => {
+                                  const questionIdNum = parseInt(questionId);
+                                  const sourceData = sources[questionId];
+                                  
+                                  if (sourceData) {
+                                    // Question has gap resolution data (filled gap or knowledge gap)
+                                    respondentsArray.push({
+                                      questionId: questionIdNum,
+                                      respondentName: sourceData.answeredBy || '',
+                                      respondentRole: sourceData.answeredByRole || undefined,
+                                      source: sourceData.source,
+                                      isKnowledgeGap: sourceData.isKnowledgeGap || false,
+                                    });
+                                  } else {
+                                    // Question was answered initially (no gap resolution)
+                                    respondentsArray.push({
+                                      questionId: questionIdNum,
+                                      respondentName: tfaAssessment.initialRespondent || '',
+                                      respondentRole: tfaAssessment.initialRespondentRole || undefined,
+                                      source: 'Initial assessment',
+                                      isKnowledgeGap: false,
+                                    });
+                                  }
+                                });
+                                
+                                return respondentsArray;
                               })()}
                             />
                           </div>
