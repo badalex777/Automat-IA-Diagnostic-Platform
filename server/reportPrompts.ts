@@ -3,6 +3,69 @@
 // Variables in {{double_braces}} get populated from database
 // Variables in [square_brackets] are left for manual analyst commentary
 
+/**
+ * COMPREHENSIVE VARIABLE MAPPING
+ * ================================
+ * This maps template {{variables}} to their database sources and calculations
+ * 
+ * COMPANY CONTEXT:
+ * - {{company_name}} → company.name
+ * - {{annual_revenue}} → company.annualRevenue (optional, for normalization)
+ * - {{total_employees}} → company.totalEmployees (optional, for normalization)
+ * 
+ * PORTFOLIO-LEVEL METRICS (calculated across all workflows/opportunities):
+ * - {{total_workflows}} → count of workflows
+ * - {{workflow_count}} → same as total_workflows
+ * - {{total_opportunities}} → count of opportunities
+ * - {{opportunity_count}} → same as total_opportunities
+ * - {{annual_benefit}} → sum of all opportunity.annualBenefit
+ * - {{avg_payback}} → average of all opportunity.paybackPeriodMonths
+ * - {{payback_period}} → same as avg_payback
+ * - {{roi_percent}} → average ROI across opportunities
+ * - {{fte_savings}} → sum of all opportunity.fteSavings
+ * - {{functions_list}} → comma-separated list of unique workflow departments/functions
+ * 
+ * TOP 3 OPPORTUNITIES (sorted by business impact):
+ * - Top 3 opportunities with: name, annual benefit, ROI, payback, FTE, description
+ * 
+ * MATRIX QUADRANT COUNTS:
+ * - {{quickwin_count}} → count of opportunities in Quick Wins quadrant
+ * - Quick Wins, Strategic, Nice-to-Have, Deprioritize counts and lists
+ * 
+ * PER-OPPORTUNITY DETAILS (for tables and Appendix D):
+ * - {{workflow_name}} → workflow.name
+ * - {{opportunity_name}} → opportunity.name
+ * - {{annual_benefit}} → opportunity.annualBenefit
+ * - {{payback_months}} → opportunity.paybackPeriodMonths
+ * - {{fte_saved}} → opportunity.fteSavings
+ * - {{implementation_cost}} → opportunity.implementationCost
+ * - {{net_benefit_3yr}} → opportunity.netBenefit3Year (optional)
+ * - {{net_benefit_5yr}} → opportunity.netBenefit5Year (optional)
+ * - {{annual_hours_saved}} → opportunity.fteSavings * 2080
+ * - {{weekly_hours_saved}} → annual_hours_saved / 52
+ * - {{dominant_component}} → calculated from impact breakdown
+ * 
+ * READINESS SCORES (per workflow):
+ * - {{tfa_score}} → TFA score 0-100
+ * - {{pif_score}} → Aggregated PIF score 0-100
+ * - {{readiness_score}} → Combined readiness (TFA 60% + PIF 40%)
+ * - {{readiness_band}} → Very High/High/Moderate/Low/Very Low
+ * 
+ * DATE FORMATTING:
+ * - {{diagnostic_date}} → Format as "MMM YYYY" (e.g., "Oct 2025")
+ * 
+ * COMMENTARY PLACEHOLDERS (converted from {{}} to []):
+ * - [commentary] → Manual analyst insights
+ * - [readiness_commentary] → Readiness analysis
+ * - [roi_commentary] → ROI interpretation
+ * - [matrix_distribution_commentary] → Matrix analysis
+ * - [executive_analysis_commentary] → Executive interpretation
+ * - [quickwin_commentary] → Quick wins analysis
+ * - [foundational_commentary] → Foundational phase analysis
+ * - [strategic_commentary] → Strategic phase analysis
+ * - [roadmap_summary_commentary] → Roadmap summary
+ */
+
 export const EXECUTIVE_SUMMARY = `
 Executive Summary
 

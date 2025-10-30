@@ -12,7 +12,7 @@ import {
   type Workflow
 } from "@shared/schema";
 import { eq, and, isNotNull } from "drizzle-orm";
-import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
+import { calculateReadinessRubric, calculateAggregatedPIFScores, calculateSWOT } from "@shared/pifCalculations";
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
 import { calculateSectionScores } from "@shared/tfaQuestions";
 
@@ -21,6 +21,67 @@ export interface DiagnosticData {
   workflows: WorkflowData[];
   diagnosticPeriod: { start: Date; end: Date };
   hasCompleteOpportunities: boolean;
+  portfolioMetrics: PortfolioMetrics;
+  top3Opportunities: TopOpportunity[];
+  matrixDistribution: MatrixDistribution;
+  roadmapPhases: RoadmapPhases;
+  appendixB: AppendixBData[];
+  appendixF: AppendixFData[];
+}
+
+export interface PortfolioMetrics {
+  totalWorkflows: number;
+  totalOpportunities: number;
+  totalAnnualBenefit: number;
+  averagePaybackMonths: number;
+  averageRoi: number;
+  totalFteSavings: number;
+  functionsList: string;
+}
+
+export interface TopOpportunity {
+  workflowName: string;
+  opportunityName: string;
+  annualBenefit: number;
+  roi: number;
+  paybackMonths: number;
+  fteSavings: number;
+  description: string;
+  businessImpact: number;
+}
+
+export interface MatrixDistribution {
+  quickWins: { count: number; opportunities: string[] };
+  strategicGoals: { count: number; opportunities: string[] };
+  niceToHaves: { count: number; opportunities: string[] };
+  deprioritize: { count: number; opportunities: string[] };
+}
+
+export interface RoadmapPhases {
+  phase1QuickWins: OpportunityData[];
+  phase2Foundational: OpportunityData[];
+  phase3Strategic: OpportunityData[];
+}
+
+export interface AppendixBData {
+  workflowName: string;
+  swotAnalysis: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  };
+}
+
+export interface AppendixFData {
+  workflowName: string;
+  dataType: 'TFA' | 'PIF';
+  respondentName: string;
+  respondentRole: string;
+  department: string | null;
+  collectionMethod: string;
+  submissionDate: string;
+  knowledgeGaps: string | null;
 }
 
 export interface WorkflowData {
@@ -316,10 +377,154 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     end: latestDate || new Date(),
   };
 
+  // ===== PORTFOLIO METRICS CALCULATION =====
+  const allOpportunities = workflowsData.flatMap(w => w.opportunities);
+  const totalOpportunities = allOpportunities.length;
+  const totalAnnualBenefit = allOpportunities.reduce((sum, o) => sum + o.roiMetrics.annualRoi, 0);
+  const averagePaybackMonths = totalOpportunities > 0
+    ? allOpportunities.reduce((sum, o) => sum + o.roiMetrics.paybackMonths, 0) / totalOpportunities
+    : 0;
+  const totalFteSavings = allOpportunities.reduce((sum, o) => sum + o.roiMetrics.fteSavings, 0);
+  
+  // Calculate average ROI from annual benefit and implementation cost
+  const totalCost = allOpportunities.reduce((sum, o) => sum + parseFloat(o.opportunity.implementationCost || "0"), 0);
+  const averageRoi = totalCost > 0 ? ((totalAnnualBenefit / totalCost) * 100) : 0;
+  
+  // Get unique functions list from workflows
+  const uniqueFunctions = new Set<string>();
+  workflowsData.forEach(w => {
+    if (w.workflow.department) uniqueFunctions.add(w.workflow.department);
+  });
+  const functionsList = Array.from(uniqueFunctions).join(", ");
+
+  const portfolioMetrics: PortfolioMetrics = {
+    totalWorkflows: workflowsData.length,
+    totalOpportunities,
+    totalAnnualBenefit,
+    averagePaybackMonths,
+    averageRoi,
+    totalFteSavings,
+    functionsList,
+  };
+
+  // ===== TOP 3 OPPORTUNITIES CALCULATION =====
+  const allOpportunitiesWithWorkflow = workflowsData.flatMap(w =>
+    w.opportunities.map(o => ({
+      workflowName: w.workflow.name,
+      opportunityName: o.opportunity.name,
+      annualBenefit: o.roiMetrics.annualRoi,
+      roi: totalCost > 0 ? ((o.roiMetrics.annualRoi / parseFloat(o.opportunity.implementationCost || "1")) * 100) : 0,
+      paybackMonths: o.roiMetrics.paybackMonths,
+      fteSavings: o.roiMetrics.fteSavings,
+      description: o.opportunity.description || "",
+      businessImpact: o.matrixPosition.businessImpact,
+    }))
+  );
+
+  const top3Opportunities = allOpportunitiesWithWorkflow
+    .sort((a, b) => b.businessImpact - a.businessImpact)
+    .slice(0, 3);
+
+  // ===== MATRIX DISTRIBUTION CALCULATION =====
+  const matrixDistribution: MatrixDistribution = {
+    quickWins: { count: 0, opportunities: [] },
+    strategicGoals: { count: 0, opportunities: [] },
+    niceToHaves: { count: 0, opportunities: [] },
+    deprioritize: { count: 0, opportunities: [] },
+  };
+
+  allOpportunities.forEach(o => {
+    const oppName = o.opportunity.name;
+    switch (o.matrixPosition.quadrant) {
+      case 'Quick Wins':
+        matrixDistribution.quickWins.count++;
+        matrixDistribution.quickWins.opportunities.push(oppName);
+        break;
+      case 'Strategic Goals':
+        matrixDistribution.strategicGoals.count++;
+        matrixDistribution.strategicGoals.opportunities.push(oppName);
+        break;
+      case 'Nice-To-Haves':
+        matrixDistribution.niceToHaves.count++;
+        matrixDistribution.niceToHaves.opportunities.push(oppName);
+        break;
+      case 'Deprioritize':
+        matrixDistribution.deprioritize.count++;
+        matrixDistribution.deprioritize.opportunities.push(oppName);
+        break;
+    }
+  });
+
+  // ===== ROADMAP PHASES CALCULATION =====
+  // Phase 1: Quick Wins (0-6 months) - Low effort, high impact
+  // Phase 2: Foundational (6-12 months) - Medium effort
+  // Phase 3: Strategic (12-18+ months) - High effort, high impact
+  const roadmapPhases: RoadmapPhases = {
+    phase1QuickWins: allOpportunities.filter(o => o.matrixPosition.quadrant === 'Quick Wins'),
+    phase2Foundational: allOpportunities.filter(o => 
+      o.matrixPosition.quadrant === 'Nice-To-Haves' || 
+      (o.matrixPosition.quadrant === 'Strategic Goals' && o.matrixPosition.implementationEffort < 65)
+    ),
+    phase3Strategic: allOpportunities.filter(o => 
+      o.matrixPosition.quadrant === 'Strategic Goals' && o.matrixPosition.implementationEffort >= 65
+    ),
+  };
+
+  // ===== APPENDIX B: SWOT ANALYSIS =====
+  const appendixB: AppendixBData[] = workflowsData
+    .filter(w => w.readiness !== null)
+    .map(w => {
+      const swot = calculateSWOT(w.readiness!);
+      return {
+        workflowName: w.workflow.name,
+        swotAnalysis: swot,
+      };
+    });
+
+  // ===== APPENDIX F: DATA PROVENANCE =====
+  const appendixF: AppendixFData[] = [];
+  
+  workflowsData.forEach(w => {
+    // Add TFA provenance
+    if (w.tfa) {
+      const knowledgeGaps = Object.keys(w.tfa.gapMetadata || {});
+      appendixF.push({
+        workflowName: w.workflow.name,
+        dataType: 'TFA',
+        respondentName: w.tfa.initialRespondent,
+        respondentRole: 'Technical Contact',
+        department: w.workflow.department,
+        collectionMethod: 'Technical Feasibility Assessment Form',
+        submissionDate: w.tfa.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        knowledgeGaps: knowledgeGaps.length > 0 ? `${knowledgeGaps.length} questions with gaps` : null,
+      });
+    }
+
+    // Add PIF provenance for each respondent
+    w.pifs.forEach(pif => {
+      appendixF.push({
+        workflowName: w.workflow.name,
+        dataType: 'PIF',
+        respondentName: pif.respondentName,
+        respondentRole: pif.respondentRole,
+        department: w.workflow.department,
+        collectionMethod: 'Process Insights Form',
+        submissionDate: pif.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        knowledgeGaps: null,
+      });
+    });
+  });
+
   return {
     company,
     workflows: workflowsData,
     diagnosticPeriod,
     hasCompleteOpportunities,
+    portfolioMetrics,
+    top3Opportunities,
+    matrixDistribution,
+    roadmapPhases,
+    appendixB,
+    appendixF,
   };
 }
