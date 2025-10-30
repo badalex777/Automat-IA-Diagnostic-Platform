@@ -195,6 +195,41 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
+  async unmarkTFAGap(id: string, questionId: string): Promise<TFAAssessment | undefined> {
+    const assessment = await this.getTFAAssessment(id);
+    if (!assessment) return undefined;
+
+    // Clone JSON objects to avoid mutation issues
+    const currentSources = JSON.parse(JSON.stringify(assessment.responseSources || {})) as Record<string, any>;
+    const currentResponses = JSON.parse(JSON.stringify(assessment.responses || {})) as Record<string, string>;
+    
+    // Verify the question exists in responses
+    if (!currentResponses[questionId]) {
+      return undefined;
+    }
+    
+    // Remove the question from responseSources (if it exists there)
+    delete currentSources[questionId];
+    
+    // Set response back to "Don't Know" (value "0")
+    currentResponses[questionId] = "0";
+    
+    // Recalculate score
+    const { calculateTFAScore } = await import("@shared/tfaQuestions");
+    const updatedScore = calculateTFAScore(currentResponses);
+
+    const [updated] = await db.update(tfaAssessments)
+      .set({
+        responses: currentResponses,
+        responseSources: currentSources,
+        score: updatedScore,
+      })
+      .where(eq(tfaAssessments.id, id))
+      .returning();
+    
+    return updated;
+  }
+
   async completeTFA(id: string, score: number, comments?: string): Promise<TFAAssessment | undefined> {
     const updateData: any = { score, completedAt: new Date() };
     if (comments !== undefined) {

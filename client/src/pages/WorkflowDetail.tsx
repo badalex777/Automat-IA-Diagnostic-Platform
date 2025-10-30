@@ -384,6 +384,7 @@ export default function WorkflowDetail() {
                         initialRespondent={tfaAssessment.initialRespondent || undefined}
                         leadAnalystName={company?.leadAnalystName}
                         gapMetadata={tfaAssessment.gapMetadata as Record<string, { why: string; whoMightKnow: string }> | undefined}
+                        responseSources={tfaAssessment.responseSources as Record<string, any> || undefined}
                       />
                     )}
 

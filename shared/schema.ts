@@ -162,6 +162,10 @@ export const fillGapsSchema = z.object({
   )),
 });
 
+export const unmarkGapSchema = z.object({
+  questionId: z.string().min(1, "Question ID is required"),
+});
+
 export const insertBusinessImpactSchema = createInsertSchema(businessImpact).omit({
   id: true,
   createdAt: true,

@@ -9,6 +9,7 @@ import {
   insertTFAAssessmentSchema,
   tfaResponsesSchema,
   fillGapsSchema,
+  unmarkGapSchema,
   pifSubmitSchema,
   insertBusinessImpactSchema,
   updateBusinessImpactSchema,
@@ -545,6 +546,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!updated) {
         return res.status(404).json({ error: "Assessment not found" });
       }
+
+      res.json({ 
+        assessment: updated,
+        score: updatedScore,
+        sectionScores,
+      });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Unmark knowledge gap endpoint
+  app.patch("/api/tfa/:id/unmark-gap", async (req, res) => {
+    try {
+      const validatedData = unmarkGapSchema.parse(req.body);
+      const { questionId } = validatedData;
+
+      // Get the current assessment
+      const assessment = await storage.getTFAAssessment(req.params.id);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Check if the question is actually marked
+      const responseSources = (assessment.responseSources as Record<string, any>) || {};
+      if (!responseSources[questionId]) {
+        return res.status(400).json({ error: `Question ${questionId} is not marked as a knowledge gap` });
+      }
+
+      // Unmark the gap
+      const updated = await storage.unmarkTFAGap(req.params.id, questionId);
+
+      if (!updated) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Recalculate scores for response
+      const updatedResponses = (updated.responses as Record<string, string>) || {};
+      const updatedScore = calculateTFAScore(updatedResponses);
+      const sectionScores = calculateSectionScores(updatedResponses);
 
       res.json({ 
         assessment: updated,

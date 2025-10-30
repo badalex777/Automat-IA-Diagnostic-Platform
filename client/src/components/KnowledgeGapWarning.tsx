@@ -26,6 +26,7 @@ interface KnowledgeGapWarningProps {
   initialRespondent?: string;
   leadAnalystName?: string | null;
   gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
+  responseSources?: Record<string, any>;
 }
 
 interface GapFormData {
@@ -42,7 +43,8 @@ export default function KnowledgeGapWarning({
   gaps, 
   initialRespondent,
   leadAnalystName,
-  gapMetadata = {}
+  gapMetadata = {},
+  responseSources = {}
 }: KnowledgeGapWarningProps) {
   const { toast } = useToast();
   
@@ -81,6 +83,27 @@ export default function KnowledgeGapWarning({
     onError: (error: Error) => {
       toast({
         title: "Error filling gaps",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const unmarkGapMutation = useMutation({
+    mutationFn: async (questionId: string) => {
+      const res = await apiRequest('PATCH', `/api/tfa/${assessmentId}/unmark-gap`, { questionId });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/tfa`] });
+      toast({
+        title: "Knowledge gap unmarked",
+        description: "The question has been restored to 'Don't Know' status.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error unmarking gap",
         description: error.message,
         variant: "destructive",
       });
@@ -191,6 +214,44 @@ export default function KnowledgeGapWarning({
           For each unanswered question below, please provide the correct answer along with who provided it and why the original respondent couldn't answer.
         </p>
 
+        {/* Show already-marked knowledge gaps from server */}
+        {Object.entries(responseSources).some(([_, data]) => data && data.isKnowledgeGap === true) && (
+          <div className="mb-8">
+            <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 mb-4">Marked Knowledge Gaps (Saved)</h4>
+            <div className="space-y-4">
+              {Object.entries(responseSources)
+                .filter(([_, data]) => data && data.isKnowledgeGap === true)
+                .map(([questionId, data]) => {
+                  const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
+                  if (!question) return null;
+                  return (
+                    <Card key={questionId} className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium mb-2">{question.question}</p>
+                          <div className="text-xs text-muted-foreground">
+                            <p>Score: 3/5 (auto-assigned)</p>
+                            {data.reason && <p className="mt-1">{data.reason}</p>}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => unmarkGapMutation.mutate(questionId)}
+                          disabled={unmarkGapMutation.isPending}
+                          data-testid={`button-unmark-saved-gap-${questionId}`}
+                          className="ml-4"
+                        >
+                          {unmarkGapMutation.isPending ? 'Unmarking...' : 'Unmark & Restore'}
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-8">
           {Object.entries(groupedGaps).map(([section, sectionGaps]) => (
             <div key={section} className="space-y-4">
@@ -201,16 +262,41 @@ export default function KnowledgeGapWarning({
                 <Card key={gap.questionId} className="p-4 bg-muted/30">
                   <div className="flex items-start justify-between mb-4">
                     <p className="text-sm font-medium flex-1">{gap.question}</p>
-                    {!isMarkedAsGap && leadAnalystName && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => markAsKnowledgeGap(gap.questionId.toString())}
-                        data-testid={`button-mark-gap-${gap.questionId}`}
-                        className="ml-4"
-                      >
-                        Mark as Knowledge Gap
-                      </Button>
+                    {leadAnalystName && (
+                      <>
+                        {!isMarkedAsGap ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => markAsKnowledgeGap(gap.questionId.toString())}
+                            data-testid={`button-mark-gap-${gap.questionId}`}
+                            className="ml-4"
+                          >
+                            Mark as Knowledge Gap
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Clear the local marking
+                              setGapResponses(prev => {
+                                const updated = { ...prev };
+                                delete updated[gap.questionId.toString()];
+                                return updated;
+                              });
+                              toast({
+                                title: "Marking removed",
+                                description: "The knowledge gap marking has been removed. You can now fill this gap normally.",
+                              });
+                            }}
+                            data-testid={`button-unmark-gap-${gap.questionId}`}
+                            className="ml-4"
+                          >
+                            Unmark Knowledge Gap
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                   
