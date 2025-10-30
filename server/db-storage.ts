@@ -35,12 +35,24 @@ export class DbStorage implements IStorage {
   }
 
   async createCompany(company: InsertCompany): Promise<Company> {
-    const [newCompany] = await db.insert(companies).values(company).returning();
+    // Convert number fields to strings for decimal columns
+    const dbCompany: any = {
+      ...company,
+      annualRevenue: company.annualRevenue?.toString(),
+      // totalEmployees is integer, no conversion needed
+    };
+    const [newCompany] = await db.insert(companies).values(dbCompany).returning();
     return newCompany;
   }
 
   async updateCompany(id: string, data: Partial<InsertCompany>): Promise<Company | undefined> {
-    const [updated] = await db.update(companies).set(data).where(eq(companies.id, id)).returning();
+    // Convert number fields to strings for decimal columns
+    const dbData: any = { ...data };
+    if (data.annualRevenue !== undefined) {
+      dbData.annualRevenue = data.annualRevenue?.toString();
+    }
+    // totalEmployees is integer, no conversion needed
+    const [updated] = await db.update(companies).set(dbData).where(eq(companies.id, id)).returning();
     return updated;
   }
 
@@ -272,15 +284,19 @@ export class DbStorage implements IStorage {
 
   async createImplementationOpportunity(opportunity: InsertImplementationOpportunity): Promise<ImplementationOpportunity> {
     // Convert number fields to strings for decimal columns
-    const dbOpportunity = {
+    const dbOpportunity: any = {
       ...opportunity,
       annualRoi: opportunity.annualRoi?.toString(),
+      implementationCost: opportunity.implementationCost?.toString(),
+      cumulativeNetBenefit3Year: opportunity.cumulativeNetBenefit3Year?.toString(),
+      cumulativeNetBenefit5Year: opportunity.cumulativeNetBenefit5Year?.toString(),
       hoursSavedPerWeek: opportunity.hoursSavedPerWeek?.toString(),
       annualHoursSaved: opportunity.annualHoursSaved?.toString(),
       fteSavings: opportunity.fteSavings?.toString(),
       errorReductionPct: opportunity.errorReductionPct?.toString(),
       hoursReallocatedToRevenue: opportunity.hoursReallocatedToRevenue?.toString(),
       revenueUpliftAnnual: opportunity.revenueUpliftAnnual?.toString(),
+      rampupPeriodMonths: opportunity.rampupPeriodMonths?.toString(),
       paybackPeriodMonths: opportunity.paybackPeriodMonths?.toString(),
       trainingHoursPerEmployee: opportunity.trainingHoursPerEmployee?.toString(),
     };
@@ -292,12 +308,16 @@ export class DbStorage implements IStorage {
     // Convert number fields to strings for decimal columns
     const dbData: any = { ...data };
     if (data.annualRoi !== undefined) dbData.annualRoi = data.annualRoi?.toString();
+    if (data.implementationCost !== undefined) dbData.implementationCost = data.implementationCost?.toString();
+    if (data.cumulativeNetBenefit3Year !== undefined) dbData.cumulativeNetBenefit3Year = data.cumulativeNetBenefit3Year?.toString();
+    if (data.cumulativeNetBenefit5Year !== undefined) dbData.cumulativeNetBenefit5Year = data.cumulativeNetBenefit5Year?.toString();
     if (data.hoursSavedPerWeek !== undefined) dbData.hoursSavedPerWeek = data.hoursSavedPerWeek?.toString();
     if (data.annualHoursSaved !== undefined) dbData.annualHoursSaved = data.annualHoursSaved?.toString();
     if (data.fteSavings !== undefined) dbData.fteSavings = data.fteSavings?.toString();
     if (data.errorReductionPct !== undefined) dbData.errorReductionPct = data.errorReductionPct?.toString();
     if (data.hoursReallocatedToRevenue !== undefined) dbData.hoursReallocatedToRevenue = data.hoursReallocatedToRevenue?.toString();
     if (data.revenueUpliftAnnual !== undefined) dbData.revenueUpliftAnnual = data.revenueUpliftAnnual?.toString();
+    if (data.rampupPeriodMonths !== undefined) dbData.rampupPeriodMonths = data.rampupPeriodMonths?.toString();
     if (data.paybackPeriodMonths !== undefined) dbData.paybackPeriodMonths = data.paybackPeriodMonths?.toString();
     if (data.trainingHoursPerEmployee !== undefined) dbData.trainingHoursPerEmployee = data.trainingHoursPerEmployee?.toString();
     
