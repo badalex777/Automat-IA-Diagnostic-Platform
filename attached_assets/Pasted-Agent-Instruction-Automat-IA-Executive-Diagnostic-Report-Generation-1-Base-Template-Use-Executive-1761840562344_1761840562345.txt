@@ -1,0 +1,111 @@
+Agent Instruction: Automat-IA Executive Diagnostic Report Generation
+1. Base Template
+
+Use Executive_Diagnostic_Report_Template.docx as the master source document.
+This file defines the official structure, tone, and content for all Executive Diagnostic Reports generated through the platform.
+
+2. Core Rules
+
+Populate all {{ }} tokens with live data pulled from the diagnostic database.
+
+Preserve all [ ] fields as-is for post-generation analyst editing and commentary.
+
+Do not modify any paragraph text, headings, or table formats.
+
+Maintain original structure, tables, and appendices verbatim from the template.
+
+Standardize formatting and branding across the entire report — including fonts, colors, margins, table styling, header/footer design, and section numbering — so every client deliverable reflects the Automat-IA brand standard consistently.
+
+Use the official Automat-IA color palette and typography from the report template.
+
+Ensure headers, subheaders, and tables follow the same font sizes and weight hierarchy.
+
+Preserve all spacing, indentation, and line breaks.
+
+3. Dynamic Data Population
+
+Populate tokenized fields ({{ }}) from the diagnostic webapp’s database according to the following logic:
+
+Company data: name, diagnostic period (Month, Year), department scope, total workflows, and respondent metadata.
+
+TFA / PIF data: readiness scores, knowledge gaps, qualitative notes.
+
+ROI modeling data: annual benefit, payback, FTE savings, cost components.
+
+Opportunity matrix data: quadrant distribution, Base and Enhanced matrix images or rendered tables.
+
+Roadmap data: phase sequencing, timeframes, opportunity mapping, and commentary fields.
+
+If a variable is missing or null, insert an em-dash (—) rather than deleting the field.
+
+4. Dynamic Appendix F — Data Trail & Auditability
+
+Generate Appendix F (Data Provenance and Audit Trail) dynamically based on the current live infrastructure of the diagnostic webapp.
+This appendix must automatically include:
+
+Data Type	Workflow	Opportunity	Respondent Name	Role	Department	Date of Submission	Data Source	Validation Status	Gap/Follow-Up Assigned To
+
+Populate the table with all TFA and PIF submission data, including:
+
+Submission metadata (who, when, which workflow/opportunity).
+
+Knowledge gaps identified and midpoint substitutions used.
+
+Follow-up owner, date, and resolution status.
+
+Validation source (stakeholder interview, system documentation, manual entry, etc.).
+
+Appendix F must serve as a traceability log, ensuring every data point in the report can be audited back to its source inside the platform.
+
+5. Table of Contents (TOC) Generation
+
+The Table of Contents must be automatically generated and updated upon document creation:
+
+Adjust page numbering dynamically based on the actual number of pages in the final output.
+
+Account for variable sections such as:
+
+“Workflow Readiness SWOT Analysis” (Appendix B)
+
+“Detailed ROI Overview” (Appendix D)
+
+Any company-specific data tables that may expand or contract depending on workflow count.
+
+Ensure TOC hyperlinks and numbering reflect the final layout after all data population and appendix generation are complete.
+
+6. Diagnostic Period
+
+Populate the {{diagnostic_period}} token with the month and year at the time of report generation, formatted as MMM YYYY (e.g., Oct 2025).
+
+7. Branding & Export Requirements
+
+Include standardized headers and footers:
+Header: “Prepared for {{company_name}} by Automat-IA | Confidential”
+Footer: “Automat-IA Executive Diagnostic Report – {{diagnostic_period}}”
+
+Ensure page numbering is continuous across sections and appendices.
+
+Output as both .docx and .pdf.
+
+File naming convention:
+Automat-IA_Executive_Diagnostic_Report_{{company_name}}_{{diagnostic_period}}.docx
+
+8. Validation Before Export
+
+Run the following checks automatically before generating the final downloadable file:
+
+All {{ }} tokens successfully resolved with valid values.
+
+All [ ] fields remain intact and clearly marked for analyst commentary.
+
+Appendix F table populated correctly from live infrastructure data.
+
+Table of Contents updated and page numbers recalculated.
+
+Formatting and branding fully aligned with Automat-IA brand guide.
+
+If any check fails, abort the export and return a validation message specifying the missing or mismatched element.
+
+In short:
+
+Use Executive_Diagnostic_Report_Template.docx as the base file. Populate all {{ }} tokens from the diagnostic database fields. Leave all [ ] fields intact for analyst editing. Preserve structure, tables, and appendices verbatim. Standardize formatting and branding across the document. Generate Appendix F dynamically based on the webapp’s current data infrastructure. Automatically regenerate and update the Table of Contents and page numbering to match the final document structure.

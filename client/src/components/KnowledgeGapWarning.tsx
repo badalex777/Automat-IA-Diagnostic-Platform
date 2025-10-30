@@ -110,12 +110,23 @@ export default function KnowledgeGapWarning({
       return;
     }
 
+    // Check if answeredByRole is filled
+    const currentResponse = gapResponses[questionId];
+    if (!currentResponse?.answeredByRole || currentResponse.answeredByRole.trim() === '') {
+      toast({
+        title: "Resolver Role required",
+        description: "Please specify the Resolver Role before marking as knowledge gap.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setGapResponses(prev => ({
       ...prev,
       [questionId]: {
+        ...prev[questionId],
         value: '3', // Middle score
         answeredBy: leadAnalystName,
-        answeredByRole: 'Lead Analyst',
         reason: 'Marked as knowledge gap - information unavailable from any identified source',
         isKnowledgeGap: true,
       },
@@ -123,7 +134,7 @@ export default function KnowledgeGapWarning({
 
     toast({
       title: "Knowledge gap marked",
-      description: "Question auto-filled with middle score (3) by Lead Analyst.",
+      description: `Question auto-filled with middle score (3) by ${leadAnalystName}.`,
     });
   };
 
