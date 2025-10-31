@@ -133,8 +133,9 @@ roadmap automation opportunities aligned with its business objectives and operat
 
 The engagement analyzed {{total_workflows}} workflows, identifying {{total_opportunities}}
 valid automation opportunities with an estimated total annual benefit of {{annual_benefit}},
-an average payback of {{payback_period}} months, and a conservative ROI of
-{{roi_percent}}%.
+an average payback of {{payback_period}} months, and an average Annual Run Rate ROI of
+{{roi_percent}}% (the steady-state ROI once implementations are fully operational, representing
+the annual return after the ramp-up period).
 
 Each workflow was assessed using Automat-IA's dual-diagnostic methodology — combining the
 Technical Feasibility Assessment (TFA) and Process Insights Form (PIF) — to establish an
@@ -453,6 +454,11 @@ operational benefits.
 Each opportunity's annual benefit represents the combined effect of time savings, error
 reduction, and potential revenue uplift, modeled under the Conservative Scenario
 Framework to ensure realistic projections.
+
+The Annual Run Rate ROI% represents the steady-state return on investment once each
+implementation is fully operational, reflecting the annual return achieved after the initial
+ramp-up period. This metric provides a normalized view of long-term value creation across
+all opportunities.
 
 (ROI Insights Table will be generated with columns: Workflow, Opportunity, Annual Benefit ($), Estimated Cost ($), FTE Savings, Payback (months))
 
