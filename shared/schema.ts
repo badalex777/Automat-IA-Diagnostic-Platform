@@ -204,6 +204,7 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
 }).extend({
   annualRoi: z.coerce.number().optional(),
   implementationCost: z.coerce.number().positive("Implementation cost must be positive"),
+  annualRunRateRoi: z.coerce.number().optional(),
   cumulativeNetBenefit3Year: z.coerce.number().optional(),
   cumulativeNetBenefit5Year: z.coerce.number().optional(),
   hoursSavedPerWeek: z.coerce.number().optional(),
