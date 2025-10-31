@@ -666,8 +666,8 @@ multiple respondents exist, responses are aggregated with variance tracking.
 
 Readiness Rubric.
 Combined readiness score per workflow or opportunity using TFA 60 percent and PIF 40
-percent, normalized 0 to 100. This score represents estimated implementation effort and feeds
-the Opportunity Matrix vertical coordinate for effort.
+percent, normalized 0 to 100. This score is a primary input (50 percent weight) into the
+Implementation Effort calculation detailed in Section A.5.
 
 Automat-IA ROI Calculator.
 Quantifies financial impact using PIF operational data and cost assumptions from the
@@ -680,7 +680,8 @@ Final analytical layer that unifies readiness and ROI into a single prioritizati
 
 ● X axis: Business Impact, a normalized score derived from efficiency and value.
 
-● Y axis: Implementation Effort, represented by the Readiness Rubric score.
+● Y axis: Implementation Effort, a weighted composite score combining readiness, ramp-up
+period, payback period, and training hours. See Section A.5 for detailed methodology.
 
 A.3 Data Integrity and Knowledge Gap Handling
 
@@ -708,7 +709,55 @@ Base Impact components and normalization.
 Normalization by revenue and FTEs prevents bias toward larger firms and captures the relative
 significance of benefits.
 
-A.5 ROI Modeling Methodology
+A.5 Implementation Effort Scoring Methodology
+
+Implementation Effort represents the vertical axis of the Opportunity Matrix and measures the
+complexity and resource requirements for bringing an automation opportunity to production. Lower
+scores indicate easier implementation.
+
+Formula and weights.
+
+Implementation Effort is calculated as a weighted composite of four factors:
+
+● Readiness Score (inverted): 50 percent. Derived from the combined TFA (60 percent) and
+PIF (40 percent) assessment. Higher readiness results in lower effort. This is the primary
+driver because it reflects comprehensive client assessment data across 61 combined questions.
+
+● Ramp-up Period: 20 percent. Estimated months from kickoff to steady-state operation.
+Normalized on a scale where 2 months or less equals 0 (lowest effort) and 12+ months
+equals 100 (highest effort).
+
+● Payback Period: 20 percent. Estimated months to recover implementation costs. Normalized
+where 3 months or less equals 0 (lowest effort) and 18+ months equals 100 (highest effort).
+
+● Training Hours per Employee: 10 percent. Estimated end-user training required. Normalized
+where 1 hour or less equals 0 (lowest effort) and 20+ hours equals 100 (highest effort).
+
+Rationale for 50 percent readiness weighting. The Readiness Rubric synthesizes actual client
+data from both technical (TFA) and operational (PIF) assessments, while ramp-up, payback, and
+training represent analyst-generated estimates subject to refinement during scoping. Weighting
+readiness at 50 percent ensures that ground-truth client data anchors the effort calculation,
+while still allowing differentiation between opportunities within the same workflow based on
+their specific implementation characteristics.
+
+Example calculation.
+
+Opportunity with 38 percent readiness, 12-month ramp-up, 18-month payback, 15 hours training:
+
+● Readiness effort (inverted): 100 − 38 = 62 → 62 × 0.50 = 31.0
+
+● Ramp-up effort: ((12 − 2) ÷ (12 − 2)) × 100 = 100 → 100 × 0.20 = 20.0
+
+● Payback effort: ((18 − 3) ÷ (18 − 3)) × 100 = 100 → 100 × 0.20 = 20.0
+
+● Training effort: ((15 − 1) ÷ (20 − 1)) × 100 = 73.7 → 73.7 × 0.10 = 7.4
+
+Total Implementation Effort = 31.0 + 20.0 + 20.0 + 7.4 = 78.4
+
+This score positions the opportunity in the upper region of the matrix, indicating high
+implementation complexity.
+
+A.6 ROI Modeling Methodology
 
 Double-layer conservatism.
 
@@ -734,7 +783,7 @@ value.
 Inputs, parameters, and versions are documented in Appendix E: ROI Calculator
 Methodology.
 
-A.6 Opportunity Matrix Methodology
+A.7 Opportunity Matrix Methodology
 
 The Opportunity Matrix converts readiness and business impact into a transparent prioritization
 model.
@@ -759,7 +808,9 @@ Axes.
 
 ● X axis: Business Impact (Base or Enhanced, depending on the view presented).
 
-● Y axis: Implementation Effort (Readiness Rubric 0 to 100).
+● Y axis: Implementation Effort (0 to 100), a weighted composite combining readiness score
+(50 percent), ramp-up period (20 percent), payback period (20 percent), and training hours
+(10 percent). See Section A.5 for detailed methodology.
 
 Quadrants.
 
@@ -771,7 +822,7 @@ Quadrants.
 
 ● Deprioritize: Low impact and high effort.
 
-A.7 Roadmap Development Methodology
+A.8 Roadmap Development Methodology
 
 Roadmap sequencing is derived directly from matrix positions and diagnostic evidence.
 
@@ -788,7 +839,7 @@ orchestration requirements.
 Sequencing also considers technical dependencies, value realization timing, resource capacity,
 change management cadence, and budget cycles.
 
-A.8 Methodological Limitations
+A.9 Methodological Limitations
 
 This diagnostic is a point-in-time assessment of readiness and potential value, not a detailed
 implementation plan.

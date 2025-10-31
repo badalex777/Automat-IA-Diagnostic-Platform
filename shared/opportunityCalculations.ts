@@ -55,15 +55,19 @@ function normalizeTrainingHours(hours: number | null | undefined): number {
  * Calculate Implementation Effort Score (Y-axis)
  * Lower score = easier implementation
  * 
- * Formula (tightened ranges for more sensitive scoring):
- * - Readiness Score (inverted): 30%
- * - Ramp-up Period: 30%
- * - Payback Period: 25%
- * - Training Hours: 15%
+ * Formula:
+ * - Readiness Score (inverted): 50% - Primary driver (actual client assessment data)
+ * - Ramp-up Period: 20% - Secondary factor (analyst estimate)
+ * - Payback Period: 20% - Secondary factor (analyst estimate)
+ * - Training Hours: 10% - Minor factor (analyst estimate)
  * 
- * Example: 12mo ramp-up + 20mo payback + 15hrs training + 38% readiness
- * → readiness_effort=62, ramp=100, payback=100(capped), training=74
- * → (62×0.3)+(100×0.3)+(100×0.25)+(74×0.15) = 18.6+30+25+11.1 = 84.7
+ * Rationale: Readiness is weighted heaviest because it's derived from comprehensive
+ * client assessments (TFA + PIF), while other factors are educated estimates that
+ * will be refined during actual scoping.
+ * 
+ * Example: 12mo ramp-up + 18mo payback + 15hrs training + 38% readiness
+ * → readiness_effort=62, ramp=100, payback=100, training=74
+ * → (62×0.5)+(100×0.2)+(100×0.2)+(74×0.1) = 31+20+20+7.4 = 78.4
  */
 export function calculateImplementationEffort(
   readinessScore: number, // 0-100 from Readiness Rubric
@@ -78,10 +82,10 @@ export function calculateImplementationEffort(
   const trainingEffort = normalizeTrainingHours(trainingHoursPerEmployee);
 
   const effort = 
-    (readinessEffort * 0.30) +
-    (rampupEffort * 0.30) +
-    (paybackEffort * 0.25) +
-    (trainingEffort * 0.15);
+    (readinessEffort * 0.50) +
+    (rampupEffort * 0.20) +
+    (paybackEffort * 0.20) +
+    (trainingEffort * 0.10);
 
   return Math.round(effort * 100) / 100; // Round to 2 decimals
 }
