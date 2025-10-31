@@ -549,6 +549,12 @@ export interface Translations {
       bonusCalculationContent: string;
       matrixGuaranteeTitle: string;
       matrixGuaranteeContent: string;
+      implementationEffortScoring: string;
+      implementationEffortScoringContent: string;
+      effortWeightingRationale: string;
+      effortWeightingRationaleContent: string;
+      effortNormalizationScales: string;
+      effortNormalizationScalesContent: string;
       scatterPlotInterpretation: string;
       scatterPlotInterpretationContent: string;
       quadrants: string;
@@ -558,18 +564,38 @@ export interface Translations {
       quadrant4: string;
     };
     
+    // ROI Calculator Integration
+    roiCalculatorIntegration: {
+      title: string;
+      intro: string;
+      workflowOverview: string;
+      workflowOverviewContent: string;
+      platformRoles: string;
+      platformRolesContent: string;
+    };
+    
+    // Data Flow & Population Map
+    dataFlow: {
+      title: string;
+      intro: string;
+      pifToCalculator: string;
+      pifToCalculatorContent: string;
+      calculatorToOpportunities: string;
+      calculatorToOpportunitiesContent: string;
+      opportunitiesToMatrix: string;
+      opportunitiesToMatrixContent: string;
+      calculatorToReport: string;
+      calculatorToReportContent: string;
+    };
+    
     // ROI Calculations
     roiCalculations: {
       title: string;
       intro: string;
-      annualRoiFormula: string;
-      annualRoiFormulaContent: string;
       fteSavingsFormula: string;
       fteSavingsFormulaContent: string;
       businessImpactScoring: string;
       businessImpactScoringContent: string;
-      implementationEffort: string;
-      implementationEffortContent: string;
     };
     
     // Formulas Reference
@@ -594,8 +620,8 @@ export interface Translations {
       enhancedImpactMatrixFormula: string;
       bonusFormulas: string;
       bonusFormulasExplanation: string;
-      implementationEffort: string;
-      implementationEffortFormula: string;
+      implementationEffortScore: string;
+      implementationEffortScoreFormula: string;
     };
   };
 
@@ -762,6 +788,7 @@ const en: Translations = {
     editCompany: "Edit Company",
     deleteCompany: "Delete Company",
     confirmDelete: "Are you sure you want to delete this company? This action cannot be undone.",
+    downloadSnapshot: "Download Snapshot",
   },
   workflow: {
     name: "Workflow Name",
@@ -904,6 +931,8 @@ const en: Translations = {
     contactPlaceholder: "Email, phone, or contact name",
     annualRevenuePlaceholder: "e.g., 5000000",
     totalEmployeesPlaceholder: "e.g., 250",
+    annualLaborCosts: "Annual Labor Costs",
+    annualLaborCostsPlaceholder: "e.g., 10000000",
     workflowName: "Workflow Name",
     workflowNamePlaceholder: "e.g., Invoice Processing Automation",
     workflowDescription: "Description",
@@ -1195,6 +1224,12 @@ const en: Translations = {
       bonusCalculationContent: "Error Reduction Bonus: (Error Score × 25%) capped at +25 points. Revenue Uplift Bonus: (Revenue Score × 25%) capped at +25 points. These bonuses are added on top of the base 60/40 time savings score, not redistributed. Example: An opportunity with ROI Score = 60, Hours Score = 40, Error Score = 80 would have Base Impact = (60 × 0.60) + (40 × 0.40) = 52, Enhanced Impact = 52 + (80 × 0.25) = 52 + 20 = 72. The Enhanced score is always higher when bonuses apply.",
       matrixGuaranteeTitle: "Key Guarantee: Enhanced ≥ Base Always",
       matrixGuaranteeContent: "Because bonuses are additive (not redistributive), the Enhanced Impact Matrix ALWAYS scores opportunities equal to or higher than the Base Impact Matrix. This mathematical guarantee means you never lose the base time-savings comparison while gaining visibility into additional business value. Use Base Matrix for pure efficiency comparison, Enhanced Matrix for comprehensive business impact including quality and growth.",
+      implementationEffortScoring: "Implementation Effort Scoring (Y-axis, 0-100)",
+      implementationEffortScoringContent: "Implementation Effort combines four factors into a composite score where lower values indicate easier implementation. The score ranges from 0-100 and positions opportunities on the matrix's vertical axis. Formula: Implementation Effort = (Inverted Readiness × 50%) + (Normalized Ramp-up × 20%) + (Normalized Payback × 20%) + (Normalized Training × 10%).",
+      effortWeightingRationale: "Weighting Rationale: Why 50/20/20/10?",
+      effortWeightingRationaleContent: "Readiness receives 50% weight because it's derived from comprehensive client assessments (21 TFA questions + 40 PIF questions = 61 total questions). This is ground-truth data directly from the client organization. Ramp-up Period, Payback Period, and Training Hours (20%/20%/10%) are analyst estimates that will be refined during scoping. Actual client data should outweigh educated estimates. Inverted Readiness: Higher readiness score = lower implementation effort. A workflow scoring 80% readiness contributes (100-80) × 0.50 = 10 effort points. Combined TFA (60%) + PIF (40%) assessment inverted to effort scale.",
+      effortNormalizationScales: "Normalization Scales",
+      effortNormalizationScalesContent: "Ramp-up Period (20% weight): ≤2 months = 0 effort, ≥12 months = 100 effort, linear scaling between. Represents time from kickoff to steady-state productivity. Payback Period (20% weight): ≤3 months = 0 effort, ≥18 months = 100 effort, linear scaling between. Represents time to recover implementation costs. Training Hours (10% weight): ≤1 hour = 0 effort, ≥20 hours = 100 effort, linear scaling between. Represents end-user training investment per employee. Example: 38% readiness, 12mo ramp-up, 18mo payback, 15hrs training → Effort = (62 × 0.50) + (100 × 0.20) + (100 × 0.20) + (74 × 0.10) = 31.0 + 20.0 + 20.0 + 7.4 = 78.4. Lower scores indicate easier implementation.",
       scatterPlotInterpretation: "Scatter Plot Interpretation",
       scatterPlotInterpretationContent: "The matrix divides into four quadrants based on median values: Quick Wins (High Impact, Low Effort): Prioritize immediately. These deliver strong results with manageable implementation complexity. Strategic Bets (High Impact, High Effort): Long-term strategic projects. Significant business value justifies higher implementation investment. Nice-to-Haves (Low Impact, Low Effort): Consider after higher priorities. Easy to implement but limited business impact. Deprioritize (Low Impact, High Effort): Avoid unless strategic reasons exist. Poor ROI relative to implementation complexity.",
       quadrants: "Quadrant Definitions",
@@ -1204,17 +1239,35 @@ const en: Translations = {
       quadrant4: "Deprioritize: Low business impact, high implementation effort. Avoid unless non-financial strategic drivers exist.",
     },
     
+    roiCalculatorIntegration: {
+      title: "Integration with ROI Calculator",
+      intro: "The diagnostic platform works in conjunction with a separate ROI Calculator application to provide comprehensive AI implementation analysis. Understanding how these two platforms interact is essential for effective consulting workflows.",
+      workflowOverview: "Two-Platform Workflow",
+      workflowOverviewContent: "The diagnostic platform serves as your data collection and reporting hub, while the ROI Calculator is your analysis engine for detailed financial modeling. Data Flow: (1) Collect TFA and PIF assessment data in the diagnostic platform. (2) Manually transfer PIF responses to ROI Calculator for detailed financial analysis using research-backed rubrics and scenario modeling. (3) ROI Calculator outputs (Annual ROI, FTE Savings, error metrics, revenue uplift) are manually entered as opportunities in the diagnostic platform. (4) The diagnostic platform automatically positions opportunities on the Business Impact Matrix and stores detailed ROI outputs for Executive Report generation.",
+      platformRoles: "Platform Roles & Responsibilities",
+      platformRolesContent: "Diagnostic Platform: TFA collection (21 technical questions across 4 categories), PIF collection (40 operational questions with multi-respondent support), Readiness Rubric calculation (TFA 60% + PIF 40%), Opportunity Matrix visualization (dual-matrix scoring with business impact vs implementation effort), Executive Diagnostic Report generation (comprehensive client deliverable). ROI Calculator: Time Savings analysis using AI Time Saved Rubric (4-question assessment), Quality Impact modeling with 6-question rubric for error reduction, Revenue Uplift calculations with 3-question reallocation rubric, Scenario modeling (Best/Base/Conservative/Worst case projections), Detailed ROI breakdowns with ramp-up adjustments and implementation costs. The diagnostic platform does NOT calculate ROI—it uses ROI outputs from your analysis to score and position opportunities for strategic decision-making.",
+    },
+    
+    dataFlow: {
+      title: "Data Flow & Population Map",
+      intro: "This section documents the specific data mappings between PIF responses, ROI Calculator inputs, opportunity creation, and matrix calculations. Understanding these flows ensures accurate data transfer and analysis.",
+      pifToCalculator: "PIF → ROI Calculator (Manual Transfer)",
+      pifToCalculatorContent: "Time Savings Section (Q11-Q13): Q11 Role performed → informs Time Savings Rubric process type selection. Q12-Q13 Time investment data → validates calculator time assumptions. Revenue Uplift Section (Q14-Q15): Q14 Role reallocation potential → feeds Revenue Uplift Rubric role profile. Q15 Revenue process involvement → feeds Revenue Uplift Rubric revenue process type. Time & Volume Data (Q28-Q31): Q28 Employees involved → populates 'Number of Employees' in calculator. Q29 Frequency (Daily/Weekly/Monthly) → populates 'Frequency' selector. Q30 Processes per period → populates 'Processes per Period'. Q31 Minutes per process → populates 'Time per Process'. Quality Impact Module (Q32-Q41 when Q32='yes'): Q33 Error frequency → informs Quality Impact Rubric error frequency. Q34-Q38 Error characteristics → feed remaining Quality Impact Rubric questions. Q39 Current error rate → populates 'Current Error Rate (%)'. Q40 Rework minutes per error → populates 'Rework Minutes per Error'. Q41 Financial cost per error → populates 'Financial Cost per Error'.",
+      calculatorToOpportunities: "ROI Calculator → Opportunity Creation (Manual Entry)",
+      calculatorToOpportunitiesContent: "Core Business Impact Inputs: Annual ROI (dollars) → Required field for opportunity creation, drives Business Impact X-axis scoring. Hours Saved per Week → Converted to FTE Savings (÷2080), drives Business Impact X-axis scoring alongside ROI. Optional Error Reduction Metrics (when errorMetricsEnabled=true): Error Reduction % → Stored for Executive Report detail tables. Errors Avoided Annually → Used for Enhanced Impact Matrix error bonus calculation (+25 max). Optional Revenue Uplift Metrics (when revenueMetricsEnabled=true): Hours Reallocated to Revenue → Used for Enhanced Impact Matrix revenue bonus calculation. Annual Revenue Uplift (dollars) → Used for Enhanced Impact Matrix revenue bonus calculation (+25 max). Implementation Parameters: Ramp-up Period (months) → Feeds Implementation Effort Y-axis calculation (20% weight). Payback Period (months) → Feeds Implementation Effort Y-axis calculation (20% weight). Training Hours per Employee → Feeds Implementation Effort Y-axis calculation (10% weight). Additional Stored Data: All scenario projections (Best/Base/Conservative/Worst), detailed cost breakdowns, ramp-up efficiency scores → stored for Executive Diagnostic Report appendices.",
+      opportunitiesToMatrix: "Opportunities → Business Impact Matrix (Automatic)",
+      opportunitiesToMatrixContent: "X-Axis (Business Impact): Base Impact = (ROI Score × 60%) + (Hours Score × 40%). ROI Score = (Annual ROI ÷ Company Revenue) × 1000, capped at 100. Hours Score = (FTE Savings ÷ Total Employees) × 1000, capped at 100. Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus (when enabled). Y-Axis (Implementation Effort): Effort = (Inverted Readiness × 50%) + (Normalized Ramp-up × 20%) + (Normalized Payback × 20%) + (Normalized Training × 10%). Readiness comes from TFA (60%) + PIF (40%) combined assessment. Quadrant Assignment: Automatically calculated based on median impact and 50% effort threshold, categorizing opportunities into Quick Wins, Strategic Bets, Nice-to-Haves, or Deprioritize.",
+      calculatorToReport: "ROI Calculator Outputs → Executive Report (Stored for Later)",
+      calculatorToReportContent: "The Executive Diagnostic Report pulls from both platform assessments and stored ROI Calculator outputs: Detailed ROI Overview Table: Opportunity name, Annual ROI, FTE Savings, Error Reduction %, Revenue Uplift, Implementation Effort Score, Readiness Score, Quadrant classification. ROI Calculation Methodology Appendix: Time savings formulas and assumptions, Quality impact calculation methodology, Revenue uplift projection rationale, Scenario modeling multipliers and conservative estimates. Scenario Comparison Tables: Best/Base/Conservative/Worst case projections for each opportunity, Cost-benefit breakdowns showing implementation costs vs annual benefits, Payback period calculations with ramp-up adjustments. This comprehensive data ensures the Executive Report provides full transparency and audit-ready documentation for client decision-making.",
+    },
+    
     roiCalculations: {
       title: "ROI Calculations",
-      intro: "The platform calculates ROI and business impact using company-relative formulas that account for organization size and financial context.",
-      annualRoiFormula: "Annual ROI Formula",
-      annualRoiFormulaContent: "Annual ROI = (Annual Hours Saved × Hourly Labor Cost) - Implementation Costs. Where: Annual Hours Saved = Hours per Week × 52 weeks, Hourly Labor Cost = (Total Company Labor Costs / Total Employees) / 2080 hours. Implementation costs include training, ramp-up, and integration expenses captured in opportunity details.",
-      fteSavingsFormula: "FTE Savings Formula",
-      fteSavingsFormulaContent: "FTE Savings = Annual Hours Saved / 2080 hours. This represents the full-time equivalent headcount liberated to focus on higher-value work. Critical note: FTE savings does not mean job elimination. It represents capacity reallocation, enabling employees to augment their capabilities and contribute to more strategic initiatives.",
-      businessImpactScoring: "Business Impact Scoring (Company-Relative)",
-      businessImpactScoringContent: "ROI Score = (Annual ROI / Company Annual Revenue) × 1000, capped at 100. Example: $50K ROI for $5M company = (50,000 / 5,000,000) × 1000 = 10. A 10% ROI (very high) scores 100, 5% scores 50, 2% scores 20, 1% scores 10. Hours Score = (FTE Savings / Total Employees) × 1000, capped at 100. Example: 2 FTE saved for 200-employee company = (2 / 200) × 1000 = 10. A 10% workforce impact (exceptional) scores 100, 1% scores 10. This ensures opportunities are evaluated relative to company size, not absolute dollars.",
-      implementationEffort: "Implementation Effort Calculation (Y-axis, 0-100)",
-      implementationEffortContent: "Implementation Effort = (Inverted Readiness × 40%) + (Ramp-up Period × 25%) + (Payback Period × 25%) + (Training Hours × 10%). Inverted Readiness (40% weight): Higher readiness = lower effort. A workflow with 80 readiness has effort contribution of (100-80) × 0.40 = 8. Ramp-up Period (25% weight): 3 months = 0, 18+ months = 100, linear scaling between. Payback Period (25% weight): 6 months = 0, 36+ months = 100, linear scaling between. Training Hours (10% weight): 2 hours/employee = 0, 40+ hours = 100, linear scaling between. This multi-factor formula captures true implementation complexity.",
+      intro: "This section explains the scoring mathematics the diagnostic platform performs to position opportunities on the Business Impact Matrix. Note: This platform does NOT calculate ROI or perform financial modeling—that's done in the separate ROI Calculator. This platform uses ROI outputs to create comparative scores.",
+      fteSavingsFormula: "FTE Savings Conversion",
+      fteSavingsFormulaContent: "FTE Savings = Annual Hours Saved ÷ 2080 hours. Where Annual Hours Saved = Hours Saved per Week × 52 weeks. This converts weekly time savings (from ROI Calculator output) into full-time equivalent headcount. Critical note: FTE savings represents capacity reallocation for higher-value work, not job elimination. The diagnostic platform uses this FTE value for company-relative scoring, not ROI calculation.",
+      businessImpactScoring: "Business Impact Scoring Mathematics",
+      businessImpactScoringContent: "The platform converts ROI Calculator outputs into 0-100 scores using company-relative formulas with a 10× multiplier. ROI Score Formula: ROI Score = MIN(100, (Annual ROI ÷ Company Annual Revenue) × 1000). Example: $50K ROI for $5M company = (50,000 ÷ 5,000,000) × 1000 = 10 score. Hours Score Formula: Hours Score = MIN(100, (FTE Savings ÷ Total Employees) × 1000). Example: 2 FTE saved for 200-employee company = (2 ÷ 200) × 1000 = 10 score. Base Impact Matrix: Base Impact = (ROI Score × 60%) + (Hours Score × 40%), always 0-100 scale. Enhanced Impact Matrix: Enhanced Impact = Base Impact + (Error Score × 25%) + (Revenue Score × 25%), dynamic 0-150 scale. The 10× multiplier acknowledges that workflow-level automations rarely exceed 10% company-wide impact, making a 10% impact score 100 (exceptional), 5% impact score 50 (solid), and 2% impact score 20 (modest). This scoring system enables apples-to-apples comparison across opportunities regardless of company size.",
     },
     
     formulasReference: {
@@ -1238,8 +1291,8 @@ const en: Translations = {
       enhancedImpactMatrixFormula: "Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus. Where: Base Impact = (ROI Score × 0.60) + (Hours Score × 0.40), Error Bonus = (Error Score × 0.25) when enabled (max +25), Revenue Bonus = (Revenue Score × 0.25) when enabled (max +25). Scale: 0-100 (time only), 0-125 (one bonus), 0-150 (both bonuses). Key guarantee: Enhanced Impact ≥ Base Impact always, since bonuses are additive.",
       bonusFormulas: "Additive Bonus Formulas",
       bonusFormulasExplanation: "Error Reduction Bonus = MIN(25, Error Score × 0.25). Revenue Uplift Bonus = MIN(25, Revenue Score × 0.25). These bonuses are layered on top of the base 60/40 time-savings score. Example: ROI Score = 50, Hours Score = 60, Error Score = 80, Revenue Score = 40 → Base Impact = (50 × 0.60) + (60 × 0.40) = 54, Enhanced Impact = 54 + (80 × 0.25) + (40 × 0.25) = 54 + 20 + 10 = 84.",
-      implementationEffort: "Implementation Effort",
-      implementationEffortFormula: "Implementation Effort = (Inverted Readiness × 0.40) + (Normalized Ramp-up × 0.25) + (Normalized Payback × 0.25) + (Normalized Training × 0.10). Where: Inverted Readiness = 100 - Readiness Score. Normalized Ramp-up: 0 at ≤3 months, 100 at ≥18 months, linear between. Normalized Payback: 0 at ≤6 months, 100 at ≥36 months, linear between. Normalized Training: 0 at ≤2 hours, 100 at ≥40 hours, linear between. Scale: 0-100 (lower = easier).",
+      implementationEffortScore: "Implementation Effort Score (Y-axis)",
+      implementationEffortScoreFormula: "Implementation Effort = (Inverted Readiness × 0.50) + (Normalized Ramp-up × 0.20) + (Normalized Payback × 0.20) + (Normalized Training × 0.10). Where: Inverted Readiness = 100 - Readiness Score (higher readiness = lower effort). Normalized Ramp-up: 0 at ≤2 months, 100 at ≥12 months, linear between. Normalized Payback: 0 at ≤3 months, 100 at ≥18 months, linear between. Normalized Training: 0 at ≤1 hour, 100 at ≥20 hours, linear between. Scale: 0-100 (lower = easier implementation). Example: 38% readiness, 12mo ramp-up, 18mo payback, 15hrs training → (62 × 0.50) + (100 × 0.20) + (100 × 0.20) + (74 × 0.10) = 78.4.",
     },
   },
 
@@ -1398,6 +1451,7 @@ const es: Translations = {
     editCompany: "Editar Empresa",
     deleteCompany: "Eliminar Empresa",
     confirmDelete: "¿Está seguro de que desea eliminar esta empresa? Esta acción no se puede deshacer.",
+    downloadSnapshot: "Descargar Instantánea",
   },
   workflow: {
     name: "Nombre del Flujo de Trabajo",
@@ -1540,6 +1594,8 @@ const es: Translations = {
     contactPlaceholder: "Correo, teléfono o nombre de contacto",
     annualRevenuePlaceholder: "ej., 5000000",
     totalEmployeesPlaceholder: "ej., 250",
+    annualLaborCosts: "Costos Laborales Anuales",
+    annualLaborCostsPlaceholder: "ej., 10000000",
     workflowName: "Nombre del Flujo de Trabajo",
     workflowNamePlaceholder: "ej., Automatización de Procesamiento de Facturas",
     workflowDescription: "Descripción",
@@ -1831,6 +1887,12 @@ const es: Translations = {
       bonusCalculationContent: "Bonificación de Reducción de Errores: (Puntuación Error × 25%) limitado a +25 puntos. Bonificación de Aumento de Ingresos: (Puntuación Ingresos × 25%) limitado a +25 puntos. Estas bonificaciones se agregan además de la puntuación base de ahorro de tiempo 60/40, no se redistribuyen. Ejemplo: Una oportunidad con Puntuación ROI = 60, Puntuación Horas = 40, Puntuación Error = 80 tendría Impacto Base = (60 × 0.60) + (40 × 0.40) = 52, Impacto Mejorado = 52 + (80 × 0.25) = 52 + 20 = 72. La puntuación mejorada siempre es mayor cuando se aplican bonificaciones.",
       matrixGuaranteeTitle: "Garantía Clave: Mejorado ≥ Base Siempre",
       matrixGuaranteeContent: "Debido a que las bonificaciones son aditivas (no redistributivas), la Matriz de Impacto Mejorado SIEMPRE puntúa oportunidades igual o mayor que la Matriz de Impacto Base. Esta garantía matemática significa que nunca pierde la comparación base de ahorro de tiempo mientras gana visibilidad del valor empresarial adicional. Use Matriz Base para comparación de eficiencia pura, Matriz Mejorada para impacto empresarial integral incluyendo calidad y crecimiento.",
+      implementationEffortScoring: "Puntuación de Esfuerzo de Implementación (eje Y, 0-100)",
+      implementationEffortScoringContent: "El Esfuerzo de Implementación combina cuatro factores en una puntuación compuesta donde valores más bajos indican implementación más fácil. Fórmula: Esfuerzo de Implementación = (Preparación Invertida × 50%) + (Rampa Normalizada × 20%) + (Recuperación Normalizada × 20%) + (Capacitación Normalizada × 10%).",
+      effortWeightingRationale: "Razón de Ponderación: ¿Por qué 50/20/20/10?",
+      effortWeightingRationaleContent: "La Preparación recibe 50% de peso porque se deriva de evaluaciones integrales del cliente (21 preguntas TFA + 40 preguntas PIF = 61 preguntas totales). Esto es datos de verdad fundamental directamente de la organización cliente. Período de Rampa, Período de Recuperación y Horas de Capacitación (20%/20%/10%) son estimaciones del analista que se refinarán durante el alcance. Los datos reales del cliente deben superar las estimaciones educadas.",
+      effortNormalizationScales: "Escalas de Normalización",
+      effortNormalizationScalesContent: "Período de Rampa (peso 20%): ≤2 meses = 0 esfuerzo, ≥12 meses = 100 esfuerzo, escalado lineal entre. Período de Recuperación (peso 20%): ≤3 meses = 0 esfuerzo, ≥18 meses = 100 esfuerzo, escalado lineal entre. Horas de Capacitación (peso 10%): ≤1 hora = 0 esfuerzo, ≥20 horas = 100 esfuerzo, escalado lineal entre. Ejemplo: 38% preparación, 12mo rampa, 18mo recuperación, 15hrs capacitación → Esfuerzo = (62 × 0.50) + (100 × 0.20) + (100 × 0.20) + (74 × 0.10) = 78.4.",
       scatterPlotInterpretation: "Interpretación del Gráfico de Dispersión",
       scatterPlotInterpretationContent: "La matriz se divide en cuatro cuadrantes basados en valores medianos: Victorias Rápidas (Alto Impacto, Bajo Esfuerzo): Priorice inmediatamente. Estos entregan resultados sólidos con complejidad de implementación manejable. Apuestas Estratégicas (Alto Impacto, Alto Esfuerzo): Proyectos estratégicos a largo plazo. El valor empresarial significativo justifica mayor inversión de implementación. Agradables de Tener (Bajo Impacto, Bajo Esfuerzo): Considere después de prioridades más altas. Fácil de implementar pero impacto empresarial limitado. Despriorizar (Bajo Impacto, Alto Esfuerzo): Evite a menos que existan razones estratégicas. ROI pobre relativo a la complejidad de implementación.",
       quadrants: "Definiciones de Cuadrantes",
@@ -1840,17 +1902,35 @@ const es: Translations = {
       quadrant4: "Despriorizar: Bajo impacto empresarial, alto esfuerzo de implementación. Evite a menos que existan impulsores estratégicos no financieros.",
     },
     
+    roiCalculatorIntegration: {
+      title: "Integración con Calculadora de ROI",
+      intro: "La plataforma de diagnóstico funciona junto con una aplicación separada de Calculadora de ROI para proporcionar análisis integral de implementación de IA.",
+      workflowOverview: "Flujo de Trabajo de Dos Plataformas",
+      workflowOverviewContent: "La plataforma de diagnóstico sirve como centro de recopilación de datos y generación de informes, mientras que la Calculadora de ROI es el motor de análisis para modelado financiero detallado. Flujo de datos: (1) Recopilar datos de evaluación TFA y PIF. (2) Transferir manualmente respuestas PIF a la Calculadora de ROI. (3) Ingresar manualmente resultados de la Calculadora de ROI como oportunidades. (4) La plataforma posiciona automáticamente las oportunidades en la Matriz de Impacto Empresarial.",
+      platformRoles: "Roles y Responsabilidades de la Plataforma",
+      platformRolesContent: "Plataforma de Diagnóstico: Recopilación TFA, Recopilación PIF, Cálculo de Rúbrica de Preparación, Visualización de Matriz de Oportunidades, Generación de Informe Ejecutivo de Diagnóstico. Calculadora de ROI: Análisis de Ahorro de Tiempo, Modelado de Impacto de Calidad, Cálculos de Aumento de Ingresos, Modelado de Escenarios, Desgloses detallados de ROI. La plataforma de diagnóstico NO calcula ROI; utiliza resultados de ROI para puntuar y posicionar oportunidades.",
+    },
+    
+    dataFlow: {
+      title: "Flujo de Datos y Mapa de Población",
+      intro: "Esta sección documenta los mapeos de datos específicos entre respuestas PIF, entradas de Calculadora de ROI, creación de oportunidades y cálculos de matriz.",
+      pifToCalculator: "PIF → Calculadora de ROI (Transferencia Manual)",
+      pifToCalculatorContent: "Sección de Ahorro de Tiempo (P11-P13): P11 Rol realizado → informa selección de tipo de proceso de Rúbrica de Ahorro de Tiempo. P12-P13 Datos de inversión de tiempo → valida supuestos de tiempo de calculadora. Datos de Tiempo y Volumen (P28-P31): P28 Empleados involucrados → poblacíón 'Número de Empleados'. P29 Frecuencia → poblacíón selector 'Frecuencia'. P30 Procesos por período → población 'Procesos por Período'. P31 Minutos por proceso → población 'Tiempo por Proceso'.",
+      calculatorToOpportunities: "Calculadora de ROI → Creación de Oportunidades (Entrada Manual)",
+      calculatorToOpportunitiesContent: "Entradas de Impacto Empresarial Principal: ROI Anual (dólares) → Campo requerido, impulsa puntuación de Impacto Empresarial eje X. Horas Ahorradas por Semana → Convertido a Ahorro FTE. Métricas Opcionales de Reducción de Errores: Reducción de Errores %, Errores Evitados Anualmente. Métricas Opcionales de Aumento de Ingresos: Horas Reasignadas a Ingresos, Aumento de Ingresos Anual. Parámetros de Implementación: Período de Rampa, Período de Recuperación, Horas de Capacitación por Empleado.",
+      opportunitiesToMatrix: "Oportunidades → Matriz de Impacto Empresarial (Automático)",
+      opportunitiesToMatrixContent: "Eje X (Impacto Empresarial): Impacto Base = (Puntuación ROI × 60%) + (Puntuación Horas × 40%). Impacto Mejorado = Impacto Base + Bonificación Error + Bonificación Ingresos. Eje Y (Esfuerzo de Implementación): Esfuerzo = (Preparación Invertida × 50%) + (Rampa Normalizada × 20%) + (Recuperación Normalizada × 20%) + (Capacitación Normalizada × 10%). Asignación de Cuadrante: Calculado automáticamente.",
+      calculatorToReport: "Resultados Calculadora de ROI → Informe Ejecutivo (Almacenado para Después)",
+      calculatorToReportContent: "El Informe Ejecutivo de Diagnóstico extrae de evaluaciones de plataforma y resultados almacenados de la Calculadora de ROI: Tabla de Descripción General Detallada de ROI, Apéndice de Metodología de Cálculo de ROI, Tablas de Comparación de Escenarios.",
+    },
+    
     roiCalculations: {
       title: "Cálculos de ROI",
-      intro: "La plataforma calcula el ROI y el impacto empresarial usando fórmulas relativas a la empresa que consideran el tamaño de la organización y el contexto financiero.",
-      annualRoiFormula: "Fórmula de ROI Anual",
-      annualRoiFormulaContent: "ROI Anual = (Horas Anuales Ahorradas × Costo Laboral por Hora) - Costos de Implementación. Donde: Horas Anuales Ahorradas = Horas por Semana × 52 semanas, Costo Laboral por Hora = (Costos Laborales Totales de la Empresa / Total Empleados) / 2080 horas. Los costos de implementación incluyen capacitación, rampa y gastos de integración capturados en detalles de oportunidad.",
-      fteSavingsFormula: "Fórmula de Ahorro FTE",
-      fteSavingsFormulaContent: "Ahorro FTE = Horas Anuales Ahorradas / 2080 horas. Esto representa el equivalente de personal de tiempo completo liberado para enfocarse en trabajo de mayor valor. Nota crítica: El ahorro FTE no significa eliminación de empleos. Representa reasignación de capacidad, permitiendo a los empleados aumentar sus capacidades y contribuir a iniciativas más estratégicas.",
-      businessImpactScoring: "Puntuación de Impacto Empresarial (Relativa a la Empresa)",
-      businessImpactScoringContent: "Puntuación ROI = (ROI Anual / Ingresos Anuales de la Empresa) × 1000, limitado a 100. Ejemplo: $50K ROI para empresa de $5M = (50,000 / 5,000,000) × 1000 = 10. Un ROI del 10% (muy alto) puntúa 100, 5% puntúa 50, 2% puntúa 20, 1% puntúa 10. Puntuación Horas = (Ahorro FTE / Total Empleados) × 1000, limitado a 100. Ejemplo: 2 FTE ahorrados para empresa de 200 empleados = (2 / 200) × 1000 = 10. Un impacto de fuerza laboral del 10% (excepcional) puntúa 100, 1% puntúa 10. Esto asegura que las oportunidades se evalúen en relación con el tamaño de la empresa, no dólares absolutos.",
-      implementationEffort: "Cálculo de Esfuerzo de Implementación (eje Y, 0-100)",
-      implementationEffortContent: "Esfuerzo de Implementación = (Preparación Invertida × 40%) + (Período de Rampa × 25%) + (Período de Recuperación × 25%) + (Horas de Capacitación × 10%). Preparación Invertida (peso 40%): Mayor preparación = menor esfuerzo. Un flujo de trabajo con preparación de 80 tiene contribución de esfuerzo de (100-80) × 0.40 = 8. Período de Rampa (peso 25%): 3 meses = 0, 18+ meses = 100, escalado lineal entre. Período de Recuperación (peso 25%): 6 meses = 0, 36+ meses = 100, escalado lineal entre. Horas de Capacitación (peso 10%): 2 horas/empleado = 0, 40+ horas = 100, escalado lineal entre. Esta fórmula multifactorial captura la verdadera complejidad de implementación.",
+      intro: "Esta sección explica las matemáticas de puntuación que la plataforma de diagnóstico realiza para posicionar oportunidades en la Matriz de Impacto Empresarial. Nota: Esta plataforma NO calcula ROI—eso se hace en la Calculadora de ROI separada.",
+      fteSavingsFormula: "Conversión de Ahorro FTE",
+      fteSavingsFormulaContent: "Ahorro FTE = Horas Anuales Ahorradas ÷ 2080 horas. Esto convierte el ahorro de tiempo semanal en equivalente de personal de tiempo completo. La plataforma de diagnóstico utiliza este valor FTE para puntuación relativa a la empresa, no para cálculo de ROI.",
+      businessImpactScoring: "Matemáticas de Puntuación de Impacto Empresarial",
+      businessImpactScoringContent: "La plataforma convierte resultados de la Calculadora de ROI en puntuaciones 0-100 usando fórmulas relativas a la empresa con un multiplicador de 10×. Fórmula de Puntuación ROI: MIN(100, (ROI Anual ÷ Ingresos Anuales de la Empresa) × 1000). Fórmula de Puntuación Horas: MIN(100, (Ahorro FTE ÷ Total Empleados) × 1000). Matriz de Impacto Base: Impacto Base = (Puntuación ROI × 60%) + (Puntuación Horas × 40%). Matriz de Impacto Mejorado: Impacto Mejorado = Impacto Base + bonificaciones.",
     },
     
     formulasReference: {
@@ -1874,8 +1954,8 @@ const es: Translations = {
       enhancedImpactMatrixFormula: "Impacto Mejorado = Impacto Base + Bonificación Error + Bonificación Ingresos. Donde: Impacto Base = (Puntuación ROI × 0.60) + (Puntuación Horas × 0.40), Bonificación Error = (Puntuación Error × 0.25) cuando está habilitado (máx +25), Bonificación Ingresos = (Puntuación Ingresos × 0.25) cuando está habilitado (máx +25). Escala: 0-100 (solo tiempo), 0-125 (una bonificación), 0-150 (ambas bonificaciones). Garantía clave: Impacto Mejorado ≥ Impacto Base siempre, ya que las bonificaciones son aditivas.",
       bonusFormulas: "Fórmulas de Bonificación Aditiva",
       bonusFormulasExplanation: "Bonificación de Reducción de Errores = MIN(25, Puntuación Error × 0.25). Bonificación de Aumento de Ingresos = MIN(25, Puntuación Ingresos × 0.25). Estas bonificaciones se agregan además de la puntuación base de ahorro de tiempo 60/40. Ejemplo: Puntuación ROI = 50, Puntuación Horas = 60, Puntuación Error = 80, Puntuación Ingresos = 40 → Impacto Base = (50 × 0.60) + (60 × 0.40) = 54, Impacto Mejorado = 54 + (80 × 0.25) + (40 × 0.25) = 54 + 20 + 10 = 84.",
-      implementationEffort: "Esfuerzo de Implementación",
-      implementationEffortFormula: "Esfuerzo de Implementación = (Preparación Invertida × 0.40) + (Rampa Normalizada × 0.25) + (Recuperación Normalizada × 0.25) + (Capacitación Normalizada × 0.10). Donde: Preparación Invertida = 100 - Puntuación de Preparación. Rampa Normalizada: 0 en ≤3 meses, 100 en ≥18 meses, lineal entre. Recuperación Normalizada: 0 en ≤6 meses, 100 en ≥36 meses, lineal entre. Capacitación Normalizada: 0 en ≤2 horas, 100 en ≥40 horas, lineal entre. Escala: 0-100 (menor = más fácil).",
+      implementationEffortScore: "Puntuación de Esfuerzo de Implementación (eje Y)",
+      implementationEffortScoreFormula: "Esfuerzo de Implementación = (Preparación Invertida × 0.50) + (Rampa Normalizada × 0.20) + (Recuperación Normalizada × 0.20) + (Capacitación Normalizada × 0.10). Donde: Preparación Invertida = 100 - Puntuación de Preparación. Rampa Normalizada: 0 en ≤2 meses, 100 en ≥12 meses, lineal entre. Recuperación Normalizada: 0 en ≤3 meses, 100 en ≥18 meses, lineal entre. Capacitación Normalizada: 0 en ≤1 hora, 100 en ≥20 horas, lineal entre. Escala: 0-100 (menor = más fácil). Ejemplo: 38% preparación, 12mo rampa, 18mo recuperación, 15hrs capacitación → (62 × 0.50) + (100 × 0.20) + (100 × 0.20) + (74 × 0.10) = 78.4.",
     },
   },
 

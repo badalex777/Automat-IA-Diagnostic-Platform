@@ -147,6 +147,8 @@ export default function Documentation() {
       <li><a href="#pif-methodology">${doc.pifMethodology.title}</a></li>
       <li><a href="#readiness-rubric">${doc.readinessRubric.title}</a></li>
       <li><a href="#opportunity-matrix">${doc.opportunityMatrix.title}</a></li>
+      <li><a href="#roi-calculator-integration">${doc.roiCalculatorIntegration.title}</a></li>
+      <li><a href="#data-flow">${doc.dataFlow.title}</a></li>
       <li><a href="#roi-calculations">${doc.roiCalculations.title}</a></li>
       <li><a href="#formulas-reference">${doc.formulasReference.title}</a></li>
     </ul>
@@ -250,6 +252,28 @@ ${doc.opportunityMatrix.capFormula}
     </ul>
   </div>
 
+  <div class="section" id="roi-calculator-integration">
+    <h2>${doc.roiCalculatorIntegration.title}</h2>
+    <p>${doc.roiCalculatorIntegration.intro}</p>
+    <h3>${doc.roiCalculatorIntegration.workflowOverview}</h3>
+    <p>${doc.roiCalculatorIntegration.workflowOverviewContent}</p>
+    <h3>${doc.roiCalculatorIntegration.platformRoles}</h3>
+    <p>${doc.roiCalculatorIntegration.platformRolesContent}</p>
+  </div>
+
+  <div class="section" id="data-flow">
+    <h2>${doc.dataFlow.title}</h2>
+    <p>${doc.dataFlow.intro}</p>
+    <h3>${doc.dataFlow.pifToCalculator}</h3>
+    <p>${doc.dataFlow.pifToCalculatorContent}</p>
+    <h3>${doc.dataFlow.calculatorToOpportunities}</h3>
+    <p>${doc.dataFlow.calculatorToOpportunitiesContent}</p>
+    <h3>${doc.dataFlow.opportunitiesToMatrix}</h3>
+    <p>${doc.dataFlow.opportunitiesToMatrixContent}</p>
+    <h3>${doc.dataFlow.calculatorToReport}</h3>
+    <p>${doc.dataFlow.calculatorToReportContent}</p>
+  </div>
+
   <div class="section" id="roi-calculations">
     <h2>${doc.roiCalculations.title}</h2>
     <h3>${doc.roiCalculations.annualRoiTitle}</h3>
@@ -300,6 +324,8 @@ ${doc.formulasReference.businessImpactFormula3}
     { id: "pif-methodology", label: t.documentation.pifMethodology.title },
     { id: "readiness-rubric", label: t.documentation.readinessRubric.title },
     { id: "opportunity-matrix", label: t.documentation.opportunityMatrix.title },
+    { id: "roi-calculator-integration", label: t.documentation.roiCalculatorIntegration.title },
+    { id: "data-flow", label: t.documentation.dataFlow.title },
     { id: "roi-calculations", label: t.documentation.roiCalculations.title },
     { id: "formulas-reference", label: t.documentation.formulasReference.title },
   ];
@@ -857,6 +883,78 @@ ${doc.formulasReference.businessImpactFormula3}
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant4}</p>
                           </div>
                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* ROI Calculator Integration */}
+                <section id="roi-calculator-integration" className="scroll-mt-24">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{t.documentation.roiCalculatorIntegration.title}</CardTitle>
+                      <CardDescription>{t.documentation.roiCalculatorIntegration.intro}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.workflowOverview}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.roiCalculatorIntegration.workflowOverviewContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.platformRoles}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.roiCalculatorIntegration.platformRolesContent}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* Data Flow & Population Map */}
+                <section id="data-flow" className="scroll-mt-24">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{t.documentation.dataFlow.title}</CardTitle>
+                      <CardDescription>{t.documentation.dataFlow.intro}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.pifToCalculator}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.dataFlow.pifToCalculatorContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToOpportunities}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.dataFlow.calculatorToOpportunitiesContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.opportunitiesToMatrix}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.dataFlow.opportunitiesToMatrixContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToReport}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.dataFlow.calculatorToReportContent}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
