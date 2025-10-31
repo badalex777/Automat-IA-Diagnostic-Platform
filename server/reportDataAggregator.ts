@@ -78,7 +78,8 @@ function extractTFAInsights(
   const responseSources = (tfa.responseSources as Record<string, any>) || {};
   
   for (const question of TFA_QUESTIONS) {
-    const responseValue = responses[`q${question.id}`];
+    // Try both formats: "qX" and "X" (database may store without 'q' prefix)
+    const responseValue = responses[`q${question.id}`] || responses[`${question.id}`];
     // Explicitly check for null/undefined to include "0" (Don't Know) responses
     if (responseValue === null || responseValue === undefined) continue;
     
@@ -128,7 +129,8 @@ function extractPIFInsights(
     if (!question.weight) continue;
     if (question.type === 'text' || question.type === 'textarea' || question.type === 'number') continue;
     
-    const responseValue = responses[`q${question.id}`];
+    // Try both formats: "qX" and "X" (database may store without 'q' prefix)
+    const responseValue = responses[`q${question.id}`] || responses[`${question.id}`];
     // Explicitly check for null/undefined to handle all valid values including "0"
     if (responseValue === null || responseValue === undefined) continue;
     
@@ -405,6 +407,7 @@ export interface PIFData {
   respondentName: string;
   respondentRole: string;
   respondentResponsibilities: string | null;
+  responses: Record<string, string>; // Question responses needed for insights
   completedAt: Date;
   operationalScores: {
     processClarity: number;
@@ -574,6 +577,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
         respondentResponsibilities: pif.respondentResponsibilities,
+        responses: (pif.responses as Record<string, string>) || {}, // Include question responses for insights
         completedAt: pif.completedAt!,
         operationalScores: {
           processClarity: pif.processClarity || 0,
