@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -68,12 +67,10 @@ export default function Documentation() {
 
   const handleDownload = () => {
     const doc = t.documentation;
-    const filename = language === 'es' 
-      ? 'Automat-IA_Manual_de_Documentacion.html'
-      : 'Automat-IA_Documentation_Handbook.html';
+    const filename = 'Automat-IA_Platform_Handbook.html';
 
     const htmlContent = `<!DOCTYPE html>
-<html lang="${language}">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
