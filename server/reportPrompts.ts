@@ -282,17 +282,11 @@ scalability.
 
 7.4 Standard vs. Enhanced Opportunity Matrix
 
-Automat-IA applies a Two-Matrix Framework.
+Automat-IA applies a Two-Matrix Framework:
 
-1. The Base Impact Opportunity Matrix provides an initial prioritization based on the two
-primary axes described above, supporting executive visibility and quick sequencing of
-opportunities.
+1. The Base Impact Opportunity Matrix calculates Business Impact based on Annual ROI percentage and FTE savings, providing initial prioritization that supports executive visibility and quick sequencing of opportunities.
 
-2. The Enhanced Opportunity Matrix expands the analysis using a 0 to 150 dynamic
-scale that integrates additional variables such as cross-functional scalability, data
-readiness maturity, and compounded benefit potential. This refined matrix adjusts
-opportunity rankings to reflect broader strategic interdependencies, ensuring a balanced
-portfolio of short-term gains and sustainable long-term automation value.
+2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
 
 Phase 8: Automation Roadmap Development
 
@@ -323,14 +317,11 @@ analysis covered {{workflow_count}} workflows across key back-office functions i
 
 Each workflow was evaluated across three dimensions:
 
-Technical Feasibility – The ability of current systems, data structures, and integration
-pathways to support automation securely and reliably.
+• Technical Feasibility – The ability of current systems, data structures, and integration pathways to support automation securely and reliably.
 
-Organizational Readiness – The degree of process standardization, data consistency,
-and change adaptability within the organization.
+• Organizational Readiness – The degree of process standardization, data consistency, and change adaptability within the organization.
 
-Business Impact – Quantified ROI, payback period, and annual benefit potential
-derived from modeled automation opportunities.
+• Business Impact – Quantified ROI, payback period, and annual benefit potential derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
 
 All automation opportunities were positioned within Automat-IA's Opportunity Matrix, aligning
 technical readiness with financial value. The objective was to identify and prioritize automations
@@ -342,7 +333,7 @@ Total Workflows Analyzed: {{workflow_count}}
 Validated Automation Opportunities: {{opportunity_count}}
 Total Annual Benefit Potential: {{annual_benefit}}
 Average Payback Period: {{avg_payback}} months
-FTE saved: {{fte_savings}} FTEs
+FTE Saved: {{fte_savings}}
 
 Readiness scores varied across workflows, reflecting differences in data quality, process
 structure, and integration maturity.

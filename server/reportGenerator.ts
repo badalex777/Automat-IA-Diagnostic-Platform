@@ -70,6 +70,46 @@ function formatNumber(value: number, decimals: number = 1): string {
 }
 
 /**
+ * Create a body paragraph with justified alignment (for content after cover page)
+ */
+function createBodyParagraph(text: string, options: {spacing?: any} = {}): Paragraph {
+  return new Paragraph({
+    text,
+    alignment: AlignmentType.BOTH,
+    spacing: options.spacing || { after: 120 },
+  });
+}
+
+/**
+ * Create a bulleted paragraph with proper docx bullets
+ */
+function createBulletParagraph(text: string): Paragraph {
+  return new Paragraph({
+    text,
+    alignment: AlignmentType.BOTH,
+    bullet: { level: 0 },
+    spacing: { after: 60 },
+  });
+}
+
+/**
+ * Create horizontal separator line for subsection breaks
+ */
+function createHorizontalSeparator(): Paragraph {
+  return new Paragraph({
+    border: {
+      bottom: {
+        color: COLORS.LIGHT_GRAY,
+        space: 1,
+        style: BorderStyle.SINGLE,
+        size: 6,
+      },
+    },
+    spacing: { before: 240, after: 240 },
+  });
+}
+
+/**
  * Create paragraphs from multi-line text with smart formatting
  * - Detects phase titles and makes them bold
  * - Detects subsection titles and makes them headings
@@ -95,6 +135,7 @@ function createTextParagraphs(text: string): Paragraph[] {
       if (text) {
         paragraphs.push(new Paragraph({
           text,
+          alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
       }
@@ -117,6 +158,7 @@ function createTextParagraphs(text: string): Paragraph[] {
       // Add phase title as bold paragraph
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
+        alignment: AlignmentType.BOTH,
         spacing: { before: 120, after: 120 },
       }));
       continue;
