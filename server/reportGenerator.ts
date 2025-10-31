@@ -70,16 +70,78 @@ function formatNumber(value: number, decimals: number = 1): string {
 }
 
 /**
- * Create a text paragraph from a multi-line string
+ * Create paragraphs from multi-line text with smart formatting
+ * - Detects phase titles and makes them bold
+ * - Detects subsection titles and makes them headings
+ * - Groups consecutive lines into paragraphs
  */
 function createTextParagraphs(text: string): Paragraph[] {
-  return text
-    .split('\n')
-    .filter(line => line.trim() !== '')
-    .map(line => new Paragraph({
-      text: line.trim(),
-      spacing: { after: 120 },
-    }));
+  const lines = text.split('\n');
+  const paragraphs: Paragraph[] = [];
+  let currentParagraph: string[] = [];
+
+  const isPhaseTitle = (line: string): boolean => {
+    return /^Phase\s+\d+[:\s]/.test(line.trim());
+  };
+
+  const isSubsectionTitle = (line: string): boolean => {
+    // Matches patterns like "7.1 Title", "A.1 Title", "E.1 Title", "4.1 Title", etc.
+    return /^(\d+\.\d+|[A-Z]\.\d+)\s+/.test(line.trim());
+  };
+
+  const flushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      const text = currentParagraph.join(' ').trim();
+      if (text) {
+        paragraphs.push(new Paragraph({
+          text,
+          spacing: { after: 120 },
+        }));
+      }
+      currentParagraph = [];
+    }
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed === '') {
+      // Blank line - flush current paragraph
+      flushParagraph();
+      continue;
+    }
+
+    if (isPhaseTitle(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Add phase title as bold paragraph
+      paragraphs.push(new Paragraph({
+        children: [new TextRun({ text: trimmed, bold: true })],
+        spacing: { before: 120, after: 120 },
+      }));
+      continue;
+    }
+
+    if (isSubsectionTitle(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Add subsection as heading
+      paragraphs.push(new Paragraph({
+        text: trimmed,
+        heading: HeadingLevel.HEADING_3,
+        spacing: { before: 120, after: 120 },
+      }));
+      continue;
+    }
+
+    // Regular line - add to current paragraph
+    currentParagraph.push(trimmed);
+  }
+
+  // Flush any remaining paragraph
+  flushParagraph();
+
+  return paragraphs;
 }
 
 /**

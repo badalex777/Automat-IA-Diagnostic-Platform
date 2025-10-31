@@ -123,8 +123,6 @@ export function formatDiagnosticDate(date: Date): string {
  */
 
 export const EXECUTIVE_SUMMARY = `
-Executive Summary
-
 Automat-IA conducted a data-driven diagnostic to evaluate {{company_name}}'s readiness for
 AI-driven back-office automation and to quantify the financial return of potential
 implementations.
@@ -163,8 +161,6 @@ prioritization strategy.]
 `;
 
 export const CONFIDENTIALITY_DISCLAIMER = `
-Confidentiality and Disclaimer Statement
-
 This document has been prepared exclusively for {{company_name}} by Automat-IA as part of the AI
 Automation Diagnostic and Readiness Assessment. All analyses, financial models, and workflow
 evaluations contained herein are confidential and intended solely for the internal use of the client's
@@ -200,8 +196,6 @@ projections presented herein.
 `;
 
 export const METHODOLOGY_OVERVIEW = `
-Methodology Overview
-
 Our diagnostic approach integrates technical feasibility analysis with business impact
 evaluation to produce a complete, data-driven view of automation potential. The methodology
 unfolds through eight key phases, ensuring analytical depth, stakeholder validation, and
@@ -320,8 +314,6 @@ efficiency gains to organization-wide AI enablement.
 
 // Continue with remaining prompts...
 export const DIAGNOSTIC_OVERVIEW = `
-Diagnostic Overview
-
 4.1 Scope of Evaluation
 
 Automat-IA conducted a comprehensive diagnostic of {{company_name}} to assess
@@ -424,8 +416,6 @@ phases.
 `;
 
 export const FINDINGS_ANALYSIS = `
-Findings and Analysis
-
 5.1 Readiness Summary
 
 The table below consolidates the readiness assessment results for all automation opportunities
@@ -498,8 +488,6 @@ balanced view of short-term gains and long-term automation potential.
 `;
 
 export const AUTOMATION_ROADMAP = `
-Automation Roadmap
-
 The Automation Roadmap translates the diagnostic findings into a structured sequence of
 initiatives guiding {{company_name}} from analysis to execution. It consolidates insights from
 the Readiness Rubric, ROI Analysis, and Opportunity Matrix into a practical, phased
@@ -630,8 +618,6 @@ updated to reflect new opportunities, refined readiness scores, and evolving bus
 `;
 
 export const APPENDIX_A = `
-Appendix A: Detailed Methodology
-
 A.1 Data Sources and Collection
 
 The diagnostic integrates quantitative and qualitative inputs from multiple organizational layers
@@ -820,8 +806,6 @@ impact.
 `;
 
 export const APPENDIX_D = `
-Appendix D: All Opportunities ROI Detailed Overview
-
 This appendix provides an auditable financial view of each validated automation opportunity.
 Results are modeled using Automat-IA's Conservative Scenario Framework unless indicated
 otherwise. Financial figures are rounded to the nearest hundred.
@@ -895,8 +879,6 @@ report focused on synthesized insights while the appendix provides full financia
 `;
 
 export const APPENDIX_E = `
-Appendix E – ROI Calculation Methodology
-
 This appendix documents the financial logic and scenario controls used to generate
 Automat-IA's ROI, payback, and benefit projections. All calculations are performed under the
 Conservative Scenario Framework, ensuring every figure in this report is realistic,
