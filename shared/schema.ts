@@ -86,6 +86,7 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   description: text("description"),
   annualRoi: decimal("annual_roi", { precision: 12, scale: 2 }),
   implementationCost: decimal("implementation_cost", { precision: 12, scale: 2 }),
+  annualRunRateRoi: decimal("annual_run_rate_roi", { precision: 8, scale: 2 }),
   cumulativeNetBenefit3Year: decimal("cumulative_net_benefit_3year", { precision: 12, scale: 2 }),
   cumulativeNetBenefit5Year: decimal("cumulative_net_benefit_5year", { precision: 12, scale: 2 }),
   hoursSavedPerWeek: decimal("hours_saved_per_week", { precision: 8, scale: 2 }),

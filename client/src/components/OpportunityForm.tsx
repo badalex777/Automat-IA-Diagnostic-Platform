@@ -41,6 +41,7 @@ export function OpportunityForm({
       description: initialData?.description || "",
       annualRoi: initialData?.annualRoi,
       implementationCost: initialData?.implementationCost,
+      annualRunRateRoi: initialData?.annualRunRateRoi,
       cumulativeNetBenefit3Year: initialData?.cumulativeNetBenefit3Year,
       cumulativeNetBenefit5Year: initialData?.cumulativeNetBenefit5Year,
       hoursSavedPerWeek: initialData?.hoursSavedPerWeek,
@@ -87,6 +88,7 @@ export function OpportunityForm({
       ...data,
       annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
       implementationCost: data.implementationCost ? parseFloat(data.implementationCost) : undefined,
+      annualRunRateRoi: data.annualRunRateRoi ? parseFloat(data.annualRunRateRoi) : undefined,
       cumulativeNetBenefit3Year: data.cumulativeNetBenefit3Year ? parseFloat(data.cumulativeNetBenefit3Year) : undefined,
       cumulativeNetBenefit5Year: data.cumulativeNetBenefit5Year ? parseFloat(data.cumulativeNetBenefit5Year) : undefined,
       hoursSavedPerWeek,
@@ -200,6 +202,31 @@ export function OpportunityForm({
                 </FormControl>
                 <FormDescription>
                   Total cost to implement this opportunity (consulting, software, training, etc.)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="annualRunRateRoi"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Annual Run Rate ROI%</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    step="any"
+                    placeholder="e.g., 350"
+                    data-testid="input-annual-run-rate-roi"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={e => field.onChange(e.target.value)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  The steady-state ROI once implementation is fully operational (annual return after ramp-up period)
                 </FormDescription>
                 <FormMessage />
               </FormItem>
