@@ -529,6 +529,13 @@ export interface Translations {
       feasibilityBandingContent: string;
       swotAnalysis: string;
       swotAnalysisContent: string;
+      weightNormalization: string;
+      weightNormalizationContent: string;
+      tfaComponentsTitle: string;
+      tfaComponentsContent: string;
+      pifComponentsTitle: string;
+      pifComponentsContent: string;
+      normalizationNote: string;
     };
     
     // Opportunity Matrix
@@ -1867,10 +1874,17 @@ const es: Translations = {
       component1: "Calidad de Datos (18%): Mayor peso individual. Sin datos de calidad, las soluciones de IA no pueden funcionar de manera confiable. Este componente determina directamente el rendimiento de la IA.",
       component2: "Viabilidad de Integración (18%): Igualmente crítico. Los sistemas deben conectarse sin problemas para que la automatización funcione. La integración pobre crea implementaciones frágiles.",
       component3: "Entorno del Sistema (15%): Base de infraestructura. Los sistemas modernos y escalables soportan soluciones de IA sostenibles.",
-      component4: "Claridad del Proceso (12%): Los procesos estandarizados son más fáciles de automatizar. La alta claridad reduce la complejidad de implementación y mejora la calidad de la solución.",
-      component5: "Magnitud del Cambio (12%): Comprender el alcance del cambio informa la planificación de adopción. Menor magnitud típicamente significa implementaciones más rápidas y fluidas.",
+      component4: "Claridad del Proceso (15%): Los procesos estandarizados son más fáciles de automatizar. La alta claridad reduce la complejidad de implementación y mejora la calidad de la solución.",
+      component5: "Magnitud del Cambio (15%): Comprender el alcance del cambio informa la planificación de adopción. Menor magnitud típicamente significa implementaciones más rápidas y fluidas.",
       component6: "Seguridad y Cumplimiento (9%): Esencial pero a menudo verificación en lugar de capacidad. Las organizaciones cumplen con los estándares o tienen caminos de remediación claros.",
-      component7: "Fragilidad del Flujo de Trabajo (6%): Peso más bajo. Indica riesgo en lugar de capacidad. Incluso los flujos de trabajo frágiles pueden ser automatizados con diseño cuidadoso.",
+      component7: "Fragilidad del Flujo de Trabajo (10%): Indica riesgo en lugar de capacidad. Incluso los flujos de trabajo frágiles pueden ser automatizados con diseño cuidadoso.",
+      weightNormalization: "Normalización de Pesos: De Individual a Combinado",
+      weightNormalizationContent: "Cada evaluación (TFA y PIF) puntúa componentes independientemente en una escala de 0-100. Para combinarlos en una Rúbrica de Preparación unificada, los pesos de los componentes se multiplican por el peso de su evaluación padre (TFA × 0.60, PIF × 0.40). Esta normalización asegura que los componentes contribuyan proporcionalmente a la puntuación combinada final.",
+      tfaComponentsTitle: "Componentes TFA (60% de la Puntuación Combinada)",
+      tfaComponentsContent: "Los componentes TFA llevan sus pesos dentro-TFA (25%, 30%, 30%, 15% totalizando 100%). Al contribuir a la Rúbrica de Preparación combinada, cada peso se multiplica por 0.60:",
+      pifComponentsTitle: "Componentes PIF (40% de la Puntuación Combinada)",
+      pifComponentsContent: "Los componentes PIF se normalizan primero dentro de la evaluación PIF (37.5%, 37.5%, 25% totalizando 100%). Estos pesos luego se multiplican por 0.40 para contribuir a la preparación combinada:",
+      normalizationNote: "Ejemplo: Entorno del Sistema puntúa 80/100 en TFA. Su contribución a la Preparación Combinada = 80 × 0.25 (peso dentro-TFA) × 0.60 (peso padre TFA) = 12 puntos hacia la puntuación combinada final 0-100. Esta ponderación de dos etapas asegura que tanto la importancia del componente individual como la prioridad de la evaluación padre se preserven.",
       feasibilityBanding: "Bandas de Viabilidad",
       feasibilityBandingContent: "La puntuación de preparación combinada se clasifica en las mismas bandas que TFA: Muy Alta (80-100), Alta (65-79), Moderada (50-64), Baja (35-49), Muy Baja (<35). Sin embargo, la puntuación combinada refleja dimensiones tanto técnicas como operacionales, proporcionando una evaluación de preparación para implementación más holística.",
       swotAnalysis: "Generación de Análisis FODA",
