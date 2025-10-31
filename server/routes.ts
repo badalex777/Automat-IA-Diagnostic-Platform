@@ -136,7 +136,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Set headers for file download
       const companyName = diagnosticData.company.name.replace(/[^a-z0-9]/gi, '_');
-      const filename = `Executive_Diagnostic_Report_${companyName}.docx`;
+      const diagnosticPeriod = diagnosticData.diagnosticPeriod.end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '_');
+      const filename = `Automat-IA_Executive_Diagnostic_Report_${companyName}_${diagnosticPeriod}.docx`;
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

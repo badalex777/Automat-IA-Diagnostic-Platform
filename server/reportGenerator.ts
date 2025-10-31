@@ -131,8 +131,13 @@ function createTable(
  */
 export async function generateExecutiveReport(data: DiagnosticData): Promise<Buffer> {
   // Prepare template variables from aggregated data
+  const diagnosticPeriod = formatDiagnosticDate(data.diagnosticPeriod.end); // Format: "Oct 2025"
+  
   const templateVars = {
     company_name: data.company.name,
+    Lead_Analyst_Name: data.company.leadAnalystName || "[Lead Analyst Name]",
+    Month: diagnosticPeriod,
+    diagnostic_period: diagnosticPeriod,
     total_workflows: data.portfolioMetrics.totalWorkflows.toString(),
     workflow_count: data.portfolioMetrics.totalWorkflows.toString(),
     total_opportunities: data.portfolioMetrics.totalOpportunities.toString(),
@@ -144,7 +149,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     fte_savings: formatNumber(data.portfolioMetrics.totalFteSavings, 2),
     functions_list: data.portfolioMetrics.functionsList,
     quickwin_count: data.matrixDistribution.quickWins.count.toString(),
-    diagnostic_date: formatDiagnosticDate(data.diagnosticPeriod.end),
+    diagnostic_date: diagnosticPeriod,
   };
 
   // Commentary placeholders that should be converted to [brackets]
@@ -165,23 +170,59 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   // ===== COVER PAGE =====
   sections.push(
     new Paragraph({
-      text: "AI Automation Diagnostic Report",
+      text: "EXECUTIVE DIAGNOSTIC REPORT",
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
-      spacing: { before: 2000, after: 400 },
+      spacing: { before: 1000, after: 200 },
     }),
     new Paragraph({
-      text: `Prepared for ${data.company.name}`,
+      children: [
+        new TextRun({
+          text: data.company.name,
+          size: 28,
+          bold: true,
+          font: "Roboto",
+        }),
+      ],
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
     }),
     new Paragraph({
-      text: `Diagnostic Period: ${formatDiagnosticDate(data.diagnosticPeriod.start)} - ${formatDiagnosticDate(data.diagnosticPeriod.end)}`,
+      children: [
+        new TextRun({
+          text: "Automation Readiness & Opportunity Analysis",
+          size: 24,
+          font: "Roboto",
+        }),
+      ],
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    }),
+    new Paragraph({
+      text: `Diagnostic Period: ${diagnosticPeriod}`,
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
     }),
     new Paragraph({
-      text: "Prepared by Automat-IA",
+      text: `Lead Analyst: ${data.company.leadAnalystName || "[Lead Analyst Name]"}`,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 200 },
+    }),
+    new Paragraph({
+      text: `Version: v1 - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    }),
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: "Automat-IA",
+          size: 32,
+          bold: true,
+          color: COLORS.PRIMARY_GREEN,
+          font: "Roboto",
+        }),
+      ],
       alignment: AlignmentType.CENTER,
       spacing: { after: 2000 },
     }),
@@ -568,11 +609,37 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
                     text: `Prepared for ${data.company.name} by Automat-IA | Confidential`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
+                    font: "Roboto",
                   }),
                 ],
                 alignment: AlignmentType.CENTER,
                 border: {
                   bottom: {
+                    color: COLORS.PRIMARY_GREEN,
+                    space: 1,
+                    style: BorderStyle.SINGLE,
+                    size: 6,
+                  },
+                },
+              }),
+            ],
+          }),
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `Automat-IA Executive Diagnostic Report – ${diagnosticPeriod}`,
+                    size: 18,
+                    color: COLORS.MEDIUM_GRAY,
+                    font: "Roboto",
+                  }),
+                ],
+                alignment: AlignmentType.CENTER,
+                border: {
+                  top: {
                     color: COLORS.PRIMARY_GREEN,
                     space: 1,
                     style: BorderStyle.SINGLE,
