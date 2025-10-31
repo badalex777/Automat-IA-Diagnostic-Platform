@@ -484,7 +484,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(...createTextParagraphs(appendixAText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
-  // Appendix B - SWOT Analysis
+  // Appendix B - SWOT Analysis + Question Insights + Follow-Up Actions
   sections.push(createHeading("Appendix B: Readiness SWOT Analysis", HeadingLevel.HEADING_1));
   data.appendixB.forEach(swotData => {
     sections.push(
@@ -495,6 +495,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       })
     );
 
+    // SWOT Table
     const swotHeaders = ["Category", "Findings"];
     const swotRows = [
       ["Strengths", swotData.swotAnalysis.strengths.join("\n")],
@@ -503,6 +504,53 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       ["Threats", swotData.swotAnalysis.threats.join("\n")],
     ];
     sections.push(createTable(swotHeaders, swotRows, [30, 70]));
+    
+    // Question-Level Insights Table
+    if (swotData.questionInsights && swotData.questionInsights.length > 0) {
+      sections.push(
+        new Paragraph({
+          text: "Question-Level Insights",
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 240, after: 120 },
+        })
+      );
+      
+      const insightHeaders = ["Q#", "Question", "Section", "Type", "Respondent", "Response", "Score", "Date"];
+      const insightRows = swotData.questionInsights.map(insight => [
+        insight.questionId.toString(),
+        insight.questionText,
+        insight.section,
+        insight.dataType,
+        insight.respondentName,
+        insight.rawResponse,
+        insight.numericScore !== null ? insight.numericScore.toString() : "N/A",
+        insight.submissionDate,
+      ]);
+      sections.push(createTable(insightHeaders, insightRows, [5, 25, 12, 5, 12, 20, 8, 13]));
+    }
+    
+    // Recommended Follow-Up Actions Table
+    if (swotData.followUpActions && swotData.followUpActions.length > 0) {
+      sections.push(
+        new Paragraph({
+          text: "Recommended Follow-Up Actions",
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 240, after: 120 },
+        })
+      );
+      
+      const actionHeaders = ["Priority", "Section", "Avg Score", "Factor(s)", "Recommendation"];
+      const actionRows = swotData.followUpActions.map(action => [
+        action.priority,
+        action.section,
+        action.score.toFixed(1),
+        action.factor,
+        action.recommendation,
+      ]);
+      sections.push(createTable(actionHeaders, actionRows, [12, 18, 10, 25, 35]));
+    }
+    
+    sections.push(new Paragraph({ spacing: { after: 240 } }));
   });
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
@@ -537,9 +585,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(...createTextParagraphs(appendixEText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
-  // Appendix F - Data Provenance
+  // Appendix F - Data Provenance and Audit Trail
   sections.push(createHeading("Appendix F: Data Provenance and Audit Trail", HeadingLevel.HEADING_1));
-  const provenanceHeaders = ["Workflow", "Type", "Respondent", "Role", "Department", "Method", "Date", "Gaps"];
+  const provenanceHeaders = ["Workflow", "Type", "Respondent", "Role", "Department", "Method", "Date", "Status", "Gaps"];
   const provenanceRows = data.appendixF.map(prov => [
     prov.workflowName,
     prov.dataType,
@@ -548,11 +596,37 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     prov.department || "N/A",
     prov.collectionMethod,
     prov.submissionDate,
+    prov.validationStatus,
     prov.knowledgeGaps || "None",
   ]);
   if (provenanceRows.length > 0) {
-    sections.push(createTable(provenanceHeaders, provenanceRows));
+    sections.push(createTable(provenanceHeaders, provenanceRows, [15, 6, 12, 10, 10, 15, 10, 8, 14]));
   }
+  
+  // Add detailed knowledge gap resolution tables if available
+  data.appendixF.forEach(prov => {
+    if (prov.knowledgeGapDetails && prov.knowledgeGapDetails.length > 0) {
+      sections.push(
+        new Paragraph({
+          text: `Knowledge Gap Resolution Details: ${prov.workflowName} (${prov.dataType})`,
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 240, after: 120 },
+        })
+      );
+      
+      const gapHeaders = ["Q#", "Question", "Resolved By", "Role", "Method", "Gap?", "Date"];
+      const gapRows = prov.knowledgeGapDetails.map(detail => [
+        detail.questionId.toString(),
+        detail.questionText,
+        detail.resolvedBy,
+        detail.resolverRole,
+        detail.resolutionMethod,
+        detail.isKnowledgeGap ? "Yes" : "No",
+        detail.resolvedAt,
+      ]);
+      sections.push(createTable(gapHeaders, gapRows, [5, 30, 15, 12, 15, 8, 15]));
+    }
+  });
 
   // Create document
   const doc = new Document({

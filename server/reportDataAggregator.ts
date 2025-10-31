@@ -14,7 +14,194 @@ import {
 import { eq, and, isNotNull } from "drizzle-orm";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
-import { calculateSectionScores } from "@shared/tfaQuestions";
+import { calculateSectionScores, TFA_QUESTIONS } from "@shared/tfaQuestions";
+import { ALL_PIF_QUESTIONS } from "@shared/pifQuestions";
+
+/**
+ * Remediation recommendations based on section and score level
+ */
+const REMEDIATION_MAP: Record<string, Record<string, string>> = {
+  "System Environment": {
+    "Critical": "Immediate infrastructure upgrade required - consider cloud migration or API modernization",
+    "High": "Prioritize system modernization - implement REST APIs and enhance integration capabilities",
+    "Medium": "Incrementally improve system access and documentation"
+  },
+  "Data Quality": {
+    "Critical": "Critical data governance initiative required - establish data quality framework immediately",
+    "High": "Implement data validation, cleansing, and standardization processes",
+    "Medium": "Enhance data documentation and consistency checks"
+  },
+  "Integration Feasibility": {
+    "Critical": "Integration architecture overhaul needed - engage integration specialists",
+    "High": "Develop comprehensive integration strategy with proper middleware and error handling",
+    "Medium": "Document existing integrations and identify improvement opportunities"
+  },
+  "Security/Compliance": {
+    "Critical": "Immediate security audit and compliance remediation required",
+    "High": "Strengthen security controls and establish compliance monitoring",
+    "Medium": "Review and update security documentation and access controls"
+  },
+  "Process Clarity": {
+    "Critical": "Comprehensive process documentation initiative required",
+    "High": "Standardize and document all workflow steps with clear ownership",
+    "Medium": "Enhance existing process documentation and training materials"
+  },
+  "Change Magnitude": {
+    "Critical": "Extensive change management and training program required",
+    "High": "Develop structured change management plan with stakeholder engagement",
+    "Medium": "Provide targeted training and support for process changes"
+  },
+  "Workflow Brittleness": {
+    "Critical": "Workflow redesign necessary to reduce fragility and dependencies",
+    "High": "Implement error handling, fallback procedures, and resilience measures",
+    "Medium": "Document dependencies and establish monitoring for critical paths"
+  }
+};
+
+/**
+ * Extract question insights from TFA assessment
+ */
+function extractTFAInsights(
+  tfa: TFAAssessment,
+  initialRespondent: string,
+  submissionDate: Date
+): QuestionInsight[] {
+  const insights: QuestionInsight[] = [];
+  
+  for (const question of TFA_QUESTIONS) {
+    const responseValue = tfa.responses[`q${question.id}`];
+    // Explicitly check for null/undefined to include "0" (Don't Know) responses
+    if (responseValue === null || responseValue === undefined) continue;
+    
+    const selectedOption = question.options.find(opt => opt.value === responseValue);
+    if (!selectedOption) continue;
+    
+    // Determine respondent from response sources
+    const responseSource = tfa.responseSources?.[`q${question.id}`];
+    const respondent = responseSource?.respondent || initialRespondent;
+    
+    insights.push({
+      questionId: question.id,
+      questionText: question.question,
+      section: question.section,
+      dataType: 'TFA',
+      respondentName: respondent,
+      rawResponse: selectedOption.label,
+      numericScore: selectedOption.score, // Will be null for Don't Know
+      submissionDate: submissionDate.toISOString().split('T')[0],
+      analystComments: responseSource?.comments || undefined
+    });
+  }
+  
+  return insights;
+}
+
+/**
+ * Extract question insights from PIF responses
+ */
+function extractPIFInsights(
+  pif: PIFResponse,
+  respondentName: string,
+  submissionDate: Date
+): QuestionInsight[] {
+  const insights: QuestionInsight[] = [];
+  
+  for (const question of ALL_PIF_QUESTIONS) {
+    // Skip non-operational questions (ROI inputs and qualitative)
+    if (!question.weight) continue;
+    if (question.type === 'text' || question.type === 'textarea' || question.type === 'number') continue;
+    
+    const responseValue = pif.responses[`q${question.id}`];
+    // Explicitly check for null/undefined to handle all valid values including "0"
+    if (responseValue === null || responseValue === undefined) continue;
+    
+    const selectedOption = question.options?.find(opt => opt.value === responseValue);
+    if (!selectedOption) continue;
+    
+    // Calculate numeric score (respecting inverse scoring)
+    const numericValue = parseInt(responseValue);
+    const numericScore = question.inverseScoring ? (6 - numericValue) : numericValue;
+    
+    insights.push({
+      questionId: question.id,
+      questionText: question.question,
+      section: question.section,
+      dataType: 'PIF',
+      respondentName: respondentName,
+      rawResponse: selectedOption.label,
+      numericScore: numericScore,
+      submissionDate: submissionDate.toISOString().split('T')[0],
+      analystComments: undefined
+    });
+  }
+  
+  return insights;
+}
+
+/**
+ * Generate follow-up actions for low-scoring factors
+ * Treats "Don't Know" responses (null scores) as 0 to reflect critical knowledge gaps
+ */
+function generateFollowUpActions(insights: QuestionInsight[]): FollowUpAction[] {
+  const actions: FollowUpAction[] = [];
+  const lowScoreThreshold = 3;
+  
+  // Group by section
+  const sectionScores: Record<string, { scores: number[]; factors: string[] }> = {};
+  
+  for (const insight of insights) {
+    // Treat null scores (Don't Know) as 0 - representing critical knowledge gaps
+    const effectiveScore = insight.numericScore === null ? 0 : insight.numericScore;
+    
+    if (effectiveScore >= lowScoreThreshold) continue;
+    
+    if (!sectionScores[insight.section]) {
+      sectionScores[insight.section] = { scores: [], factors: [] };
+    }
+    
+    sectionScores[insight.section].scores.push(effectiveScore);
+    sectionScores[insight.section].factors.push(insight.questionText);
+  }
+  
+  // Generate action for each section with low scores
+  for (const [section, data] of Object.entries(sectionScores)) {
+    if (data.scores.length === 0) continue;
+    
+    const avgScore = data.scores.reduce((a, b) => a + b, 0) / data.scores.length;
+    const priority: 'Critical' | 'High' | 'Medium' = 
+      avgScore <= 1.5 ? 'Critical' : avgScore <= 2.5 ? 'High' : 'Medium';
+    
+    const recommendations = REMEDIATION_MAP[section] || {
+      "Critical": "Immediate remediation required",
+      "High": "High-priority improvement needed",
+      "Medium": "Targeted improvement recommended"
+    };
+    
+    // Format factors list to preserve specific question identities
+    let factorText: string;
+    if (data.factors.length === 1) {
+      factorText = data.factors[0];
+    } else if (data.factors.length <= 3) {
+      factorText = data.factors.join("; ");
+    } else {
+      // Show first 3 and indicate there are more
+      factorText = data.factors.slice(0, 3).join("; ") + `; and ${data.factors.length - 3} more`;
+    }
+    
+    actions.push({
+      section: section,
+      factor: factorText,
+      score: Math.round(avgScore * 10) / 10,
+      recommendation: recommendations[priority],
+      priority: priority
+    });
+  }
+  
+  return actions.sort((a, b) => {
+    const priorityOrder = { 'Critical': 0, 'High': 1, 'Medium': 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+}
 
 /**
  * Generate SWOT analysis from readiness component scores
@@ -119,6 +306,26 @@ export interface RoadmapPhases {
   phase3Strategic: OpportunityData[];
 }
 
+export interface QuestionInsight {
+  questionId: number;
+  questionText: string;
+  section: string;
+  dataType: 'TFA' | 'PIF';
+  respondentName: string;
+  rawResponse: string;
+  numericScore: number | null; // null for "Don't Know"
+  submissionDate: string;
+  analystComments?: string;
+}
+
+export interface FollowUpAction {
+  section: string;
+  factor: string;
+  score: number;
+  recommendation: string;
+  priority: 'Critical' | 'High' | 'Medium';
+}
+
 export interface AppendixBData {
   workflowName: string;
   swotAnalysis: {
@@ -127,6 +334,8 @@ export interface AppendixBData {
     opportunities: string[];
     threats: string[];
   };
+  questionInsights: QuestionInsight[];
+  followUpActions: FollowUpAction[];
 }
 
 export interface AppendixFData {
@@ -138,12 +347,15 @@ export interface AppendixFData {
   collectionMethod: string;
   submissionDate: string;
   knowledgeGaps: string | null;
+  validationStatus: 'Complete' | 'Pending' | 'Partial';
   knowledgeGapDetails?: Array<{
     questionId: number;
+    questionText: string;
     resolvedBy: string;
     resolverRole: string;
     isKnowledgeGap: boolean;
     resolvedAt: string;
+    resolutionMethod: string;
   }>;
 }
 
@@ -534,14 +746,41 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     ),
   };
 
-  // ===== APPENDIX B: SWOT ANALYSIS =====
+  // ===== APPENDIX B: SWOT ANALYSIS + QUESTION INSIGHTS + FOLLOW-UP ACTIONS =====
   const appendixB: AppendixBData[] = workflowsData
     .filter(w => w.readiness !== null)
     .map(w => {
       const swot = generateSWOT(w.readiness!);
+      
+      // Collect question insights from TFA and all PIFs
+      const questionInsights: QuestionInsight[] = [];
+      
+      if (w.tfa) {
+        const tfaInsights = extractTFAInsights(
+          w.tfa as any, // Cast to TFAAssessment type
+          w.tfa.initialRespondent,
+          w.tfa.completedAt
+        );
+        questionInsights.push(...tfaInsights);
+      }
+      
+      w.pifs.forEach(pif => {
+        const pifInsights = extractPIFInsights(
+          pif as any, // Cast to PIFResponse type
+          pif.respondentName,
+          pif.completedAt
+        );
+        questionInsights.push(...pifInsights);
+      });
+      
+      // Generate follow-up actions for low-scoring factors
+      const followUpActions = generateFollowUpActions(questionInsights);
+      
       return {
         workflowName: w.workflow.name,
         swotAnalysis: swot,
+        questionInsights: questionInsights,
+        followUpActions: followUpActions,
       };
     });
 
@@ -561,21 +800,28 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       // Identify resolved gaps and knowledge gaps from responseSources
       const knowledgeGapDetails: Array<{
         questionId: number;
+        questionText: string;
         resolvedBy: string;
         resolverRole: string;
         isKnowledgeGap: boolean;
         resolvedAt: string;
+        resolutionMethod: string;
       }> = [];
       
-      Object.keys(responseSources).forEach(questionId => {
-        const source = responseSources[questionId];
+      Object.keys(responseSources).forEach(questionKey => {
+        const source = responseSources[questionKey];
         if (source.answeredBy && source.answeredByRole) {
+          const qId = parseInt(questionKey.replace('q', ''));
+          const question = TFA_QUESTIONS.find(q => q.id === qId);
+          
           knowledgeGapDetails.push({
-            questionId: parseInt(questionId),
+            questionId: qId,
+            questionText: question?.question || `Question ${qId}`,
             resolvedBy: source.answeredBy,
             resolverRole: source.answeredByRole,
             isKnowledgeGap: source.isKnowledgeGap || false,
             resolvedAt: source.answeredAt || '',
+            resolutionMethod: source.isKnowledgeGap ? 'Knowledge Gap Resolution' : 'SME Consultation'
           });
         }
       });
@@ -591,6 +837,13 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         gapSummary = `${initialGapsCount} initial gaps: ${parts.join(', ')}`;
       }
       
+      // Determine validation status
+      const totalQuestions = TFA_QUESTIONS.length;
+      const answeredQuestions = Object.keys(w.tfa.responses).length;
+      const validationStatus: 'Complete' | 'Pending' | 'Partial' = 
+        answeredQuestions === totalQuestions && markedAsKnowledgeGapCount === 0 ? 'Complete' :
+        markedAsKnowledgeGapCount > 0 ? 'Partial' : 'Pending';
+      
       appendixF.push({
         workflowName: w.workflow.name,
         dataType: 'TFA',
@@ -600,6 +853,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         collectionMethod: 'Technical Feasibility Assessment Form',
         submissionDate: w.tfa.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: gapSummary,
+        validationStatus: validationStatus,
         knowledgeGapDetails: knowledgeGapDetails.length > 0 ? knowledgeGapDetails : undefined,
       });
     }
@@ -615,6 +869,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         collectionMethod: 'Process Insights Form',
         submissionDate: pif.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: null,
+        validationStatus: 'Complete', // PIFs are always complete when submitted
       });
     });
   });
