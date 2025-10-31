@@ -68,8 +68,17 @@ function extractTFAInsights(
 ): QuestionInsight[] {
   const insights: QuestionInsight[] = [];
   
+  // Defensive check: ensure responses object exists
+  if (!tfa.responses || typeof tfa.responses !== 'object') {
+    console.warn(`TFA assessment has invalid or missing responses object`);
+    return insights;
+  }
+  
+  const responses = tfa.responses as Record<string, string>;
+  const responseSources = (tfa.responseSources as Record<string, any>) || {};
+  
   for (const question of TFA_QUESTIONS) {
-    const responseValue = tfa.responses[`q${question.id}`];
+    const responseValue = responses[`q${question.id}`];
     // Explicitly check for null/undefined to include "0" (Don't Know) responses
     if (responseValue === null || responseValue === undefined) continue;
     
@@ -77,7 +86,7 @@ function extractTFAInsights(
     if (!selectedOption) continue;
     
     // Determine respondent from response sources
-    const responseSource = tfa.responseSources?.[`q${question.id}`];
+    const responseSource = responseSources[`q${question.id}`];
     const respondent = responseSource?.respondent || initialRespondent;
     
     insights.push({
@@ -106,12 +115,20 @@ function extractPIFInsights(
 ): QuestionInsight[] {
   const insights: QuestionInsight[] = [];
   
+  // Defensive check: ensure responses object exists
+  if (!pif.responses || typeof pif.responses !== 'object') {
+    console.warn(`PIF response for ${respondentName} has invalid or missing responses object`);
+    return insights;
+  }
+  
+  const responses = pif.responses as Record<string, string>;
+  
   for (const question of ALL_PIF_QUESTIONS) {
     // Skip non-operational questions (ROI inputs and qualitative)
     if (!question.weight) continue;
     if (question.type === 'text' || question.type === 'textarea' || question.type === 'number') continue;
     
-    const responseValue = pif.responses[`q${question.id}`];
+    const responseValue = responses[`q${question.id}`];
     // Explicitly check for null/undefined to handle all valid values including "0"
     if (responseValue === null || responseValue === undefined) continue;
     

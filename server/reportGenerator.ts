@@ -34,6 +34,16 @@ import {
   formatDiagnosticDate,
 } from "./reportPrompts";
 
+/**
+ * Custom error class for report validation failures
+ */
+export class ReportValidationError extends Error {
+  constructor(message: string, public validationErrors: string[]) {
+    super(message);
+    this.name = 'ReportValidationError';
+  }
+}
+
 // Automat-IA Brand Colors
 const COLORS = {
   PRIMARY_GREEN: "10b981",
@@ -303,8 +313,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   // Pre-export validation - data structure
   const dataValidation = validateDiagnosticData(data);
   if (!dataValidation.valid) {
-    throw new Error(
-      `Report generation validation failed:\n${dataValidation.errors.map(e => `  - ${e}`).join('\n')}`
+    throw new ReportValidationError(
+      'Report generation validation failed',
+      dataValidation.errors
     );
   }
   
@@ -333,8 +344,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   // Pre-export validation - template variables
   const varsValidation = validateTemplateVars(templateVars);
   if (!varsValidation.valid) {
-    throw new Error(
-      `Template variable validation failed:\n${varsValidation.errors.map(e => `  - ${e}`).join('\n')}`
+    throw new ReportValidationError(
+      'Template variable validation failed',
+      varsValidation.errors
     );
   }
 

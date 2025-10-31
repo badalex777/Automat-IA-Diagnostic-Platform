@@ -20,7 +20,7 @@ import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@share
 import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualitativeResponses } from "@shared/pifQuestions";
 import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { aggregateCompanyDiagnosticData } from "./reportDataAggregator";
-import { generateExecutiveReport } from "./reportGenerator";
+import { generateExecutiveReport, ReportValidationError } from "./reportGenerator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Companies
@@ -146,6 +146,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(buffer);
     } catch (error: any) {
       console.error('Error generating executive report:', error);
+      
+      // Check if this is a validation error (from pre-export validation)
+      if (error.name === 'ReportValidationError') {
+        return res.status(400).json({ 
+          error: error.message, 
+          validationErrors: error.validationErrors 
+        });
+      }
+      
+      // All other errors are internal server errors
       res.status(500).json({ error: "Failed to generate executive report" });
     }
   });
