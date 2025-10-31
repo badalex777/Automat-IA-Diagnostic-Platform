@@ -74,20 +74,9 @@ export default function OpportunityMatrix({
     return colors;
   }, [opportunities, workflowColors]);
 
-  // Determine max X-axis scale based on filter (100/125/150)
-  const maxImpactScale = useMemo(() => {
-    // Calculate what max scale we need based on filter type
-    let hasError = false;
-    let hasRevenue = false;
-    
-    const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
-    filteredOpps.forEach(opp => {
-      if (opp.errorMetricsEnabled) hasError = true;
-      if (opp.revenueMetricsEnabled) hasRevenue = true;
-    });
-    
-    return getFilterMaxScore({ errorMetrics: hasError, revenueMetrics: hasRevenue });
-  }, [opportunities, filterType]);
+  // Enhanced Impact Matrix always uses 0-150 scale (supports all 3 metrics)
+  // Individual opportunities may score lower if their bonuses are toggled off
+  const maxImpactScale = 150;
 
   const { dataPoints, workflowLegend } = useMemo(() => {
     const workflowMap = workflows.reduce((acc, w) => {
@@ -112,13 +101,8 @@ export default function OpportunityMatrix({
       // Calculate ENHANCED impact (respects per-opportunity toggles, uses reweighting)
       const enhancedImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
       
-      // Determine quadrant using filter-specific max scale
-      const toggles: ToggleState = {
-        errorMetrics: opp.errorMetricsEnabled || false,
-        revenueMetrics: opp.revenueMetricsEnabled || false
-      };
-      const oppMaxScale = getFilterMaxScore(toggles);
-      const quadrant = getQuadrant(implementationEffort, enhancedImpact, oppMaxScale);
+      // Determine quadrant using fixed 150 scale (Enhanced Impact Matrix uses full capability scale)
+      const quadrant = getQuadrant(implementationEffort, enhancedImpact, 150);
       
       return {
         id: opp.id,
@@ -203,7 +187,7 @@ export default function OpportunityMatrix({
           <div>
             <CardTitle>Enhanced Impact Matrix</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              Reweighted scoring with dynamic scale ({maxImpactScale === 150 ? 'All 3 Metrics: 0-150' : maxImpactScale === 125 ? 'Two Metrics: 0-125' : 'Base Only: 0-100'})
+              Additive bonus model with full capability scale (0-150)
             </p>
           </div>
           <Select value={filterType} onValueChange={handleFilterChange}>
@@ -245,10 +229,10 @@ export default function OpportunityMatrix({
                   type="number" 
                   dataKey="x" 
                   name={t.matrix.xAxis}
-                  domain={[0, maxImpactScale]}
-                  ticks={maxImpactScale === 150 ? [0, 30, 60, 90, 120, 150] : maxImpactScale === 125 ? [0, 25, 50, 75, 100, 125] : [0, 25, 50, 75, 100]}
+                  domain={[0, 150]}
+                  ticks={[0, 30, 60, 90, 120, 150]}
                   label={{ 
-                    value: `${t.matrix.xAxis} (0-${maxImpactScale}) →`, 
+                    value: `${t.matrix.xAxis} (0-150) →`, 
                     position: 'bottom',
                     offset: 40,
                     className: "fill-foreground text-sm"
@@ -270,9 +254,9 @@ export default function OpportunityMatrix({
                   tick={{ className: "fill-muted-foreground text-xs" }}
                 />
 
-                {/* Quadrant dividers - Dynamic midpoint based on max scale */}
+                {/* Quadrant dividers - Fixed at 75 (midpoint of 0-150 scale) */}
                 <ReferenceLine 
-                  x={maxImpactScale / 2} 
+                  x={75} 
                   stroke="hsl(var(--border))" 
                   strokeWidth={2}
                   strokeDasharray="5 5"
