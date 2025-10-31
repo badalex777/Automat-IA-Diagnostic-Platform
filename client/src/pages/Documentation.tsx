@@ -82,29 +82,30 @@ export default function Documentation() {
     body { 
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6; 
-      color: #1a1a1a; 
-      background: #ffffff;
+      color: #e5e5e5; 
+      background: #0a0a0a;
       padding: 40px;
       max-width: 900px;
       margin: 0 auto;
     }
-    h1 { font-size: 32px; margin: 40px 0 16px; color: #000; border-bottom: 3px solid #10b981; padding-bottom: 12px; }
-    h2 { font-size: 24px; margin: 32px 0 12px; color: #000; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
-    h3 { font-size: 20px; margin: 24px 0 8px; color: #374151; }
-    h4 { font-size: 16px; margin: 16px 0 8px; color: #4b5563; font-weight: 600; }
-    p { margin: 12px 0; color: #374151; }
-    ul, ol { margin: 12px 0 12px 24px; color: #374151; }
+    h1 { font-size: 32px; margin: 40px 0 16px; color: #ffffff; border-bottom: 3px solid #10b981; padding-bottom: 12px; }
+    h2 { font-size: 24px; margin: 32px 0 12px; color: #ffffff; border-bottom: 2px solid #27272a; padding-bottom: 8px; }
+    h3 { font-size: 20px; margin: 24px 0 8px; color: #ffffff; }
+    h4 { font-size: 16px; margin: 16px 0 8px; color: #e5e5e5; font-weight: 600; }
+    p { margin: 12px 0; color: #e5e5e5; }
+    ul, ol { margin: 12px 0 12px 24px; color: #e5e5e5; }
     li { margin: 6px 0; }
     .section { margin: 40px 0; page-break-inside: avoid; }
     .subsection { margin: 24px 0; page-break-inside: avoid; }
     .formula { 
       font-family: 'JetBrains Mono', 'Courier New', monospace;
-      background: #f9fafb; 
+      background: #18181b; 
       padding: 16px; 
       border-left: 4px solid #10b981; 
       margin: 16px 0;
       font-size: 14px;
       overflow-x: auto;
+      color: #e5e5e5;
     }
     .badge {
       display: inline-block;
@@ -114,21 +115,21 @@ export default function Documentation() {
       font-weight: 600;
       margin: 4px 4px 4px 0;
     }
-    .badge-very-high { background: #d1fae5; color: #065f46; }
-    .badge-high { background: #dbeafe; color: #1e40af; }
-    .badge-moderate { background: #fef3c7; color: #92400e; }
-    .badge-low { background: #fed7aa; color: #9a3412; }
-    .badge-very-low { background: #fecaca; color: #991b1b; }
+    .badge-very-high { background: #065f46; color: #d1fae5; }
+    .badge-high { background: #1e40af; color: #dbeafe; }
+    .badge-moderate { background: #92400e; color: #fef3c7; }
+    .badge-low { background: #9a3412; color: #fed7aa; }
+    .badge-very-low { background: #991b1b; color: #fecaca; }
     table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-    th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; }
-    th { background: #f9fafb; font-weight: 600; color: #000; }
-    .toc { background: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0; }
+    th, td { border: 1px solid #27272a; padding: 12px; text-align: left; color: #e5e5e5; }
+    th { background: #18181b; font-weight: 600; color: #ffffff; }
+    .toc { background: #18181b; padding: 24px; border-radius: 8px; margin: 24px 0; border: 1px solid #27272a; }
     .toc ul { list-style: none; margin: 0; }
     .toc li { margin: 8px 0; }
     .toc a { color: #10b981; text-decoration: none; }
     .toc a:hover { text-decoration: underline; }
     @media print {
-      body { padding: 20px; }
+      body { padding: 20px; background: #0a0a0a; }
       .section { page-break-before: auto; }
       h1, h2 { page-break-after: avoid; }
     }
@@ -155,13 +156,13 @@ export default function Documentation() {
 
   <div class="section" id="platform-overview">
     <h2>${doc.platformOverview.title}</h2>
-    <p>${doc.platformOverview.purpose}</p>
-    <h3>${doc.platformOverview.keyBenefitsTitle}</h3>
+    <p>${doc.platformOverview.purposeContent}</p>
+    <h3>${doc.platformOverview.keyBenefits}</h3>
     <ul>
-      <li><strong>${doc.platformOverview.benefit1Title}:</strong> ${doc.platformOverview.benefit1Desc}</li>
-      <li><strong>${doc.platformOverview.benefit2Title}:</strong> ${doc.platformOverview.benefit2Desc}</li>
-      <li><strong>${doc.platformOverview.benefit3Title}:</strong> ${doc.platformOverview.benefit3Desc}</li>
-      <li><strong>${doc.platformOverview.benefit4Title}:</strong> ${doc.platformOverview.benefit4Desc}</li>
+      <li>${doc.platformOverview.benefit1}</li>
+      <li>${doc.platformOverview.benefit2}</li>
+      <li>${doc.platformOverview.benefit3}</li>
+      <li>${doc.platformOverview.benefit4}</li>
     </ul>
   </div>
 
@@ -169,28 +170,28 @@ export default function Documentation() {
     <h2>${doc.userJourney.title}</h2>
     <p>${doc.userJourney.intro}</p>
     <ol>
-      <li><strong>${doc.userJourney.step1Title}:</strong> ${doc.userJourney.step1Desc}</li>
-      <li><strong>${doc.userJourney.step2Title}:</strong> ${doc.userJourney.step2Desc}</li>
-      <li><strong>${doc.userJourney.step3Title}:</strong> ${doc.userJourney.step3Desc}</li>
-      <li><strong>${doc.userJourney.step4Title}:</strong> ${doc.userJourney.step4Desc}</li>
-      <li><strong>${doc.userJourney.step5Title}:</strong> ${doc.userJourney.step5Desc}</li>
-      <li><strong>${doc.userJourney.step6Title}:</strong> ${doc.userJourney.step6Desc}</li>
+      <li><strong>${doc.userJourney.step1Title}:</strong> ${doc.userJourney.step1Content}</li>
+      <li><strong>${doc.userJourney.step2Title}:</strong> ${doc.userJourney.step2Content}</li>
+      <li><strong>${doc.userJourney.step3Title}:</strong> ${doc.userJourney.step3Content}</li>
+      <li><strong>${doc.userJourney.step4Title}:</strong> ${doc.userJourney.step4Content}</li>
+      <li><strong>${doc.userJourney.step5Title}:</strong> ${doc.userJourney.step5Content}</li>
+      <li><strong>${doc.userJourney.step6Title}:</strong> ${doc.userJourney.step6Content}</li>
     </ol>
   </div>
 
   <div class="section" id="tfa-methodology">
     <h2>${doc.tfaMethodology.title}</h2>
-    <p>${doc.tfaMethodology.overview}</p>
-    <h3>${doc.tfaMethodology.sectionsTitle}</h3>
+    <p>${doc.tfaMethodology.intro}</p>
+    <h3>${doc.tfaMethodology.sectionWeights}</h3>
     <ul>
-      <li><strong>${doc.tfaMethodology.section1}:</strong> 25% ${doc.tfaMethodology.weight} (6 ${doc.tfaMethodology.questions})</li>
-      <li><strong>${doc.tfaMethodology.section2}:</strong> 30% ${doc.tfaMethodology.weight} (5 ${doc.tfaMethodology.questions})</li>
-      <li><strong>${doc.tfaMethodology.section3}:</strong> 30% ${doc.tfaMethodology.weight} (6 ${doc.tfaMethodology.questions})</li>
-      <li><strong>${doc.tfaMethodology.section4}:</strong> 15% ${doc.tfaMethodology.weight} (4 ${doc.tfaMethodology.questions})</li>
+      <li>${doc.tfaMethodology.systemEnvironment}</li>
+      <li>${doc.tfaMethodology.dataQuality}</li>
+      <li>${doc.tfaMethodology.integrationFeasibility}</li>
+      <li>${doc.tfaMethodology.securityCompliance}</li>
     </ul>
-    <h3>${doc.tfaMethodology.scoringTitle}</h3>
-    <p>${doc.tfaMethodology.scoringDesc}</p>
-    <h3>${doc.tfaMethodology.bandsTitle}</h3>
+    <h3>${doc.tfaMethodology.scoringAlgorithm}</h3>
+    <p>${doc.tfaMethodology.scoringAlgorithmContent}</p>
+    <h3>${doc.tfaMethodology.feasibilityBands}</h3>
     <p>
       <span class="badge badge-very-high">${doc.tfaMethodology.veryHigh}</span>
       <span class="badge badge-high">${doc.tfaMethodology.high}</span>
@@ -202,25 +203,25 @@ export default function Documentation() {
 
   <div class="section" id="pif-methodology">
     <h2>${doc.pifMethodology.title}</h2>
-    <p>${doc.pifMethodology.overview}</p>
-    <h3>${doc.pifMethodology.sectionsTitle}</h3>
+    <p>${doc.pifMethodology.intro}</p>
+    <h3>${doc.pifMethodology.sections}</h3>
     <ul>
-      <li><strong>${doc.pifMethodology.section1}:</strong> ${doc.pifMethodology.section1Desc}</li>
-      <li><strong>${doc.pifMethodology.section2}:</strong> ${doc.pifMethodology.section2Desc}</li>
-      <li><strong>${doc.pifMethodology.section3}:</strong> ${doc.pifMethodology.section3Desc}</li>
-      <li><strong>${doc.pifMethodology.section4}:</strong> ${doc.pifMethodology.section4Desc}</li>
-      <li><strong>${doc.pifMethodology.section5}:</strong> ${doc.pifMethodology.section5Desc}</li>
-      <li><strong>${doc.pifMethodology.section6}:</strong> ${doc.pifMethodology.section6Desc}</li>
-      <li><strong>${doc.pifMethodology.section7}:</strong> ${doc.pifMethodology.section7Desc}</li>
-      <li><strong>${doc.pifMethodology.section8}:</strong> ${doc.pifMethodology.section8Desc}</li>
+      <li>${doc.pifMethodology.section1}</li>
+      <li>${doc.pifMethodology.section2}</li>
+      <li>${doc.pifMethodology.section3}</li>
+      <li>${doc.pifMethodology.section4}</li>
+      <li>${doc.pifMethodology.section5}</li>
+      <li>${doc.pifMethodology.section6}</li>
+      <li>${doc.pifMethodology.section7}</li>
+      <li>${doc.pifMethodology.section8}</li>
     </ul>
   </div>
 
   <div class="section" id="readiness-rubric">
     <h2>${doc.readinessRubric.title}</h2>
-    <p>${doc.readinessRubric.overview}</p>
-    <div class="formula">${doc.readinessRubric.formula}</div>
-    <h3>${doc.readinessRubric.componentsTitle}</h3>
+    <p>${doc.readinessRubric.intro}</p>
+    <div class="formula">${doc.readinessRubric.weightingFormulaContent}</div>
+    <h3>${doc.readinessRubric.componentBreakdown}</h3>
     <ul>
       <li>${doc.readinessRubric.component1}</li>
       <li>${doc.readinessRubric.component2}</li>
@@ -234,20 +235,17 @@ export default function Documentation() {
 
   <div class="section" id="opportunity-matrix">
     <h2>${doc.opportunityMatrix.title}</h2>
-    <p>${doc.opportunityMatrix.overview}</p>
-    <h3>${doc.opportunityMatrix.scoringTitle}</h3>
-    <p>${doc.opportunityMatrix.scoringDesc}</p>
-    <div class="formula">
-${doc.opportunityMatrix.roiFormula}<br/>
-${doc.opportunityMatrix.fteFormula}<br/>
-${doc.opportunityMatrix.capFormula}
-    </div>
-    <h3>${doc.opportunityMatrix.filterViewsTitle}</h3>
+    <p>${doc.opportunityMatrix.intro}</p>
+    <h3>${doc.opportunityMatrix.businessImpactScoring}</h3>
+    <p>${doc.opportunityMatrix.businessImpactScoringContent}</p>
+    <h3>${doc.opportunityMatrix.implementationEffortScoring}</h3>
+    <p>${doc.opportunityMatrix.implementationEffortScoringContent}</p>
+    <h3>${doc.opportunityMatrix.quadrants}</h3>
     <ul>
-      <li><strong>${doc.opportunityMatrix.view1}:</strong> ${doc.opportunityMatrix.view1Desc}</li>
-      <li><strong>${doc.opportunityMatrix.view2}:</strong> ${doc.opportunityMatrix.view2Desc}</li>
-      <li><strong>${doc.opportunityMatrix.view3}:</strong> ${doc.opportunityMatrix.view3Desc}</li>
-      <li><strong>${doc.opportunityMatrix.view4}:</strong> ${doc.opportunityMatrix.view4Desc}</li>
+      <li>${doc.opportunityMatrix.quadrant1}</li>
+      <li>${doc.opportunityMatrix.quadrant2}</li>
+      <li>${doc.opportunityMatrix.quadrant3}</li>
+      <li>${doc.opportunityMatrix.quadrant4}</li>
     </ul>
   </div>
 
@@ -275,31 +273,34 @@ ${doc.opportunityMatrix.capFormula}
 
   <div class="section" id="roi-calculations">
     <h2>${doc.roiCalculations.title}</h2>
-    <h3>${doc.roiCalculations.annualRoiTitle}</h3>
-    <div class="formula">${doc.roiCalculations.annualRoiFormula}</div>
-    <h3>${doc.roiCalculations.fteSavingsTitle}</h3>
-    <div class="formula">${doc.roiCalculations.fteSavingsFormula}</div>
-    <h3>${doc.roiCalculations.impactScoreTitle}</h3>
-    <div class="formula">
-${doc.roiCalculations.impactScoreFormula1}<br/>
-${doc.roiCalculations.impactScoreFormula2}
-    </div>
+    <p>${doc.roiCalculations.intro}</p>
+    <h3>${doc.roiCalculations.fteSavingsFormula}</h3>
+    <div class="formula">${doc.roiCalculations.fteSavingsFormulaContent}</div>
+    <h3>${doc.roiCalculations.businessImpactScoring}</h3>
+    <div class="formula">${doc.roiCalculations.businessImpactScoringContent}</div>
   </div>
 
   <div class="section" id="formulas-reference">
     <h2>${doc.formulasReference.title}</h2>
-    <h3>${doc.formulasReference.tfaScoreTitle}</h3>
+    <p>${doc.formulasReference.intro}</p>
+    <h3>${doc.formulasReference.tfaScore}</h3>
     <div class="formula">${doc.formulasReference.tfaScoreFormula}</div>
-    <h3>${doc.formulasReference.pifScoreTitle}</h3>
-    <div class="formula">${doc.formulasReference.pifScoreFormula}</div>
-    <h3>${doc.formulasReference.readinessScoreTitle}</h3>
+    <h3>${doc.formulasReference.readinessScore}</h3>
     <div class="formula">${doc.formulasReference.readinessScoreFormula}</div>
-    <h3>${doc.formulasReference.businessImpactTitle}</h3>
-    <div class="formula">
-${doc.formulasReference.businessImpactFormula1}<br/>
-${doc.formulasReference.businessImpactFormula2}<br/>
-${doc.formulasReference.businessImpactFormula3}
-    </div>
+    <h3>${doc.formulasReference.roiScore}</h3>
+    <div class="formula">${doc.formulasReference.roiScoreFormula}</div>
+    <h3>${doc.formulasReference.hoursScore}</h3>
+    <div class="formula">${doc.formulasReference.hoursScoreFormula}</div>
+    <h3>${doc.formulasReference.errorScore}</h3>
+    <div class="formula">${doc.formulasReference.errorScoreFormula}</div>
+    <h3>${doc.formulasReference.revenueScore}</h3>
+    <div class="formula">${doc.formulasReference.revenueScoreFormula}</div>
+    <h3>${doc.formulasReference.baseImpactMatrix}</h3>
+    <div class="formula">${doc.formulasReference.baseImpactMatrixFormula}</div>
+    <h3>${doc.formulasReference.enhancedImpactMatrix}</h3>
+    <div class="formula">${doc.formulasReference.enhancedImpactMatrixFormula}</div>
+    <h3>${doc.formulasReference.implementationEffortScore}</h3>
+    <div class="formula">${doc.formulasReference.implementationEffortScoreFormula}</div>
   </div>
 
 </body>
