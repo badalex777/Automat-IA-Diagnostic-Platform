@@ -231,6 +231,28 @@ export default function Documentation() {
       <li>${doc.readinessRubric.component6}</li>
       <li>${doc.readinessRubric.component7}</li>
     </ul>
+    <h3>${doc.readinessRubric.weightNormalization}</h3>
+    <p>${doc.readinessRubric.weightNormalizationContent}</p>
+    <div class="subsection">
+      <h4>${doc.readinessRubric.tfaComponentsTitle}</h4>
+      <p>${doc.readinessRubric.tfaComponentsContent}</p>
+      <div class="formula">
+        System Environment: 25% × 0.60 = 15%<br>
+        Data Quality: 30% × 0.60 = 18%<br>
+        Integration Feasibility: 30% × 0.60 = 18%<br>
+        Security & Compliance: 15% × 0.60 = 9%
+      </div>
+    </div>
+    <div class="subsection">
+      <h4>${doc.readinessRubric.pifComponentsTitle}</h4>
+      <p>${doc.readinessRubric.pifComponentsContent}</p>
+      <div class="formula">
+        Process Clarity: 37.5% × 0.40 = 15%<br>
+        Change Magnitude: 37.5% × 0.40 = 15%<br>
+        Workflow Brittleness: 25% × 0.40 = 10%
+      </div>
+    </div>
+    <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; font-size: 0.9rem;">${doc.readinessRubric.normalizationNote}</p>
   </div>
 
   <div class="section" id="opportunity-matrix">
@@ -755,11 +777,11 @@ export default function Documentation() {
                             <span className="text-muted-foreground text-sm">{t.documentation.readinessRubric.component3}</span>
                           </div>
                           <div className="flex items-start gap-3">
-                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">12%</span>
+                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">15%</span>
                             <span className="text-muted-foreground text-sm">{t.documentation.readinessRubric.component4}</span>
                           </div>
                           <div className="flex items-start gap-3">
-                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">12%</span>
+                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">15%</span>
                             <span className="text-muted-foreground text-sm">{t.documentation.readinessRubric.component5}</span>
                           </div>
                           <div className="flex items-start gap-3">
@@ -767,8 +789,41 @@ export default function Documentation() {
                             <span className="text-muted-foreground text-sm">{t.documentation.readinessRubric.component6}</span>
                           </div>
                           <div className="flex items-start gap-3">
-                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">6%</span>
+                            <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium whitespace-nowrap">10%</span>
                             <span className="text-muted-foreground text-sm">{t.documentation.readinessRubric.component7}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.weightNormalization}</h3>
+                        <p className="text-muted-foreground leading-relaxed mb-3">
+                          {t.documentation.readinessRubric.weightNormalizationContent}
+                        </p>
+                        <div className="space-y-3">
+                          <div className="border border-border rounded-md p-4 bg-accent/5">
+                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.readinessRubric.tfaComponentsTitle}</h4>
+                            <p className="text-muted-foreground text-xs leading-relaxed mb-2">{t.documentation.readinessRubric.tfaComponentsContent}</p>
+                            <div className="bg-muted p-2 rounded-md font-mono text-xs space-y-1">
+                              <div>System Environment: 25% × 0.60 = 15%</div>
+                              <div>Data Quality: 30% × 0.60 = 18%</div>
+                              <div>Integration Feasibility: 30% × 0.60 = 18%</div>
+                              <div>Security & Compliance: 15% × 0.60 = 9%</div>
+                            </div>
+                          </div>
+                          <div className="border border-border rounded-md p-4 bg-primary/5">
+                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.readinessRubric.pifComponentsTitle}</h4>
+                            <p className="text-muted-foreground text-xs leading-relaxed mb-2">{t.documentation.readinessRubric.pifComponentsContent}</p>
+                            <div className="bg-muted p-2 rounded-md font-mono text-xs space-y-1">
+                              <div>Process Clarity: 37.5% × 0.40 = 15%</div>
+                              <div>Change Magnitude: 37.5% × 0.40 = 15%</div>
+                              <div>Workflow Brittleness: 25% × 0.40 = 10%</div>
+                            </div>
+                          </div>
+                          <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5">
+                            <p className="text-muted-foreground text-xs leading-relaxed">{t.documentation.readinessRubric.normalizationNote}</p>
                           </div>
                         </div>
                       </div>
