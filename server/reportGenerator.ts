@@ -24,9 +24,23 @@ import {
   EXECUTIVE_SUMMARY,
   CONFIDENTIALITY_DISCLAIMER,
   METHODOLOGY_OVERVIEW,
-  DIAGNOSTIC_OVERVIEW,
-  FINDINGS_ANALYSIS,
-  AUTOMATION_ROADMAP,
+  DIAGNOSTIC_OVERVIEW_PART1,
+  DIAGNOSTIC_OVERVIEW_PART2,
+  DIAGNOSTIC_OVERVIEW_PART3,
+  FINDINGS_ANALYSIS_PART1,
+  FINDINGS_ANALYSIS_PART2,
+  FINDINGS_ANALYSIS_PART3,
+  FINDINGS_ANALYSIS_PART4,
+  FINDINGS_ANALYSIS_PART5,
+  FINDINGS_ANALYSIS_PART6,
+  AUTOMATION_ROADMAP_INTRO,
+  AUTOMATION_ROADMAP_PHASE1,
+  AUTOMATION_ROADMAP_PHASE1_OUTCOMES,
+  AUTOMATION_ROADMAP_PHASE2,
+  AUTOMATION_ROADMAP_PHASE2_OUTCOMES,
+  AUTOMATION_ROADMAP_PHASE3,
+  AUTOMATION_ROADMAP_PHASE3_OUTCOMES,
+  AUTOMATION_ROADMAP_SUMMARY,
   APPENDIX_A,
   APPENDIX_D,
   APPENDIX_E,
@@ -113,6 +127,7 @@ function createHorizontalSeparator(): Paragraph {
  * Create paragraphs from multi-line text with smart formatting
  * - Detects phase titles and makes them bold
  * - Detects subsection titles and makes them headings
+ * - Detects framework names and makes them bold with colons
  * - Groups consecutive lines into paragraphs
  */
 function createTextParagraphs(text: string): Paragraph[] {
@@ -127,6 +142,24 @@ function createTextParagraphs(text: string): Paragraph[] {
   const isSubsectionTitle = (line: string): boolean => {
     // Matches patterns like "7.1 Title", "A.1 Title", "E.1 Title", "4.1 Title", etc.
     return /^(\d+\.\d+|[A-Z]\.\d+)\s+/.test(line.trim());
+  };
+  
+  const isFrameworkName = (line: string): boolean => {
+    // Matches framework names like "Technical Feasibility Assessment (TFA)." or "Process Insights Form (PIF)."
+    const frameworks = [
+      'Technical Feasibility Assessment',
+      'Technical Feasibility Assessments',
+      'Process Insights Form',
+      'Process Insights Forms',
+      'Stakeholder Interviews',
+      'End-User Interviews',
+      'Documentation Review',
+      'Readiness Rubric',
+      'Automat-IA ROI Calculator',
+      'Opportunity Matrix'
+    ];
+    const trimmed = line.trim();
+    return frameworks.some(fw => trimmed.startsWith(fw));
   };
 
   const flushParagraph = () => {
@@ -173,6 +206,32 @@ function createTextParagraphs(text: string): Paragraph[] {
         heading: HeadingLevel.HEADING_3,
         spacing: { before: 120, after: 120 },
       }));
+      continue;
+    }
+    
+    if (isFrameworkName(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Framework name paragraphs: bold the framework name up to the period or colon
+      const match = trimmed.match(/^([^.]+(?:\([^)]+\))?[.:])(.*)$/);
+      if (match) {
+        const [, boldPart, rest] = match;
+        paragraphs.push(new Paragraph({
+          children: [
+            new TextRun({ text: boldPart, bold: true }),
+            new TextRun({ text: rest }),
+          ],
+          alignment: AlignmentType.BOTH,
+          spacing: { after: 120 },
+        }));
+      } else {
+        // Fallback if pattern doesn't match
+        paragraphs.push(new Paragraph({
+          children: [new TextRun({ text: trimmed, bold: true })],
+          alignment: AlignmentType.BOTH,
+          spacing: { after: 120 },
+        }));
+      }
       continue;
     }
 
@@ -563,15 +622,19 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
 
   // ===== DIAGNOSTIC OVERVIEW =====
   sections.push(createHeading("Diagnostic Overview", HeadingLevel.HEADING_1));
-  const diagnosticOverviewText = replaceVariables(DIAGNOSTIC_OVERVIEW, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(diagnosticOverviewText));
   
-  // Top 3 Opportunities Table
+  // Part 1: Sections 4.1 and 4.2
+  const diagnosticOverviewPart1 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART1, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(diagnosticOverviewPart1));
+  sections.push(createHorizontalSeparator());
+  
+  // Table 4.3: Top Three Opportunities
   if (data.top3Opportunities.length > 0) {
     sections.push(
       new Paragraph({
-        text: "Top Three Automation Opportunities",
+        text: "4.3 Top Three Automation Opportunities",
         heading: HeadingLevel.HEADING_3,
+        alignment: AlignmentType.BOTH,
         spacing: { before: 240, after: 120 },
       })
     );
@@ -587,27 +650,64 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ]);
     sections.push(createTable(top3Headers, top3Rows));
   }
+  
+  // Part 2: Commentary after Table 4.3
+  const diagnosticOverviewPart2 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART2, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(diagnosticOverviewPart2));
+  sections.push(createHorizontalSeparator());
+  
+  // Table 4.4: Financial Summary of Top Opportunities
+  if (data.top3Opportunities.length > 0) {
+    sections.push(
+      new Paragraph({
+        text: "4.4 Financial Summary of Top Opportunities",
+        heading: HeadingLevel.HEADING_3,
+        alignment: AlignmentType.BOTH,
+        spacing: { before: 360, after: 120 },
+      })
+    );
+
+    const financialSummaryHeaders = ["Metric", "Value", "Description"];
+    const totalTopBenefit = data.top3Opportunities.reduce((sum, opp) => sum + opp.annualBenefit, 0);
+    const totalTopCost = data.top3Opportunities.reduce((sum, opp) => sum + parseFloat(opp.implementationCost || "0"), 0);
+    const avgTopROI = data.top3Opportunities.reduce((sum, opp) => sum + opp.roi, 0) / data.top3Opportunities.length;
+    const avgTopPayback = data.top3Opportunities.reduce((sum, opp) => sum + opp.paybackMonths, 0) / data.top3Opportunities.length;
+    const totalTopFTE = data.top3Opportunities.reduce((sum, opp) => sum + opp.fteSavings, 0);
+
+    const financialSummaryRows = [
+      ["Total Annual Benefit", formatCurrency(totalTopBenefit), "Combined quantifiable value across identified opportunities"],
+      ["Total Estimated Implementation Cost", formatCurrency(totalTopCost), "Includes implementation, training, and change management"],
+      ["Average ROI", formatNumber(avgTopROI, 1) + "%", "Modeled under the Conservative Scenario Framework"],
+      ["Average Payback Period", formatNumber(avgTopPayback, 1) + " months", "Time to recover implementation cost"],
+      ["Total FTE Capacity Saved", formatNumber(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
+    ];
+
+    sections.push(createTable(financialSummaryHeaders, financialSummaryRows));
+    sections.push(createBodyParagraph("All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the nearest hundred."));
+  }
+  sections.push(createHorizontalSeparator());
+  
+  // Part 3: Sections 4.5-4.9
+  const diagnosticOverviewPart3 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART3, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(diagnosticOverviewPart3));
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== FINDINGS & ANALYSIS =====
   sections.push(createHeading("Findings and Analysis", HeadingLevel.HEADING_1));
-  const findingsText = replaceVariables(FINDINGS_ANALYSIS, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsText));
-
-  // Readiness Summary Table
-  sections.push(
-    new Paragraph({
-      text: "Readiness Summary Table",
-      heading: HeadingLevel.HEADING_3,
-      spacing: { before: 240, after: 120 },
-    })
-  );
-
-  const readinessHeaders = ["Workflow", "Opportunity", "TFA Score", "PIF Score", "Readiness", "Band"];
+  
+  // Part 1: 5.1 Introduction text
+  const findingsPart1 = replaceVariables(FINDINGS_ANALYSIS_PART1, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart1));
+  
+  // Table 5.1: Readiness Summary - ONE ROW PER WORKFLOW (not per opportunity)
+  const readinessHeaders = ["Workflow", "TFA Score", "PIF Score", "Readiness", "Band"];
   const readinessRows: string[][] = [];
+
+  // Group by workflow to avoid duplication
+  const workflowMap = new Map<string, any>();
   data.workflows.forEach(w => {
-    if (w.readiness && w.readiness.componentScores) {
+    if (w.readiness && w.readiness.componentScores && !workflowMap.has(w.workflow.name)) {
       const readiness = w.readiness;
       const avgPIFScore = Math.round(
         (readiness.componentScores.processClarity + 
@@ -615,32 +715,40 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
          readiness.componentScores.workflowBrittleness) / 3
       );
       
-      w.opportunities.forEach(opp => {
-        readinessRows.push([
-          w.workflow.name,
-          opp.opportunity.name,
-          Math.round(w.tfa?.score || 0) + "%",
-          avgPIFScore + "%",
-          Math.round(readiness.totalScore) + "%",
-          readiness.feasibilityBand,
-        ]);
+      workflowMap.set(w.workflow.name, {
+        name: w.workflow.name,
+        tfaScore: Math.round(w.tfa?.score || 0),
+        pifScore: avgPIFScore,
+        readiness: Math.round(readiness.totalScore),
+        band: readiness.feasibilityBand,
       });
     }
+  });
+
+  workflowMap.forEach(w => {
+    readinessRows.push([
+      w.name,
+      w.tfaScore + "%",
+      w.pifScore + "%",
+      w.readiness + "%",
+      w.band,
+    ]);
   });
 
   if (readinessRows.length > 0) {
     sections.push(createTable(readinessHeaders, readinessRows));
   }
-
-  // ROI Insights Table
-  sections.push(
-    new Paragraph({
-      text: "ROI Insights Table",
-      heading: HeadingLevel.HEADING_3,
-      spacing: { before: 360, after: 120 },
-    })
-  );
-
+  
+  // Part 2: Commentary after Table 5.1
+  const findingsPart2 = replaceVariables(FINDINGS_ANALYSIS_PART2, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart2));
+  sections.push(createHorizontalSeparator());
+  
+  // Part 3: 5.2 ROI Insights introduction text
+  const findingsPart3 = replaceVariables(FINDINGS_ANALYSIS_PART3, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart3));
+  
+  // Table 5.2: ROI Insights Table
   const roiHeaders = ["Workflow", "Opportunity", "Annual Benefit", "Est. Cost", "FTE Saved", "Payback"];
   const roiRows: string[][] = [];
   data.workflows.forEach(w => {
@@ -659,16 +767,17 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   if (roiRows.length > 0) {
     sections.push(createTable(roiHeaders, roiRows));
   }
-
-  // Matrix Distribution
-  sections.push(
-    new Paragraph({
-      text: "Matrix Distribution Overview",
-      heading: HeadingLevel.HEADING_3,
-      spacing: { before: 360, after: 120 },
-    })
-  );
-
+  
+  // Part 4: Commentary after Table 5.2
+  const findingsPart4 = replaceVariables(FINDINGS_ANALYSIS_PART4, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart4));
+  sections.push(createHorizontalSeparator());
+  
+  // Part 5: 5.3 Opportunity Matrix Analysis introduction text
+  const findingsPart5 = replaceVariables(FINDINGS_ANALYSIS_PART5, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart5));
+  
+  // Table 5.3: Matrix Distribution
   const matrixHeaders = ["Quadrant", "Opportunities", "Count"];
   const matrixRows = [
     ["Quick Wins", data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
@@ -677,7 +786,11 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Deprioritize", data.matrixDistribution.deprioritize.opportunities.join(", "), data.matrixDistribution.deprioritize.count.toString()],
   ];
   sections.push(createTable(matrixHeaders, matrixRows));
-
+  
+  // Part 6: Commentary and matrix image placeholders
+  const findingsPart6 = replaceVariables(FINDINGS_ANALYSIS_PART6, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(findingsPart6));
+  
   // Matrix image placeholders
   sections.push(
     new Paragraph({
@@ -696,19 +809,18 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
 
   // ===== AUTOMATION ROADMAP =====
   sections.push(createHeading("Automation Roadmap", HeadingLevel.HEADING_1));
-  const roadmapText = replaceVariables(AUTOMATION_ROADMAP, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapText));
-
+  
+  // Introduction
+  const roadmapIntro = replaceVariables(AUTOMATION_ROADMAP_INTRO, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapIntro));
+  sections.push(createHorizontalSeparator());
+  
+  // Phase 1
+  const roadmapPhase1 = replaceVariables(AUTOMATION_ROADMAP_PHASE1, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase1));
+  
   // Phase 1 Table
   if (data.roadmapPhases.phase1QuickWins.length > 0) {
-    sections.push(
-      new Paragraph({
-        text: "Phase 1: Quick Wins (0-6 months)",
-        heading: HeadingLevel.HEADING_3,
-        spacing: { before: 240, after: 120 },
-      })
-    );
-
     const phase1Headers = ["Opportunity", "Annual Benefit", "Payback", "FTE Saved"];
     const phase1Rows = data.roadmapPhases.phase1QuickWins.map(opp => [
       opp.opportunity.name,
@@ -718,17 +830,17 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ]);
     sections.push(createTable(phase1Headers, phase1Rows));
   }
+  
+  const roadmapPhase1Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE1_OUTCOMES, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase1Outcomes));
+  sections.push(createHorizontalSeparator());
 
+  // Phase 2
+  const roadmapPhase2 = replaceVariables(AUTOMATION_ROADMAP_PHASE2, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase2));
+  
   // Phase 2 Table
   if (data.roadmapPhases.phase2Foundational.length > 0) {
-    sections.push(
-      new Paragraph({
-        text: "Phase 2: Foundational (6-12 months)",
-        heading: HeadingLevel.HEADING_3,
-        spacing: { before: 360, after: 120 },
-      })
-    );
-
     const phase2Headers = ["Opportunity", "Annual Benefit", "Payback", "FTE Saved"];
     const phase2Rows = data.roadmapPhases.phase2Foundational.map(opp => [
       opp.opportunity.name,
@@ -738,17 +850,17 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ]);
     sections.push(createTable(phase2Headers, phase2Rows));
   }
+  
+  const roadmapPhase2Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE2_OUTCOMES, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase2Outcomes));
+  sections.push(createHorizontalSeparator());
 
+  // Phase 3
+  const roadmapPhase3 = replaceVariables(AUTOMATION_ROADMAP_PHASE3, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase3));
+  
   // Phase 3 Table
   if (data.roadmapPhases.phase3Strategic.length > 0) {
-    sections.push(
-      new Paragraph({
-        text: "Phase 3: Strategic (12-18+ months)",
-        heading: HeadingLevel.HEADING_3,
-        spacing: { before: 360, after: 120 },
-      })
-    );
-
     const phase3Headers = ["Opportunity", "Annual Benefit", "Payback", "FTE Saved"];
     const phase3Rows = data.roadmapPhases.phase3Strategic.map(opp => [
       opp.opportunity.name,
@@ -758,12 +870,17 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ]);
     sections.push(createTable(phase3Headers, phase3Rows));
   }
-
+  
+  const roadmapPhase3Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE3_OUTCOMES, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapPhase3Outcomes));
+  sections.push(createHorizontalSeparator());
+  
   // Gantt Table (18-month roadmap)
   sections.push(
     new Paragraph({
-      text: "18-Month Automation Roadmap",
+      text: "6.4 18-Month Automation Roadmap",
       heading: HeadingLevel.HEADING_3,
+      alignment: AlignmentType.BOTH,
       spacing: { before: 360, after: 120 },
     })
   );
@@ -775,6 +892,28 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Phase 3: Strategic", "", "", "", "", "█████", "█████"],
   ];
   sections.push(createTable(ganttHeaders, ganttRows));
+  
+  // Narrative Summary
+  const roadmapSummary = replaceVariables(AUTOMATION_ROADMAP_SUMMARY, templateVars, commentaryKeys);
+  sections.push(...createTextParagraphs(roadmapSummary));
+
+  sections.push(new Paragraph({ children: [new PageBreak()] }));
+  
+  // ===== CONCLUSIONS & NEXT STEPS =====
+  sections.push(createHeading("Conclusions and Next Steps", HeadingLevel.HEADING_1));
+
+  sections.push(createBodyParagraph("Key Conclusions:"));
+  sections.push(createBulletParagraph("High-readiness workflows identified for immediate automation, offering quick ROI realization."));
+  sections.push(createBulletParagraph("Foundational gaps in data quality and system integration require strategic investment."));
+  sections.push(createBulletParagraph("The phased roadmap balances short-term wins with long-term transformation."));
+
+  sections.push(createBodyParagraph("Recommended Next Steps:"));
+  sections.push(createBulletParagraph("Prioritize Quick Win opportunities for Phase 1 implementation within the next 90 days."));
+  sections.push(createBulletParagraph("Develop detailed implementation plans for foundational infrastructure improvements."));
+  sections.push(createBulletParagraph("Establish governance framework and change management protocols."));
+  sections.push(createBulletParagraph("Schedule follow-up diagnostic review at 6-month interval to track progress."));
+
+  sections.push(createHorizontalSeparator());
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
@@ -786,8 +925,33 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(...createTextParagraphs(appendixAText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
-  // Appendix B - SWOT Analysis + Question Insights + Follow-Up Actions
-  sections.push(createHeading("Appendix B: Readiness SWOT Analysis", HeadingLevel.HEADING_1));
+  // Appendix B: Readiness Score Metric Weighting
+  sections.push(createHeading("Appendix B: Readiness Score Metric Weighting", HeadingLevel.HEADING_1));
+  
+  sections.push(createBodyParagraph(
+    "The Readiness Score is calculated as a weighted combination of the Technical Feasibility Assessment (TFA) " +
+    "and Process Insights Form (PIF). These weights reflect the relative importance of technical and operational " +
+    "factors in determining automation feasibility."
+  ));
+  
+  // Metric Weighting Table
+  const metricWeightHeaders = ["Component", "Weight", "Description"];
+  const metricWeightRows = [
+    ["Technical Feasibility Assessment (TFA)", "60%", "Measures system readiness, data quality, integration capability, and security compliance"],
+    ["Process Insights Form (PIF)", "40%", "Captures process clarity, change magnitude, and workflow brittleness from operational perspective"],
+  ];
+  sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
+  
+  sections.push(createBodyParagraph("Why These Weights Matter:"));
+  sections.push(createBulletParagraph("TFA carries higher weight (60%) because technical barriers are typically harder and more expensive to remediate than operational issues."));
+  sections.push(createBulletParagraph("PIF provides essential context (40%) on process maturity and organizational readiness, which directly impacts adoption success."));
+  sections.push(createBulletParagraph("Combined, these metrics produce a holistic readiness score that balances technical feasibility with operational reality."));
+  
+  sections.push(createHorizontalSeparator());
+  sections.push(new Paragraph({ children: [new PageBreak()] }));
+  
+  // Appendix C: Readiness SWOT Analysis (formerly Appendix B)
+  sections.push(createHeading("Appendix C: Readiness SWOT Analysis", HeadingLevel.HEADING_1));
   data.appendixB.forEach(swotData => {
     sections.push(
       new Paragraph({
@@ -807,31 +971,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ];
     sections.push(createTable(swotHeaders, swotRows, [30, 70]));
     
-    // Question-Level Insights Table
-    if (swotData.questionInsights && swotData.questionInsights.length > 0) {
-      sections.push(
-        new Paragraph({
-          text: "Question-Level Insights",
-          heading: HeadingLevel.HEADING_3,
-          spacing: { before: 240, after: 120 },
-        })
-      );
-      
-      const insightHeaders = ["Q#", "Question", "Section", "Type", "Respondent", "Response", "Score", "Date"];
-      const insightRows = swotData.questionInsights.map(insight => [
-        insight.questionId.toString(),
-        insight.questionText,
-        insight.section,
-        insight.dataType,
-        insight.respondentName,
-        insight.rawResponse,
-        insight.numericScore !== null ? insight.numericScore.toString() : "N/A",
-        insight.submissionDate,
-      ]);
-      sections.push(createTable(insightHeaders, insightRows, [5, 25, 12, 5, 12, 20, 8, 13]));
-    }
-    
-    // Recommended Follow-Up Actions Table
+    // Recommended Follow-Up Actions Table (Question Insights removed per Task 13)
     if (swotData.followUpActions && swotData.followUpActions.length > 0) {
       sections.push(
         new Paragraph({
@@ -852,7 +992,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       sections.push(createTable(actionHeaders, actionRows, [12, 18, 10, 25, 35]));
     }
     
-    sections.push(new Paragraph({ spacing: { after: 240 } }));
+    sections.push(createHorizontalSeparator());
   });
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
@@ -879,12 +1019,14 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   if (portfolioRows.length > 0) {
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
+  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix E
   sections.push(createHeading("Appendix E: ROI Calculation Methodology", HeadingLevel.HEADING_1));
   const appendixEText = replaceVariables(APPENDIX_E, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(appendixEText));
+  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix F - Data Provenance and Audit Trail

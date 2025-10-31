@@ -307,7 +307,7 @@ efficiency gains to organization-wide AI enablement.
 `;
 
 // Continue with remaining prompts...
-export const DIAGNOSTIC_OVERVIEW = `
+export const DIAGNOSTIC_OVERVIEW_PART1 = `
 4.1 Scope of Evaluation
 
 Automat-IA conducted a comprehensive diagnostic of {{company_name}} to assess
@@ -343,21 +343,14 @@ highlight foundational gaps in documentation, API connectivity, or process owner
 [Commentary: Summarize overall readiness trends, such as "Finance and HR exhibit mature
 technical readiness, while Procurement and Operations require data and process
 standardization."]
+`;
 
-4.3 Top Three Automation Opportunities
-
-(Table will be generated with workflow, opportunity, annual benefit, ROI, payback, FTE, description)
-
+export const DIAGNOSTIC_OVERVIEW_PART2 = `
 [Commentary: Explain why these top opportunities rank highest, their expected impact on
 operations, and any interdependencies.]
+`;
 
-4.4 Financial Summary of Top Opportunities
-
-(Table will be generated with metrics: Total Annual Benefit, Total Estimated Implementation Cost, Average ROI, Average Payback Period, Total FTE Capacity Saved)
-
-All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the
-nearest hundred.
-
+export const DIAGNOSTIC_OVERVIEW_PART3 = `
 4.5 Immediate Implementation Potential (Quick Wins)
 
 {{quickwin_count}} workflows demonstrated high readiness and low implementation effort,
@@ -406,25 +399,26 @@ Matrix dynamically.
 phases.
 `;
 
-export const FINDINGS_ANALYSIS = `
+export const FINDINGS_ANALYSIS_PART1 = `
 5.1 Readiness Summary
 
-The table below consolidates the readiness assessment results for all automation opportunities
-identified during the diagnostic phase. Each opportunity is linked to its parent workflow and
-evaluated through the combined outputs of the Technical Feasibility Assessment (TFA) and
-the Process Insights Form (PIF).
+The table below consolidates the readiness assessment results for all workflows analyzed
+during the diagnostic phase. Each workflow was evaluated through the combined outputs of 
+the Technical Feasibility Assessment (TFA) and the Process Insights Form (PIF).
 
 The aggregated readiness score provides an objective measure of implementation readiness,
 forming the analytical foundation for prioritization within the Opportunity Matrix and the
 Automation Roadmap.
+`;
 
-(Readiness Summary Table will be generated with columns: Workflow, Automation Opportunity, TFA Score (60%), PIF Score (40%), Aggregated Readiness, Readiness Band, Notes)
-
+export const FINDINGS_ANALYSIS_PART2 = `
 [readiness_commentary]
 
 For detailed, per-workflow qualitative insights including identified strengths, weaknesses, and
 dependencies, refer to Appendix B: Readiness SWOT Analysis.
+`;
 
+export const FINDINGS_ANALYSIS_PART3 = `
 5.2 ROI Insights
 
 This section summarizes the quantitative results of the ROI modeling conducted for the
@@ -440,25 +434,25 @@ The Annual Run Rate ROI% represents the steady-state return on investment once e
 implementation is fully operational, reflecting the annual return achieved after the initial
 ramp-up period. This metric provides a normalized view of long-term value creation across
 all opportunities.
+`;
 
-(ROI Insights Table will be generated with columns: Workflow, Opportunity, Annual Benefit ($), Estimated Cost ($), FTE Savings, Payback (months))
-
+export const FINDINGS_ANALYSIS_PART4 = `
 [roi_commentary]
 
 All results are modeled under the Conservative Scenario Framework.
-For detailed financial breakdowns, refer to Appendix C: ROI Model and Benefit Components.
+For detailed financial breakdowns, refer to Appendix D: ROI Model and Benefit Components.
+`;
 
+export const FINDINGS_ANALYSIS_PART5 = `
 5.3 Opportunity Matrix Analysis
 
 The Opportunity Matrix visualizes the positioning of all automation opportunities within a single
 model that balances Business Impact and Implementation Effort. This provides an
 evidence-based view of where automation can create the highest return relative to complexity
 and readiness.
+`;
 
-Matrix Distribution Overview
-
-(Matrix Distribution Table will be generated with columns: Quadrant, Opportunities, Count)
-
+export const FINDINGS_ANALYSIS_PART6 = `
 [matrix_distribution_commentary]
 
 Matrix Visualizations
@@ -478,7 +472,7 @@ balanced view of short-term gains and long-term automation potential.
 [executive_analysis_commentary]
 `;
 
-export const AUTOMATION_ROADMAP = `
+export const AUTOMATION_ROADMAP_INTRO = `
 The Automation Roadmap translates the diagnostic findings into a structured sequence of
 initiatives guiding {{company_name}} from analysis to execution. It consolidates insights from
 the Readiness Rubric, ROI Analysis, and Opportunity Matrix into a practical, phased
@@ -495,7 +489,9 @@ strategy.
 
 This phased approach ensures momentum, minimizes disruption, and aligns implementation
 pacing with organizational readiness.
+`;
 
+export const AUTOMATION_ROADMAP_PHASE1 = `
 6.1 Phase 1 – Quick Wins (Short-Term, 0 to 6 months)
 
 Objective: Achieve immediate operational improvements with minimal complexity and risk.
@@ -503,10 +499,9 @@ Objective: Achieve immediate operational improvements with minimal complexity an
 Quick Wins typically involve repetitive, rules-based workflows with clean data and existing
 system connectivity. Their implementation demonstrates the value of automation while
 establishing internal confidence and governance foundations.
+`;
 
-Opportunities Identified:
-(Quick Win Opportunities Table will be generated)
-
+export const AUTOMATION_ROADMAP_PHASE1_OUTCOMES = `
 Expected Outcomes:
 
 ● Rapid ROI realization and visible efficiency gains.
@@ -516,7 +511,9 @@ Expected Outcomes:
 ● Early establishment of automation governance and monitoring mechanisms.
 
 [quickwin_commentary]
+`;
 
+export const AUTOMATION_ROADMAP_PHASE2 = `
 6.2 Phase 2 – Foundational Enhancements (Mid-Term, 6 to 12 months)
 
 Objective: Strengthen the technological and procedural foundations required for scalable
@@ -525,10 +522,9 @@ automation.
 This phase focuses on workflows that have strong ROI potential but require improvement in
 data quality, system integration, or process clarity before deployment. It builds the operational
 backbone that enables sustainable expansion of automation capability.
+`;
 
-Opportunities Identified:
-(Foundational Opportunities Table will be generated)
-
+export const AUTOMATION_ROADMAP_PHASE2_OUTCOMES = `
 Focus Areas:
 
 ● Remediation of technical and data limitations identified during the TFA.
@@ -550,7 +546,9 @@ Expected Outcomes:
 ● Reduced operational friction and improved cross-departmental coordination.
 
 [foundational_commentary]
+`;
 
+export const AUTOMATION_ROADMAP_PHASE3 = `
 6.3 Phase 3 – Strategic Implementations (Long-Term, 12 to 18+ months)
 
 Objective: Deploy high-impact, complex automations that drive transformative efficiency and
@@ -560,10 +558,9 @@ These initiatives, drawn from the High Impact / High Effort quadrant of the Oppo
 require stronger infrastructure and cross-departmental collaboration. By this stage, Quick Wins
 and Foundational phases will have validated the governance model, making these large-scale
 transformations viable.
+`;
 
-Opportunities Identified:
-(Strategic Opportunities Table will be generated)
-
+export const AUTOMATION_ROADMAP_PHASE3_OUTCOMES = `
 Focus Areas:
 
 ● Deployment of multi-system or AI-driven automations across departments.
@@ -586,13 +583,9 @@ Expected Outcomes:
 ● Strengthened data integrity and system traceability across operations.
 
 [strategic_commentary]
+`;
 
-6.4 {{company_name}} 18-Month Roadmap
-
-(Gantt Table will be generated with 3 rows for phases and columns for 0-3, 3-6, 6-9, 9-12, 12-15, 15-18 months with shaded cells)
-
-Table 6.1: {{company_name}} 18-Month Automation Roadmap
-
+export const AUTOMATION_ROADMAP_SUMMARY = `
 6.5 Narrative Summary
 
 This roadmap enables {{company_name}} to advance automation maturity in structured,
