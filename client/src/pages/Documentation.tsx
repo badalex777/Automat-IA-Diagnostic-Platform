@@ -358,7 +358,6 @@ ${doc.formulasReference.businessImpactFormula3}
               >
                 <Download className="h-5 w-5" />
               </Button>
-              <LanguageToggle />
               <ThemeToggle />
             </div>
           </div>
