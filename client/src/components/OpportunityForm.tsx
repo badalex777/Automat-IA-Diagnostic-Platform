@@ -185,31 +185,6 @@ export function OpportunityForm({
 
           <FormField
             control={form.control}
-            name="implementationCost"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Estimated Implementation Cost</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number"
-                    step="any"
-                    placeholder="e.g., 15000"
-                    data-testid="input-implementation-cost"
-                    {...field}
-                    value={field.value || ""}
-                    onChange={e => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Total cost to implement this opportunity (consulting, software, training, etc.)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="annualRunRateRoi"
             render={({ field }) => (
               <FormItem>
@@ -309,6 +284,31 @@ export function OpportunityForm({
         <div className="space-y-4">
           <h3 className="text-sm font-semibold">{t.forms.implementationDetails}</h3>
           
+          <FormField
+            control={form.control}
+            name="implementationCost"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estimated Implementation Cost</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number"
+                    step="any"
+                    placeholder="e.g., 15000"
+                    data-testid="input-implementation-cost"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={e => field.onChange(e.target.value)}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Total cost to implement this opportunity (consulting, software, training, etc.)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="rampupPeriodMonths"
