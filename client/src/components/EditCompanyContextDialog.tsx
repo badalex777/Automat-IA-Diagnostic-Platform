@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil } from "lucide-react";
 import type { Company } from "@shared/schema";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EditCompanyContextDialogProps {
   company: Company;
@@ -24,7 +23,6 @@ interface EditCompanyContextDialogProps {
 }
 
 export default function EditCompanyContextDialog({ company, trigger, onSubmit }: EditCompanyContextDialogProps) {
-  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     annualRevenue: '',
@@ -62,26 +60,26 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
             data-testid="button-edit-company-context"
           >
             <Pencil className="h-4 w-4 mr-2" />
-            {t.actions.editFinancialContext}
+            Edit Financial Context
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t.dialogs.editFinancialContext}</DialogTitle>
+          <DialogTitle>Edit Company Financial Context</DialogTitle>
           <DialogDescription>
-            {t.dialogs.editFinancialContextDesc}
+            Update financial metrics used for opportunity scoring and ROI calculations
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="annualRevenue">{t.company.annualRevenue} ($)</Label>
+              <Label htmlFor="annualRevenue">Annual Revenue ($)</Label>
               <Input
                 id="annualRevenue"
                 type="number"
                 step="0.01"
-                placeholder={t.forms.annualRevenuePlaceholder}
+                placeholder="e.g., 5000000"
                 value={formData.annualRevenue}
                 onChange={(e) => setFormData({ ...formData, annualRevenue: e.target.value })}
                 data-testid="input-edit-annual-revenue"
@@ -89,12 +87,12 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="totalEmployees">{t.company.totalEmployees}</Label>
+              <Label htmlFor="totalEmployees">Total Employees</Label>
               <Input
                 id="totalEmployees"
                 type="number"
                 step="1"
-                placeholder={t.forms.totalEmployeesPlaceholder}
+                placeholder="e.g., 250"
                 value={formData.totalEmployees}
                 onChange={(e) => setFormData({ ...formData, totalEmployees: e.target.value })}
                 data-testid="input-edit-total-employees"
@@ -104,10 +102,10 @@ export default function EditCompanyContextDialog({ company, trigger, onSubmit }:
           
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} data-testid="button-cancel-edit-context">
-              {t.common.cancel}
+              Cancel
             </Button>
             <Button type="submit" data-testid="button-submit-edit-context">
-              {t.actions.saveChanges}
+              Save Changes
             </Button>
           </div>
         </form>

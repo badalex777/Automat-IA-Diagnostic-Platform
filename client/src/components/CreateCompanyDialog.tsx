@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CreateCompanyDialogProps {
   onSubmit?: (data: { 
@@ -26,7 +25,6 @@ interface CreateCompanyDialogProps {
 }
 
 export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogProps) {
-  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -66,22 +64,22 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
       <DialogTrigger asChild>
         <Button data-testid="button-create-company">
           <Plus className="h-4 w-4 mr-2" />
-          {t.actions.addCompany}
+          Add Company
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t.dialogs.createCompany}</DialogTitle>
+          <DialogTitle>Create New Company</DialogTitle>
           <DialogDescription>
-            {t.dialogs.createCompanyDesc}
+            Add a new company to manage their AI implementation diagnostics
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="companyName">{t.forms.companyName} *</Label>
+            <Label htmlFor="companyName">Company Name *</Label>
             <Input
               id="companyName"
-              placeholder={t.forms.companyNamePlaceholder}
+              placeholder="e.g., Acme Corporation"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
@@ -89,10 +87,10 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="industry">{t.forms.industry} *</Label>
+            <Label htmlFor="industry">Industry *</Label>
             <Input
               id="industry"
-              placeholder={t.forms.industryPlaceholder}
+              placeholder="e.g., Manufacturing, Healthcare, Finance"
               value={formData.industry}
               onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
               required
@@ -100,10 +98,10 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="contact">{t.forms.contact}</Label>
+            <Label htmlFor="contact">Contact Information</Label>
             <Textarea
               id="contact"
-              placeholder={t.forms.contactPlaceholder}
+              placeholder="Email, phone, or contact name"
               value={formData.contact}
               onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
               rows={3}
@@ -123,20 +121,20 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
           
           <div className="border-t pt-4 space-y-4">
             <div className="space-y-1">
-              <h4 className="text-sm font-semibold">{t.company.financialContext}</h4>
+              <h4 className="text-sm font-semibold">Financial Context</h4>
               <p className="text-xs text-muted-foreground">
-                {t.dialogs.editFinancialContextDesc}
+                Update financial metrics used for opportunity scoring and ROI calculations
               </p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="annualRevenue">{t.company.annualRevenue} ($) *</Label>
+                <Label htmlFor="annualRevenue">Annual Revenue ($) *</Label>
                 <Input
                   id="annualRevenue"
                   type="number"
                   step="0.01"
-                  placeholder={t.forms.annualRevenuePlaceholder}
+                  placeholder="e.g., 5000000"
                   value={formData.annualRevenue}
                   onChange={(e) => setFormData({ ...formData, annualRevenue: e.target.value })}
                   required
@@ -145,12 +143,12 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="totalEmployees">{t.company.totalEmployees} *</Label>
+                <Label htmlFor="totalEmployees">Total Employees *</Label>
                 <Input
                   id="totalEmployees"
                   type="number"
                   step="1"
-                  placeholder={t.forms.totalEmployeesPlaceholder}
+                  placeholder="e.g., 250"
                   value={formData.totalEmployees}
                   onChange={(e) => setFormData({ ...formData, totalEmployees: e.target.value })}
                   required
@@ -162,10 +160,10 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
           
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} data-testid="button-cancel-company">
-              {t.common.cancel}
+              Cancel
             </Button>
             <Button type="submit" data-testid="button-submit-company">
-              {t.dashboard.createCompany}
+              Create Company
             </Button>
           </div>
         </form>

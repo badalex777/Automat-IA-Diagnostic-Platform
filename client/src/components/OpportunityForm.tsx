@@ -15,8 +15,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useLanguage } from "@/contexts/LanguageContext";
-
 interface OpportunityFormProps {
   workflowId: string;
   initialData?: Partial<InsertImplementationOpportunity>;
@@ -32,7 +30,6 @@ export function OpportunityForm({
   onCancel,
   isLoading 
 }: OpportunityFormProps) {
-  const { t } = useLanguage();
   const form = useForm<InsertImplementationOpportunity>({
     resolver: zodResolver(insertImplementationOpportunitySchema),
     defaultValues: {
@@ -112,17 +109,17 @@ export function OpportunityForm({
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         {/* Basic Info */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold">{t.opportunities.title}</h3>
+          <h3 className="text-sm font-semibold">Implementation Opportunities</h3>
           
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t.forms.opportunityName}</FormLabel>
+                <FormLabel>Opportunity Name</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder={t.forms.opportunityNamePlaceholder} 
+                    placeholder="e.g., Automated Invoice Processing" 
                     data-testid="input-opportunity-name"
                     {...field} 
                   />
@@ -137,10 +134,10 @@ export function OpportunityForm({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t.forms.opportunityDescription}</FormLabel>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea 
-                    placeholder={t.forms.opportunityDescriptionPlaceholder}
+                    placeholder="Describe this implementation opportunity"
                     data-testid="input-opportunity-description"
                     className="resize-none"
                     rows={3}
@@ -156,19 +153,19 @@ export function OpportunityForm({
 
         {/* Core ROI Metrics */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold">{t.forms.financialMetrics}</h3>
+          <h3 className="text-sm font-semibold">Financial Metrics</h3>
           
           <FormField
             control={form.control}
             name="annualRoi"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t.opportunities.annualRoi}</FormLabel>
+                <FormLabel>Annual ROI</FormLabel>
                 <FormControl>
                   <Input 
                     type="number"
                     step="any"
-                    placeholder={t.forms.annualRoiPlaceholder}
+                    placeholder="e.g., 150000"
                     data-testid="input-annual-roi"
                     {...field}
                     value={field.value || ""}
@@ -176,7 +173,7 @@ export function OpportunityForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  {t.forms.annualBenefitsPlaceholder}
+                  e.g., 125000
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -259,12 +256,12 @@ export function OpportunityForm({
             name="hoursSavedPerWeek"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t.forms.hoursSavedPerWeek}</FormLabel>
+                <FormLabel>Hours Saved Per Week</FormLabel>
                 <FormControl>
                   <Input 
                     type="number"
                     step="any"
-                    placeholder={t.forms.hoursSavedPerWeekPlaceholder}
+                    placeholder="e.g., 40"
                     data-testid="input-hours-saved-per-week"
                     {...field}
                     value={field.value || ""}
@@ -272,7 +269,7 @@ export function OpportunityForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  {t.forms.fteEquivalentHelp}
+                  Full-time employee equivalent
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -282,7 +279,7 @@ export function OpportunityForm({
 
         {/* Implementation Effort Metrics */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold">{t.forms.implementationDetails}</h3>
+          <h3 className="text-sm font-semibold">Implementation Details</h3>
           
           <FormField
             control={form.control}
@@ -314,12 +311,12 @@ export function OpportunityForm({
             name="rampupPeriodMonths"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t.forms.rampupPeriodMonths}</FormLabel>
+                <FormLabel>Ramp-up Period (months)</FormLabel>
                 <FormControl>
                   <Input 
                     type="number"
                     step="any"
-                    placeholder={t.forms.rampupPeriodMonthsPlaceholder}
+                    placeholder="e.g., 6"
                     data-testid="input-rampup-period"
                     {...field}
                     value={field.value || ""}
@@ -327,7 +324,7 @@ export function OpportunityForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  {t.forms.rampupPeriodMonths}
+                  Ramp-up Period (months)
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -340,12 +337,12 @@ export function OpportunityForm({
               name="paybackPeriodMonths"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.forms.paybackPeriodMonths}</FormLabel>
+                  <FormLabel>Payback Period (months)</FormLabel>
                   <FormControl>
                     <Input 
                       type="number"
                       step="any"
-                      placeholder={t.forms.paybackPeriodMonthsPlaceholder}
+                      placeholder="e.g., 12"
                       data-testid="input-payback-period"
                       {...field}
                       value={field.value || ""}
@@ -362,12 +359,12 @@ export function OpportunityForm({
               name="trainingHoursPerEmployee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t.forms.trainingHoursPerEmployee}</FormLabel>
+                  <FormLabel>Training Hours Per Employee</FormLabel>
                   <FormControl>
                     <Input 
                       type="number"
                       step="any"
-                      placeholder={t.forms.trainingHoursPerEmployeePlaceholder}
+                      placeholder="e.g., 8"
                       data-testid="input-training-hours"
                       {...field}
                       value={field.value || ""}
@@ -396,7 +393,7 @@ export function OpportunityForm({
                 />
               </FormControl>
               <FormLabel htmlFor="error-metrics-toggle" className="text-sm font-semibold cursor-pointer !mt-0">
-                {t.opportunities.enableErrorMetrics}
+                Enable Error Reduction Metrics
               </FormLabel>
             </FormItem>
           )}
@@ -404,7 +401,7 @@ export function OpportunityForm({
 
         {errorMetricsEnabled && (
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground">{t.forms.errorMetrics}</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">Error Reduction Metrics</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -412,14 +409,14 @@ export function OpportunityForm({
                 name="errorReductionPct"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.forms.errorReductionPct}</FormLabel>
+                    <FormLabel>Error Reduction %</FormLabel>
                     <FormControl>
                       <Input 
                         type="number"
                         step="any"
                         min="0"
                         max="100"
-                        placeholder={t.forms.errorReductionPctPlaceholder}
+                        placeholder="e.g., 75"
                         data-testid="input-error-reduction-pct"
                         {...field}
                         value={field.value || ""}
@@ -436,12 +433,12 @@ export function OpportunityForm({
                 name="errorsAvoidedAnnually"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.forms.errorsAvoidedAnnually}</FormLabel>
+                    <FormLabel>Errors Avoided Annually</FormLabel>
                     <FormControl>
                       <Input 
                         type="number"
                         step="any"
-                        placeholder={t.forms.errorsAvoidedAnnuallyPlaceholder}
+                        placeholder="e.g., 500"
                         data-testid="input-errors-avoided"
                         {...field}
                         value={field.value || ""}
@@ -471,7 +468,7 @@ export function OpportunityForm({
                 />
               </FormControl>
               <FormLabel htmlFor="revenue-metrics-toggle" className="text-sm font-semibold cursor-pointer !mt-0">
-                {t.opportunities.enableRevenueMetrics}
+                Enable Revenue Uplift Metrics
               </FormLabel>
             </FormItem>
           )}
@@ -479,7 +476,7 @@ export function OpportunityForm({
 
         {revenueMetricsEnabled && (
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground">{t.forms.revenueMetrics}</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground">Revenue Uplift Metrics</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -487,12 +484,12 @@ export function OpportunityForm({
                 name="hoursReallocatedToRevenue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.forms.hoursReallocatedToRevenue}</FormLabel>
+                    <FormLabel>Hours Reallocated to Revenue</FormLabel>
                     <FormControl>
                       <Input 
                         type="number"
                         step="any"
-                        placeholder={t.forms.hoursReallocatedToRevenuePlaceholder}
+                        placeholder="e.g., 1000"
                         data-testid="input-hours-reallocated"
                         {...field}
                         value={field.value || ""}
@@ -509,12 +506,12 @@ export function OpportunityForm({
                 name="revenueUpliftAnnual"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t.forms.revenueUpliftAnnual}</FormLabel>
+                    <FormLabel>Annual Revenue Uplift</FormLabel>
                     <FormControl>
                       <Input 
                         type="number"
                         step="any"
-                        placeholder={t.forms.revenueUpliftAnnualPlaceholder}
+                        placeholder="e.g., 250000"
                         data-testid="input-revenue-uplift"
                         {...field}
                         value={field.value || ""}
@@ -539,7 +536,7 @@ export function OpportunityForm({
               disabled={isLoading}
               data-testid="button-cancel"
             >
-              {t.common.cancel}
+              Cancel
             </Button>
           )}
           <Button
@@ -547,7 +544,7 @@ export function OpportunityForm({
             disabled={isLoading}
             data-testid="button-submit-opportunity"
           >
-            {isLoading ? t.actions.saving : initialData ? t.common.update : t.common.create}
+            {isLoading ? "Saving..." : initialData ? "Update" : "Create"}
           </Button>
         </div>
       </form>

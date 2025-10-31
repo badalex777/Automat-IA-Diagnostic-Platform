@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { BusinessImpact } from "@shared/schema";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BusinessImpactFormProps {
   workflowId: string;
@@ -16,7 +15,6 @@ interface BusinessImpactFormProps {
 
 export default function BusinessImpactForm({ workflowId, initialData }: BusinessImpactFormProps) {
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     hoursPerWeek: initialData?.hoursPerWeek?.toString() || '',
     hoursPerYear: initialData?.hoursPerYear?.toString() || '',
@@ -46,13 +44,13 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/business-impact`] });
       toast({
-        title: t.toast.businessImpactSaved,
-        description: t.toast.businessImpactSavedDesc,
+        title: "Business impact saved",
+        description: "The business impact data has been successfully saved.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorSaving,
+        title: "Error saving data",
         description: error.message,
         variant: "destructive",
       });
@@ -78,82 +76,82 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-4">{t.forms.timeSavings}</h3>
+        <h3 className="font-semibold text-lg mb-4">Time Savings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="hoursPerWeek">{t.forms.hoursPerWeek}</Label>
+            <Label htmlFor="hoursPerWeek">Hours Saved per Week</Label>
             <Input
               id="hoursPerWeek"
               type="number"
               step="0.1"
-              placeholder={t.forms.hoursPerWeekPlaceholder}
+              placeholder="e.g., 40"
               value={formData.hoursPerWeek}
               onChange={(e) => handleChange('hoursPerWeek', e.target.value)}
               data-testid="input-hours-per-week"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="hoursPerYear">{t.forms.hoursPerYear}</Label>
+            <Label htmlFor="hoursPerYear">Hours Saved per Year</Label>
             <Input
               id="hoursPerYear"
               type="number"
               step="0.1"
-              placeholder={t.forms.hoursPerYearPlaceholder}
+              placeholder="e.g., 2080"
               value={formData.hoursPerYear}
               onChange={(e) => handleChange('hoursPerYear', e.target.value)}
               data-testid="input-hours-per-year"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fteEquivalent">{t.forms.fteEquivalent}</Label>
+            <Label htmlFor="fteEquivalent">FTE Equivalent</Label>
             <Input
               id="fteEquivalent"
               type="number"
               step="0.01"
-              placeholder={t.forms.fteEquivalentPlaceholder}
+              placeholder="e.g., 1.5"
               value={formData.fteEquivalent}
               onChange={(e) => handleChange('fteEquivalent', e.target.value)}
               data-testid="input-fte-equivalent"
             />
-            <p className="text-xs text-muted-foreground">{t.forms.fteEquivalentHelp}</p>
+            <p className="text-xs text-muted-foreground">Full-time employee equivalent</p>
           </div>
         </div>
       </Card>
 
       <Card className="p-6">
-        <h3 className="font-semibold text-lg mb-4">{t.forms.financialMetrics}</h3>
+        <h3 className="font-semibold text-lg mb-4">Financial Metrics</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="annualBenefits">{t.forms.annualBenefits}</Label>
+            <Label htmlFor="annualBenefits">Annual Benefits ($)</Label>
             <Input
               id="annualBenefits"
               type="number"
               step="1000"
-              placeholder={t.forms.annualBenefitsPlaceholder}
+              placeholder="e.g., 125000"
               value={formData.annualBenefits}
               onChange={(e) => handleChange('annualBenefits', e.target.value)}
               data-testid="input-annual-benefits"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="roiPercentage">{t.forms.roiPercentage}</Label>
+            <Label htmlFor="roiPercentage">ROI Percentage (%)</Label>
             <Input
               id="roiPercentage"
               type="number"
               step="1"
-              placeholder={t.forms.roiPercentagePlaceholder}
+              placeholder="e.g., 250"
               value={formData.roiPercentage}
               onChange={(e) => handleChange('roiPercentage', e.target.value)}
               data-testid="input-roi-percentage"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="paybackMonths">{t.forms.paybackMonths}</Label>
+            <Label htmlFor="paybackMonths">Payback Period (months)</Label>
             <Input
               id="paybackMonths"
               type="number"
               step="0.5"
-              placeholder={t.forms.paybackMonthsPlaceholder}
+              placeholder="e.g., 8"
               value={formData.paybackMonths}
               onChange={(e) => handleChange('paybackMonths', e.target.value)}
               data-testid="input-payback-months"
@@ -164,14 +162,14 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
 
       <div className="flex justify-end gap-3">
         <Button type="button" variant="outline" data-testid="button-cancel">
-          {t.common.cancel}
+          Cancel
         </Button>
         <Button 
           type="submit" 
           disabled={saveMutation.isPending}
           data-testid="button-save-impact"
         >
-          {saveMutation.isPending ? t.actions.saving : t.workflow.saveBusinessImpact}
+          {saveMutation.isPending ? "Saving..." : "Save Business Impact"}
         </Button>
       </div>
     </form>

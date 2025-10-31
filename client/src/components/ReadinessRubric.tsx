@@ -4,7 +4,6 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, AlertTriangle } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useQuery } from "@tanstack/react-query";
 import type { TFAAssessment, PIFResponse } from "@shared/schema";
 import { TFA_QUESTIONS, TFA_SECTIONS } from "@shared/tfaQuestions";
@@ -114,8 +113,6 @@ const PIF_RECOMMENDATIONS: Record<string, string[]> = {
 };
 
 export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricProps) {
-  const { t } = useLanguage();
-  
   // Fetch TFA assessment with question responses (with guards)
   const { data: tfaAssessment } = useQuery<TFAAssessment>({
     queryKey: [`/api/workflows/${workflowId}/tfa`],
@@ -396,9 +393,9 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             <h3 className="text-2xl font-bold mb-2" data-testid="text-readiness-score">
               {rubric.totalScore}/100
             </h3>
-            <p className="text-sm text-muted-foreground">{t.readiness.combinedScore}</p>
+            <p className="text-sm text-muted-foreground">Combined Readiness Score</p>
             <p className="text-xs text-muted-foreground mt-1">
-              {t.rubric.technicalOperational}
+              Technical (60%) + Operational (40%)
             </p>
           </div>
           <Badge 
@@ -421,25 +418,25 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
 
       {/* Score Breakdown */}
       <Card className="p-6" data-testid="card-readiness-breakdown">
-        <h3 className="font-semibold text-lg mb-4">{t.rubric.scoreComponents}</h3>
+        <h3 className="font-semibold text-lg mb-4">Score Components</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-muted/30 rounded-md p-4">
-            <p className="text-sm text-muted-foreground mb-1">{t.rubric.technicalFoundation}</p>
+            <p className="text-sm text-muted-foreground mb-1">Technical Foundation (60%)</p>
             <p className="text-2xl font-bold" data-testid="text-tfa-score">{rubric.tfaScore}/100</p>
           </div>
           <div className="bg-muted/30 rounded-md p-4">
-            <p className="text-sm text-muted-foreground mb-1">{t.rubric.operationalReadiness}</p>
+            <p className="text-sm text-muted-foreground mb-1">Operational Readiness (40%)</p>
             <p className="text-2xl font-bold" data-testid="text-pif-score">{rubric.pifScore}/100</p>
           </div>
         </div>
 
         <div className="space-y-3">
-          <h4 className="font-semibold text-base mb-3">{t.rubric.detailedComponents}</h4>
+          <h4 className="font-semibold text-base mb-3">Detailed Components</h4>
           
           {/* TFA Components */}
           <div className="space-y-3">
-            <p className="text-sm font-medium text-muted-foreground">{t.rubric.technicalFoundation}</p>
+            <p className="text-sm font-medium text-muted-foreground">Technical Foundation (60%)</p>
             {(['systemEnvironment', 'dataQuality', 'integrationFeasibility', 'securityCompliance'] as const).map((key) => {
               const displayScore = rubric.componentScores[key];
               return (
@@ -447,7 +444,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
                   <div className="flex items-center justify-between text-sm">
                     <span>{componentLabels[key]}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-xs">{componentWeights[key]} {t.labels.weight}</span>
+                      <span className="text-muted-foreground text-xs">{componentWeights[key]} weight</span>
                       <span className="font-medium">{displayScore}/100</span>
                     </div>
                   </div>
@@ -459,7 +456,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
 
           {/* PIF Components */}
           <div className="space-y-3 pt-4 border-t border-border">
-            <p className="text-sm font-medium text-muted-foreground">{t.rubric.operationalReadiness}</p>
+            <p className="text-sm font-medium text-muted-foreground">Operational Readiness (40%)</p>
             {(['processClarity', 'changeMagnitude', 'workflowBrittleness'] as const).map((key) => {
               const displayScore = rubric.componentScores[key];
               return (
@@ -467,7 +464,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
                   <div className="flex items-center justify-between text-sm">
                     <span>{componentLabels[key]}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground text-xs">{componentWeights[key]} {t.labels.weight}</span>
+                      <span className="text-muted-foreground text-xs">{componentWeights[key]} weight</span>
                       <span className="font-medium">{displayScore}/100</span>
                     </div>
                   </div>
@@ -482,7 +479,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
       {/* Executive Summary - SWOT Analysis */}
       <Card data-testid="card-executive-summary">
         <CardHeader>
-          <CardTitle>{t.rubric.executiveSummary}</CardTitle>
+          <CardTitle>Executive Summary</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Strengths */}
@@ -490,7 +487,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-green-600 dark:text-green-400">
                 <CheckCircle2 className="h-4 w-4" />
-                {t.readiness.strengths}
+                Strengths
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.strengths.map((strength, index) => (
@@ -507,7 +504,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-orange-600 dark:text-orange-400">
                 <AlertCircle className="h-4 w-4" />
-                {t.readiness.weaknesses}
+                Weaknesses
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.weaknesses.map((weakness, index) => (
@@ -524,7 +521,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-blue-600 dark:text-blue-400">
                 <TrendingUp className="h-4 w-4" />
-                {t.readiness.opportunities}
+                Opportunities
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.opportunities.map((opportunity, index) => (
@@ -541,7 +538,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             <div className="space-y-2">
               <h4 className="font-semibold text-sm flex items-center gap-2 text-red-600 dark:text-red-400">
                 <AlertTriangle className="h-4 w-4" />
-                {t.readiness.threats}
+                Threats
               </h4>
               <div className="space-y-2">
                 {swotAnalysis.threats.map((threat, index) => (
@@ -560,7 +557,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
         {/* Radar Chart - Component Comparison */}
         <Card data-testid="card-radar-chart">
           <CardHeader>
-            <CardTitle>{t.rubric.componentAnalysis}</CardTitle>
+            <CardTitle>Component Analysis</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -586,7 +583,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
         {/* Pie Chart - Component Weights */}
         <Card data-testid="card-component-weights">
           <CardHeader>
-            <CardTitle>{t.rubric.componentWeights}</CardTitle>
+            <CardTitle>Component Weight Distribution</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -624,17 +621,17 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
             
             {/* Weight Explanation */}
             <div className="mt-6 space-y-3 text-sm">
-              <h4 className="font-semibold">{t.rubric.whyTheseWeights}</h4>
+              <h4 className="font-semibold">Why These Weights?</h4>
               <div className="space-y-2 text-muted-foreground">
-                <p>{t.rubric.dataQualityWeight}</p>
+                <p>Data Quality (18%) and Integration Feasibility (18%) carry the most weight because they directly determine whether the AI can connect to existing systems and work with available data - the fundamental building blocks of any AI implementation.</p>
                 
-                <p>{t.rubric.systemEnvWeight}</p>
+                <p>System Environment (15%) is critical as it encompasses the technical infrastructure, scalability, and backup capabilities that ensure the AI solution can run reliably.</p>
                 
-                <p>{t.rubric.securityWeight}</p>
+                <p>Security & Compliance (9%) addresses regulatory and security requirements that, while essential, are often more about verification than technical capability.</p>
                 
-                <p>{t.rubric.clarityWeight}</p>
+                <p>Process Clarity (15%) and Change Magnitude (15%) reflect operational readiness - clear processes reduce implementation complexity, while understanding change magnitude helps plan adoption strategies.</p>
                 
-                <p>{t.rubric.brittlenessWeight}</p>
+                <p>Workflow Brittleness (10%) has the lowest weight as it indicates risk rather than capability, and can often be mitigated through careful design even in brittle workflows.</p>
               </div>
             </div>
           </CardContent>

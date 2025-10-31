@@ -23,7 +23,6 @@ import { Link } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CompanyCardProps {
   id: string;
@@ -41,7 +40,6 @@ export default function CompanyCard({
   completedCount,
 }: CompanyCardProps) {
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const completionRate = workflowCount > 0 ? Math.round((completedCount / workflowCount) * 100) : 0;
 
@@ -54,13 +52,13 @@ export default function CompanyCard({
       queryClient.removeQueries({ queryKey: [`/api/companies/${id}`] });
       queryClient.removeQueries({ queryKey: [`/api/companies/${id}/workflows`] });
       toast({
-        title: t.toast.companyDeleted,
-        description: t.toast.companyDeletedDesc,
+        title: "Company deleted",
+        description: "The company and all its workflows have been removed.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t.toast.errorDeleting,
+        title: "Error deleting item",
         description: error.message,
         variant: "destructive",
       });
@@ -117,7 +115,7 @@ export default function CompanyCard({
                     data-testid={`menuitem-delete-company-${id}`}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    {t.company.deleteCompany}
+                    Delete Company
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -128,13 +126,13 @@ export default function CompanyCard({
           <div className="mt-4 flex items-center justify-between gap-4">
             <div className="flex gap-4">
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">{t.company.workflows}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Workflows</p>
                 <p className="text-lg font-mono font-semibold" data-testid={`text-workflow-count-${id}`}>
                   {workflowCount}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">{t.workflow.complete}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Complete</p>
                 <p className="text-lg font-mono font-semibold" data-testid={`text-completed-count-${id}`}>
                   {completedCount}
                 </p>
@@ -150,19 +148,19 @@ export default function CompanyCard({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t.dialogs.deleteCompany}</AlertDialogTitle>
+            <AlertDialogTitle>Delete Company</AlertDialogTitle>
             <AlertDialogDescription>
-              {t.dialogs.deleteCompanyDesc}
+              Are you sure you want to delete this company? This will also delete all associated workflows and data. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">{t.common.cancel}</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-company"
             >
-              {t.common.delete}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

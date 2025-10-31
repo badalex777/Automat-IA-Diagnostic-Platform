@@ -22,10 +22,27 @@ function Router() {
       <Route path="/documentation" component={Documentation} />
       <Route path="/company/:id" component={CompanyDetail} />
       <Route path="/company/:companyId/workflow/:workflowId" component={WorkflowDetail} />
-      <Route path="/tfa/:shareableLink/thank-you" component={TFAThankYou} />
-      <Route path="/tfa/:shareableLink" component={TFAForm} />
-      <Route path="/pif/:shareableId/thank-you" component={PIFThankYou} />
-      <Route path="/pif/:shareableId" component={PIFForm} />
+      {/* Bilingual survey routes wrapped with LanguageProvider */}
+      <Route path="/tfa/:shareableLink/thank-you">
+        <LanguageProvider>
+          <TFAThankYou />
+        </LanguageProvider>
+      </Route>
+      <Route path="/tfa/:shareableLink">
+        <LanguageProvider>
+          <TFAForm />
+        </LanguageProvider>
+      </Route>
+      <Route path="/pif/:shareableId/thank-you">
+        <LanguageProvider>
+          <PIFThankYou />
+        </LanguageProvider>
+      </Route>
+      <Route path="/pif/:shareableId">
+        <LanguageProvider>
+          <PIFForm />
+        </LanguageProvider>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -34,14 +51,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <ThemeProvider defaultTheme="dark">
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </ThemeProvider>
-      </LanguageProvider>
+      <ThemeProvider defaultTheme="dark">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

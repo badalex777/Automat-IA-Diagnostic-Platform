@@ -12,14 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CreateWorkflowDialogProps {
   onSubmit?: (data: { name: string; description: string }) => void;
 }
 
 export default function CreateWorkflowDialog({ onSubmit }: CreateWorkflowDialogProps) {
-  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -38,22 +36,22 @@ export default function CreateWorkflowDialog({ onSubmit }: CreateWorkflowDialogP
       <DialogTrigger asChild>
         <Button data-testid="button-create-workflow">
           <Plus className="h-4 w-4 mr-2" />
-          {t.actions.addWorkflow}
+          Add Workflow
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{t.dialogs.createWorkflow}</DialogTitle>
+          <DialogTitle>Create New Workflow</DialogTitle>
           <DialogDescription>
-            {t.dialogs.createWorkflowDesc}
+            Add a new workflow to assess for AI automation potential
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="workflowName">{t.forms.workflowName} *</Label>
+            <Label htmlFor="workflowName">Workflow Name *</Label>
             <Input
               id="workflowName"
-              placeholder={t.forms.workflowNamePlaceholder}
+              placeholder="e.g., Invoice Processing Automation"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
@@ -61,10 +59,10 @@ export default function CreateWorkflowDialog({ onSubmit }: CreateWorkflowDialogP
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">{t.forms.workflowDescription} *</Label>
+            <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
-              placeholder={t.forms.workflowDescriptionPlaceholder}
+              placeholder="Brief description of the workflow and what it does"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
@@ -74,10 +72,10 @@ export default function CreateWorkflowDialog({ onSubmit }: CreateWorkflowDialogP
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} data-testid="button-cancel-workflow">
-              {t.common.cancel}
+              Cancel
             </Button>
             <Button type="submit" data-testid="button-submit-workflow">
-              {t.company.createWorkflow}
+              Create Workflow
             </Button>
           </div>
         </form>
