@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Automat-IA Diagnostic Platform is a professional data management web application designed to help consultants manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics per project (company) and workflow, including Technical Feasibility Assessments (TFA), Readiness Rubrics, and Business Impact calculations to determine ROI and implementation viability. The platform aims to streamline the management of multiple diagnostic projects and generate shareable assessment links for technical contacts.
+The Automat-IA Diagnostic Platform is a professional web application for consultants to manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics, including Technical Feasibility Assessments (TFA), Readiness Rubrics, and Business Impact calculations to determine ROI and implementation viability. The platform streamlines project management, generates shareable assessment links, and produces comprehensive Executive Diagnostic Reports. The business vision is to empower consultants with a robust tool for AI strategy, enhancing market potential by providing clear, data-driven insights for AI adoption.
 
 ## User Preferences
 
@@ -12,47 +12,46 @@ Design principles:
 - No emojis anywhere in the webapp (use Lucide React SVG icons instead)
 - All messaging must position AI as augmentation of human work, never replacement
 
+Language Requirements:
+- **Platform**: English-only for all internal components (Dashboard, Company Detail, Workflow Detail, all dialogs, forms, and reports)
+- **TFA/PIF Surveys**: Bilingual (English/Spanish) with language toggle for client-facing assessment forms only
+- Translation functionality is isolated to survey routes via scoped LanguageProvider in App.tsx
+
 ## System Architecture
 
-### Frontend Architecture
+### Frontend
 
-The frontend is built as a Single Page Application (SPA) using React 18+ with TypeScript and Wouter for routing. It leverages Radix UI primitives and Shadcn/ui (New York variant) for a consistent, accessible UI, styled with Tailwind CSS. State management relies on TanStack Query for server state and React hooks for local component state. The design system features a professional, data-focused aesthetic with a custom HSL-based color system, Inter and JetBrains Mono typography, and a consistent elevation system. Dark mode is supported by default.
+The frontend is a React 18+ SPA with TypeScript and Wouter for routing. It uses Radix UI and Shadcn/ui (New York variant) for a consistent, accessible UI, styled with Tailwind CSS. State management uses TanStack Query for server state. The design system features a professional, data-focused aesthetic with a custom HSL-based color system, Inter and JetBrains Mono typography, and dark mode support.
 
-### Backend Architecture
+### Backend
 
-The backend is built with Express.js and TypeScript, utilizing ESM modules. Data is stored in a PostgreSQL database (Neon serverless) managed by Drizzle ORM for type-safe queries and schema management, with Zod for runtime validation. The API follows a RESTful pattern with JSON request/response formats and includes middleware for logging, error handling, and CORS. Session management is prepared using connect-pg-simple.
+The backend uses Express.js and TypeScript (ESM modules). Data is stored in PostgreSQL (Neon serverless) managed by Drizzle ORM and Zod for validation. The API is RESTful with JSON formats, including middleware for logging, error handling, and CORS.
 
 ### Data Model
 
-The core entities include Companies (client organizations with optional financial context: annualRevenue for ROI normalization, totalEmployees for FTE normalization), Workflows (business processes within companies), TFA Assessments (technical feasibility with weighted scoring across 4 technical categories: System Environment 25%, Data Quality 30%, Integration Feasibility 30%, Security/Compliance 15%), PIF Responses (Process Insight Form with multi-respondent support), Readiness Rubrics (combining TFA 60% + PIF 40%), Implementation Opportunities (ROI-based business impact opportunities with FTE-based hours normalization, no per-opportunity labor cost data), and Business Impact (ROI calculations with 10x multiplier applied to both ROI and FTE metrics). TFA assessments include a 21-question weighted scoring system (0-100 score), feasibility bands (Very High, High, Moderate, Low, Very Low), shareable links, and open-ended comments. The system also tracks initial respondents and multiple response sources to audit knowledge gaps. PIF responses store respondent metadata (name, role, responsibilities), 40-question responses with conditional Quality Impact module, operational scores (Process Clarity, Change Magnitude, Workflow Brittleness), ROI inputs, and qualitative insights.
+Core entities include Companies, Workflows, TFA Assessments (21-question weighted scoring, feasibility bands), PIF Responses (multi-respondent, 40-question, operational scores, ROI inputs, qualitative insights), Readiness Rubrics (TFA 60% + PIF 40%), Implementation Opportunities (ROI-based business impact with FTE normalization), and Business Impact (ROI calculations with a 10x multiplier). The system tracks respondents and knowledge gaps.
 
-### Feature Specifications
+### Key Features
 
-- **TFA Survey**: Collects responses to 21 questions across 4 technical sections (System Environment: 6q, Data Quality: 5q, Integration Feasibility: 6q, Security/Compliance: 4q), detects "Don't Know" answers, and collects "gap metadata" (why the question couldn't be answered, who might know).
-- **Gap Resolution**: Consultants can fill knowledge gaps, with an audit trail of who provided the information and why.
-- **TFA Analysis**: Provides auto-updating scores, assessment notes, visual analytics (radar and pie charts), a 5-tier feasibility interpretation with recommendations, and a data-driven Executive Summary. The Executive Summary includes Critical Technical Gaps (questions scoring 1-2, impact-sorted using formula: (5 - score) × section_weight), Key Strengths (top questions scoring 5), and an Implementation Roadmap with score-specific recommendations pulled directly from question responses.
-- **Question-Level Analysis**: Collapsible detailed view showing individual question responses with score-specific recommendations (105 total: 21 questions × 5 score levels). Features include: text search, section filter (4 technical categories), score filter (Critical 1, Weak 2, Moderate 3, Strong 4, Optimal 5), automatic exclusion of "Don't Know" responses, respondent attribution, and actionable mitigation strategies for each answer. Shows answered questions even when knowledge gaps exist; full analysis (charts, executive summary) unlocks when all gaps are resolved.
-- **PIF Survey**: Multi-respondent Process Insight Form accessible via shareable workflow-based link (no registration required). Collects 40 questions across 8 sections with section-level validation (Process Clarity Q1-Q3, Change Magnitude Q4-Q6, Workflow Brittleness Q7-Q10, Time Savings Q11-Q13, Revenue Uplift Q14-Q15, Experience & Insights Q17-Q27, Time & Volume Data Q28-Q31, Quality Impact Module Q32-Q41 conditional on Q32 = 'yes'). Questions include examples for clarity (e.g., Q24 typical outcomes, Q19 exceptions). Key question refinements: Q11 asks "which best describes the primary work you perform in this step?" providing 15 comprehensive back-office role options organized into 7 departmental categories for easier scanning: Finance & Accounting (financial, finance_ops), Sales & Customer Operations (sales_ops, customer_success, support), Operations & Logistics (procurement, inventory, facilities), HR & Administration (hr, admin), IT & Data (it_ops, data_analyst), Marketing & Growth (marketing_ops), Compliance & Quality (quality_assurance, legal), and Other. This merged role question serves both time savings categorization AND revenue uplift calculations (eliminating redundant Q14 "who gets time back"); Q33 frequency question; Q24 captures typical outcomes/deliverables, Q22 identifies time-wasters, Q17 documents specific steps performed, Q19 captures exceptions and special cases, Q32 is Yes/No gate for Quality Impact module (was Likert scale). Next button validates required questions per section before progression. Captures respondent metadata (name, role, responsibilities), operational scores (Process Clarity 0-100, Change Magnitude 0-100, Workflow Brittleness 0-100), ROI inputs extracted from Q28-Q31 (employeeCount, frequency, processesPerPeriod, minutesPerProcess) and Q39-Q41 when hasQualityImpact = true (errorRate, reworkMinutesPerError, costPerError), and section-specific qualitative insights including role (Q11), personalSteps (Q17), criticalKnowledge (Q18), exceptions (Q19), toolsUsed (Q20), toolLimitations (Q21), timeWasters (Q22), automationWish (Q23), typicalOutcome (Q24), keyDifficulties (Q25), impactOfDelays (Q26), additionalContext (Q27). Supports unlimited respondents per workflow.
-- **PIF Aggregation & Variance**: Displays aggregated scores (average, min-max range, standard deviation) across all respondents for each operational metric. Visual variance indicators (icons for low/moderate/high variance) help identify consensus vs. disagreement. Individual responses viewable in detail dialog with complete data (scores, ROI, qualitative). Delete functionality with cache invalidation.
-- **Readiness Rubric**: Unified readiness assessment combining TFA technical foundation (60% weight) and PIF operational readiness (40% weight) into a 0-100 combined score. Displays 7 component breakdowns: TFA components (System Environment 15%, Data Quality 18%, Integration Feasibility 18%, Security/Compliance 9%) and PIF components (Process Clarity 15%, Change Magnitude 15%, Workflow Brittleness 10%). Features feasibility banding (Very High 80+, High 65-79, Moderate 50-64, Low 35-49, Very Low <35) with color-coded badges and strategic recommendations. Visual analytics include component radar chart and component weights pie chart with detailed explanations of why each component carries its specific weight. Executive Summary provides comprehensive SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) using actual TFA and PIF data to identify high-scoring areas, critical gaps, implementation opportunities, and potential blockers. Requires both TFA completion and at least one PIF response.
-- **Opportunity Matrix**: 2D scatter plot visualization mapping opportunities by Business Impact (X-axis) vs Implementation Effort (Y-axis). Features **dual-matrix scoring system** with Base Impact Matrix and Enhanced Impact Matrix for comprehensive opportunity comparison. **Business Impact Scoring with 10x Multiplier** (X-axis): Uses absolute percentage-based scoring with 10x amplification applied to both ROI and FTE metrics. Formula: `roiScore = (Annual ROI / Company Revenue) × 1000` and `hoursScore = (FTE Savings / Total Employees) × 1000`, both capped at 100. This multiplier acknowledges that workflow-level automations rarely exceed 10% company-wide impact, making 10% ROI or 10% FTE savings = score 100 (exceptional), 5% = score 50 (solid), 2% = score 20 (modest). Scores remain stable when adding/removing other opportunities (no relative normalization). **Base Impact Matrix**: Fixed apples-to-apples comparison using ROI 60% + Hours 40% = 100 max. Provides consistent opportunity comparison regardless of additional metrics. **Enhanced Impact Matrix**: Additive bonus model starting with base impact (ROI 60% + Hours 40%) and layering bonuses on top: Error Reduction +25%, Revenue Uplift +25%. Guarantees Enhanced Impact ≥ Base Impact since bonuses can only increase scores. Dynamic scale adjusts based on enabled metrics: Time Only = 0-100 (base only), Time + Error/Revenue = 0-125 (base + one bonus), All Three Metrics = 0-150 (base + both bonuses). Toggle controls (errorMetricsEnabled, revenueMetricsEnabled) persist per-opportunity to database. Workflow color stability via sorted ID assignment. **Implementation Effort Scoring** (Y-axis): Calculated as a weighted composite of four factors, with readiness weighted at 50% because it's derived from comprehensive client assessments (61 combined TFA + PIF questions), while other factors are analyst estimates. Formula: `effort = (invertedReadiness × 0.50) + (normalizedRampup × 0.20) + (normalizedPayback × 0.20) + (normalizedTraining × 0.10)`. **Readiness (inverted, 50%)**: Higher readiness = lower effort. Combines TFA (60%) + PIF (40%) scores, then inverts (100 - readiness). **Ramp-up Period (20%)**: Normalized months from kickoff to steady-state (≤2mo = 0 effort, ≥12mo = 100 effort). **Payback Period (20%)**: Normalized months to recover costs (≤3mo = 0 effort, ≥18mo = 100 effort). **Training Hours (10%)**: Normalized end-user training required (≤1hr = 0 effort, ≥20hrs = 100 effort). Example: 38% readiness, 12mo ramp-up, 18mo payback, 15hrs training → effort = (62 × 0.5) + (100 × 0.2) + (100 × 0.2) + (74 × 0.1) = 78.4. Lower scores indicate easier implementation.
-- **Executive Diagnostic Report**: Comprehensive Word document (.docx) generation for client delivery. Conditionally available via "Generate Executive Report" button on company detail page when ≥1 workflow has both completed TFA and ≥1 PIF response. Report features Automat-IA branding (black background, green accents #10b981, Roboto 11pt font) with C-suite friendly structure: Cover page with company name/date, Executive Summary with key findings, Confidentiality/Disclaimer, Methodology Overview, Diagnostic Overview (company context, workflows summary), Findings & Analysis (TFA/PIF scores, readiness assessment, business impact summary), Automation Roadmap (prioritized opportunities), and Conclusions & Next Steps. Six technical appendices provide deep-dive transparency: Detailed Methodology (data sources, frameworks, scoring, limitations), All Opportunities Readiness SWOT Analysis (per-workflow strengths/weaknesses/opportunities/threats), Readiness Score Metric Weighting (7 components with rationale), Detailed ROI Overview (comprehensive opportunity table), ROI Calculation Methodology (formulas and conservative assumptions), and Data Provenance & Audit Trail (TFA/PIF respondents, completion dates, knowledge gaps). Backend validates prerequisites, aggregates diagnostic data via reportDataAggregator service, generates professional document via reportGenerator using docx library, and returns downloadable file with sanitized company name. Frontend handles blob download with loading states and success/error toasts.
-- **Workflow Progression**: Workflows track status from tfa_only → tfa_readiness → readiness_impact → complete.
-- **Dashboard**: Provides overview of companies and workflows with search/filter functionality.
+- **TFA Survey & Analysis**: Collects technical feasibility data, detects "Don't Know" answers, supports gap resolution, provides auto-updating scores, visual analytics, 5-tier feasibility interpretation, and an Executive Summary with critical technical gaps, strengths, and an implementation roadmap.
+- **PIF Survey & Aggregation**: Multi-respondent Process Insight Form collecting 40 questions across 8 sections, including operational scores, ROI inputs, and qualitative insights. Aggregates scores with variance indicators across respondents.
+- **Readiness Rubric**: Unifies TFA and PIF into a combined 0-100 score with 7 component breakdowns, feasibility banding, visual analytics, and a comprehensive SWOT analysis Executive Summary.
+- **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of readiness, ramp-up, payback, and training). Features both a Base Impact Matrix and an Enhanced Impact Matrix with additive bonuses.
+- **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document for clients, including an Executive Summary, methodology, findings, automation roadmap, and six detailed technical appendices.
 
 ## External Dependencies
 
 ### Database & Infrastructure
 
-- **Neon Serverless PostgreSQL**: Cloud database with connection pooling.
-- **Drizzle Kit**: For schema migrations.
+- **Neon Serverless PostgreSQL**: Cloud database.
+- **Drizzle Kit**: Schema migrations.
 
 ### UI Component Libraries
 
 - **@radix-ui/\***: Accessible component primitives.
-- **recharts**: Charting library for data visualization.
-- **embla-carousel**: Touch-friendly carousel.
-- **cmdk**: Command palette component.
+- **recharts**: Charting library.
+- **embla-carousel**: Carousel component.
+- **cmdk**: Command palette.
 - **date-fns**: Date manipulation.
 - **lucide-react**: Icon library.
 
@@ -63,14 +62,13 @@ The core entities include Companies (client organizations with optional financia
 
 ### Document Generation
 
-- **docx**: Library for creating Word documents programmatically, used for Executive Diagnostic Report generation.
+- **docx**: Programmatic Word document creation.
 
 ### Development Tools
 
 - **Vite**: Build tool and dev server.
-- **@replit/vite-plugin-\***: Replit-specific plugins.
-- **TypeScript**: For type checking.
-- **ESBuild**: For production server bundling.
+- **TypeScript**: Type checking.
+- **ESBuild**: Production server bundling.
 
 ### Styling Infrastructure
 
