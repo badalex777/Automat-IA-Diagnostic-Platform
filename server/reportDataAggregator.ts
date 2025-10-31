@@ -682,9 +682,10 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     : 0;
   const totalFteSavings = allOpportunities.reduce((sum, o) => sum + o.roiMetrics.fteSavings, 0);
   
-  // Calculate average ROI from annual benefit and implementation cost
-  const totalCost = allOpportunities.reduce((sum, o) => sum + parseFloat(o.opportunity.implementationCost || "0"), 0);
-  const averageRoi = totalCost > 0 ? ((totalAnnualBenefit / totalCost) * 100) : 0;
+  // Calculate average Annual Run Rate ROI% from stored values
+  const averageRoi = totalOpportunities > 0
+    ? allOpportunities.reduce((sum, o) => sum + parseFloat(o.opportunity.annualRunRateRoi || "0"), 0) / totalOpportunities
+    : 0;
   
   // Get unique functions list from workflows - using workflow names as proxy since department field doesn't exist
   const uniqueFunctions = new Set<string>();
@@ -710,7 +711,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       workflowName: w.workflow.name,
       opportunityName: o.opportunity.name,
       annualBenefit: o.roiMetrics.annualRoi,
-      roi: totalCost > 0 ? ((o.roiMetrics.annualRoi / parseFloat(o.opportunity.implementationCost || "1")) * 100) : 0,
+      roi: parseFloat(o.opportunity.annualRunRateRoi || "0"),
       paybackMonths: o.roiMetrics.paybackMonths,
       fteSavings: o.roiMetrics.fteSavings,
       description: o.opportunity.description || "",
