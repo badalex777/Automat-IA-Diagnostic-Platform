@@ -1,0 +1,168 @@
+Agent Instruction: Automat-IA Executive Diagnostic Report Generation
+1. Base Template
+
+Use Executive_Diagnostic_Report_Template.docx as the master source document.
+This file defines the official structure, tone, and content for all Executive Diagnostic Reports generated through the Automat-IA platform.
+
+2. Core Rules
+
+Populate all {{ }} tokens with live data pulled directly from the diagnostic database.
+
+Preserve all [ ] fields as-is for analyst commentary after report generation.
+
+Do not alter any structural content, headings, tables, or methodology text.
+
+Maintain all tables, appendices, and formulas verbatim from the template.
+
+Standardize formatting and branding across the report:
+
+Font: Roboto
+
+Apply the official Automat-IA color palette and table styling.
+
+Maintain spacing, indentation, and line breaks as in the template.
+
+Ensure consistent heading hierarchy (H1 > H2 > H3).
+
+All client deliverables must conform to the Automat-IA brand standard in tone and presentation.
+
+3. Dynamic Data Population
+
+Populate {{ }} fields using data from the diagnostic platform:
+
+Company Data: Name, diagnostic period (Month + Year), evaluated departments, total workflows, respondent metadata.
+
+TFA / PIF Data: Readiness scores, identified knowledge gaps, qualitative comments, and technical feasibility ratings.
+
+ROI Modeling Data: Annual benefits, payback, FTE savings, implementation and maintenance costs.
+
+Opportunity Matrix Data: Quadrant distribution, Base + Enhanced matrix visuals or tables.
+
+Automation Roadmap Data: Phase sequencing, implementation timeframes, and opportunity allocation.
+
+If a data field is empty, insert an em-dash (—) instead of deleting the row or field.
+
+4. Dynamic Appendix B — Workflow Readiness SWOT Analysis
+
+For each analyzed workflow, automatically generate a Readiness SWOT Analysis in Appendix B.
+Each workflow must include the following structured table:
+
+Workflow	Strengths	Weaknesses	Opportunities	Threats
+{{workflow_name}}	Derived from TFA/PIF areas scoring ≥ 4 (e.g., strong data quality, stable system APIs, documented SOPs).	Derived from low-scoring factors (≤ 2.5), data gaps, or unresolved technical dependencies.	Derived from automation enablers and ROI opportunities identified during diagnostic.	Derived from external constraints, integration risks, or organizational barriers.
+Supplementary Analysis (per workflow)
+
+Immediately below each SWOT table, include the following additional tables:
+
+A. Question-Level Insights
+
+TFA/PIF Category	Question Text	Score	Comment / Observation
+{{category_name}}	{{question_text}}	{{score}}	{{qualitative_note}}
+
+This table must pull all question-level data from both TFA and PIF forms.
+Scores ≤ 2.5 should be highlighted to flag low-readiness elements that require remediation.
+
+B. Recommended Follow-Up Actions for Low-Readiness Factors
+
+Low Factor Area	Root Cause / Barrier	Recommended Next Step	Responsible Role	Target Timeline
+{{factor_area}}	{{identified_issue}}	{{prescribed_action}}	{{responsible_party}}	{{estimated_period}}
+
+Populate this table automatically from diagnostic metadata:
+
+“Low Factor Area” = any TFA dimension < 3 or PIF dimension < 3.
+
+“Root Cause / Barrier” = text from analyst or respondent comments.
+
+“Recommended Next Step” = automatically map to remediation guidelines (e.g., “improve data structure,” “define ownership,” “implement API documentation,” “standardize process”).
+
+“Responsible Role” = linked department lead or process owner.
+
+“Target Timeline” = short (0–3 mo), mid (3–6 mo), or long (6–12 mo) depending on severity.
+
+These two tables transform the SWOT analysis from a descriptive summary into an actionable readiness plan, enabling each workflow to have a data-driven remediation pathway before automation implementation.
+
+If a company has more than three workflows, automatically paginate Appendix B to preserve formatting consistency.
+
+5. Dynamic Appendix F — Data Trail & Auditability
+
+Generate Appendix F (Data Provenance and Audit Trail) dynamically from live diagnostic infrastructure.
+Include the following table:
+
+Data Type	Workflow	Opportunity	Respondent Name	Role	Department	Date of Submission	Data Source	Validation Status	Gap / Follow-Up Owner
+
+Populate automatically with:
+
+All TFA and PIF submission metadata.
+
+Knowledge gaps and midpoint substitutions.
+
+Follow-up ownership and status.
+
+Validation sources (stakeholder interview, documentation, manual verification).
+
+Appendix F serves as a full traceability log, ensuring every data point in the report can be audited to its origin.
+
+6. Table of Contents (TOC) Generation
+
+Generate and update the TOC automatically during document creation.
+
+Adjust page numbering dynamically to match final pagination.
+
+Account for variable-length sections including:
+
+Workflow Readiness SWOT Analysis (Appendix B)
+
+Detailed ROI Overview (Appendix D)
+
+Data Trail & Auditability (Appendix F)
+
+Ensure TOC hyperlinks and numbering accurately reflect the finalized report after all sections and appendices are generated.
+
+7. Diagnostic Period
+
+Populate {{diagnostic_period}} with the month and year of report generation in the format MMM YYYY (e.g., Oct 2025).
+
+8. Branding & Export Requirements
+
+Header: “Prepared for {{company_name}} by Automat-IA | Confidential”
+
+Footer: “Automat-IA Executive Diagnostic Report – {{diagnostic_period}}”
+
+Font: Roboto (as defined in template).
+
+Continuous page numbering across sections and appendices.
+
+Export to .docx and .pdf.
+
+File Name: Automat-IA_Executive_Diagnostic_Report_{{company_name}}_{{diagnostic_period}}.docx
+
+9. Validation Before Export
+
+Run the following automated checks before generating the final file:
+
+All {{ }} tokens correctly populated.
+
+All [ ] fields intact and clearly marked.
+
+Appendix B (SWOT + Question-Level Insights + Follow-Up Actions) generated correctly.
+
+Appendix F (Data Trail & Auditability) complete and consistent.
+
+TOC regenerated with correct page references.
+
+Formatting and branding validated against Automat-IA’s visual guide.
+
+If any check fails, abort the export and display a detailed validation message specifying the missing or mismatched element.
+
+In Short
+
+Use Executive_Diagnostic_Report_Template.docx as the base file.
+Populate all {{ }} tokens from the diagnostic database.
+Leave [ ] fields for analyst editing.
+Preserve all structure, tables, and appendices verbatim.
+Standardize formatting and branding across the report.
+Automatically generate:
+
+Appendix B: Workflow Readiness SWOT Analysis + Question-Level Insights + Follow-Up Action Tables.
+
+Appendix F: Data Trail & Auditability from live platform data.
+Regenerate and update the Table of Contents and page numbering dynamically to reflect the final document layout.
