@@ -883,6 +883,25 @@ export default function Documentation() {
                           </div>
                         </div>
                       </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.implementationEffortScoring}</h3>
+                        <p className="text-muted-foreground leading-relaxed mb-3">
+                          {t.documentation.opportunityMatrix.implementationEffortScoringContent}
+                        </p>
+                        <div className="space-y-3">
+                          <div className="border border-border rounded-md p-4 bg-accent/5">
+                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.effortWeightingRationale}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.effortWeightingRationaleContent}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.effortNormalizationScales}</h4>
+                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.effortNormalizationScalesContent}</p>
+                          </div>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 </section>
