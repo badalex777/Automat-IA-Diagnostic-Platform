@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/lib/translations";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,7 +9,9 @@ import { Home, BookOpen, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Documentation() {
-  const { t, language } = useLanguage();
+  // Force English-only for Platform Handbook (internal consultant resource)
+  const t = translations.en;
+  const language = 'en';
   const [activeSection, setActiveSection] = useState("platform-overview");
   const observerRef = useRef<IntersectionObserver | null>(null);
   const isScrollingToSection = useRef(false);
