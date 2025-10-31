@@ -127,9 +127,187 @@ function createTable(
 }
 
 /**
+ * Validate diagnostic data before report generation
+ */
+function validateDiagnosticData(data: DiagnosticData): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  // ===== COMPANY DATA VALIDATION =====
+  if (!data.company.name || data.company.name.trim() === '') {
+    errors.push('Company name is required');
+  }
+  if (!data.company.leadAnalystName || data.company.leadAnalystName.trim() === '') {
+    errors.push('Lead Analyst name is required for cover page');
+  }
+
+  // ===== DIAGNOSTIC PERIOD VALIDATION =====
+  if (!data.diagnosticPeriod.start || !data.diagnosticPeriod.end) {
+    errors.push('Diagnostic period dates are required');
+  }
+
+  // ===== PORTFOLIO METRICS VALIDATION =====
+  if (!Number.isFinite(data.portfolioMetrics.totalWorkflows) || data.portfolioMetrics.totalWorkflows <= 0) {
+    errors.push('Total workflows must be a finite number greater than zero');
+  }
+  if (!Number.isFinite(data.portfolioMetrics.totalOpportunities)) {
+    errors.push('Total opportunities must be a finite number');
+  }
+  if (!Number.isFinite(data.portfolioMetrics.totalAnnualBenefit)) {
+    errors.push('Total annual benefit must be a finite number');
+  }
+  if (!Number.isFinite(data.portfolioMetrics.averagePaybackMonths)) {
+    errors.push('Average payback period must be a finite number');
+  }
+  if (!Number.isFinite(data.portfolioMetrics.averageRoi)) {
+    errors.push('Average ROI must be a finite number');
+  }
+  if (!Number.isFinite(data.portfolioMetrics.totalFteSavings)) {
+    errors.push('Total FTE savings must be a finite number');
+  }
+  if (!data.portfolioMetrics.functionsList || data.portfolioMetrics.functionsList.trim() === '') {
+    errors.push('Functions list is required for portfolio summary');
+  }
+
+  // ===== APPENDIX B VALIDATION =====
+  if (!data.appendixB || data.appendixB.length === 0) {
+    errors.push('Appendix B data is missing - at least one workflow with TFA/PIF analysis is required');
+  } else {
+    data.appendixB.forEach((workflow, index) => {
+      const prefix = `Appendix B workflow ${index + 1}`;
+      
+      if (!workflow.workflowName || workflow.workflowName.trim() === '') {
+        errors.push(`${prefix}: Missing workflow name`);
+      }
+      
+      // Validate SWOT analysis data
+      if (!workflow.swotAnalysis) {
+        errors.push(`${prefix} "${workflow.workflowName}": Missing SWOT analysis`);
+      } else {
+        if (!Array.isArray(workflow.swotAnalysis.strengths)) {
+          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT strengths array`);
+        }
+        if (!Array.isArray(workflow.swotAnalysis.weaknesses)) {
+          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT weaknesses array`);
+        }
+        if (!Array.isArray(workflow.swotAnalysis.opportunities)) {
+          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT opportunities array`);
+        }
+        if (!Array.isArray(workflow.swotAnalysis.threats)) {
+          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT threats array`);
+        }
+      }
+      
+      // Validate question insights
+      if (!workflow.questionInsights || workflow.questionInsights.length === 0) {
+        errors.push(`${prefix} "${workflow.workflowName}": No question insights found`);
+      } else {
+        workflow.questionInsights.forEach((insight, i) => {
+          if (!insight.questionText || insight.questionText.trim() === '') {
+            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing question text`);
+          }
+          if (!insight.section || insight.section.trim() === '') {
+            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing section`);
+          }
+          if (!insight.respondentName || insight.respondentName.trim() === '') {
+            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing respondent name`);
+          }
+        });
+      }
+      
+      // Validate followUpActions array exists (may be empty if all scores are high)
+      if (!Array.isArray(workflow.followUpActions)) {
+        errors.push(`${prefix} "${workflow.workflowName}": Invalid followUpActions array`);
+      }
+    });
+  }
+
+  // ===== APPENDIX F VALIDATION =====
+  if (!data.appendixF || data.appendixF.length === 0) {
+    errors.push('Appendix F data is missing - data provenance information is required');
+  } else {
+    data.appendixF.forEach((provenance, index) => {
+      const prefix = `Appendix F entry ${index + 1}`;
+      
+      if (!provenance.workflowName || provenance.workflowName.trim() === '') {
+        errors.push(`${prefix}: Missing workflow name`);
+      }
+      if (!provenance.respondentName || provenance.respondentName.trim() === '') {
+        errors.push(`${prefix} "${provenance.workflowName}": Missing respondent name`);
+      }
+      if (!provenance.respondentRole || provenance.respondentRole.trim() === '') {
+        errors.push(`${prefix} "${provenance.workflowName}": Missing respondent role`);
+      }
+      if (!provenance.collectionMethod || provenance.collectionMethod.trim() === '') {
+        errors.push(`${prefix} "${provenance.workflowName}": Missing collection method`);
+      }
+      if (!provenance.submissionDate || provenance.submissionDate.trim() === '') {
+        errors.push(`${prefix} "${provenance.workflowName}": Missing submission date`);
+      }
+      if (!provenance.validationStatus || !['Complete', 'Pending', 'Partial'].includes(provenance.validationStatus)) {
+        errors.push(`${prefix} "${provenance.workflowName}": Invalid or missing validation status`);
+      }
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Validate template variables are all populated
+ */
+function validateTemplateVars(vars: Record<string, string>): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  const requiredKeys = [
+    'company_name',
+    'Lead_Analyst_Name',
+    'Month',
+    'diagnostic_period',
+    'total_workflows',
+    'workflow_count',
+    'total_opportunities',
+    'opportunity_count',
+    'annual_benefit',
+    'payback_period',
+    'avg_payback',
+    'roi_percent',
+    'fte_savings',
+    'functions_list',
+    'quickwin_count',
+    'diagnostic_date',
+  ];
+
+  for (const key of requiredKeys) {
+    const value = vars[key];
+    if (value === undefined || value === null || value.trim() === '') {
+      errors.push(`Template variable '${key}' is empty or undefined`);
+    }
+    // Check for un-replaced template tokens
+    if (value && value.includes('{{')) {
+      errors.push(`Template variable '${key}' contains un-replaced token: ${value}`);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
  * Main function to generate Executive Diagnostic Report
  */
 export async function generateExecutiveReport(data: DiagnosticData): Promise<Buffer> {
+  // Pre-export validation - data structure
+  const dataValidation = validateDiagnosticData(data);
+  if (!dataValidation.valid) {
+    throw new Error(
+      `Report generation validation failed:\n${dataValidation.errors.map(e => `  - ${e}`).join('\n')}`
+    );
+  }
+  
   // Prepare template variables from aggregated data
   const diagnosticPeriod = formatDiagnosticDate(data.diagnosticPeriod.end); // Format: "Oct 2025"
   
@@ -151,6 +329,14 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     quickwin_count: data.matrixDistribution.quickWins.count.toString(),
     diagnostic_date: diagnosticPeriod,
   };
+
+  // Pre-export validation - template variables
+  const varsValidation = validateTemplateVars(templateVars);
+  if (!varsValidation.valid) {
+    throw new Error(
+      `Template variable validation failed:\n${varsValidation.errors.map(e => `  - ${e}`).join('\n')}`
+    );
+  }
 
   // Commentary placeholders that should be converted to [brackets]
   const commentaryKeys = [
