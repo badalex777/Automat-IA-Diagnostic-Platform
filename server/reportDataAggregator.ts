@@ -310,6 +310,7 @@ export interface TopOpportunity {
   fteSavings: number;
   description: string;
   businessImpact: number;
+  implementationCost: string;
 }
 
 export interface MatrixDistribution {
@@ -716,6 +717,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       fteSavings: o.roiMetrics.fteSavings,
       description: o.opportunity.description || "",
       businessImpact: o.matrixPosition.businessImpact,
+      implementationCost: o.opportunity.implementationCost || "0",
     }))
   );
 
@@ -830,6 +832,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         resolutionMethod: string;
       }> = [];
       
+      // First, add all items from responseSources that were actively resolved
       Object.keys(responseSources).forEach(questionKey => {
         const source = responseSources[questionKey];
         if (source.answeredBy && source.answeredByRole) {
@@ -844,6 +847,26 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
             isKnowledgeGap: source.isKnowledgeGap || false,
             resolvedAt: source.answeredAt || '',
             resolutionMethod: source.isKnowledgeGap ? 'Knowledge Gap Resolution' : 'SME Consultation'
+          });
+        }
+      });
+      
+      // Then, add any gaps from gapMetadata that aren't in responseSources
+      // These are unresolved gaps that were marked with midpoint scores
+      Object.keys(gapMetadata).forEach(questionKey => {
+        const qId = parseInt(questionKey.replace('q', ''));
+        // Check if this gap is already in knowledgeGapDetails
+        const alreadyIncluded = knowledgeGapDetails.some(detail => detail.questionId === qId);
+        if (!alreadyIncluded) {
+          const question = TFA_QUESTIONS.find(q => q.id === qId);
+          knowledgeGapDetails.push({
+            questionId: qId,
+            questionText: question?.question || `Question ${qId}`,
+            resolvedBy: 'Unresolved',
+            resolverRole: 'N/A',
+            isKnowledgeGap: true,
+            resolvedAt: '',
+            resolutionMethod: 'Midpoint Score Applied'
           });
         }
       });

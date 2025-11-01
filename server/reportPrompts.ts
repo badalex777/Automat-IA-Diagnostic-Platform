@@ -131,9 +131,7 @@ roadmap automation opportunities aligned with its business objectives and operat
 
 The engagement analyzed {{total_workflows}} workflows, identifying {{total_opportunities}}
 valid automation opportunities with an estimated total annual benefit of {{annual_benefit}},
-an average payback of {{payback_period}} months, and an average Annual Run Rate ROI of
-{{roi_percent}}% (the steady-state ROI once implementations are fully operational, representing
-the annual return after the ramp-up period).
+an average payback of {{payback_period}} months, and an average ROI of {{roi_percent}}%.
 
 Each workflow was assessed using Automat-IA's dual-diagnostic methodology — combining the
 Technical Feasibility Assessment (TFA) and Process Insights Form (PIF) — to establish an
@@ -840,42 +838,15 @@ feasibility and benefits. Conservative modeling and normalization are used to av
 impact.
 `;
 
-export const APPENDIX_D = `
+export const APPENDIX_D_INTRO = `
 This appendix provides an auditable financial view of each validated automation opportunity.
 Results are modeled using Automat-IA's Conservative Scenario Framework unless indicated
 otherwise. Financial figures are rounded to the nearest hundred.
 
 D.1 Portfolio Summary Table
+`;
 
-(Portfolio Summary Table will be generated with columns: Workflow, Opportunity, Annual Benefit ($), Estimated Cost ($), FTE Savings, Payback (months), Weekly Hours Saved)
-
-Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance.
-Detailed per-opportunity pages follow.
-
-D.2 ROI Insights – {{workflow_name}} / {{opportunity_name}}
-
-(This section will be repeated for each opportunity with the following structure)
-
-Performance Summary. Under the conservative scenario, estimated annual benefit is
-{{annual_benefit}}, equivalent to {{fte_saved}} FTEs or approximately
-{{annual_hours_saved}} hours per year, with an expected payback of {{payback_months}}
-months.
-
-D.2.1 Key Metrics Table (Conservative Scenario)
-
-(Table with metrics: Annual Benefit, Estimated Implementation Cost, Payback Period, 1-Year Net Benefit, 3-Year Net Benefit, 5-Year Net Benefit, FTE Saved, Annual Hours Saved, Weekly Hours Saved)
-
-All values modeled under Automat-IA Conservative Scenario.
-
-D.2.3 Business Impact Components
-
-(Table with columns: Impact Area, Key Metrics, Description covering Time Savings, Quality Impact, Revenue Uplift, Ramp-Up Period)
-
-For this opportunity, the majority of measurable benefit is driven by {{dominant_component}}.
-Quality and revenue impacts are modeled conservatively or omitted where supporting data is
-insufficient. Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable
-performance.
-
+export const APPENDIX_D_MODELING_NOTES = `
 D.3 Modeling Notes and Traceability
 
 ● Calculations follow the Automat-IA ROI Calculator and Conservative Scenario
@@ -893,27 +864,9 @@ avoid inflating benefit.
 
 ● FTE conversions assume 2,080 hours per year unless client-specific contracts dictate
 otherwise.
-
-D.4 Replication Template
-
-Use the following section for each additional opportunity. Duplicate D.2 for every item, replacing
-variables accordingly:
-
-● Section title with workflow and opportunity name
-
-● Performance summary paragraph
-
-● Conservative table
-
-● Business Impact Components
-
-● One-paragraph interpretation of dominant drivers and ramp-up
-
-This ensures consistent, auditable presentation across all opportunities and keeps the main
-report focused on synthesized insights while the appendix provides full financial detail.
 `;
 
-export const APPENDIX_E = `
+export const APPENDIX_E_PART1 = `
 This appendix documents the financial logic and scenario controls used to generate
 Automat-IA's ROI, payback, and benefit projections. All calculations are performed under the
 Conservative Scenario Framework, ensuring every figure in this report is realistic,
@@ -945,9 +898,9 @@ investment, including a Year-1 ramp-up factor to reflect progressive adoption ra
 realization.
 
 E.2 Net Benefit Formulas
+`;
 
-(Table with columns: Projection Horizon, Formula, Purpose covering Year 1, 3-Year, 5-Year)
-
+export const APPENDIX_E_PART2 = `
 E.3 FTE and Hours Conversions
 
 FTE Saved = Annual Hours Saved / 2,080
@@ -962,26 +915,20 @@ redeployable time rather than headcount reduction.
 E.4 Annual Benefit Breakdown
 
 Total Annual Benefits = Time Savings Benefits + Error Reduction Benefits + Revenue Uplift Benefits
+`;
 
-(Table with columns: Component, Formula, Description covering Time Savings Benefits, Error Reduction Benefits, Revenue Uplift Benefits)
-
-All benefit calculations apply downward multipliers in conservative modeling to avoid
-overstatement.
-
+export const APPENDIX_E_PART3 = `
 E.5 Scenario Adjustment Framework
 
 To reflect real-world execution realities, Automat-IA applies five adjustment layers that moderate
 both benefit and cost estimations:
+`;
 
-(Table with columns: Adjustment Category, Conservative Modeling Rationale covering Time Savings Adjustment, Error Reduction Adjustment, Revenue Reallocation Adjustment, Cost Overrun Adjustment, Ramp-Up Efficiency Adjustment)
-
-Together these controls form the Conservative Scenario Framework, ensuring projections
-remain achievable, evidence-based, and comparable across diagnostics.
-
+export const APPENDIX_E_PART4 = `
 E.6 Key Modeling Assumptions
+`;
 
-(Table with columns: Variable, Standard Assumption, Rationale covering Effective Hourly Rate, Standard Work Year, Process Baseline, Automation Capability, Recurring Costs, One-Time Costs)
-
+export const APPENDIX_E_PART5 = `
 E.7 Formula Integrity and Audit Trail
 
 All formulas are implemented in Automat-IA's ROI Calculator engine with:

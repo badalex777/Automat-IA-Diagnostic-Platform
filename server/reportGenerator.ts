@@ -42,8 +42,13 @@ import {
   AUTOMATION_ROADMAP_PHASE3_OUTCOMES,
   AUTOMATION_ROADMAP_SUMMARY,
   APPENDIX_A,
-  APPENDIX_D,
-  APPENDIX_E,
+  APPENDIX_D_INTRO,
+  APPENDIX_D_MODELING_NOTES,
+  APPENDIX_E_PART1,
+  APPENDIX_E_PART2,
+  APPENDIX_E_PART3,
+  APPENDIX_E_PART4,
+  APPENDIX_E_PART5,
   replaceVariables,
   formatDiagnosticDate,
 } from "./reportPrompts";
@@ -998,14 +1003,14 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
 
   // Appendix D
   sections.push(createHeading("Appendix D: All Opportunities ROI Detailed Overview", HeadingLevel.HEADING_1));
-  const appendixDText = replaceVariables(APPENDIX_D, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(appendixDText));
-
-  // Portfolio Summary Table
-  const portfolioHeaders = ["Workflow", "Opportunity", "Annual Benefit", "Est. Cost", "FTE Saved", "Payback"];
+  sections.push(createBodyParagraph(APPENDIX_D_INTRO));
+  
+  // D.1 Portfolio Summary Table (add Weekly Hours Saved column)
+  const portfolioHeaders = ["Workflow", "Opportunity", "Annual Benefit", "Est. Cost", "FTE Saved", "Payback", "Weekly Hours Saved"];
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
+      const weeklyHours = (opp.roiMetrics.fteSavings * 2080) / 52;
       portfolioRows.push([
         w.workflow.name,
         opp.opportunity.name,
@@ -1013,19 +1018,141 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
         formatCurrency(parseFloat(opp.opportunity.implementationCost || "0")),
         formatNumber(opp.roiMetrics.fteSavings, 2),
         Math.round(opp.roiMetrics.paybackMonths) + " mo",
+        formatNumber(weeklyHours, 1),
       ]);
     });
   });
   if (portfolioRows.length > 0) {
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
+  sections.push(createBodyParagraph("Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. Detailed per-opportunity pages follow."));
+  sections.push(createHorizontalSeparator());
+  
+  // D.2.X sections - ONE PER OPPORTUNITY
+  let oppCounter = 1;
+  data.workflows.forEach(w => {
+    w.opportunities.forEach(opp => {
+      sections.push(
+        new Paragraph({
+          text: `D.2.${oppCounter} ROI Insights – ${w.workflow.name} / ${opp.opportunity.name}`,
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 360, after: 120 },
+        })
+      );
+      
+      // Performance Summary paragraph
+      const annualHours = opp.roiMetrics.fteSavings * 2080;
+      sections.push(createBodyParagraph(
+        `Performance Summary. Under the conservative scenario, estimated annual benefit is ` +
+        `${formatCurrency(opp.roiMetrics.annualRoi)}, equivalent to ${formatNumber(opp.roiMetrics.fteSavings, 2)} FTEs or approximately ` +
+        `${formatNumber(annualHours, 0)} hours per year, with an expected payback of ${Math.round(opp.roiMetrics.paybackMonths)} months.`
+      ));
+      
+      // Key Metrics Table (9 rows)
+      const implCost = parseFloat(opp.opportunity.implementationCost || "0");
+      const year1Net = opp.roiMetrics.annualRoi - implCost;
+      const year3Net = (opp.roiMetrics.annualRoi * 3) - implCost;
+      const year5Net = (opp.roiMetrics.annualRoi * 5) - implCost;
+      const weeklyHours = annualHours / 52;
+      
+      const keyMetricsHeaders = ["Metric", "Value"];
+      const keyMetricsRows = [
+        ["Annual Benefit", formatCurrency(opp.roiMetrics.annualRoi)],
+        ["Estimated Implementation Cost", formatCurrency(implCost)],
+        ["Payback Period", `${Math.round(opp.roiMetrics.paybackMonths)} months`],
+        ["1-Year Net Benefit", formatCurrency(year1Net)],
+        ["3-Year Net Benefit", formatCurrency(year3Net)],
+        ["5-Year Net Benefit", formatCurrency(year5Net)],
+        ["FTE Saved", formatNumber(opp.roiMetrics.fteSavings, 2)],
+        ["Annual Hours Saved", formatNumber(annualHours, 0)],
+        ["Weekly Hours Saved", formatNumber(weeklyHours, 1)],
+      ];
+      sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
+      sections.push(createBodyParagraph("All values modeled under Automat-IA Conservative Scenario."));
+      
+      // Business Impact Components Table
+      const impactHeaders = ["Impact Area", "Key Metrics", "Description"];
+      const impactRows = [
+        ["Time Savings", `${formatNumber(annualHours, 0)} hours/year`, "Primary efficiency gain from process automation"],
+        ["Quality Impact", "Conservative estimate", "Error reduction benefits modeled conservatively where data available"],
+        ["Revenue Uplift", "To be validated", "Capacity reallocation potential subject to business validation"],
+        ["Ramp-Up Period", "3 months", "Time to reach steady-state performance after implementation"],
+      ];
+      sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
+      
+      // Dominant component paragraph
+      sections.push(createBodyParagraph(
+        "For this opportunity, the majority of measurable benefit is driven by time savings. " +
+        "Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. " +
+        "Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance."
+      ));
+      
+      sections.push(createHorizontalSeparator());
+      oppCounter++;
+    });
+  });
+  
+  // D.3 Modeling Notes
+  sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES));
   sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix E
   sections.push(createHeading("Appendix E: ROI Calculation Methodology", HeadingLevel.HEADING_1));
-  const appendixEText = replaceVariables(APPENDIX_E, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(appendixEText));
+
+  // E.1 Core Financial Formulas (text only)
+  sections.push(...createTextParagraphs(APPENDIX_E_PART1));
+
+  // E.2 Net Benefit Formulas Table
+  const netBenefitHeaders = ["Projection Horizon", "Formula", "Purpose"];
+  const netBenefitRows = [
+    ["Year 1", "Annual Benefit × Ramp-Up Factor − Implementation Cost", "Accounts for partial realization during adoption phase"],
+    ["3-Year", "(Annual Benefit × 3) − Implementation Cost", "Cumulative value over initial contract period"],
+    ["5-Year", "(Annual Benefit × 5) − Implementation Cost", "Long-term strategic value assessment"],
+  ];
+  sections.push(createTable(netBenefitHeaders, netBenefitRows, [25, 40, 35]));
+
+  // E.3 FTE Conversions (text)
+  sections.push(...createTextParagraphs(APPENDIX_E_PART2));
+
+  // E.4 Annual Benefit Breakdown Table
+  const benefitHeaders = ["Component", "Formula", "Description"];
+  const benefitRows = [
+    ["Time Savings Benefits", "Hours Saved × Effective Hourly Rate × Adoption %", "Value of time freed for higher-priority work"],
+    ["Error Reduction Benefits", "Error Rate × Rework Cost × Volume × Improvement %", "Value of quality improvements and rework avoided"],
+    ["Revenue Uplift Benefits", "Capacity Reallocation × Revenue per Hour × Realization %", "Value from redirecting capacity to revenue-generating activities"],
+  ];
+  sections.push(createTable(benefitHeaders, benefitRows, [25, 40, 35]));
+  sections.push(createBodyParagraph("All benefit calculations apply downward multipliers in conservative modeling to avoid overstatement."));
+
+  // E.5 Scenario Adjustment Framework Table
+  sections.push(...createTextParagraphs(APPENDIX_E_PART3));
+  const scenarioHeaders = ["Adjustment Category", "Conservative Modeling Rationale"];
+  const scenarioRows = [
+    ["Time Savings Adjustment", "Apply 60-75% realization factor to account for exceptions, learning curves, and process variations"],
+    ["Error Reduction Adjustment", "Only include when error data is documented; apply 50% discount to projected improvements"],
+    ["Revenue Reallocation Adjustment", "Exclude unless business validates capacity can be redirected; apply 40% discount when included"],
+    ["Cost Overrun Adjustment", "Add 20% contingency to implementation costs to reflect typical project overruns"],
+    ["Ramp-Up Efficiency Adjustment", "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization"],
+  ];
+  sections.push(createTable(scenarioHeaders, scenarioRows, [35, 65]));
+  sections.push(createBodyParagraph("Together these controls form the Conservative Scenario Framework, ensuring projections remain achievable, evidence-based, and comparable across diagnostics."));
+
+  // E.6 Key Modeling Assumptions Table
+  sections.push(...createTextParagraphs(APPENDIX_E_PART4));
+  const assumptionsHeaders = ["Variable", "Standard Assumption", "Rationale"];
+  const assumptionsRows = [
+    ["Effective Hourly Rate", "$50-$75 per hour", "Blended rate reflecting salary, benefits, and overhead across roles"],
+    ["Standard Work Year", "2,080 hours", "52 weeks × 40 hours, industry standard for FTE calculations"],
+    ["Process Baseline", "Current state as reported", "PIF data establishes pre-automation performance baseline"],
+    ["Automation Capability", "60-80% task coverage", "Realistic automation scope accounting for exceptions and edge cases"],
+    ["Recurring Costs", "10-15% of implementation", "Annual software licenses, maintenance, and support"],
+    ["One-Time Costs", "Implementation + Training", "Includes build, configuration, testing, and change management"],
+  ];
+  sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
+
+  // E.7 Formula Integrity (text)
+  sections.push(...createTextParagraphs(APPENDIX_E_PART5));
   sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
