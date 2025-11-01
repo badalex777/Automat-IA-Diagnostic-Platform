@@ -939,18 +939,24 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     "factors in determining automation feasibility."
   ));
   
-  // Metric Weighting Table
+  // Component Weighting Table - 7-row breakdown matching template
   const metricWeightHeaders = ["Component", "Weight", "Description"];
   const metricWeightRows = [
-    ["Technical Feasibility Assessment (TFA)", "60%", "Measures system readiness, data quality, integration capability, and security compliance"],
-    ["Process Insights Form (PIF)", "40%", "Captures process clarity, change magnitude, and workflow brittleness from operational perspective"],
+    ["System Environment", "15%", "API accessibility, structured data formats, and automation-friendly system architecture"],
+    ["Data Quality", "18%", "Completeness, consistency, standardization, and reliability of data used in the workflow"],
+    ["Integration Feasibility", "18%", "Ease of system integration, availability of connectors, and cross-platform data flow"],
+    ["Security/Compliance", "9%", "Regulatory requirements, data sensitivity, and access control considerations"],
+    ["Process Clarity", "15%", "Documentation quality, rule consistency, and decision logic transparency"],
+    ["Change Magnitude", "15%", "Frequency of process changes, adaptability requirements, and rules stability"],
+    ["Workflow Brittleness", "10%", "Error frequency, exception handling needs, and input consistency challenges"],
   ];
   sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
   sections.push(createBodyParagraph("Why These Weights Matter:"));
-  sections.push(createBulletParagraph("TFA carries higher weight (60%) because technical barriers are typically harder and more expensive to remediate than operational issues."));
-  sections.push(createBulletParagraph("PIF provides essential context (40%) on process maturity and organizational readiness, which directly impacts adoption success."));
-  sections.push(createBulletParagraph("Combined, these metrics produce a holistic readiness score that balances technical feasibility with operational reality."));
+  sections.push(createBulletParagraph("Technical components (System Environment, Data Quality, Integration, Security/Compliance) total 60%, reflecting the reality that technical barriers are harder and costlier to remediate."));
+  sections.push(createBulletParagraph("Operational components (Process Clarity, Change Magnitude, Workflow Brittleness) total 40%, capturing process maturity and organizational readiness factors critical to adoption success."));
+  sections.push(createBulletParagraph("Data Quality and Integration Feasibility receive the highest individual weights (18% each) as they are the primary determinants of automation viability."));
+  sections.push(createBulletParagraph("Combined, these seven components produce a holistic readiness score that balances technical feasibility with operational reality."));
   
   sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
