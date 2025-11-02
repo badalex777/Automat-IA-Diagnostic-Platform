@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ChevronLeft, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
+import { OpportunityForm } from "@/components/OpportunityForm";
 import { useToast } from "@/hooks/use-toast";
-import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity } from "@shared/schema";
 
 export default function WorkflowStepDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId/step/:stepId");
@@ -14,6 +23,7 @@ export default function WorkflowStepDetail() {
   const workflowId = params?.workflowId || '';
   const stepId = params?.stepId || '';
   const { toast } = useToast();
+  const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
 
   const { data: company, isLoading: companyLoading } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -40,6 +50,28 @@ export default function WorkflowStepDetail() {
   }>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
     enabled: !!workflowId,
+  });
+
+  const createOpportunityMutation = useMutation({
+    mutationFn: async (data: InsertImplementationOpportunity) => {
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/opportunities`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity created",
+        description: "Implementation opportunity has been created successfully.",
+      });
+      setIsOpportunityDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to create opportunity",
+      });
+    },
   });
 
   if (stepError) {
@@ -222,6 +254,18 @@ export default function WorkflowStepDetail() {
           </div>
         </Card>
 
+        {/* Create Opportunity Button */}
+        <div className="flex justify-center">
+          <Button
+            onClick={() => setIsOpportunityDialogOpen(true)}
+            size="lg"
+            data-testid="button-create-opportunity"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Implementation Opportunity
+          </Button>
+        </div>
+
         {/* Generate PIF Link for this specific step */}
         {!hasStepPIF && (
           <ShareableLinkCard
@@ -270,6 +314,22 @@ export default function WorkflowStepDetail() {
           </>
         )}
       </div>
+
+      {/* Create Opportunity Dialog */}
+      <Dialog open={isOpportunityDialogOpen} onOpenChange={setIsOpportunityDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-create-opportunity">
+          <DialogHeader>
+            <DialogTitle>Create Implementation Opportunity for {step.stepName}</DialogTitle>
+          </DialogHeader>
+          <OpportunityForm
+            workflowId={workflowId}
+            stepId={stepId}
+            onSubmit={(data) => createOpportunityMutation.mutate(data)}
+            onCancel={() => setIsOpportunityDialogOpen(false)}
+            isLoading={createOpportunityMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

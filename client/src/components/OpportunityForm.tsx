@@ -2,10 +2,18 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertImplementationOpportunitySchema, type InsertImplementationOpportunity } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -15,8 +23,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
 interface OpportunityFormProps {
   workflowId: string;
+  stepId?: string; // Optional pre-filled step ID
   initialData?: Partial<InsertImplementationOpportunity>;
   onSubmit: (data: InsertImplementationOpportunity) => void;
   onCancel?: () => void;
@@ -24,16 +34,23 @@ interface OpportunityFormProps {
 }
 
 export function OpportunityForm({ 
-  workflowId, 
+  workflowId,
+  stepId,
   initialData, 
   onSubmit, 
   onCancel,
   isLoading 
 }: OpportunityFormProps) {
+  // Fetch workflow steps for selection
+  const { data: workflowSteps = [], isLoading: stepsLoading } = useQuery<any[]>({
+    queryKey: [`/api/workflows/${workflowId}/steps`],
+  });
+
   const form = useForm<InsertImplementationOpportunity>({
     resolver: zodResolver(insertImplementationOpportunitySchema),
     defaultValues: {
       workflowId,
+      stepId: stepId || initialData?.stepId || undefined,
       name: initialData?.name || "",
       description: initialData?.description || "",
       annualRoi: initialData?.annualRoi,
@@ -83,6 +100,7 @@ export function OpportunityForm({
     
     const converted = {
       ...data,
+      stepId: data.stepId === "none" || !data.stepId ? undefined : data.stepId,
       annualRoi: data.annualRoi ? parseFloat(data.annualRoi) : undefined,
       implementationCost: data.implementationCost ? parseFloat(data.implementationCost) : undefined,
       annualRunRateRoi: data.annualRunRateRoi ? parseFloat(data.annualRunRateRoi) : undefined,
@@ -145,6 +163,45 @@ export function OpportunityForm({
                     value={field.value || ""}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="stepId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Process Step (Optional)</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value || undefined}
+                  disabled={stepsLoading}
+                >
+                  <FormControl>
+                    <SelectTrigger data-testid="select-step">
+                      <SelectValue placeholder="Select a process step (optional)" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="none" data-testid="select-step-none">
+                      None (Workflow-level opportunity)
+                    </SelectItem>
+                    {workflowSteps.map((step: any) => (
+                      <SelectItem 
+                        key={step.id} 
+                        value={step.id}
+                        data-testid={`select-step-${step.id}`}
+                      >
+                        {step.stepName} - {step.participantName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Link this opportunity to a specific workflow step, or leave blank for workflow-level opportunities
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

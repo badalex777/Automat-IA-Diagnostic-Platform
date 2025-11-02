@@ -11,10 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Edit, Trash2, DollarSign, Clock, Users, TrendingUp, AlertTriangle } from "lucide-react";
+import { Edit, Trash2, DollarSign, Clock, Users, TrendingUp, AlertTriangle, ListOrdered } from "lucide-react";
 
 interface OpportunityCardProps {
   opportunity: ImplementationOpportunity;
@@ -41,6 +41,12 @@ export function OpportunityCard({
   onDelete,
 }: OpportunityCardProps) {
   const { toast } = useToast();
+  
+  // Fetch step data if stepId is present
+  const { data: stepData } = useQuery<any>({
+    queryKey: [`/api/steps/${opportunity.stepId}`],
+    enabled: !!opportunity.stepId,
+  });
   
   // Use per-opportunity toggle state
   const toggles: ToggleState = {
@@ -105,6 +111,12 @@ export function OpportunityCard({
               <CardDescription className="line-clamp-2 mt-1">
                 {opportunity.description}
               </CardDescription>
+            )}
+            {stepData && (
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                <ListOrdered className="w-3 h-3" />
+                <span>Step: {stepData.stepName} ({stepData.participantName})</span>
+              </div>
             )}
           </div>
           <Badge 
