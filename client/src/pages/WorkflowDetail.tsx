@@ -26,7 +26,7 @@ import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity } from "@shared/schema";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity, WorkflowStep } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import type { ToggleState } from "@shared/opportunityCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
@@ -88,6 +88,11 @@ export default function WorkflowDetail() {
 
   const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
     queryKey: [`/api/workflows/${workflowId}/opportunities`],
+    enabled: !!workflowId,
+  });
+
+  const { data: workflowSteps = [], isLoading: stepsLoading, error: stepsError } = useQuery<WorkflowStep[]>({
+    queryKey: [`/api/workflows/${workflowId}/steps`],
     enabled: !!workflowId,
   });
 
@@ -354,6 +359,7 @@ export default function WorkflowDetail() {
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
             <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
             <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
+            <TabsTrigger value="steps" data-testid="tab-steps">Process Steps</TabsTrigger>
             <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
           </TabsList>
 
@@ -682,6 +688,150 @@ export default function WorkflowDetail() {
 
               return <ReadinessRubric rubric={rubric} workflowId={workflowId} />;
             })()}
+          </TabsContent>
+
+          <TabsContent value="steps" className="space-y-6">
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold">Workflow Process Steps</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Manage individual steps in this workflow. Each step can have its own readiness assessment and opportunities.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {/* TODO: Add step dialog */}}
+                  data-testid="button-add-step"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Step
+                </Button>
+              </div>
+
+              {stepsError ? (
+                <div className="bg-destructive/10 rounded-lg border border-destructive/30 p-4">
+                  <p className="text-destructive text-sm">Error loading steps: {stepsError.message}</p>
+                </div>
+              ) : stepsLoading ? (
+                <p className="text-muted-foreground text-sm">Loading process steps...</p>
+              ) : workflowSteps.length === 0 ? (
+                <div className="text-center py-12 bg-muted/30 rounded-lg border border-border">
+                  <h4 className="font-medium text-base mb-2">No Process Steps Yet</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Add steps to break down this workflow into individual tasks for assessment.
+                  </p>
+                  <Button
+                    onClick={() => {/* TODO: Add step dialog */}}
+                    data-testid="button-add-first-step"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add First Step
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {workflowSteps.map((step, index) => {
+                    // Calculate step-specific readiness if there's a PIF for this step
+                    const stepPIFs = pifData?.responses.filter(pif => pif.stepId === step.id) || [];
+                    const hasTFA = tfaAssessment && tfaAssessment.score !== null;
+                    const hasStepPIF = stepPIFs.length > 0;
+                    
+                    let stepReadiness: number | null = null;
+                    if (hasTFA && hasStepPIF) {
+                      // Calculate readiness: 60% TFA + 40% PIF
+                      const tfaScore = tfaAssessment.score || 0;
+                      
+                      // Average PIF operational scores (processClarity, changeMagnitude, workflowBrittleness) for this step
+                      // These are on a 1-5 scale and need to be normalized to 0-100
+                      const avgOperationalScore = stepPIFs.reduce((sum, pif) => {
+                        const scores = [
+                          pif.processClarity,
+                          pif.changeMagnitude,
+                          pif.workflowBrittleness
+                        ].filter(s => s !== null && s !== undefined) as number[];
+                        
+                        const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+                        return sum + avg;
+                      }, 0) / stepPIFs.length;
+                      
+                      // Normalize operational score from 1-5 scale to 0-100 scale
+                      const normalizedOperationalScore = (avgOperationalScore / 5) * 100;
+                      
+                      stepReadiness = Math.round(tfaScore * 0.6 + normalizedOperationalScore * 0.4);
+                    }
+
+                    return (
+                      <Card key={step.id} className="hover-elevate" data-testid={`card-step-${step.id}`}>
+                        <div className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                                  Step {step.stepOrder !== null && step.stepOrder !== undefined ? step.stepOrder : index + 1}
+                                </span>
+                                <h4 className="font-semibold text-base truncate" data-testid={`text-step-name-${step.id}`}>
+                                  {step.stepName}
+                                </h4>
+                              </div>
+                              
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <span className="text-muted-foreground">Participant:</span>
+                                  <span className="ml-2 font-medium" data-testid={`text-participant-${step.id}`}>
+                                    {step.participantName || 'Not specified'}
+                                  </span>
+                                </div>
+                                {step.participantRole && (
+                                  <div>
+                                    <span className="text-muted-foreground">Role:</span>
+                                    <span className="ml-2 font-medium" data-testid={`text-role-${step.id}`}>
+                                      {step.participantRole}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {step.stepDescription && (
+                                <p className="text-sm text-muted-foreground mt-2 line-clamp-2" data-testid={`text-description-${step.id}`}>
+                                  {step.stepDescription}
+                                </p>
+                              )}
+                              
+                              {hasStepPIF && (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {stepPIFs.length} PIF response{stepPIFs.length > 1 ? 's' : ''}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center gap-3">
+                              {stepReadiness !== null && (
+                                <div className="text-center min-w-[80px]">
+                                  <div className="text-2xl font-bold" data-testid={`text-readiness-${step.id}`}>
+                                    {stepReadiness}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">Readiness</div>
+                                </div>
+                              )}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {/* TODO: Navigate to step detail */}}
+                                data-testid={`button-view-step-${step.id}`}
+                              >
+                                View Details
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
           </TabsContent>
 
           <TabsContent value="opportunities" className="space-y-6">
