@@ -6,6 +6,8 @@ import {
   updateCompanySchema,
   insertWorkflowSchema,
   updateWorkflowSchema,
+  insertWorkflowStepSchema,
+  updateWorkflowStepSchema,
   insertTFAAssessmentSchema,
   tfaResponsesSchema,
   fillGapsSchema,
@@ -253,6 +255,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Workflow Steps
+  app.get("/api/workflows/:workflowId/steps", async (req, res) => {
+    try {
+      const steps = await storage.getWorkflowStepsByWorkflow(req.params.workflowId);
+      res.json(steps);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/workflows/:workflowId/steps", async (req, res) => {
+    try {
+      const validatedData = insertWorkflowStepSchema.parse({
+        ...req.body,
+        workflowId: req.params.workflowId,
+      });
+      const step = await storage.createWorkflowStep(validatedData);
+      res.status(201).json(step);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/steps/:id", async (req, res) => {
+    try {
+      const step = await storage.getWorkflowStep(req.params.id);
+      if (!step) {
+        return res.status(404).json({ error: "Workflow step not found" });
+      }
+      res.json(step);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.patch("/api/steps/:id", async (req, res) => {
+    try {
+      const validatedData = updateWorkflowStepSchema.parse(req.body);
+      
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const step = await storage.updateWorkflowStep(req.params.id, validatedData);
+      if (!step) {
+        return res.status(404).json({ error: "Workflow step not found" });
+      }
+      res.json(step);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/steps/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteWorkflowStep(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Workflow step not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 

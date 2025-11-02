@@ -3,7 +3,8 @@ import { nanoid } from "nanoid";
 import { db } from "./db";
 import { 
   companies, 
-  workflows, 
+  workflows,
+  workflowSteps,
   tfaAssessments,
   pifResponses,
   businessImpact,
@@ -12,6 +13,8 @@ import {
   type InsertCompany,
   type Workflow,
   type InsertWorkflow,
+  type WorkflowStep,
+  type InsertWorkflowStep,
   type TFAAssessment,
   type InsertTFAAssessment,
   type PIFResponse,
@@ -88,6 +91,33 @@ export class DbStorage implements IStorage {
 
   async deleteWorkflow(id: string): Promise<boolean> {
     const result = await db.delete(workflows).where(eq(workflows.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Workflow Steps
+  async getWorkflowStep(id: string): Promise<WorkflowStep | undefined> {
+    const [step] = await db.select().from(workflowSteps).where(eq(workflowSteps.id, id));
+    return step;
+  }
+
+  async getWorkflowStepsByWorkflow(workflowId: string): Promise<WorkflowStep[]> {
+    return db.select().from(workflowSteps)
+      .where(eq(workflowSteps.workflowId, workflowId))
+      .orderBy(workflowSteps.stepOrder, desc(workflowSteps.createdAt));
+  }
+
+  async createWorkflowStep(step: InsertWorkflowStep): Promise<WorkflowStep> {
+    const [newStep] = await db.insert(workflowSteps).values(step).returning();
+    return newStep;
+  }
+
+  async updateWorkflowStep(id: string, data: Partial<InsertWorkflowStep>): Promise<WorkflowStep | undefined> {
+    const [updated] = await db.update(workflowSteps).set(data).where(eq(workflowSteps.id, id)).returning();
+    return updated;
+  }
+
+  async deleteWorkflowStep(id: string): Promise<boolean> {
+    const result = await db.delete(workflowSteps).where(eq(workflowSteps.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
