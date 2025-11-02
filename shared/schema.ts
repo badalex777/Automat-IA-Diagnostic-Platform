@@ -27,6 +27,19 @@ export const workflows = pgTable("workflows", {
   companyIdIdx: index("workflows_company_id_idx").on(table.companyId),
 }));
 
+export const workflowSteps = pgTable("workflow_steps", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  stepName: text("step_name").notNull(),
+  participantName: text("participant_name").notNull(),
+  participantRole: text("participant_role").notNull(),
+  stepDescription: text("step_description"),
+  stepOrder: integer("step_order").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  workflowIdIdx: index("workflow_steps_workflow_id_idx").on(table.workflowId),
+}));
+
 export const tfaAssessments = pgTable("tfa_assessments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
@@ -48,6 +61,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
 export const pifResponses = pgTable("pis_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  stepId: varchar("step_id").references(() => workflowSteps.id, { onDelete: 'cascade' }),
   shareableId: varchar("shareable_id").notNull(),
   respondentName: text("respondent_name").notNull(),
   respondentRole: text("respondent_role").notNull(),
@@ -62,6 +76,7 @@ export const pifResponses = pgTable("pis_responses", {
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("pis_responses_workflow_id_idx").on(table.workflowId),
+  stepIdIdx: index("pis_responses_step_id_idx").on(table.stepId),
   shareableIdIdx: index("pis_responses_shareable_id_idx").on(table.shareableId),
 }));
 
@@ -82,6 +97,7 @@ export const businessImpact = pgTable("business_impact", {
 export const implementationOpportunities = pgTable("implementation_opportunities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  stepId: varchar("step_id").references(() => workflowSteps.id, { onDelete: 'set null' }),
   name: text("name").notNull(),
   description: text("description"),
   annualRoi: decimal("annual_roi", { precision: 12, scale: 2 }),
@@ -125,6 +141,13 @@ export const insertWorkflowSchema = createInsertSchema(workflows).omit({
 });
 
 export const updateWorkflowSchema = insertWorkflowSchema.partial();
+
+export const insertWorkflowStepSchema = createInsertSchema(workflowSteps).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const updateWorkflowStepSchema = insertWorkflowStepSchema.partial();
 
 export const insertTFAAssessmentSchema = createInsertSchema(tfaAssessments).omit({
   id: true,
@@ -227,6 +250,9 @@ export type InsertCompany = z.infer<typeof insertCompanySchema>;
 
 export type Workflow = typeof workflows.$inferSelect;
 export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
+
+export type WorkflowStep = typeof workflowSteps.$inferSelect;
+export type InsertWorkflowStep = z.infer<typeof insertWorkflowStepSchema>;
 
 export type TFAAssessment = typeof tfaAssessments.$inferSelect;
 export type InsertTFAAssessment = z.infer<typeof insertTFAAssessmentSchema>;
