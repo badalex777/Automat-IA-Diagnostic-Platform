@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Dashboard from "@/pages/Dashboard";
 import CompanyDetail from "@/pages/CompanyDetail";
 import WorkflowDetail from "@/pages/WorkflowDetail";
+import WorkflowStepDetail from "@/pages/WorkflowStepDetail";
 import TFAForm from "@/pages/TFAForm";
 import TFAThankYou from "@/pages/TFAThankYou";
 import PIFForm from "@/pages/PIFForm";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/documentation" component={Documentation} />
       <Route path="/company/:id" component={CompanyDetail} />
+      <Route path="/company/:companyId/workflow/:workflowId/step/:stepId" component={WorkflowStepDetail} />
       <Route path="/company/:companyId/workflow/:workflowId" component={WorkflowDetail} />
       {/* Bilingual survey routes wrapped with LanguageProvider */}
       <Route path="/tfa/:shareableLink/thank-you">

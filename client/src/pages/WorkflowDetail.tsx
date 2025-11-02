@@ -815,14 +815,15 @@ export default function WorkflowDetail() {
                                   <div className="text-xs text-muted-foreground">Readiness</div>
                                 </div>
                               )}
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {/* TODO: Navigate to step detail */}}
-                                data-testid={`button-view-step-${step.id}`}
-                              >
-                                View Details
-                              </Button>
+                              <Link href={`/company/${companyId}/workflow/${workflowId}/step/${step.id}`}>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  data-testid={`button-view-step-${step.id}`}
+                                >
+                                  View Details
+                                </Button>
+                              </Link>
                             </div>
                           </div>
                         </div>
