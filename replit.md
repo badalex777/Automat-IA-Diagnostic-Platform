@@ -29,7 +29,7 @@ The backend uses Express.js and TypeScript (ESM modules). Data is stored in Post
 
 ### Data Model
 
-Core entities include Companies, Workflows, TFA Assessments (21-question weighted scoring, feasibility bands), PIF Responses (multi-respondent, 40-question, operational scores, ROI inputs, qualitative insights), Readiness Rubrics (TFA 60% + PIF 40%), Implementation Opportunities (ROI-based business impact with FTE normalization), and Business Impact (ROI calculations with a 10x multiplier). The system tracks respondents and knowledge gaps.
+Core entities include Companies, Workflows, Workflow Steps (step-level granularity with participant assignments), TFA Assessments (21-question weighted scoring at workflow level, feasibility bands), PIF Responses (step-level multi-respondent, 40-question, operational scores, ROI inputs, qualitative insights), Readiness Rubrics (calculated per step: TFA 60% + step PIF 40%), Implementation Opportunities (ROI-based business impact with FTE normalization, linkable to specific steps), and Business Impact (ROI calculations with a 10x multiplier). The system tracks respondents, knowledge gaps, and step-level performance metrics.
 
 ### Key Features
 
@@ -38,6 +38,17 @@ Core entities include Companies, Workflows, TFA Assessments (21-question weighte
 - **Readiness Rubric**: Unifies TFA and PIF into a combined 0-100 score with 7 component breakdowns, feasibility banding, visual analytics, and a comprehensive SWOT analysis Executive Summary.
 - **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of readiness, ramp-up, payback, and training). Features both a Base Impact Matrix and an Enhanced Impact Matrix with additive bonuses.
 - **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document for clients, including an Executive Summary, methodology, findings, automation roadmap, and six detailed technical appendices.
+
+### Step-Level Assessment Architecture
+
+The platform implements step-level granularity for workflow assessments:
+
+- **Workflow Steps**: Each workflow is broken down into individual process steps, each with assigned participants (name, role) and ordering
+- **Step-Level PIFs**: Process Insight Forms are collected per workflow step/participant, capturing operational realities at granular level
+- **Step-Level Readiness**: Each step receives its own readiness score calculated as 60% shared workflow TFA + 40% unique step PIF operational average
+- **Step-Level SWOT**: Each step with a completed PIF generates its own SWOT analysis based on step-specific readiness components
+- **Opportunity Linking**: Implementation opportunities can be linked to specific workflow steps, enabling precise scoping and impact attribution
+- **Report Aggregation**: Executive Diagnostic Report Appendix C aggregates all step-level SWOT analyses per workflow, providing comprehensive step-by-step assessment insights
 
 ## External Dependencies
 
