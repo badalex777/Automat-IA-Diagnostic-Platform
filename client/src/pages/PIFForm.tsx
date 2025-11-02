@@ -30,6 +30,10 @@ export default function PIFForm() {
   const shareableId = params?.shareableId || '';
   const { toast } = useToast();
   
+  // Read stepId from URL query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const stepId = urlParams.get('stepId') || undefined;
+  
   const ALL_PIF_QUESTIONS = getAllPIFQuestions();
   
   // Language state with localStorage persistence (independent from admin UI)
@@ -153,6 +157,7 @@ export default function PIFForm() {
       respondentRole: respondentRole.trim(),
       respondentResponsibilities: respondentResponsibilities.trim(),
       responses: answers,
+      ...(stepId && { stepId }), // Include stepId if present
     });
   };
 

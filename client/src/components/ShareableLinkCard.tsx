@@ -13,6 +13,8 @@ interface ShareableLinkCardProps {
   companyName: string;
   workflowTitle: string;
   type?: 'tfa' | 'pif';
+  stepId?: string;
+  stepName?: string;
 }
 
 export default function ShareableLinkCard({
@@ -20,6 +22,8 @@ export default function ShareableLinkCard({
   companyName,
   workflowTitle,
   type = 'tfa',
+  stepId,
+  stepName,
 }: ShareableLinkCardProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -54,7 +58,7 @@ export default function ShareableLinkCard({
   });
 
   const shareableUrl = type === 'pif' && pifShareableId
-    ? `${window.location.origin}/pif/${pifShareableId}`
+    ? `${window.location.origin}/pif/${pifShareableId}${stepId ? `?stepId=${stepId}` : ''}`
     : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
@@ -73,9 +77,13 @@ export default function ShareableLinkCard({
     }
   };
 
-  const linkTitle = type === 'pif' ? 'Process Insight Form Link' : 'Shareable TFA Link';
+  const linkTitle = type === 'pif' 
+    ? (stepId ? 'Step-Level Process Insight Form Link' : 'Process Insight Form Link') 
+    : 'Shareable TFA Link';
   const linkDescription = type === 'pif' 
-    ? 'Share this link with end users and process owners to collect operational insights. Multiple responses can be submitted.'
+    ? (stepId 
+      ? `Share this link to collect operational insights specifically for the "${stepName}" step. The response will be associated with this workflow step.`
+      : 'Share this link with end users and process owners to collect operational insights. Multiple responses can be submitted.')
     : 'Send this link to the technical contact to complete the Technical Feasibility Assessment';
 
   if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pif' && !shareableUrl)) {
@@ -146,6 +154,9 @@ export default function ShareableLinkCard({
           <p className="font-medium">Pre-filled Information:</p>
           <p className="text-muted-foreground">• Company: {companyName}</p>
           <p className="text-muted-foreground">• Workflow: {workflowTitle}</p>
+          {stepId && stepName && (
+            <p className="text-muted-foreground">• Step: {stepName}</p>
+          )}
         </div>
         
         {type === 'tfa' && (

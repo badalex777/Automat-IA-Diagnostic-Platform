@@ -206,6 +206,7 @@ export const pifSubmitSchema = z.object({
   respondentRole: z.string().min(1, "Role is required"),
   respondentResponsibilities: z.string().min(1, "Responsibilities are required"),
   responses: z.record(z.string(), z.string()),
+  stepId: z.string().optional(), // Optional step ID for step-level PIFs
   roiInputs: z.object({
     employeeCount: z.number().optional(),
     frequency: z.enum(['daily', 'weekly', 'monthly']).optional(),

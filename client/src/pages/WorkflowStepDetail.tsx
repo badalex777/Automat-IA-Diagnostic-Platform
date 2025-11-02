@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { useToast } from "@/hooks/use-toast";
 import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse } from "@shared/schema";
 
@@ -221,16 +222,16 @@ export default function WorkflowStepDetail() {
           </div>
         </Card>
 
-        {/* Placeholder for future components */}
+        {/* Generate PIF Link for this specific step */}
         {!hasStepPIF && (
-          <Card className="p-6">
-            <div className="text-center py-8">
-              <h3 className="text-lg font-semibold mb-2">No PIF Responses Yet</h3>
-              <p className="text-sm text-muted-foreground">
-                Generate a PIF link for this step to collect operational insights from the participant.
-              </p>
-            </div>
-          </Card>
+          <ShareableLinkCard
+            workflowId={workflowId}
+            companyName={company?.name || ''}
+            workflowTitle={workflow?.name || ''}
+            type="pif"
+            stepId={stepId}
+            stepName={step.stepName}
+          />
         )}
 
         {hasStepPIF && (

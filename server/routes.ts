@@ -695,12 +695,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/workflows/:workflowId/pif/submit", async (req, res) => {
     try {
       const validatedData = pifSubmitSchema.parse(req.body);
-      const { respondentName, respondentRole, respondentResponsibilities, responses, roiInputs, qualitativeResponses } = validatedData;
+      const { respondentName, respondentRole, respondentResponsibilities, responses, stepId, roiInputs, qualitativeResponses } = validatedData;
 
       // Verify workflow exists
       const workflow = await storage.getWorkflow(req.params.workflowId);
       if (!workflow) {
         return res.status(404).json({ error: "Workflow not found" });
+      }
+
+      // If stepId is provided, verify the step exists and belongs to this workflow
+      if (stepId) {
+        const step = await storage.getWorkflowStep(stepId);
+        if (!step) {
+          return res.status(404).json({ error: "Workflow step not found" });
+        }
+        if (step.workflowId !== req.params.workflowId) {
+          return res.status(400).json({ error: "Step does not belong to this workflow" });
+        }
       }
 
       // Calculate operational scores
@@ -717,6 +728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create PIF response
       const pifResponse = await storage.createPIFResponse({
         workflowId: req.params.workflowId,
+        stepId: stepId || null,
         respondentName,
         respondentRole,
         respondentResponsibilities: respondentResponsibilities || null,
