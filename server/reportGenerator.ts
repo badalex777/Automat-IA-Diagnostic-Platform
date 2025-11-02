@@ -346,7 +346,7 @@ function validateDiagnosticData(data: DiagnosticData): { valid: boolean; errors:
     errors.push('Functions list is required for portfolio summary');
   }
 
-  // ===== APPENDIX B VALIDATION =====
+  // ===== APPENDIX B VALIDATION (Step-Level SWOT) =====
   if (!data.appendixB || data.appendixB.length === 0) {
     errors.push('Appendix B data is missing - at least one workflow with TFA/PIF analysis is required');
   } else {
@@ -357,44 +357,60 @@ function validateDiagnosticData(data: DiagnosticData): { valid: boolean; errors:
         errors.push(`${prefix}: Missing workflow name`);
       }
       
-      // Validate SWOT analysis data
-      if (!workflow.swotAnalysis) {
-        errors.push(`${prefix} "${workflow.workflowName}": Missing SWOT analysis`);
-      } else {
-        if (!Array.isArray(workflow.swotAnalysis.strengths)) {
-          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT strengths array`);
-        }
-        if (!Array.isArray(workflow.swotAnalysis.weaknesses)) {
-          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT weaknesses array`);
-        }
-        if (!Array.isArray(workflow.swotAnalysis.opportunities)) {
-          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT opportunities array`);
-        }
-        if (!Array.isArray(workflow.swotAnalysis.threats)) {
-          errors.push(`${prefix} "${workflow.workflowName}": Invalid SWOT threats array`);
-        }
-      }
-      
-      // Validate question insights
-      if (!workflow.questionInsights || workflow.questionInsights.length === 0) {
-        errors.push(`${prefix} "${workflow.workflowName}": No question insights found`);
-      } else {
-        workflow.questionInsights.forEach((insight, i) => {
-          if (!insight.questionText || insight.questionText.trim() === '') {
-            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing question text`);
+      // Validate step-level SWOTs
+      if (workflow.stepLevelSWOTs && workflow.stepLevelSWOTs.length > 0) {
+        workflow.stepLevelSWOTs.forEach((stepSWOT, stepIndex) => {
+          const stepPrefix = `${prefix} step ${stepIndex + 1}`;
+          
+          if (!stepSWOT.stepName || stepSWOT.stepName.trim() === '') {
+            errors.push(`${stepPrefix}: Missing step name`);
           }
-          if (!insight.section || insight.section.trim() === '') {
-            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing section`);
-          }
-          if (!insight.respondentName || insight.respondentName.trim() === '') {
-            errors.push(`${prefix} "${workflow.workflowName}" insight ${i + 1}: Missing respondent name`);
+          
+          // Validate SWOT analysis data for step
+          if (!stepSWOT.swotAnalysis) {
+            errors.push(`${stepPrefix}: Missing SWOT analysis`);
+          } else {
+            if (!Array.isArray(stepSWOT.swotAnalysis.strengths)) {
+              errors.push(`${stepPrefix}: Invalid SWOT strengths array`);
+            }
+            if (!Array.isArray(stepSWOT.swotAnalysis.weaknesses)) {
+              errors.push(`${stepPrefix}: Invalid SWOT weaknesses array`);
+            }
+            if (!Array.isArray(stepSWOT.swotAnalysis.opportunities)) {
+              errors.push(`${stepPrefix}: Invalid SWOT opportunities array`);
+            }
+            if (!Array.isArray(stepSWOT.swotAnalysis.threats)) {
+              errors.push(`${stepPrefix}: Invalid SWOT threats array`);
+            }
           }
         });
       }
       
-      // Validate followUpActions array exists (may be empty if all scores are high)
-      if (!Array.isArray(workflow.followUpActions)) {
-        errors.push(`${prefix} "${workflow.workflowName}": Invalid followUpActions array`);
+      // Validate workflow-level SWOT if it exists
+      if (workflow.workflowLevelSWOT) {
+        const wlPrefix = `${prefix} workflow-level`;
+        
+        if (!workflow.workflowLevelSWOT.swotAnalysis) {
+          errors.push(`${wlPrefix}: Missing SWOT analysis`);
+        } else {
+          if (!Array.isArray(workflow.workflowLevelSWOT.swotAnalysis.strengths)) {
+            errors.push(`${wlPrefix}: Invalid SWOT strengths array`);
+          }
+          if (!Array.isArray(workflow.workflowLevelSWOT.swotAnalysis.weaknesses)) {
+            errors.push(`${wlPrefix}: Invalid SWOT weaknesses array`);
+          }
+          if (!Array.isArray(workflow.workflowLevelSWOT.swotAnalysis.opportunities)) {
+            errors.push(`${wlPrefix}: Invalid SWOT opportunities array`);
+          }
+          if (!Array.isArray(workflow.workflowLevelSWOT.swotAnalysis.threats)) {
+            errors.push(`${wlPrefix}: Invalid SWOT threats array`);
+          }
+        }
+      }
+      
+      // Ensure at least one SWOT exists (step-level or workflow-level)
+      if ((!workflow.stepLevelSWOTs || workflow.stepLevelSWOTs.length === 0) && !workflow.workflowLevelSWOT) {
+        errors.push(`${prefix} "${workflow.workflowName}": No SWOT analyses found (neither step-level nor workflow-level)`);
       }
     });
   }
@@ -961,46 +977,101 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
-  // Appendix C: Readiness SWOT Analysis (formerly Appendix B)
+  // Appendix C: Readiness SWOT Analysis - Step-Level Aggregation
   sections.push(createHeading("Appendix C: Readiness SWOT Analysis", HeadingLevel.HEADING_1));
-  data.appendixB.forEach(swotData => {
+  data.appendixB.forEach(workflowData => {
     sections.push(
       new Paragraph({
-        text: `Workflow: ${swotData.workflowName}`,
-        heading: HeadingLevel.HEADING_3,
+        text: `Workflow: ${workflowData.workflowName}`,
+        heading: HeadingLevel.HEADING_2,
         spacing: { before: 240, after: 120 },
       })
     );
 
-    // SWOT Table
-    const swotHeaders = ["Category", "Findings"];
-    const swotRows = [
-      ["Strengths", swotData.swotAnalysis.strengths.join("\n")],
-      ["Weaknesses", swotData.swotAnalysis.weaknesses.join("\n")],
-      ["Opportunities", swotData.swotAnalysis.opportunities.join("\n")],
-      ["Threats", swotData.swotAnalysis.threats.join("\n")],
-    ];
-    sections.push(createTable(swotHeaders, swotRows, [30, 70]));
-    
-    // Recommended Follow-Up Actions Table (Question Insights removed per Task 13)
-    if (swotData.followUpActions && swotData.followUpActions.length > 0) {
+    // Render step-level SWOT analyses
+    if (workflowData.stepLevelSWOTs && workflowData.stepLevelSWOTs.length > 0) {
+      workflowData.stepLevelSWOTs.forEach((stepSWOT, index) => {
+        sections.push(
+          new Paragraph({
+            text: `Step ${index + 1}: ${stepSWOT.stepName} (${stepSWOT.participantName} - ${stepSWOT.participantRole})`,
+            heading: HeadingLevel.HEADING_3,
+            spacing: { before: 180, after: 120 },
+          })
+        );
+
+        // SWOT Table for this step
+        const swotHeaders = ["Category", "Findings"];
+        const swotRows = [
+          ["Strengths", stepSWOT.swotAnalysis.strengths.join("\n")],
+          ["Weaknesses", stepSWOT.swotAnalysis.weaknesses.join("\n")],
+          ["Opportunities", stepSWOT.swotAnalysis.opportunities.join("\n")],
+          ["Threats", stepSWOT.swotAnalysis.threats.join("\n")],
+        ];
+        sections.push(createTable(swotHeaders, swotRows, [30, 70]));
+
+        // Recommended Follow-Up Actions for this step
+        if (stepSWOT.followUpActions && stepSWOT.followUpActions.length > 0) {
+          sections.push(
+            new Paragraph({
+              text: "Recommended Follow-Up Actions",
+              heading: HeadingLevel.HEADING_3,
+              spacing: { before: 180, after: 120 },
+            })
+          );
+
+          const actionHeaders = ["Priority", "Section", "Avg Score", "Factor(s)", "Recommendation"];
+          const actionRows = stepSWOT.followUpActions.map((action: any) => [
+            action.priority,
+            action.section,
+            action.score.toFixed(1),
+            action.factor,
+            action.recommendation,
+          ]);
+          sections.push(createTable(actionHeaders, actionRows, [12, 18, 10, 25, 35]));
+        }
+      });
+    }
+
+    // Also render workflow-level SWOT if it exists (backwards compatibility)
+    if (workflowData.workflowLevelSWOT) {
       sections.push(
         new Paragraph({
-          text: "Recommended Follow-Up Actions",
+          text: "Workflow-Level Analysis",
           heading: HeadingLevel.HEADING_3,
-          spacing: { before: 240, after: 120 },
+          spacing: { before: 180, after: 120 },
         })
       );
-      
-      const actionHeaders = ["Priority", "Section", "Avg Score", "Factor(s)", "Recommendation"];
-      const actionRows = swotData.followUpActions.map(action => [
-        action.priority,
-        action.section,
-        action.score.toFixed(1),
-        action.factor,
-        action.recommendation,
-      ]);
-      sections.push(createTable(actionHeaders, actionRows, [12, 18, 10, 25, 35]));
+
+      // SWOT Table
+      const swotHeaders = ["Category", "Findings"];
+      const swotRows = [
+        ["Strengths", workflowData.workflowLevelSWOT.swotAnalysis.strengths.join("\n")],
+        ["Weaknesses", workflowData.workflowLevelSWOT.swotAnalysis.weaknesses.join("\n")],
+        ["Opportunities", workflowData.workflowLevelSWOT.swotAnalysis.opportunities.join("\n")],
+        ["Threats", workflowData.workflowLevelSWOT.swotAnalysis.threats.join("\n")],
+      ];
+      sections.push(createTable(swotHeaders, swotRows, [30, 70]));
+
+      // Recommended Follow-Up Actions
+      if (workflowData.workflowLevelSWOT.followUpActions && workflowData.workflowLevelSWOT.followUpActions.length > 0) {
+        sections.push(
+          new Paragraph({
+            text: "Recommended Follow-Up Actions",
+            heading: HeadingLevel.HEADING_3,
+            spacing: { before: 180, after: 120 },
+          })
+        );
+
+        const actionHeaders = ["Priority", "Section", "Avg Score", "Factor(s)", "Recommendation"];
+        const actionRows = workflowData.workflowLevelSWOT.followUpActions.map((action: any) => [
+          action.priority,
+          action.section,
+          action.score.toFixed(1),
+          action.factor,
+          action.recommendation,
+        ]);
+        sections.push(createTable(actionHeaders, actionRows, [12, 18, 10, 25, 35]));
+      }
     }
     
     sections.push(createHorizontalSeparator());

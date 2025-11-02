@@ -2,6 +2,7 @@ import { db } from "./db";
 import { 
   companies, 
   workflows, 
+  workflowSteps,
   tfaAssessments, 
   pifResponses, 
   implementationOpportunities,
@@ -9,9 +10,11 @@ import {
   type PIFResponse,
   type ImplementationOpportunity,
   type Company,
-  type Workflow
+  type Workflow,
+  type WorkflowStep
 } from "@shared/schema";
 import { eq, and, isNotNull } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
 import { calculateSectionScores, TFA_QUESTIONS } from "@shared/tfaQuestions";
@@ -346,8 +349,10 @@ export interface FollowUpAction {
   priority: 'Critical' | 'High' | 'Medium';
 }
 
-export interface AppendixBData {
-  workflowName: string;
+export interface StepLevelSWOT {
+  stepName: string;
+  participantName: string;
+  participantRole: string;
   swotAnalysis: {
     strengths: string[];
     weaknesses: string[];
@@ -356,6 +361,21 @@ export interface AppendixBData {
   };
   questionInsights: QuestionInsight[];
   followUpActions: FollowUpAction[];
+}
+
+export interface AppendixBData {
+  workflowName: string;
+  stepLevelSWOTs: StepLevelSWOT[];  // New: array of step-level SWOT analyses
+  workflowLevelSWOT?: {  // Optional: keep workflow-level for backwards compatibility
+    swotAnalysis: {
+      strengths: string[];
+      weaknesses: string[];
+      opportunities: string[];
+      threats: string[];
+    };
+    questionInsights: QuestionInsight[];
+    followUpActions: FollowUpAction[];
+  };
 }
 
 export interface AppendixFData {
@@ -770,43 +790,137 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     ),
   };
 
-  // ===== APPENDIX B: SWOT ANALYSIS + QUESTION INSIGHTS + FOLLOW-UP ACTIONS =====
-  const appendixB: AppendixBData[] = workflowsData
-    .filter(w => w.readiness !== null)
-    .map(w => {
-      const swot = generateSWOT(w.readiness!);
+  // ===== APPENDIX B: STEP-LEVEL SWOT ANALYSES =====
+  const appendixB: AppendixBData[] = [];
+  
+  for (const w of workflowsData) {
+    // Fetch workflow steps ordered by stepOrder
+    const steps = await db
+      .select()
+      .from(workflowSteps)
+      .where(eq(workflowSteps.workflowId, w.workflow.id))
+      .orderBy(asc(workflowSteps.stepOrder));
+    
+    const stepLevelSWOTs: StepLevelSWOT[] = [];
+    
+    // Process each step
+    for (const step of steps) {
+      // Get PIFs for this specific step
+      const stepPIFs = await db
+        .select()
+        .from(pifResponses)
+        .where(
+          and(
+            eq(pifResponses.stepId, step.id),
+            isNotNull(pifResponses.completedAt)
+          )
+        );
       
-      // Collect question insights from TFA and all PIFs
+      // Only generate SWOT if this step has PIFs
+      if (stepPIFs.length > 0 && w.tfa) {
+        // Calculate step-level readiness using TFA + step PIFs
+        const aggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+        const stepReadiness = calculateReadinessRubric(
+          w.tfa.score,
+          w.tfa.sectionScores,
+          aggregatedPIF
+        );
+        
+        // Generate SWOT for this step
+        const stepSWOT = generateSWOT({
+          totalScore: stepReadiness.totalScore,
+          feasibilityBand: stepReadiness.feasibilityBand,
+          recommendation: stepReadiness.recommendation,
+          componentScores: stepReadiness.componentScores,
+          components: stepReadiness.components,
+        });
+        
+        // Collect question insights from step PIFs only
+        const stepQuestionInsights: QuestionInsight[] = [];
+        stepPIFs.forEach(pif => {
+          const pifInsights = extractPIFInsights(
+            pif as any,
+            pif.respondentName,
+            pif.completedAt!
+          );
+          stepQuestionInsights.push(...pifInsights);
+        });
+        
+        // Generate follow-up actions for this step
+        const stepFollowUpActions = generateFollowUpActions(stepQuestionInsights);
+        
+        stepLevelSWOTs.push({
+          stepName: step.stepName,
+          participantName: step.participantName,
+          participantRole: step.participantRole,
+          swotAnalysis: stepSWOT,
+          questionInsights: stepQuestionInsights,
+          followUpActions: stepFollowUpActions,
+        });
+      }
+    }
+    
+    // Also handle workflow-level PIFs (those without stepId) for backwards compatibility
+    // Fetch all PIFs for this workflow to check stepId
+    const allWorkflowPIFs = await db
+      .select()
+      .from(pifResponses)
+      .where(
+        and(
+          eq(pifResponses.workflowId, w.workflow.id),
+          isNotNull(pifResponses.completedAt)
+        )
+      );
+    
+    const workflowLevelPIFs = w.pifs.filter(pif => {
+      // Check if this PIF has no stepId
+      const originalPIF = allWorkflowPIFs.find((p: PIFResponse) => p.id === pif.id);
+      return !originalPIF?.stepId;
+    });
+    
+    let workflowLevelSWOT = undefined;
+    if (workflowLevelPIFs.length > 0 && w.readiness) {
+      const swot = generateSWOT(w.readiness);
+      
+      // Collect question insights from TFA and workflow-level PIFs
       const questionInsights: QuestionInsight[] = [];
       
       if (w.tfa) {
         const tfaInsights = extractTFAInsights(
-          w.tfa as any, // Cast to TFAAssessment type
+          w.tfa as any,
           w.tfa.initialRespondent,
           w.tfa.completedAt
         );
         questionInsights.push(...tfaInsights);
       }
       
-      w.pifs.forEach(pif => {
+      workflowLevelPIFs.forEach(pif => {
         const pifInsights = extractPIFInsights(
-          pif as any, // Cast to PIFResponse type
+          pif as any,
           pif.respondentName,
           pif.completedAt
         );
         questionInsights.push(...pifInsights);
       });
       
-      // Generate follow-up actions for low-scoring factors
       const followUpActions = generateFollowUpActions(questionInsights);
       
-      return {
-        workflowName: w.workflow.name,
+      workflowLevelSWOT = {
         swotAnalysis: swot,
-        questionInsights: questionInsights,
-        followUpActions: followUpActions,
+        questionInsights,
+        followUpActions,
       };
-    });
+    }
+    
+    // Add to appendixB if we have either step-level or workflow-level SWOTs
+    if (stepLevelSWOTs.length > 0 || workflowLevelSWOT) {
+      appendixB.push({
+        workflowName: w.workflow.name,
+        stepLevelSWOTs,
+        workflowLevelSWOT,
+      });
+    }
+  }
 
   // ===== APPENDIX F: DATA PROVENANCE =====
   const appendixF: AppendixFData[] = [];
