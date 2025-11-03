@@ -22,6 +22,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep } from "@shared/schema";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
+import { aggregateWorkflowSWOT, aggregateExecutiveSummaries } from "@shared/pifCalculations";
+import type { ReadinessRubricScore, AggregatedPIFScores } from "@shared/pifCalculations";
 import {
   Dialog,
   DialogContent,
@@ -313,6 +315,10 @@ export default function WorkflowDetail() {
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
             <TabsTrigger value="steps" data-testid="tab-steps">Workflow Steps</TabsTrigger>
             <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
+            {/* Workflow Readiness tab - hidden until step assessment completion checking is implemented */}
+            {false && workflowSteps.length > 0 && (
+              <TabsTrigger value="workflow-readiness" data-testid="tab-workflow-readiness">Workflow Readiness</TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="tfa" className="space-y-6">
@@ -668,6 +674,43 @@ export default function WorkflowDetail() {
                       </Card>
                     );
                   })}
+                </div>
+              )}
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="workflow-readiness" className="space-y-6">
+            <Card className="p-6">
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold">Workflow-Level Readiness Assessment</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Aggregated readiness analysis combining all workflow step assessments
+                </p>
+              </div>
+
+              <div className="bg-blue-500/10 dark:bg-blue-500/20 rounded-md p-4 border border-blue-500/20">
+                <h3 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">Feature In Development</h3>
+                <p className="text-sm">
+                  Workflow-level aggregated readiness scores and SWOT analysis will appear here once all process steps have completed both TFA (Technical Feasibility Assessment) and PIF (Process Insight Form) assessments.
+                </p>
+                <p className="text-sm mt-2">
+                  Navigate to individual workflow steps to complete their assessments and create implementation opportunities.
+                </p>
+              </div>
+
+              {workflowSteps.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-semibold mb-3">Step Assessment Progress</h3>
+                  <div className="space-y-2">
+                    {workflowSteps.map(step => (
+                      <div key={step.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md">
+                        <span className="font-medium">{step.stepName}</span>
+                        <span className="text-sm text-muted-foreground">
+                          Assessment status available in step details
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </Card>

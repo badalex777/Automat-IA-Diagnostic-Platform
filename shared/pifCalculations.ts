@@ -770,6 +770,154 @@ export function generateSWOTAnalysis(
   };
 }
 
+// Aggregate all step-level executive summaries into workflow-level strategic overview
+export function aggregateExecutiveSummaries(
+  stepSummaries: Array<{
+    stepNumber: number;
+    stepName: string;
+    summary: string;
+    readinessScore: number;
+    feasibilityBand: string;
+  }>
+): string {
+  if (stepSummaries.length === 0) {
+    return 'No step assessments available for workflow-level analysis.';
+  }
+  
+  // Calculate overall workflow readiness
+  const avgReadiness = Math.round(
+    stepSummaries.reduce((sum, step) => sum + step.readinessScore, 0) / stepSummaries.length
+  );
+  
+  // Determine overall workflow feasibility band
+  let workflowBand: string;
+  if (avgReadiness >= 75) {
+    workflowBand = 'Very High';
+  } else if (avgReadiness >= 65) {
+    workflowBand = 'High';
+  } else if (avgReadiness >= 50) {
+    workflowBand = 'Moderate';
+  } else if (avgReadiness >= 35) {
+    workflowBand = 'Low';
+  } else {
+    workflowBand = 'Very Low';
+  }
+  
+  // Identify step readiness patterns
+  const highSteps = stepSummaries.filter(s => s.readinessScore >= 65).map(s => s.stepName);
+  const lowSteps = stepSummaries.filter(s => s.readinessScore < 50).map(s => s.stepName);
+  
+  // Build cohesive narrative
+  let narrative = `Workflow assessment encompasses ${stepSummaries.length} process step${stepSummaries.length > 1 ? 's' : ''} with an overall readiness score of ${avgReadiness}/100 (${workflowBand} feasibility). `;
+  
+  if (avgReadiness >= 65) {
+    narrative += `The workflow demonstrates strong automation readiness across ${highSteps.length > 0 ? highSteps.length : 'multiple'} step${highSteps.length > 1 ? 's' : ''}. `;
+    
+    if (lowSteps.length > 0) {
+      narrative += `Targeted preparation for ${lowSteps.length} lower-scoring step${lowSteps.length > 1 ? 's' : ''} (${lowSteps.slice(0, 2).join(', ')}${lowSteps.length > 2 ? ', ...' : ''}) will optimize implementation timeline. `;
+    }
+    
+    narrative += `Recommended approach: initiate pilot program with highest-readiness steps while concurrently addressing preparation items for remaining workflow components.`;
+  } else if (avgReadiness >= 50) {
+    narrative += `The workflow shows moderate readiness with preparatory work required across multiple steps. `;
+    
+    if (highSteps.length > 0) {
+      narrative += `${highSteps.length} step${highSteps.length > 1 ? 's' : ''} demonstrate${highSteps.length === 1 ? 's' : ''} strong readiness (${highSteps.slice(0, 2).join(', ')}${highSteps.length > 2 ? ', ...' : ''}) and can anchor early implementation phases. `;
+    }
+    
+    if (lowSteps.length > 0) {
+      narrative += `${lowSteps.length} step${lowSteps.length > 1 ? 's' : ''} require${lowSteps.length === 1 ? 's' : ''} foundational improvements before automation deployment. `;
+    }
+    
+    narrative += `Recommended approach: phased implementation beginning with higher-readiness process components while addressing infrastructure and operational gaps in lower-scoring steps.`;
+  } else {
+    narrative += `The workflow exhibits significant readiness challenges requiring comprehensive preparation before automation becomes viable. `;
+    
+    if (highSteps.length > 0) {
+      narrative += `While ${highSteps.length} step${highSteps.length > 1 ? 's show' : ' shows'} relative strength (${highSteps.slice(0, 2).join(', ')}${highSteps.length > 2 ? ', ...' : ''}), `;
+    } else {
+      narrative += ``;
+    }
+    
+    narrative += `critical gaps across ${lowSteps.length > 0 ? lowSteps.length : 'multiple'} step${lowSteps.length > 1 ? 's' : ''} necessitate foundation-building initiatives. Recommended approach: address infrastructure, data quality, and process maturity gaps at workflow level before revisiting automation potential in 6-12 months.`;
+  }
+  
+  return narrative;
+}
+
+// Aggregate all step-level SWOTs into workflow-level SWOT with step attribution
+export function aggregateWorkflowSWOT(
+  stepSwots: Array<{
+    stepNumber: number;
+    stepName: string;
+    swot: SWOTAnalysis;
+  }>
+): SWOTAnalysis {
+  const aggregatedStrengths: string[] = [];
+  const aggregatedWeaknesses: string[] = [];
+  const aggregatedOpportunities: string[] = [];
+  const aggregatedThreats: string[] = [];
+  
+  // Aggregate internal metrics
+  let totalAnnualHours = 0;
+  let totalFTE = 0;
+  let totalErrorReduction = 0;
+  const volumeContexts: string[] = [];
+  
+  // Combine all step-level insights with step attribution
+  stepSwots.forEach(({ stepNumber, stepName, swot }) => {
+    const stepLabel = `[Step ${stepNumber} - ${stepName}]`;
+    
+    // Add strengths with step attribution
+    swot.strengths.forEach(strength => {
+      aggregatedStrengths.push(`${stepLabel} ${strength}`);
+    });
+    
+    // Add weaknesses with step attribution
+    swot.weaknesses.forEach(weakness => {
+      aggregatedWeaknesses.push(`${stepLabel} ${weakness}`);
+    });
+    
+    // Add opportunities with step attribution
+    swot.opportunities.forEach(opportunity => {
+      aggregatedOpportunities.push(`${stepLabel} ${opportunity}`);
+    });
+    
+    // Add threats with step attribution
+    swot.threats.forEach(threat => {
+      aggregatedThreats.push(`${stepLabel} ${threat}`);
+    });
+    
+    // Aggregate internal metrics
+    if (swot.internalMetrics) {
+      totalAnnualHours += swot.internalMetrics.estimatedAnnualHours || 0;
+      totalFTE += swot.internalMetrics.estimatedFTESaved || 0;
+      totalErrorReduction += swot.internalMetrics.errorReductionPotential || 0;
+      if (swot.internalMetrics.volumeContext && swot.internalMetrics.volumeContext !== 'Process volume data not fully captured') {
+        volumeContexts.push(`${stepLabel} ${swot.internalMetrics.volumeContext}`);
+      }
+    }
+  });
+  
+  // Generate workflow-level executive summary placeholder
+  // (This will be replaced by aggregateExecutiveSummaries function)
+  const executiveSummary = `Workflow assessment completed across ${stepSwots.length} process step${stepSwots.length > 1 ? 's' : ''}. Step-level insights aggregated below provide comprehensive view of automation readiness at granular process level.`;
+  
+  return {
+    strengths: aggregatedStrengths,
+    weaknesses: aggregatedWeaknesses,
+    opportunities: aggregatedOpportunities,
+    threats: aggregatedThreats,
+    executiveSummary,
+    internalMetrics: {
+      estimatedAnnualHours: totalAnnualHours,
+      estimatedFTESaved: Math.round(totalFTE * 10) / 10,
+      errorReductionPotential: Math.round(totalErrorReduction / Math.max(stepSwots.length, 1)),
+      volumeContext: volumeContexts.length > 0 ? volumeContexts.join('; ') : 'Process volume data aggregated from step assessments'
+    }
+  };
+}
+
 function generateExecutiveSummary(
   totalScore: number,
   feasibilityBand: string,
