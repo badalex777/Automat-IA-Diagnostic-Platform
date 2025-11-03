@@ -16,14 +16,10 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
-import { OpportunityForm } from "@/components/OpportunityForm";
-import OpportunityMatrix from "@/components/OpportunityMatrix";
-import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, InsertImplementationOpportunity, WorkflowStep } from "@shared/schema";
-import type { ToggleState } from "@shared/opportunityCalculations";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep } from "@shared/schema";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
 import {
@@ -41,13 +37,11 @@ export default function WorkflowDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
-  const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
-  const [editingOpportunity, setEditingOpportunity] = useState<ImplementationOpportunity | null>(null);
-  const [errorToggle, setErrorToggle] = useState(false);
-  const [revenueToggle, setRevenueToggle] = useState(false);
   const [isStepDialogOpen, setIsStepDialogOpen] = useState(false);
   const [stepName, setStepName] = useState("");
   const [stepDescription, setStepDescription] = useState("");
+  const [participantName, setParticipantName] = useState("");
+  const [participantRole, setParticipantRole] = useState("");
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -171,74 +165,13 @@ export default function WorkflowDetail() {
     },
   });
 
-  const createOpportunityMutation = useMutation({
-    mutationFn: async (data: InsertImplementationOpportunity) => {
-      const res = await apiRequest('POST', `/api/workflows/${workflowId}/opportunities`, data);
-      return await res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
-      toast({
-        title: "Opportunity created",
-        description: "Implementation opportunity created successfully.",
-      });
-      setIsOpportunityDialogOpen(false);
-      setEditingOpportunity(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error saving",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateOpportunityMutation = useMutation({
-    mutationFn: async (data: { id: string; updates: Partial<InsertImplementationOpportunity> }) => {
-      const res = await apiRequest('PATCH', `/api/opportunities/${data.id}`, data.updates);
-      return await res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
-      toast({
-        title: "Opportunity updated",
-        description: "Implementation opportunity updated successfully.",
-      });
-      setIsOpportunityDialogOpen(false);
-      setEditingOpportunity(null);
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error updating",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteOpportunityMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiRequest('DELETE', `/api/opportunities/${id}`, {});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
-      toast({
-        title: "Opportunity deleted",
-        description: "Implementation opportunity deleted successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error deleting",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const createStepMutation = useMutation({
-    mutationFn: async (data: { stepName: string; stepDescription: string }) => {
+    mutationFn: async (data: { 
+      stepName: string; 
+      stepDescription?: string; 
+      participantName?: string; 
+      participantRole?: string; 
+    }) => {
       // Get the current steps to determine the next step order
       const currentSteps = workflowSteps || [];
       const maxOrder = currentSteps.length > 0 
@@ -260,6 +193,8 @@ export default function WorkflowDetail() {
       setIsStepDialogOpen(false);
       setStepName("");
       setStepDescription("");
+      setParticipantName("");
+      setParticipantRole("");
     },
     onError: (error: Error) => {
       toast({
@@ -655,143 +590,87 @@ export default function WorkflowDetail() {
           </TabsContent>
 
           <TabsContent value="opportunities" className="space-y-6">
-            {opportunitiesError ? (
-              <div className="bg-card rounded-lg border border-destructive p-6">
-                <p className="text-destructive">Error loading opportunities: {opportunitiesError.message}</p>
+            <Card className="p-6">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold">Implementation Opportunities</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Opportunities are created within workflow steps once TFA and PIF assessments are complete
+                </p>
               </div>
-            ) : opportunitiesLoading ? (
-              <p className="text-muted-foreground">Loading opportunities...</p>
-            ) : (() => {
-              // Opportunities are created at step level with step-specific readiness
-              // No workflow-level readiness calculation needed here
-              const readinessScore = 50; // Default fallback for display
 
-              const handleOpportunitySubmit = (data: InsertImplementationOpportunity) => {
-                if (editingOpportunity) {
-                  updateOpportunityMutation.mutate({
-                    id: editingOpportunity.id,
-                    updates: data,
-                  });
-                } else {
-                  createOpportunityMutation.mutate(data);
-                }
-              };
-
-              // Convert opportunity data from DB format (strings) to form format (numbers)
-              const convertOpportunityToFormData = (opp: ImplementationOpportunity): Partial<InsertImplementationOpportunity> => ({
-                name: opp.name,
-                description: opp.description,
-                annualRoi: opp.annualRoi ? parseFloat(opp.annualRoi) : undefined,
-                hoursSavedPerWeek: opp.hoursSavedPerWeek ? parseFloat(opp.hoursSavedPerWeek) : undefined,
-                annualHoursSaved: opp.annualHoursSaved ? parseFloat(opp.annualHoursSaved) : undefined,
-                fteSavings: opp.fteSavings ? parseFloat(opp.fteSavings) : undefined,
-                errorReductionPct: opp.errorReductionPct ? parseFloat(opp.errorReductionPct) : undefined,
-                errorsAvoidedAnnually: opp.errorsAvoidedAnnually ?? undefined,
-                hoursReallocatedToRevenue: opp.hoursReallocatedToRevenue ? parseFloat(opp.hoursReallocatedToRevenue) : undefined,
-                revenueUpliftAnnual: opp.revenueUpliftAnnual ? parseFloat(opp.revenueUpliftAnnual) : undefined,
-                rampupPeriodMonths: opp.rampupPeriodMonths ? parseFloat(opp.rampupPeriodMonths) : undefined,
-                paybackPeriodMonths: opp.paybackPeriodMonths ? parseFloat(opp.paybackPeriodMonths) : undefined,
-                trainingHoursPerEmployee: opp.trainingHoursPerEmployee ? parseFloat(opp.trainingHoursPerEmployee) : undefined,
-                employeeAnnualSalary: opp.employeeAnnualSalary ? parseFloat(opp.employeeAnnualSalary) : undefined,
-                overheadMultiplier: opp.overheadMultiplier ? parseFloat(opp.overheadMultiplier) : undefined,
-                errorMetricsEnabled: opp.errorMetricsEnabled ?? false,
-                revenueMetricsEnabled: opp.revenueMetricsEnabled ?? false,
-              });
-
-              return (
-                <>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold">Implementation Opportunities</h2>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Define and prioritize automation opportunities based on business impact and implementation effort
-                      </p>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setEditingOpportunity(null);
-                        setIsOpportunityDialogOpen(true);
-                      }}
-                      data-testid="button-create-opportunity"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Opportunity
-                    </Button>
-                  </div>
-
-                  {opportunities.length === 0 ? (
-                    <div className="bg-card rounded-lg border border-border p-8" data-testid="card-no-opportunities">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold mb-2">No Opportunities Yet</h3>
-                        <p className="text-muted-foreground mb-4">
-                          Create implementation opportunities to analyze their business impact and prioritization
-                        </p>
-                        <Button
-                          onClick={() => {
-                            setEditingOpportunity(null);
-                            setIsOpportunityDialogOpen(true);
-                          }}
-                          data-testid="button-create-first-opportunity"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create First Opportunity
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="space-y-3">
-                        <h3 className="font-semibold">Opportunities List</h3>
-                        {opportunities.map((opportunity) => (
-                          <OpportunityCard
-                            key={opportunity.id}
-                            opportunity={opportunity}
-                            readinessScore={readinessScore}
-                            companyContext={{
-                              annualRevenue: company?.annualRevenue,
-                              totalEmployees: company?.totalEmployees,
-                            }}
-                            onEdit={() => {
-                              setEditingOpportunity(opportunity);
-                              setIsOpportunityDialogOpen(true);
-                            }}
-                            onDelete={() => {
-                              if (confirm('Are you sure you want to delete this opportunity?')) {
-                                deleteOpportunityMutation.mutate(opportunity.id);
-                              }
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Create/Edit Opportunity Dialog */}
-                  <Dialog open={isOpportunityDialogOpen} onOpenChange={(open) => {
-                    setIsOpportunityDialogOpen(open);
-                    if (!open) setEditingOpportunity(null);
-                  }}>
-                    <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-opportunity-form">
-                      <DialogHeader>
-                        <DialogTitle>
-                          {editingOpportunity ? 'Edit Opportunity' : 'Create New Opportunity'}
-                        </DialogTitle>
-                      </DialogHeader>
-                      <OpportunityForm
-                        workflowId={workflowId}
-                        initialData={editingOpportunity ? convertOpportunityToFormData(editingOpportunity) : undefined}
-                        onSubmit={handleOpportunitySubmit}
-                        onCancel={() => {
-                          setIsOpportunityDialogOpen(false);
-                          setEditingOpportunity(null);
-                        }}
-                        isLoading={createOpportunityMutation.isPending || updateOpportunityMutation.isPending}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              );
-            })()}
+              {opportunitiesError ? (
+                <div className="bg-destructive/10 rounded-lg border border-destructive/30 p-4">
+                  <p className="text-destructive text-sm">Error loading opportunities: {opportunitiesError.message}</p>
+                </div>
+              ) : opportunitiesLoading ? (
+                <p className="text-muted-foreground text-sm">Loading opportunities...</p>
+              ) : opportunities.length === 0 ? (
+                <div className="text-center py-8 bg-muted/30 rounded-lg border border-border">
+                  <h4 className="font-medium text-base mb-2">No Opportunities Yet</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Opportunities will appear here once created within workflow steps
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {opportunities.map((opportunity) => {
+                    // Find the step this opportunity is linked to
+                    const linkedStep = workflowSteps.find(s => s.id === opportunity.stepId);
+                    
+                    return (
+                      <Card key={opportunity.id} className="p-4" data-testid={`card-opportunity-${opportunity.id}`}>
+                        <div className="space-y-3">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-base" data-testid={`text-opportunity-name-${opportunity.id}`}>
+                                {opportunity.name}
+                              </h3>
+                              {linkedStep && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Linked to: {linkedStep.stepName}
+                                </p>
+                              )}
+                              {opportunity.description && (
+                                <p className="text-sm text-muted-foreground mt-2">
+                                  {opportunity.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t">
+                            {opportunity.annualRoi && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">Annual ROI</div>
+                                <div className="font-semibold">${parseFloat(opportunity.annualRoi).toLocaleString()}</div>
+                              </div>
+                            )}
+                            {opportunity.fteSavings && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">FTE Savings</div>
+                                <div className="font-semibold">{parseFloat(opportunity.fteSavings).toFixed(2)}</div>
+                              </div>
+                            )}
+                            {opportunity.hoursSavedPerWeek && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">Hours/Week Saved</div>
+                                <div className="font-semibold">{parseFloat(opportunity.hoursSavedPerWeek).toFixed(1)}</div>
+                              </div>
+                            )}
+                            {opportunity.paybackPeriodMonths && (
+                              <div>
+                                <div className="text-xs text-muted-foreground">Payback Period</div>
+                                <div className="font-semibold">{parseFloat(opportunity.paybackPeriodMonths).toFixed(1)} mo</div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
           </TabsContent>
         </Tabs>
 
@@ -828,6 +707,39 @@ export default function WorkflowDetail() {
                   data-testid="input-step-description"
                 />
               </div>
+              
+              <div className="border-t pt-4">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Participant Information (Optional)
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="participant-name" className="text-sm font-medium mb-2 block">
+                      Participant Name
+                    </label>
+                    <Input
+                      id="participant-name"
+                      value={participantName}
+                      onChange={(e) => setParticipantName(e.target.value)}
+                      placeholder="e.g., John Smith"
+                      data-testid="input-participant-name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="participant-role" className="text-sm font-medium mb-2 block">
+                      Participant Role
+                    </label>
+                    <Input
+                      id="participant-role"
+                      value={participantRole}
+                      onChange={(e) => setParticipantRole(e.target.value)}
+                      placeholder="e.g., Finance Manager"
+                      data-testid="input-participant-role"
+                    />
+                  </div>
+                </div>
+              </div>
+              
               <div className="flex justify-end gap-3 pt-4">
                 <Button
                   variant="outline"
@@ -835,6 +747,8 @@ export default function WorkflowDetail() {
                     setIsStepDialogOpen(false);
                     setStepName("");
                     setStepDescription("");
+                    setParticipantName("");
+                    setParticipantRole("");
                   }}
                   disabled={createStepMutation.isPending}
                   data-testid="button-cancel-step"
@@ -846,7 +760,9 @@ export default function WorkflowDetail() {
                     if (stepName.trim()) {
                       createStepMutation.mutate({
                         stepName: stepName.trim(),
-                        stepDescription: stepDescription.trim(),
+                        stepDescription: stepDescription.trim() || undefined,
+                        participantName: participantName.trim() || undefined,
+                        participantRole: participantRole.trim() || undefined,
                       });
                     }
                   }}
