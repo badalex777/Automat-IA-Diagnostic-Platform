@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
@@ -65,6 +65,28 @@ export default function OpportunityMatrix({
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
   const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
+  const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 450 });
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  // Measure actual chart dimensions for accurate collision detection
+  useEffect(() => {
+    const measureChart = () => {
+      if (chartContainerRef.current) {
+        const { width, height } = chartContainerRef.current.getBoundingClientRect();
+        // Account for chart margins (top: 20, right: 20, bottom: 60, left: 60)
+        const chartWidth = width - 80; // left (60) + right (20)
+        const chartHeight = height - 80; // top (20) + bottom (60)
+        setChartDimensions({ width: chartWidth, height: chartHeight });
+      }
+    };
+
+    // Measure on mount
+    measureChart();
+
+    // Remeasure on window resize
+    window.addEventListener('resize', measureChart);
+    return () => window.removeEventListener('resize', measureChart);
+  }, []);
 
   // Build stable color map based on ALL workflows (not just filtered)
   // Sort workflow IDs to ensure stable color assignment even when opportunities change
@@ -138,12 +160,11 @@ export default function OpportunityMatrix({
   // Collision detection function - works in data space with proper scaling
   const detectCollision = useCallback((pos1: { x: number; y: number; text: string }, pos2: { x: number; y: number; text: string }) => {
     // Chart dimensions: x-axis 0-150, y-axis 0-100
-    // Estimate chart pixel size: ~500px width, ~450px height
-    // Scale factors: 1 x-unit ≈ 3.3px, 1 y-unit ≈ 4.5px
+    // Use actual measured chart dimensions for accurate pixel-to-data conversion
     
-    // Convert pixel-based label dimensions to data space
-    const pixelToDataX = 150 / 500; // ≈ 0.3
-    const pixelToDataY = 100 / 450; // ≈ 0.22
+    // Convert pixel-based label dimensions to data space using actual chart size
+    const pixelToDataX = 150 / chartDimensions.width;
+    const pixelToDataY = 100 / chartDimensions.height;
     
     // Estimate label dimensions in pixels, then convert to data space
     const estimateWidthPixels = (text: string) => Math.min(text.length * 6 + 10, 120);
@@ -158,7 +179,7 @@ export default function OpportunityMatrix({
     const verticalOverlap = Math.abs(pos1.y - pos2.y) < labelHeightData;
 
     return horizontalOverlap && verticalOverlap;
-  }, []);
+  }, [chartDimensions]);
 
   // Handle display data updates with collision-aware label positioning
   useEffect(() => {
@@ -270,6 +291,7 @@ export default function OpportunityMatrix({
       <CardContent>
         <div className="relative">
           <div 
+            ref={chartContainerRef}
             className="h-[500px]" 
             data-testid="chart-opportunity-matrix"
           >
