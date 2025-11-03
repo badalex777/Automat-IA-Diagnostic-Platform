@@ -87,10 +87,11 @@ export default function OpportunityMatrix({
 
     // Calculate scores for filtered opportunities
     const points: DataPoint[] = filteredOpps.map(opp => {
-      const readinessScore = readinessScores[opp.workflowId];
+      // Use step-level readiness score for positioning (opportunities are always linked to steps)
+      const readinessScore = opp.stepId ? readinessScores[opp.stepId] : 0;
       
       const implementationEffort = calculateImplementationEffort(
-        readinessScore,
+        readinessScore || 0,
         parseFloat(opp.rampupPeriodMonths || "0"),
         parseFloat(opp.paybackPeriodMonths || "0"),
         parseFloat(opp.trainingHoursPerEmployee || "0")

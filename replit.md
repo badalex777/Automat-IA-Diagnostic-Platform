@@ -37,7 +37,7 @@ Core entities include Companies, Workflows, Workflow Steps (step-level granulari
 - **TFA Survey & Analysis**: Workflow-level technical feasibility assessment shared across all steps. Collects feasibility data, detects "Don't Know" answers, supports gap resolution, provides auto-updating scores, visual analytics, 5-tier feasibility interpretation, and an Executive Summary with critical technical gaps, strengths, and an implementation roadmap.
 - **Step-Level PIF Survey**: Process Insight Form collected per workflow step, capturing operational realities at granular level with 40 questions across 8 sections, including operational scores, ROI inputs, and qualitative insights. Supports multiple respondents per step with variance indicators.
 - **Step-Level Readiness Rubric**: Each process step displays its own combined readiness score (60% shared TFA + 40% step-specific PIF) with 7 component breakdowns, radar chart visualization, feasibility banding, and comprehensive SWOT analysis. This is the primary assessment view.
-- **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of readiness, ramp-up, payback, and training). Opportunities can be linked to specific workflow steps. Features both a Base Impact Matrix and an Enhanced Impact Matrix with additive bonuses.
+- **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of step-level readiness, ramp-up, payback, and training). Opportunities are created and linked exclusively at the step level. Matrix positioning uses each opportunity's step-specific readiness score for precise Implementation Effort calculation, while opportunities are color-coded by their source workflow for easy visual grouping. Features both a Base Impact Matrix (0-100 scale, ROI + FTE only) and an Enhanced Impact Matrix (0-150 scale with metric-based bonuses).
 - **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document for clients, including an Executive Summary, methodology, findings, automation roadmap, and six detailed technical appendices (Appendix C aggregates all step-level SWOT analyses per workflow).
 
 ### Step-Level Assessment Architecture
@@ -48,7 +48,7 @@ The platform implements step-level granularity for workflow assessments:
 - **Step-Level PIFs**: Process Insight Forms are collected per workflow step/participant, capturing operational realities at granular level
 - **Step-Level Readiness**: Each step receives its own readiness score calculated as 60% shared workflow TFA + 40% unique step PIF operational average
 - **Step-Level SWOT**: Each step with a completed PIF generates its own SWOT analysis based on step-specific readiness components
-- **Opportunity Linking**: Implementation opportunities can be linked to specific workflow steps, enabling precise scoping and impact attribution
+- **Step-Exclusive Opportunity Creation**: Implementation opportunities are created and linked exclusively at the step level (no workflow-level opportunities exist). Each opportunity is positioned on the matrix using its step's specific readiness score for accurate Implementation Effort calculation
 - **Report Aggregation**: Executive Diagnostic Report Appendix C aggregates all step-level SWOT analyses per workflow, providing comprehensive step-by-step assessment insights
 
 ## External Dependencies

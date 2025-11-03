@@ -12,9 +12,9 @@ import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Company, Workflow, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
+import type { Company, Workflow, WorkflowStep, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
-import { calculateReadinessRubric } from "@shared/pifCalculations";
+import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
@@ -42,6 +42,28 @@ export default function CompanyDetail() {
   const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
     queryKey: [`/api/companies/${companyId}/opportunities`],
     enabled: !!companyId,
+  });
+
+  // Fetch all workflow steps for step-level readiness calculation
+  const { data: allSteps = [], isLoading: stepsLoading } = useQuery({
+    queryKey: [`/api/companies/${companyId}/all-steps`, workflows.map(w => w.id)],
+    queryFn: async () => {
+      if (workflows.length === 0) return [];
+      
+      try {
+        const stepsPromises = workflows.map(async (workflow) => {
+          const response = await fetch(`/api/workflows/${workflow.id}/steps`);
+          if (!response.ok) return [];
+          return await response.json();
+        });
+        
+        const stepsResults = await Promise.all(stepsPromises);
+        return stepsResults.flat() as WorkflowStep[];
+      } catch (error) {
+        return [];
+      }
+    },
+    enabled: workflows.length > 0,
   });
 
   // Fetch TFA and PIF data for ALL workflows to check if report generation is possible
@@ -308,66 +330,85 @@ export default function CompanyDetail() {
     }
   }, [assessmentsError, toast]);
 
-  // Calculate readiness scores for each workflow
+  // Calculate step-level readiness scores (opportunities are positioned by step readiness)
   const readinessScores = useMemo(() => {
-    if (!workflowAssessments) return {};
+    if (!workflowAssessments || allSteps.length === 0) return {};
     
     const scores: Record<string, number> = {};
     const { tfaData, pifData } = workflowAssessments;
 
-    workflowIdsWithOpportunities.forEach((workflowId) => {
-      const tfa = tfaData[workflowId];
-      const pif = pifData[workflowId];
+    // Iterate through all steps and calculate their readiness scores
+    allSteps.forEach((step) => {
+      const tfa = tfaData[step.workflowId];
+      const allPifResponses = pifData[step.workflowId];
 
       // Validate TFA: must exist, be completed, and have valid responses object
       if (!tfa || !tfa.completedAt || !tfa.responses || typeof tfa.responses !== 'object') {
         return;
       }
 
-      // Validate PIF: must exist, have responses array, and at least one response
-      if (!pif || !pif.responses || !Array.isArray(pif.responses) || pif.responses.length === 0) {
+      // Filter PIFs for this specific step only
+      if (!allPifResponses || !allPifResponses.responses) {
+        return;
+      }
+      
+      const stepPIFs = allPifResponses.responses.filter((pif: PIFResponse) => pif.stepId === step.id);
+      
+      // Must have at least one PIF response for this step
+      if (stepPIFs.length === 0) {
         return;
       }
 
-      // Calculate section scores from TFA
-      const responses = tfa.responses as Record<string, string>;
-      const sectionScores = tfaSections.map(section => {
-        const sectionQuestions = section.questions;
-        const totalWeight = sectionQuestions.reduce((acc, q) => acc + q.weight, 0);
-        const weightedScore = sectionQuestions.reduce((acc, q) => {
-          const response = responses[q.id.toString()];
-          if (!response) return acc;
-          return acc + (parseInt(response) * q.weight);
-        }, 0);
-        const score = totalWeight > 0 ? (weightedScore / totalWeight) : 0;
-        return {
-          name: section.section,
-          score: parseFloat(score.toFixed(1)),
-          weight: section.weight,
-        };
-      });
-
-      // Extract section scores for readiness calculation
+      // Calculate TFA section scores (shared across all steps in workflow)
+      const responses = tfa.responses as Record<string, string | number>;
       const tfaSectionScores = {
-        systemEnvironment: sectionScores.find(s => s.name === "System & Environment")?.score || 0,
-        dataQuality: sectionScores.find(s => s.name === "Data Quality & Availability")?.score || 0,
-        integrationFeasibility: sectionScores.find(s => s.name === "Integration Feasibility")?.score || 0,
-        securityCompliance: sectionScores.find(s => s.name === "Security & Compliance")?.score || 0,
+        systemEnvironment: 0,
+        dataQuality: 0,
+        integrationFeasibility: 0,
+        securityCompliance: 0,
       };
 
-      // Calculate readiness score using the same logic as WorkflowDetail
-      const readinessRubric = calculateReadinessRubric(
+      tfaSections.forEach((section) => {
+        const sectionQuestions = section.questions;
+        const sectionResponses = sectionQuestions
+          .map(q => {
+            const val = responses[q.id];
+            return typeof val === 'string' ? parseInt(val, 10) : val;
+          })
+          .filter((score): score is number => 
+            score !== null && 
+            score !== undefined && 
+            !isNaN(score) &&
+            score !== 0 // Exclude "Don't Know" responses
+          );
+        
+        if (sectionResponses.length > 0) {
+          const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
+          const normalizedScore = Math.round((avgScore / 5) * 100);
+          
+          if (section.section === 'System Environment') tfaSectionScores.systemEnvironment = normalizedScore;
+          if (section.section === 'Data Quality') tfaSectionScores.dataQuality = normalizedScore;
+          if (section.section === 'Integration Feasibility') tfaSectionScores.integrationFeasibility = normalizedScore;
+          if (section.section === 'Security/Compliance') tfaSectionScores.securityCompliance = normalizedScore;
+        }
+      });
+
+      // Calculate step-specific aggregated PIF scores (only from this step's PIFs)
+      const stepAggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+
+      // Calculate step readiness rubric (60% TFA + 40% step PIF)
+      const stepReadinessRubric = calculateReadinessRubric(
         tfa.score || 0,
         tfaSectionScores,
-        pif.aggregated
+        stepAggregatedPIF
       );
 
-      // Only add to scores if calculation succeeded
-      scores[workflowId] = readinessRubric.totalScore;
+      // Store step-level readiness score keyed by stepId
+      scores[step.id] = stepReadinessRubric.totalScore;
     });
 
     return scores;
-  }, [workflowIdsWithOpportunities, workflowAssessments]);
+  }, [allSteps, workflowAssessments]);
 
   // Filter opportunities to only show those with completed TFA and at least one PIF response
   const filteredOpportunities = useMemo(() => {
@@ -696,7 +737,7 @@ export default function CompanyDetail() {
                           <OpportunityCard
                             key={opportunity.id}
                             opportunity={opportunity}
-                            readinessScore={readinessScores[opportunity.workflowId] || 0}
+                            readinessScore={opportunity.stepId ? (readinessScores[opportunity.stepId] || 0) : 0}
                             companyId={companyId}
                             companyContext={{
                               annualRevenue: company?.annualRevenue,
