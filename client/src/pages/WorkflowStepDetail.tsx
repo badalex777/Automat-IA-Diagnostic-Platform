@@ -4,12 +4,18 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChevronLeft, Plus } from "lucide-react";
+import { ChevronLeft, Plus, FileText, BarChart3, Target, Info } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
@@ -17,7 +23,7 @@ import ReadinessRubric from "@/components/ReadinessRubric";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity } from "@shared/schema";
+import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity, ImplementationOpportunity } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
@@ -53,6 +59,11 @@ export default function WorkflowStepDetail() {
     responses: PIFResponse[]; 
   }>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
+    enabled: !!workflowId,
+  });
+
+  const { data: allOpportunities, isLoading: opportunitiesLoading } = useQuery<ImplementationOpportunity[]>({
+    queryKey: [`/api/workflows/${workflowId}/opportunities`],
     enabled: !!workflowId,
   });
 
@@ -126,6 +137,9 @@ export default function WorkflowStepDetail() {
   const stepPIFs = pifData?.responses.filter(pif => pif.stepId === stepId) || [];
   const hasTFA = tfaAssessment && tfaAssessment.score !== null;
   const hasStepPIF = stepPIFs.length > 0;
+
+  // Filter opportunities for this specific step
+  const stepOpportunities = allOpportunities?.filter(opp => opp.stepId === stepId) || [];
 
   // Calculate step-specific aggregated PIF scores
   let stepAggregatedPIF: AggregatedPIFScores | null = null;
@@ -221,129 +235,212 @@ export default function WorkflowStepDetail() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        {/* Step Information Card */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Step Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-muted-foreground">Participant Name</label>
-              <p className="font-medium" data-testid="text-participant-name">
-                {step.participantName || 'Not specified'}
-              </p>
-            </div>
-            {step.participantRole && (
-              <div>
-                <label className="text-sm text-muted-foreground">Participant Role</label>
-                <p className="font-medium" data-testid="text-participant-role">
-                  {step.participantRole}
-                </p>
-              </div>
-            )}
-            {step.stepDescription && (
-              <div className="md:col-span-2">
-                <label className="text-sm text-muted-foreground">Description</label>
-                <p className="mt-1 text-sm" data-testid="text-step-description">
-                  {step.stepDescription}
-                </p>
-              </div>
-            )}
-          </div>
-        </Card>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview" className="flex items-center gap-2" data-testid="tab-overview">
+              <Info className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="pif-data" className="flex items-center gap-2" data-testid="tab-pif-data">
+              <FileText className="h-4 w-4" />
+              PIF Data
+            </TabsTrigger>
+            <TabsTrigger value="readiness" className="flex items-center gap-2" data-testid="tab-readiness" disabled={!hasStepPIF || !stepReadinessRubric}>
+              <BarChart3 className="h-4 w-4" />
+              Readiness Analysis
+            </TabsTrigger>
+            <TabsTrigger value="opportunities" className="flex items-center gap-2" data-testid="tab-opportunities">
+              <Target className="h-4 w-4" />
+              Opportunities
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Readiness Status Card */}
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Assessment Status</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">TFA Assessment</div>
-              <div className="text-lg font-semibold">
-                {hasTFA ? (
-                  <span className="text-green-600 dark:text-green-400">✓ Complete ({tfaAssessment.score})</span>
-                ) : (
-                  <span className="text-muted-foreground">Pending</span>
-                )}
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">PIF Responses</div>
-              <div className="text-lg font-semibold">
-                {hasStepPIF ? (
-                  <span className="text-green-600 dark:text-green-400">
-                    ✓ {stepPIFs.length} response{stepPIFs.length > 1 ? 's' : ''}
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">None</span>
-                )}
-              </div>
-            </div>
-            <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-sm text-muted-foreground mb-1">Readiness Score</div>
-              <div className="text-lg font-semibold">
-                {stepReadiness !== null ? (
-                  <span>{stepReadiness}/100</span>
-                ) : (
-                  <span className="text-muted-foreground">N/A</span>
-                )}
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Create Opportunity Button - Only show when readiness rubric is available */}
-        {hasStepPIF && stepReadinessRubric && (
-          <div className="flex justify-center">
-            <Button
-              onClick={() => setIsOpportunityDialogOpen(true)}
-              size="lg"
-              data-testid="button-create-opportunity"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Implementation Opportunity
-            </Button>
-          </div>
-        )}
-
-        {/* Generate PIF Link for this specific step */}
-        {!hasStepPIF && (
-          <ShareableLinkCard
-            workflowId={workflowId}
-            companyName={company?.name || ''}
-            workflowTitle={workflow?.name || ''}
-            type="pif"
-            stepId={stepId}
-            stepName={step.stepName}
-          />
-        )}
-
-        {hasStepPIF && stepReadinessRubric && (
-          <>
-            {/* Full Readiness Rubric Component */}
-            <ReadinessRubric rubric={stepReadinessRubric} workflowId={workflowId} />
-
-            {/* PIF Respondent Answers */}
+          {/* Tab 1: Overview */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Step Information Card */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                PIF Responses ({stepPIFs.length} respondent{stepPIFs.length > 1 ? 's' : ''})
-              </h3>
-              <div className="space-y-6">
-                {stepPIFs.map((pif, index) => (
-                  <div key={pif.id} className="border-t border-border pt-6 first:border-t-0 first:pt-0">
-                    <h4 className="font-medium mb-4">
-                      Respondent {index + 1}: {pif.respondentName || 'Anonymous'}
-                      {pif.respondentRole && (
-                        <span className="text-sm text-muted-foreground ml-2">
-                          ({pif.respondentRole})
-                        </span>
-                      )}
-                    </h4>
-                    <PIFRespondentDetail response={pif} />
+              <h3 className="text-lg font-semibold mb-4">Step Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-muted-foreground">Participant Name</label>
+                  <p className="font-medium" data-testid="text-participant-name">
+                    {step.participantName || 'Not specified'}
+                  </p>
+                </div>
+                {step.participantRole && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Participant Role</label>
+                    <p className="font-medium" data-testid="text-participant-role">
+                      {step.participantRole}
+                    </p>
                   </div>
-                ))}
+                )}
+                {step.stepDescription && (
+                  <div className="md:col-span-2">
+                    <label className="text-sm text-muted-foreground">Description</label>
+                    <p className="mt-1 text-sm" data-testid="text-step-description">
+                      {step.stepDescription}
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
-          </>
-        )}
+
+            {/* Readiness Status Card */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Assessment Status</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">TFA Assessment</div>
+                  <div className="text-lg font-semibold">
+                    {hasTFA ? (
+                      <span className="text-green-600 dark:text-green-400">✓ Complete ({tfaAssessment.score})</span>
+                    ) : (
+                      <span className="text-muted-foreground">Pending</span>
+                    )}
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">PIF Responses</div>
+                  <div className="text-lg font-semibold">
+                    {hasStepPIF ? (
+                      <span className="text-green-600 dark:text-green-400">
+                        ✓ {stepPIFs.length} response{stepPIFs.length > 1 ? 's' : ''}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">None</span>
+                    )}
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-muted/30 rounded-lg">
+                  <div className="text-sm text-muted-foreground mb-1">Readiness Score</div>
+                  <div className="text-lg font-semibold">
+                    {stepReadiness !== null ? (
+                      <span>{stepReadiness}/100</span>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </TabsContent>
+
+          {/* Tab 2: PIF Data */}
+          <TabsContent value="pif-data" className="space-y-6">
+            {!hasStepPIF ? (
+              <ShareableLinkCard
+                workflowId={workflowId}
+                companyName={company?.name || ''}
+                workflowTitle={workflow?.name || ''}
+                type="pif"
+                stepId={stepId}
+                stepName={step.stepName}
+              />
+            ) : (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  PIF Responses ({stepPIFs.length} respondent{stepPIFs.length > 1 ? 's' : ''})
+                </h3>
+                <div className="space-y-6">
+                  {stepPIFs.map((pif, index) => (
+                    <div key={pif.id} className="border-t border-border pt-6 first:border-t-0 first:pt-0">
+                      <h4 className="font-medium mb-4">
+                        Respondent {index + 1}: {pif.respondentName || 'Anonymous'}
+                        {pif.respondentRole && (
+                          <span className="text-sm text-muted-foreground ml-2">
+                            ({pif.respondentRole})
+                          </span>
+                        )}
+                      </h4>
+                      <PIFRespondentDetail response={pif} />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Tab 3: Readiness Analysis */}
+          <TabsContent value="readiness" className="space-y-6">
+            {hasStepPIF && stepReadinessRubric ? (
+              <ReadinessRubric rubric={stepReadinessRubric} workflowId={workflowId} />
+            ) : (
+              <Card className="p-6">
+                <p className="text-muted-foreground text-center">
+                  Complete both TFA and PIF assessments to view readiness analysis.
+                </p>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Tab 4: Opportunities */}
+          <TabsContent value="opportunities" className="space-y-6">
+            {hasStepPIF && stepReadinessRubric && (
+              <div className="flex justify-end">
+                <Button
+                  onClick={() => setIsOpportunityDialogOpen(true)}
+                  data-testid="button-create-opportunity"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Opportunity
+                </Button>
+              </div>
+            )}
+
+            {stepOpportunities.length > 0 ? (
+              <div className="space-y-4">
+                {stepOpportunities.map((opp) => (
+                  <Card key={opp.id} className="p-6" data-testid={`card-opportunity-${opp.id}`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold">{opp.name}</h3>
+                        {opp.description && (
+                          <p className="text-sm text-muted-foreground mt-1">{opp.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <div className="text-muted-foreground">Annual ROI</div>
+                        <div className="font-medium">
+                          ${Number(opp.annualRoi || 0).toLocaleString()}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground">Ramp-up Period</div>
+                        <div className="font-medium">
+                          {Number(opp.rampupPeriodMonths || 0)} months
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground">Payback Period</div>
+                        <div className="font-medium">
+                          {Number(opp.paybackPeriodMonths || 0)} months
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground">Training Hours</div>
+                        <div className="font-medium">
+                          {Number(opp.trainingHoursPerEmployee || 0)} hrs
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-6">
+                <p className="text-muted-foreground text-center">
+                  {hasStepPIF && stepReadinessRubric
+                    ? 'No opportunities created yet. Create one to get started.'
+                    : 'Complete both TFA and PIF assessments before creating opportunities.'}
+                </p>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Create Opportunity Dialog */}

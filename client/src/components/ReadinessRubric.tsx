@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, AlertTriangle } from "lucide-react";
+import { CheckCircle2, AlertCircle, XCircle, TrendingUp, TrendingDown, Minus, AlertTriangle, FileText } from "lucide-react";
 import type { ReadinessRubricScore } from "@shared/pifCalculations";
+import { generateSWOTAnalysis } from "@shared/pifCalculations";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import type { TFAAssessment, PIFResponse } from "@shared/schema";
@@ -167,222 +168,19 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
     color: item.color,
   }));
 
-  // Generate intelligent SWOT analysis using actual TFA and PIF data
-  const generateIntelligentSWOT = () => {
-    const strengths: string[] = [];
-    const weaknesses: string[] = [];
-    const opportunities: string[] = [];
-    const threats: string[] = [];
-
-    // === ANALYZE TFA RESPONSES ===
-    const tfaResponses = (tfaAssessment?.responses as Record<string, string | number>) || {};
-    
-    // Group questions by section using canonical TFA_QUESTIONS
-    const sectionData: Record<string, { scores: number[]; questions: Array<{ id: number; text: string; score: number }> }> = {};
-    
-    TFA_SECTIONS.forEach(section => {
-      sectionData[section.name] = { scores: [], questions: [] };
-    });
-
-    TFA_QUESTIONS.forEach(q => {
-      const answer = tfaResponses[q.id];
-      if (answer !== undefined && answer !== null) {
-        const selectedOption = q.options.find(opt => opt.value === String(answer));
-        if (selectedOption && selectedOption.score !== null) {
-          const score = selectedOption.score;
-          sectionData[q.section].scores.push(score);
-          sectionData[q.section].questions.push({ id: q.id, text: q.question, score });
-        }
-      }
-    });
-
-    // === ANALYZE PIF RESPONSES ===
-    const pifResponses = pifData?.responses || [];
-    const aggregatedPIF = pifData?.aggregated;
-
-    // Extract qualitative insights with respondent attribution
-    interface QualitativeInsight {
-      respondent: string;
-      role: string;
-      insight: string;
-    }
-
-    const qualitativeInsights: {
-      timeWasters: QualitativeInsight[];
-      difficulties: QualitativeInsight[];
-      exceptions: QualitativeInsight[];
-      improvements: QualitativeInsight[];
-    } = {
-      timeWasters: [],
-      difficulties: [],
-      exceptions: [],
-      improvements: []
-    };
-
-    pifResponses.forEach(response => {
-      const qual = (response.qualitativeResponses as Record<string, string>) || {};
-      const respondent = response.respondentName;
-      const role = response.respondentRole;
-
-      if (qual.timeWasters && qual.timeWasters.trim()) {
-        qualitativeInsights.timeWasters.push({ respondent, role, insight: qual.timeWasters });
-      }
-      if (qual.keyDifficulties && qual.keyDifficulties.trim()) {
-        qualitativeInsights.difficulties.push({ respondent, role, insight: qual.keyDifficulties });
-      }
-      if (qual.exceptions && qual.exceptions.trim()) {
-        qualitativeInsights.exceptions.push({ respondent, role, insight: qual.exceptions });
-      }
-      if (qual.automationWish && qual.automationWish.trim()) {
-        qualitativeInsights.improvements.push({ respondent, role, insight: qual.automationWish });
-      }
-    });
-
-    // === STRENGTHS ===
-    // Identify high-scoring TFA sections (>= 70)
-    Object.entries(sectionData).forEach(([sectionName, data]) => {
-      if (data.scores.length > 0) {
-        const avgScore = Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length / 5) * 100);
-        
-        if (avgScore >= 70) {
-          const topQuestions = data.questions
-            .filter(q => q.score >= 4)
-            .slice(0, 2)
-            .map(q => q.text.split(':')[0])
-            .join(' and ');
-          
-          if (topQuestions) {
-            strengths.push(`${sectionName} (${avgScore}/100): Strong foundation in ${topQuestions} enables smooth AI integration.`);
-          }
-        }
-      }
-    });
-
-    // PIF strengths with qualitative support
-    if (aggregatedPIF) {
-      if (aggregatedPIF.processClarity.average >= 70) {
-        const clarityInsight = qualitativeInsights.improvements[0];
-        if (clarityInsight) {
-          strengths.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100) - Well-documented workflows. ${clarityInsight.respondent} (${clarityInsight.role}): "${clarityInsight.insight}"`);
-        } else {
-          strengths.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100) - Clear, standardized processes provide predictable foundation for automation.`);
-        }
-      }
-
-      if (aggregatedPIF.changeMagnitude.average >= 70) {
-        strengths.push(`Change Readiness (${aggregatedPIF.changeMagnitude.average}/100) - Users demonstrate comfort with technology changes, enabling faster adoption.`);
-      }
-    }
-
-    // === WEAKNESSES ===
-    // TFA weaknesses with component-specific recommendations
-    Object.entries(sectionData).forEach(([sectionName, data]) => {
-      if (data.scores.length > 0) {
-        const avgScore = Math.round((data.scores.reduce((sum, s) => sum + s, 0) / data.scores.length / 5) * 100);
-        
-        if (avgScore < 60) {
-          const criticalGaps = data.questions.filter(q => q.score <= 2);
-          const recommendations = TFA_RECOMMENDATIONS[sectionName] || [];
-          
-          if (criticalGaps.length > 0 && recommendations.length > 0) {
-            weaknesses.push(`${sectionName} (${avgScore}/100) - ${criticalGaps.length} critical gap${criticalGaps.length !== 1 ? 's' : ''}. Next step: ${recommendations[0]}`);
-          } else if (recommendations.length > 1) {
-            weaknesses.push(`${sectionName} (${avgScore}/100) requires attention. Recommendation: ${recommendations[1]}`);
-          }
-        }
-      }
-    });
-
-    // PIF weaknesses with component-specific recommendations
-    if (aggregatedPIF) {
-      if (aggregatedPIF.processClarity.average < 60) {
-        const recommendations = PIF_RECOMMENDATIONS["Process Clarity"];
-        weaknesses.push(`Process Clarity (${aggregatedPIF.processClarity.average}/100): ${recommendations[0]}`);
-      }
-
-      if (aggregatedPIF.changeMagnitude.average < 60) {
-        const recommendations = PIF_RECOMMENDATIONS["Change Magnitude"];
-        weaknesses.push(`Change Magnitude (${aggregatedPIF.changeMagnitude.average}/100): ${recommendations[0]}`);
-      }
-
-      if (aggregatedPIF.workflowBrittleness.average < 60) {
-        const recommendations = PIF_RECOMMENDATIONS["Workflow Brittleness"];
-        const exceptionInsight = qualitativeInsights.exceptions[0];
-        if (exceptionInsight) {
-          weaknesses.push(`Workflow Brittleness (${aggregatedPIF.workflowBrittleness.average}/100): ${recommendations[0]} ${exceptionInsight.respondent} (${exceptionInsight.role}) reports: "${exceptionInsight.insight}"`);
-        } else {
-          weaknesses.push(`Workflow Brittleness (${aggregatedPIF.workflowBrittleness.average}/100): ${recommendations[0]}`);
-        }
-      }
-    }
-
-    // Fallback if no specific weaknesses identified but overall score is low
-    if (weaknesses.length === 0 && rubric.totalScore < 60) {
-      weaknesses.push(`Overall readiness (${rubric.totalScore}/100) requires improvement across multiple components before full AI deployment.`);
-    }
-
-    // === OPPORTUNITIES ===
-    // Strategic synergies
-    if (rubric.componentScores.dataQuality >= 70 && rubric.componentScores.integrationFeasibility >= 60) {
-      opportunities.push(`Strong data quality (${rubric.componentScores.dataQuality}/100) + solid integration capabilities (${rubric.componentScores.integrationFeasibility}/100) = ideal conditions for data-driven AI deployment.`);
-    }
-
-    if (aggregatedPIF && aggregatedPIF.processClarity.average >= 65 && rubric.componentScores.systemEnvironment >= 65) {
-      opportunities.push(`Clear processes (${aggregatedPIF.processClarity.average}/100) on modern infrastructure (${rubric.componentScores.systemEnvironment}/100) enable rapid prototyping and iteration.`);
-    }
-
-    // User-driven opportunities from qualitative insights
-    if (qualitativeInsights.improvements.length > 0) {
-      const topWish = qualitativeInsights.improvements[0];
-      opportunities.push(`Quick win identified by ${topWish.respondent} (${topWish.role}): "${topWish.insight}" - Address this to demonstrate immediate value.`);
-    }
-
-    if (qualitativeInsights.timeWasters.length > 0) {
-      const topWaster = qualitativeInsights.timeWasters[0];
-      opportunities.push(`Time savings opportunity - ${topWaster.respondent} (${topWaster.role}) identifies: "${topWaster.insight}" - Automating this delivers measurable efficiency gains.`);
-    }
-
-    // Fallback opportunity
-    if (opportunities.length === 0 && rubric.totalScore >= 50) {
-      opportunities.push(`With moderate readiness (${rubric.totalScore}/100), starting with a focused pilot can demonstrate value while addressing gaps.`);
-    }
-
-    // === THREATS ===
-    // Critical TFA blockers
-    Object.entries(sectionData).forEach(([sectionName, data]) => {
-      const criticalGaps = data.questions.filter(q => q.score <= 2);
-      if (criticalGaps.length >= 2) {
-        const mitigation = TFA_RECOMMENDATIONS[sectionName]?.[0] || 'Conduct detailed technical assessment';
-        threats.push(`${sectionName}: ${criticalGaps.length} critical technical gaps. Mitigation required: ${mitigation}`);
-      }
-    });
-
-    // Security/Compliance threats
-    if (rubric.componentScores.securityCompliance < 60) {
-      const securityRec = TFA_RECOMMENDATIONS["Security/Compliance"]?.[0] || 'Engage compliance team immediately';
-      threats.push(`Security & Compliance (${rubric.componentScores.securityCompliance}/100) may delay deployment. ${securityRec}`);
-    }
-
-    // User adoption risks from qualitative data
-    if (qualitativeInsights.difficulties.length > 0) {
-      const topDifficulty = qualitativeInsights.difficulties[0];
-      threats.push(`Adoption risk - ${topDifficulty.respondent} (${topDifficulty.role}) highlights: "${topDifficulty.insight}" - Address during design phase.`);
-    }
-
-    // Workflow brittleness threats
-    if (aggregatedPIF && aggregatedPIF.workflowBrittleness.average < 50 && qualitativeInsights.exceptions.length > 1) {
-      threats.push(`High process variability (${aggregatedPIF.workflowBrittleness.average}/100, ${qualitativeInsights.exceptions.length} respondents report exceptions) may require hybrid human-AI approach.`);
-    }
-
-    // Fallback threat if score is critically low
-    if (threats.length === 0 && rubric.totalScore < 40) {
-      threats.push(`Overall low readiness (${rubric.totalScore}/100) indicates proceeding without major improvements will likely result in implementation failure.`);
-    }
-
-    return { strengths, weaknesses, opportunities, threats };
+  // Generate SWOT analysis using data-driven function with internal calculations
+  const pifResponses = pifData?.responses || [];
+  
+  // Calculate TFA section scores for SWOT generation
+  const tfaResponses = (tfaAssessment?.responses as Record<string, string | number>) || {};
+  const tfaSectionScores = {
+    systemEnvironment: rubric.componentScores.systemEnvironment,
+    dataQuality: rubric.componentScores.dataQuality,
+    integrationFeasibility: rubric.componentScores.integrationFeasibility,
+    securityCompliance: rubric.componentScores.securityCompliance,
   };
 
-  const swotAnalysis = generateIntelligentSWOT();
+  const swotAnalysis = generateSWOTAnalysis(rubric, pifResponses, tfaSectionScores);
 
   return (
     <div className="space-y-6">
@@ -476,10 +274,27 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
         </div>
       </Card>
 
-      {/* Executive Summary - SWOT Analysis */}
+      {/* Executive Summary - Strategic Synthesis */}
       <Card data-testid="card-executive-summary">
         <CardHeader>
-          <CardTitle>Executive Summary</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Executive Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-muted/50 rounded-md p-4">
+            <p className="text-sm leading-relaxed" data-testid="text-executive-summary">
+              {swotAnalysis.executiveSummary}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* SWOT Analysis - Detailed Strategic Insights */}
+      <Card data-testid="card-swot-analysis">
+        <CardHeader>
+          <CardTitle>SWOT Analysis</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Strengths */}
