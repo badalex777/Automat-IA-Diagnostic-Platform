@@ -58,7 +58,7 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   shareableIdIdx: index("tfa_assessments_shareable_id_idx").on(table.shareableId),
 }));
 
-export const pifResponses = pgTable("pis_responses", {
+export const pifResponses = pgTable("pif_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
   stepId: varchar("step_id").references(() => workflowSteps.id, { onDelete: 'cascade' }),
@@ -75,9 +75,9 @@ export const pifResponses = pgTable("pis_responses", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  workflowIdIdx: index("pis_responses_workflow_id_idx").on(table.workflowId),
-  stepIdIdx: index("pis_responses_step_id_idx").on(table.stepId),
-  shareableIdIdx: index("pis_responses_shareable_id_idx").on(table.shareableId),
+  workflowIdIdx: index("pif_responses_workflow_id_idx").on(table.workflowId),
+  stepIdIdx: index("pif_responses_step_id_idx").on(table.stepId),
+  shareableIdIdx: index("pif_responses_shareable_id_idx").on(table.shareableId),
 }));
 
 export const businessImpact = pgTable("business_impact", {
