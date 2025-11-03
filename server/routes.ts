@@ -258,6 +258,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get assessment status for workflow (which steps have TFA and PIF completed)
+  app.get("/api/workflows/:workflowId/assessment-status", async (req, res) => {
+    try {
+      const { workflowId } = req.params;
+      
+      // Get TFA assessment for workflow
+      const tfaAssessment = await storage.getTFAByWorkflowId(workflowId);
+      // TFA is complete only if it exists AND has completedAt timestamp
+      const hasTFA = !!tfaAssessment && !!tfaAssessment.completedAt;
+      
+      // Get all workflow steps
+      const steps = await storage.getWorkflowStepsByWorkflow(workflowId);
+      
+      // Get all PIF responses for this workflow
+      const allPIFs = await storage.getAllPIFResponsesForWorkflow(workflowId);
+      
+      // Build assessment status for each step
+      const stepStatuses = steps.map(step => {
+        // Check if this step has any COMPLETED PIF responses (not just any PIF)
+        const hasPIF = allPIFs.some(pif => pif.stepId === step.id && !!pif.completedAt);
+        
+        return {
+          stepId: step.id,
+          stepName: step.stepName,
+          stepOrder: step.stepOrder,
+          hasPIF,
+          isComplete: hasTFA && hasPIF, // Both TFA (workflow-level) and PIF (step-level) must be COMPLETED
+        };
+      });
+      
+      res.json({
+        workflowId,
+        hasTFA,
+        steps: stepStatuses,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Workflow Steps
   app.get("/api/workflows/:workflowId/steps", async (req, res) => {
     try {
