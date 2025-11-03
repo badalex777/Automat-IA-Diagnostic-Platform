@@ -19,11 +19,11 @@ import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep } from "@shared/schema";
-import { tfaSections as allSections } from "@shared/tfaQuestions";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep, PIFResponse } from "@shared/schema";
+import { tfaSections as allSections, TFA_QUESTIONS, TFA_SECTIONS } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
-import { aggregateWorkflowSWOT, aggregateExecutiveSummaries } from "@shared/pifCalculations";
-import type { ReadinessRubricScore, AggregatedPIFScores } from "@shared/pifCalculations";
+import { aggregateWorkflowSWOT, aggregateExecutiveSummaries, generateSWOTAnalysis, calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
+import type { ReadinessRubricScore, AggregatedPIFScores, SWOTAnalysis } from "@shared/pifCalculations";
 import {
   Dialog,
   DialogContent,
@@ -95,6 +95,17 @@ export default function WorkflowDetail() {
     queryKey: [`/api/workflows/${workflowId}/assessment-status`],
     enabled: !!workflowId,
     refetchOnWindowFocus: true,
+  });
+
+  // Fetch all PIF responses for aggregated readiness analysis
+  interface WorkflowPIFData {
+    responses: PIFResponse[];
+    aggregated: AggregatedPIFScores;
+  }
+  
+  const { data: workflowPIFData } = useQuery<WorkflowPIFData>({
+    queryKey: [`/api/workflows/${workflowId}/pif`],
+    enabled: !!workflowId,
   });
 
   useEffect(() => {
@@ -770,12 +781,223 @@ export default function WorkflowDetail() {
                       </p>
                     </div>
 
-                    <div className="bg-muted/30 rounded-md p-4">
-                      <h3 className="font-semibold mb-2">Aggregated Workflow SWOT & Executive Summary</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Full aggregated SWOT analysis and executive summary implementation coming soon. The backend data aggregation functions are ready and will be wired to display combined step-level insights with attribution labels.
-                      </p>
-                    </div>
+                    {/* Calculate aggregated SWOT and Executive Summary */}
+                    {(() => {
+                      if (!tfaAssessment || !workflowPIFData || !workflowPIFData.responses.length) {
+                        return (
+                          <div className="bg-muted/30 rounded-md p-4">
+                            <h3 className="font-semibold mb-2">Aggregated Workflow Analysis</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Loading assessment data...
+                            </p>
+                          </div>
+                        );
+                      }
+
+                      // Calculate TFA score and section scores
+                      const tfaResponsesRaw = (tfaAssessment.responses as Record<string, string | number>) || {};
+                      
+                      // Parse responses to numbers, excluding "Don't Know" (value 0)
+                      const tfaResponses: Record<string, number> = {};
+                      Object.entries(tfaResponsesRaw).forEach(([key, val]) => {
+                        const numVal = typeof val === 'number' ? val : Number(val);
+                        if (!isNaN(numVal) && numVal > 0) { // Exclude "Don't Know" responses (value 0)
+                          tfaResponses[key] = numVal;
+                        }
+                      });
+                      
+                      // Calculate TFA section scores
+                      const tfaSectionScores = {
+                        systemEnvironment: 0,
+                        dataQuality: 0,
+                        integrationFeasibility: 0,
+                        securityCompliance: 0,
+                      };
+                      
+                      // Aggregate section scores from TFA responses
+                      let sysEnvCount = 0, dataCount = 0, integCount = 0, secCount = 0;
+                      
+                      Object.entries(tfaResponses).forEach(([qidStr, response]) => {
+                        const qid = parseInt(qidStr);
+                        const question = TFA_QUESTIONS.find(q => q.id === qid);
+                        if (!question) return;
+                        
+                        // Convert score (1-5) to 0-100 scale: (score - 1) / 4 * 100
+                        const value = ((response - 1) / 4) * 100;
+                        
+                        switch (question.section) {
+                          case 'System Environment':
+                            tfaSectionScores.systemEnvironment += value;
+                            sysEnvCount++;
+                            break;
+                          case 'Data Quality':
+                            tfaSectionScores.dataQuality += value;
+                            dataCount++;
+                            break;
+                          case 'Integration Feasibility':
+                            tfaSectionScores.integrationFeasibility += value;
+                            integCount++;
+                            break;
+                          case 'Security/Compliance':
+                            tfaSectionScores.securityCompliance += value;
+                            secCount++;
+                            break;
+                        }
+                      });
+                      
+                      // Average section scores
+                      if (sysEnvCount > 0) tfaSectionScores.systemEnvironment /= sysEnvCount;
+                      if (dataCount > 0) tfaSectionScores.dataQuality /= dataCount;
+                      if (integCount > 0) tfaSectionScores.integrationFeasibility /= integCount;
+                      if (secCount > 0) tfaSectionScores.securityCompliance /= secCount;
+                      
+                      // Calculate overall TFA score (weighted average of sections)
+                      const tfaScore = Math.round(
+                        (tfaSectionScores.systemEnvironment * 0.25) +
+                        (tfaSectionScores.dataQuality * 0.30) +
+                        (tfaSectionScores.integrationFeasibility * 0.30) +
+                        (tfaSectionScores.securityCompliance * 0.15)
+                      );
+
+                      // Calculate step-level SWOT analyses for completed steps
+                      const stepSWOTs: Array<{
+                        stepNumber: number;
+                        stepName: string;
+                        swot: SWOTAnalysis;
+                      }> = [];
+                      
+                      const stepSummaries: Array<{
+                        stepNumber: number;
+                        stepName: string;
+                        summary: string;
+                        readinessScore: number;
+                        feasibilityBand: string;
+                      }> = [];
+
+                      completedSteps.forEach(step => {
+                        const fullStep = workflowSteps.find(s => s.id === step.stepId);
+                        if (!fullStep) return;
+
+                        // Get PIF responses for this step (filter to completed only)
+                        const stepPIFs = workflowPIFData.responses.filter(
+                          pif => pif.stepId === step.stepId && !!pif.completedAt
+                        );
+                        
+                        if (stepPIFs.length === 0) return;
+
+                        // Calculate aggregated PIF scores for this step
+                        const aggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+                        
+                        // Calculate readiness rubric for this step
+                        const rubric = calculateReadinessRubric(tfaScore, tfaSectionScores, aggregatedPIF);
+                        
+                        // Generate SWOT for this step
+                        const swot = generateSWOTAnalysis(rubric, stepPIFs, tfaSectionScores, tfaResponses);
+                        
+                        stepSWOTs.push({
+                          stepNumber: fullStep.stepOrder,
+                          stepName: fullStep.stepName,
+                          swot,
+                        });
+                        
+                        stepSummaries.push({
+                          stepNumber: fullStep.stepOrder,
+                          stepName: fullStep.stepName,
+                          summary: swot.executiveSummary,
+                          readinessScore: rubric.totalScore,
+                          feasibilityBand: rubric.feasibilityBand,
+                        });
+                      });
+
+                      // Aggregate SWOTs and summaries
+                      const aggregatedSWOT = aggregateWorkflowSWOT(stepSWOTs);
+                      const executiveSummary = aggregateExecutiveSummaries(stepSummaries);
+                      
+                      // Calculate overall workflow readiness
+                      const avgReadiness = stepSummaries.length > 0
+                        ? Math.round(stepSummaries.reduce((sum, s) => sum + s.readinessScore, 0) / stepSummaries.length)
+                        : 0;
+
+                      return (
+                        <div className="space-y-6">
+                          {/* Executive Summary */}
+                          <Card className="p-6">
+                            <h3 className="text-lg font-semibold mb-3">Workflow-Level Executive Summary</h3>
+                            <div className="mb-4">
+                              <div className="flex items-center gap-4 mb-2">
+                                <div>
+                                  <span className="text-3xl font-bold">{avgReadiness}/100</span>
+                                  <span className="text-sm text-muted-foreground ml-2">Overall Readiness</span>
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{executiveSummary}</p>
+                          </Card>
+
+                          {/* Aggregated SWOT Analysis */}
+                          <Card className="p-6">
+                            <h3 className="text-lg font-semibold mb-4">Aggregated Workflow SWOT Analysis</h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Combined step-level insights with attribution labels showing which process step contributed each insight
+                            </p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {/* Strengths */}
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-green-600 dark:text-green-400">Strengths</h4>
+                                <ul className="space-y-2 text-sm">
+                                  {aggregatedSWOT.strengths.map((strength, idx) => (
+                                    <li key={idx} className="flex gap-2">
+                                      <span className="text-green-600 dark:text-green-400 shrink-0">•</span>
+                                      <span>{strength}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {/* Weaknesses */}
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-amber-600 dark:text-amber-400">Weaknesses</h4>
+                                <ul className="space-y-2 text-sm">
+                                  {aggregatedSWOT.weaknesses.map((weakness, idx) => (
+                                    <li key={idx} className="flex gap-2">
+                                      <span className="text-amber-600 dark:text-amber-400 shrink-0">•</span>
+                                      <span>{weakness}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {/* Opportunities */}
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-blue-600 dark:text-blue-400">Opportunities</h4>
+                                <ul className="space-y-2 text-sm">
+                                  {aggregatedSWOT.opportunities.map((opportunity, idx) => (
+                                    <li key={idx} className="flex gap-2">
+                                      <span className="text-blue-600 dark:text-blue-400 shrink-0">•</span>
+                                      <span>{opportunity}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+
+                              {/* Threats */}
+                              <div className="space-y-2">
+                                <h4 className="font-semibold text-red-600 dark:text-red-400">Threats</h4>
+                                <ul className="space-y-2 text-sm">
+                                  {aggregatedSWOT.threats.map((threat, idx) => (
+                                    <li key={idx} className="flex gap-2">
+                                      <span className="text-red-600 dark:text-red-400 shrink-0">•</span>
+                                      <span>{threat}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </Card>
+                        </div>
+                      );
+                    })()}
 
                     <div className="mt-6">
                       <h3 className="font-semibold mb-3">Completed Steps ({completedCount}/{totalSteps})</h3>
