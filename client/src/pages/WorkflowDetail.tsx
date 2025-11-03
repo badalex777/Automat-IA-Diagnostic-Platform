@@ -41,6 +41,7 @@ export default function WorkflowDetail() {
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
   const [isStepDialogOpen, setIsStepDialogOpen] = useState(false);
   const [stepName, setStepName] = useState("");
+  const [stepOrder, setStepOrder] = useState<number>(1);
   const [stepDescription, setStepDescription] = useState("");
   const [participantName, setParticipantName] = useState("");
   const [participantRole, setParticipantRole] = useState("");
@@ -199,21 +200,13 @@ export default function WorkflowDetail() {
 
   const createStepMutation = useMutation({
     mutationFn: async (data: { 
-      stepName: string; 
+      stepName: string;
+      stepOrder: number;
       stepDescription?: string; 
       participantName?: string; 
       participantRole?: string; 
     }) => {
-      // Get the current steps to determine the next step order
-      const currentSteps = workflowSteps || [];
-      const maxOrder = currentSteps.length > 0 
-        ? Math.max(...currentSteps.map(s => s.stepOrder || 0)) 
-        : 0;
-      
-      const res = await apiRequest('POST', `/api/workflows/${workflowId}/steps`, {
-        ...data,
-        stepOrder: maxOrder + 1,
-      });
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/steps`, data);
       return await res.json();
     },
     onSuccess: () => {
@@ -224,6 +217,7 @@ export default function WorkflowDetail() {
       });
       setIsStepDialogOpen(false);
       setStepName("");
+      setStepOrder(1);
       setStepDescription("");
       setParticipantName("");
       setParticipantRole("");
@@ -482,11 +476,6 @@ export default function WorkflowDetail() {
                         </p>
                       </Card>
                     )}
-                    <ShareableLinkCard
-                      workflowId={workflowId}
-                      companyName={company?.name || ''}
-                      workflowTitle={workflow?.name || ''}
-                    />
                   </>
                 );
               })()
@@ -1070,6 +1059,20 @@ export default function WorkflowDetail() {
                 />
               </div>
               <div>
+                <label htmlFor="step-order" className="text-sm font-medium mb-2 block">
+                  Step Number <span className="text-destructive">*</span>
+                </label>
+                <Input
+                  id="step-order"
+                  type="number"
+                  min={1}
+                  value={stepOrder}
+                  onChange={(e) => setStepOrder(Math.max(1, parseInt(e.target.value) || 1))}
+                  placeholder="1"
+                  data-testid="input-step-order"
+                />
+              </div>
+              <div>
                 <label htmlFor="step-description" className="text-sm font-medium mb-2 block">
                   Step Description
                 </label>
@@ -1122,6 +1125,7 @@ export default function WorkflowDetail() {
                   onClick={() => {
                     setIsStepDialogOpen(false);
                     setStepName("");
+                    setStepOrder(1);
                     setStepDescription("");
                     setParticipantName("");
                     setParticipantRole("");
@@ -1133,16 +1137,17 @@ export default function WorkflowDetail() {
                 </Button>
                 <Button
                   onClick={() => {
-                    if (stepName.trim()) {
+                    if (stepName.trim() && stepOrder >= 1) {
                       createStepMutation.mutate({
                         stepName: stepName.trim(),
+                        stepOrder: stepOrder,
                         stepDescription: stepDescription.trim() || undefined,
                         participantName: participantName.trim() || undefined,
                         participantRole: participantRole.trim() || undefined,
                       });
                     }
                   }}
-                  disabled={!stepName.trim() || createStepMutation.isPending}
+                  disabled={!stepName.trim() || stepOrder < 1 || createStepMutation.isPending}
                   data-testid="button-save-step"
                 >
                   {createStepMutation.isPending ? "Creating..." : "Create Step"}
