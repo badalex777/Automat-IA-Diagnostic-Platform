@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect } from "react";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, LabelList } from "recharts";
+import { useMemo, useState, useEffect, useCallback } from "react";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import type { ImplementationOpportunity, Workflow } from "@shared/schema";
 import { 
   type CompanyContext,
@@ -46,6 +46,14 @@ interface DataPoint {
   color: string;
 }
 
+interface LabelPosition {
+  id: string;
+  x: number; // pixel position
+  y: number; // pixel position
+  text: string;
+  originalY: number; // original pixel position before adjustment
+}
+
 export default function OpportunityMatrix({ 
   opportunities, 
   workflows,
@@ -56,6 +64,7 @@ export default function OpportunityMatrix({
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
+  const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
 
   // Build stable color map based on ALL workflows (not just filtered)
   // Sort workflow IDs to ensure stable color assignment even when opportunities change
@@ -126,24 +135,69 @@ export default function OpportunityMatrix({
     return { dataPoints: points, workflowLegend: legend };
   }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType]);
 
-  // Handle display data updates - immediate for data changes, fade for filter changes
+  // Collision detection function - works in data space with proper scaling
+  const detectCollision = useCallback((pos1: { x: number; y: number; text: string }, pos2: { x: number; y: number; text: string }) => {
+    // Chart dimensions: x-axis 0-150, y-axis 0-100
+    // Estimate chart pixel size: ~500px width, ~450px height
+    // Scale factors: 1 x-unit ≈ 3.3px, 1 y-unit ≈ 4.5px
+    
+    // Convert pixel-based label dimensions to data space
+    const pixelToDataX = 150 / 500; // ≈ 0.3
+    const pixelToDataY = 100 / 450; // ≈ 0.22
+    
+    // Estimate label dimensions in pixels, then convert to data space
+    const estimateWidthPixels = (text: string) => Math.min(text.length * 6 + 10, 120);
+    const labelHeightPixels = 18; // label height + small gap
+    
+    const width1Data = estimateWidthPixels(pos1.text) * pixelToDataX;
+    const width2Data = estimateWidthPixels(pos2.text) * pixelToDataX;
+    const labelHeightData = labelHeightPixels * pixelToDataY;
+
+    // Check for overlap using bounding boxes in data space
+    const horizontalOverlap = Math.abs(pos1.x - pos2.x) < (width1Data + width2Data) / 2;
+    const verticalOverlap = Math.abs(pos1.y - pos2.y) < labelHeightData;
+
+    return horizontalOverlap && verticalOverlap;
+  }, []);
+
+  // Handle display data updates with collision-aware label positioning
   useEffect(() => {
-    // No previous data - just populate immediately (initial render or recovery from empty)
-    if (displayData.length === 0) {
-      setDisplayData(dataPoints);
-      return;
-    }
-
-    // No new data - clear immediately
-    if (dataPoints.length === 0) {
-      setDisplayData([]);
-      return;
-    }
-
-    // Data changed (toggle updates, opportunity edits) - update immediately
-    // No transition needed for same-filter data updates
+    // Update display data
     setDisplayData(dataPoints);
-  }, [dataPoints]);
+
+    // No data - clear label positions
+    if (dataPoints.length === 0) {
+      setLabelPositions([]);
+      return;
+    }
+
+    // Calculate label positions with collision avoidance
+    // We work in data coordinate space (0-150 for x, 0-100 for y)
+    const positions: LabelPosition[] = dataPoints.map(point => ({
+      id: point.id,
+      x: point.x,
+      y: point.y, // will be adjusted if collisions detected
+      text: point.name,
+      originalY: point.y,
+    }));
+
+    // Sort by y-coordinate (lower values = higher on chart = should take priority)
+    positions.sort((a, b) => a.y - b.y);
+
+    // Detect and resolve collisions by shifting labels vertically
+    for (let i = 0; i < positions.length; i++) {
+      for (let j = i + 1; j < positions.length; j++) {
+        if (detectCollision(positions[i], positions[j])) {
+          // Shift the lower label down by 8 units in data space
+          // Clamp to chart bounds (Y max = 100)
+          const newY = Math.min(positions[j].y + 8, 100);
+          positions[j].y = newY;
+        }
+      }
+    }
+
+    setLabelPositions(positions);
+  }, [dataPoints, detectCollision]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -296,14 +350,64 @@ export default function OpportunityMatrix({
                       className="hover:opacity-80 transition-opacity"
                     />
                   ))}
-                  <LabelList 
-                    dataKey="name" 
-                    position="top" 
-                    offset={12}
-                    className="fill-foreground text-[10px] font-medium"
-                    style={{ pointerEvents: 'none', userSelect: 'none' }}
-                  />
                 </Scatter>
+
+                {/* Custom labels with collision avoidance - invisible scatter for coordinate mapping */}
+                <Scatter 
+                  data={labelPositions}
+                  shape={(props: any) => {
+                    const { cx, cy, payload } = props;
+                    if (!payload) return <></>;
+
+                    const dataPoint = displayData.find(d => d.id === payload.id);
+                    if (!dataPoint) return <></>;
+
+                    // Check if label was adjusted (moved from original position)
+                    const wasAdjusted = Math.abs(payload.y - payload.originalY) > 1;
+
+                    // For connector line, we need the original point's pixel position
+                    // Since we can't easily get it from Recharts, we'll calculate approximate position
+                    // based on the same data-to-pixel conversion Recharts uses
+                    // Chart area: 500px width for 0-150 domain, 450px height for 0-100 domain
+                    const chartLeft = 60; // approximate left margin
+                    const chartBottom = 440; // approximate bottom position (inverted y-axis)
+                    const xScale = 500 / 150;
+                    const yScale = 450 / 100;
+                    
+                    const originalPointX = chartLeft + dataPoint.x * xScale;
+                    const originalPointY = chartBottom - dataPoint.y * yScale;
+
+                    return (
+                      <g>
+                        {/* Connector line from original point to adjusted label when repositioned */}
+                        {wasAdjusted && (
+                          <line
+                            x1={originalPointX}
+                            y1={originalPointY}
+                            x2={cx}
+                            y2={cy - 12}
+                            stroke="hsl(var(--muted-foreground))"
+                            strokeWidth={1}
+                            strokeDasharray="2,2"
+                            opacity={0.4}
+                            style={{ pointerEvents: 'none' }}
+                          />
+                        )}
+                        {/* Label text at adjusted position */}
+                        <text
+                          x={cx}
+                          y={cy - 12} // offset above the adjusted position
+                          textAnchor="middle"
+                          className="fill-foreground text-[10px] font-medium"
+                          style={{ pointerEvents: 'none', userSelect: 'none' }}
+                        >
+                          {payload.text}
+                        </text>
+                      </g>
+                    );
+                  }}
+                  isAnimationActive={false}
+                />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
