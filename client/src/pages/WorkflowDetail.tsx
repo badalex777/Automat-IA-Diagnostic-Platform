@@ -16,22 +16,16 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
-import { PIFAggregatedScores } from "@/components/PIFAggregatedScores";
-import { PIFRespondentList } from "@/components/PIFRespondentList";
-import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
-import ReadinessRubric from "@/components/ReadinessRubric";
 import { OpportunityForm } from "@/components/OpportunityForm";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, PIFResponse, ImplementationOpportunity, InsertImplementationOpportunity, WorkflowStep } from "@shared/schema";
-import type { AggregatedPIFScores } from "@shared/pifCalculations";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, InsertImplementationOpportunity, WorkflowStep } from "@shared/schema";
 import type { ToggleState } from "@shared/opportunityCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
-import { calculateReadinessRubric } from "@shared/pifCalculations";
 import {
   Dialog,
   DialogContent,
@@ -47,11 +41,13 @@ export default function WorkflowDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [isQuestionDetailsOpen, setIsQuestionDetailsOpen] = useState(false);
-  const [selectedPIFResponse, setSelectedPIFResponse] = useState<PIFResponse | null>(null);
   const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [errorToggle, setErrorToggle] = useState(false);
   const [revenueToggle, setRevenueToggle] = useState(false);
+  const [isStepDialogOpen, setIsStepDialogOpen] = useState(false);
+  const [stepName, setStepName] = useState("");
+  const [stepDescription, setStepDescription] = useState("");
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -74,16 +70,6 @@ export default function WorkflowDetail() {
   const { data: businessImpact, isLoading: impactLoading, error: impactError } = useQuery<BusinessImpact>({
     queryKey: [`/api/workflows/${workflowId}/business-impact`],
     enabled: !!workflowId,
-  });
-
-  const { data: pifData, isLoading: pifLoading, error: pifError } = useQuery<{ 
-    responses: PIFResponse[]; 
-    aggregated: AggregatedPIFScores 
-  }>({
-    queryKey: [`/api/workflows/${workflowId}/pif`],
-    enabled: !!workflowId,
-    refetchInterval: 10000, // Refetch every 10 seconds to catch new submissions
-    refetchOnWindowFocus: true,
   });
 
   const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
@@ -251,6 +237,39 @@ export default function WorkflowDetail() {
     },
   });
 
+  const createStepMutation = useMutation({
+    mutationFn: async (data: { stepName: string; stepDescription: string }) => {
+      // Get the current steps to determine the next step order
+      const currentSteps = workflowSteps || [];
+      const maxOrder = currentSteps.length > 0 
+        ? Math.max(...currentSteps.map(s => s.stepOrder || 0)) 
+        : 0;
+      
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/steps`, {
+        ...data,
+        stepOrder: maxOrder + 1,
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/steps`] });
+      toast({
+        title: "Step created",
+        description: "Workflow step created successfully.",
+      });
+      setIsStepDialogOpen(false);
+      setStepName("");
+      setStepDescription("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error creating step",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleStartEdit = () => {
     setEditedName(workflow?.name || '');
     setIsEditingName(true);
@@ -357,9 +376,7 @@ export default function WorkflowDetail() {
         <Tabs defaultValue="tfa" className="space-y-6">
           <TabsList>
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
-            <TabsTrigger value="pif" data-testid="tab-pif">Process Insights</TabsTrigger>
-            <TabsTrigger value="readiness" data-testid="tab-readiness">Readiness Rubric</TabsTrigger>
-            <TabsTrigger value="steps" data-testid="tab-steps">Process Steps</TabsTrigger>
+            <TabsTrigger value="steps" data-testid="tab-steps">Workflow Steps</TabsTrigger>
             <TabsTrigger value="opportunities" data-testid="tab-opportunities">Opportunities</TabsTrigger>
           </TabsList>
 
@@ -534,162 +551,6 @@ export default function WorkflowDetail() {
             )}
           </TabsContent>
 
-          <TabsContent value="pif" className="space-y-6">
-            {pifError ? (
-              <div className="bg-card rounded-lg border border-destructive p-6">
-                <p className="text-destructive">Error loading PIF data: {pifError.message}</p>
-              </div>
-            ) : pifLoading ? (
-              <p className="text-muted-foreground">Loading Process Insight Form data...</p>
-            ) : pifData && pifData.responses.length > 0 ? (
-              <>
-                <Card className="p-6">
-                  <h3 className="font-semibold text-lg mb-4">Aggregated Operational Readiness</h3>
-                  <PIFAggregatedScores aggregated={pifData.aggregated} />
-                </Card>
-
-                <Card className="p-6">
-                  <h3 className="font-semibold text-lg mb-4">Respondent Insights</h3>
-                  <PIFRespondentList
-                    responses={pifData.responses}
-                    onViewDetail={(response) => setSelectedPIFResponse(response)}
-                    onDelete={async (id) => {
-                      try {
-                        await apiRequest('DELETE', `/api/pif/${id}`, {});
-                        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/pif`] });
-                        toast({
-                          title: "Response deleted",
-                          description: "The PIF response has been deleted successfully.",
-                        });
-                      } catch (error: any) {
-                        toast({
-                          title: "Delete failed",
-                          description: error.message,
-                          variant: "destructive",
-                        });
-                      }
-                    }}
-                  />
-                </Card>
-
-                <ShareableLinkCard
-                  workflowId={workflowId}
-                  companyName={company?.name || ''}
-                  workflowTitle={workflow?.name || ''}
-                  type="pif"
-                />
-              </>
-            ) : (
-              <div className="bg-card rounded-lg border border-border p-6" data-testid="card-no-pif">
-                <div className="text-center py-8">
-                  <h3 className="text-lg font-semibold mb-2">No Process Insights Yet</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Generate a shareable link below to collect operational insights from end users and process owners.
-                  </p>
-                  <ShareableLinkCard
-                    workflowId={workflowId}
-                    companyName={company?.name || ''}
-                    workflowTitle={workflow?.name || ''}
-                    type="pif"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* PIF Response Detail Dialog */}
-            <Dialog open={!!selectedPIFResponse} onOpenChange={() => setSelectedPIFResponse(null)}>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Process Insight Form Response</DialogTitle>
-                </DialogHeader>
-                {selectedPIFResponse && (
-                  <PIFRespondentDetail response={selectedPIFResponse} />
-                )}
-              </DialogContent>
-            </Dialog>
-          </TabsContent>
-
-          <TabsContent value="readiness" className="space-y-6">
-            {(() => {
-              // Check if we have all required data for readiness calculation
-              const hasTFA = tfaAssessment && tfaAssessment.score !== null && tfaAssessment.score !== undefined;
-              const hasPIF = pifData && pifData.responses.length > 0;
-              
-              if (!hasTFA || !hasPIF) {
-                return (
-                  <div className="bg-card rounded-lg border border-border p-6" data-testid="card-readiness-incomplete">
-                    <div className="text-center py-8">
-                      <h3 className="text-lg font-semibold mb-2">Readiness Rubric</h3>
-                      <p className="text-muted-foreground mb-4">
-                        The combined readiness assessment requires both Technical Feasibility (TFA) and Process Insight Form (PIF) data.
-                      </p>
-                      <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                        <div className="flex items-center justify-center gap-2">
-                          {hasTFA ? (
-                            <span className="text-green-600 dark:text-green-400">✓ TFA Complete</span>
-                          ) : (
-                            <span>○ TFA Pending</span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-center gap-2">
-                          {hasPIF ? (
-                            <span className="text-green-600 dark:text-green-400">✓ PIF Complete ({pifData.responses.length} response{pifData.responses.length > 1 ? 's' : ''})</span>
-                          ) : (
-                            <span>○ PIF Pending</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              // Calculate section scores from TFA
-              const sectionScores = {
-                systemEnvironment: 0,
-                dataQuality: 0,
-                integrationFeasibility: 0,
-                securityCompliance: 0,
-              };
-
-              if (tfaAssessment.responses) {
-                const responses = tfaAssessment.responses as Record<string, string | number>;
-                
-                allSections.forEach((section) => {
-                  const sectionResponses = section.questions
-                    .map(q => {
-                      const val = responses[q.id];
-                      return typeof val === 'string' ? parseInt(val, 10) : val;
-                    })
-                    .filter((score): score is number => 
-                      score !== null && 
-                      score !== undefined && 
-                      !isNaN(score) &&
-                      score !== 0
-                    );
-                  
-                  if (sectionResponses.length > 0) {
-                    const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
-                    const normalizedScore = Math.round((avgScore / 5) * 100);
-                    
-                    if (section.section === 'System Environment') sectionScores.systemEnvironment = normalizedScore;
-                    if (section.section === 'Data Quality') sectionScores.dataQuality = normalizedScore;
-                    if (section.section === 'Integration Feasibility') sectionScores.integrationFeasibility = normalizedScore;
-                    if (section.section === 'Security/Compliance') sectionScores.securityCompliance = normalizedScore;
-                  }
-                });
-              }
-
-              const rubric = calculateReadinessRubric(
-                tfaAssessment.score || 0,
-                sectionScores,
-                pifData.aggregated
-              );
-
-              return <ReadinessRubric rubric={rubric} workflowId={workflowId} />;
-            })()}
-          </TabsContent>
-
           <TabsContent value="steps" className="space-y-6">
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -700,7 +561,7 @@ export default function WorkflowDetail() {
                   </p>
                 </div>
                 <Button
-                  onClick={() => {/* TODO: Add step dialog */}}
+                  onClick={() => setIsStepDialogOpen(true)}
                   data-testid="button-add-step"
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -721,7 +582,7 @@ export default function WorkflowDetail() {
                     Add steps to break down this workflow into individual tasks for assessment.
                   </p>
                   <Button
-                    onClick={() => {/* TODO: Add step dialog */}}
+                    onClick={() => setIsStepDialogOpen(true)}
                     data-testid="button-add-first-step"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -731,34 +592,8 @@ export default function WorkflowDetail() {
               ) : (
                 <div className="space-y-3">
                   {workflowSteps.map((step, index) => {
-                    // Calculate step-specific readiness if there's a PIF for this step
-                    const stepPIFs = pifData?.responses.filter(pif => pif.stepId === step.id) || [];
-                    const hasTFA = tfaAssessment && tfaAssessment.score !== null;
-                    const hasStepPIF = stepPIFs.length > 0;
-                    
-                    let stepReadiness: number | null = null;
-                    if (hasTFA && hasStepPIF) {
-                      // Calculate readiness: 60% TFA + 40% PIF
-                      const tfaScore = tfaAssessment.score || 0;
-                      
-                      // Average PIF operational scores (processClarity, changeMagnitude, workflowBrittleness) for this step
-                      // These are on a 1-5 scale and need to be normalized to 0-100
-                      const avgOperationalScore = stepPIFs.reduce((sum, pif) => {
-                        const scores = [
-                          pif.processClarity,
-                          pif.changeMagnitude,
-                          pif.workflowBrittleness
-                        ].filter(s => s !== null && s !== undefined) as number[];
-                        
-                        const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-                        return sum + avg;
-                      }, 0) / stepPIFs.length;
-                      
-                      // Normalize operational score from 1-5 scale to 0-100 scale
-                      const normalizedOperationalScore = (avgOperationalScore / 5) * 100;
-                      
-                      stepReadiness = Math.round(tfaScore * 0.6 + normalizedOperationalScore * 0.4);
-                    }
+                    // Readiness is calculated on the step detail page
+                    // No need to calculate it here
 
                     return (
                       <Card key={step.id} className="hover-elevate" data-testid={`card-step-${step.id}`}>
@@ -796,25 +631,9 @@ export default function WorkflowDetail() {
                                   {step.stepDescription}
                                 </p>
                               )}
-                              
-                              {hasStepPIF && (
-                                <div className="flex items-center gap-2 mt-2">
-                                  <span className="text-xs text-muted-foreground">
-                                    {stepPIFs.length} PIF response{stepPIFs.length > 1 ? 's' : ''}
-                                  </span>
-                                </div>
-                              )}
                             </div>
                             
                             <div className="flex items-center gap-3">
-                              {stepReadiness !== null && (
-                                <div className="text-center min-w-[80px]">
-                                  <div className="text-2xl font-bold" data-testid={`text-readiness-${step.id}`}>
-                                    {stepReadiness}
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">Readiness</div>
-                                </div>
-                              )}
                               <Link href={`/company/${companyId}/workflow/${workflowId}/step/${step.id}`}>
                                 <Button
                                   variant="outline"
@@ -843,58 +662,9 @@ export default function WorkflowDetail() {
             ) : opportunitiesLoading ? (
               <p className="text-muted-foreground">Loading opportunities...</p>
             ) : (() => {
-              // Check if we have all required data for opportunity matrix
-              const hasTFA = tfaAssessment && tfaAssessment.score !== null && tfaAssessment.score !== undefined;
-              const hasPIF = pifData && pifData.responses.length > 0;
-              
-              // Calculate readiness score from TFA and PIF data
-              let readinessScore = 50; // Default
-              
-              if (hasTFA && hasPIF) {
-                // Calculate section scores from TFA
-                const sectionScores = {
-                  systemEnvironment: 0,
-                  dataQuality: 0,
-                  integrationFeasibility: 0,
-                  securityCompliance: 0,
-                };
-
-                if (tfaAssessment.responses) {
-                  const responses = tfaAssessment.responses as Record<string, string | number>;
-                  
-                  allSections.forEach((section) => {
-                    const sectionResponses = section.questions
-                      .map(q => {
-                        const val = responses[q.id];
-                        return typeof val === 'string' ? parseInt(val, 10) : val;
-                      })
-                      .filter((score): score is number => 
-                        score !== null && 
-                        score !== undefined && 
-                        !isNaN(score) &&
-                        score !== 0
-                      );
-                    
-                    if (sectionResponses.length > 0) {
-                      const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
-                      const normalizedScore = Math.round((avgScore / 5) * 100);
-                      
-                      if (section.section === 'System Environment') sectionScores.systemEnvironment = normalizedScore;
-                      if (section.section === 'Data Quality') sectionScores.dataQuality = normalizedScore;
-                      if (section.section === 'Integration Feasibility') sectionScores.integrationFeasibility = normalizedScore;
-                      if (section.section === 'Security/Compliance') sectionScores.securityCompliance = normalizedScore;
-                    }
-                  });
-                }
-
-                const rubric = calculateReadinessRubric(
-                  tfaAssessment.score || 0,
-                  sectionScores,
-                  pifData.aggregated
-                );
-                
-                readinessScore = rubric.totalScore;
-              }
+              // Opportunities are created at step level with step-specific readiness
+              // No workflow-level readiness calculation needed here
+              const readinessScore = 50; // Default fallback for display
 
               const handleOpportunitySubmit = (data: InsertImplementationOpportunity) => {
                 if (editingOpportunity) {
@@ -1024,6 +794,71 @@ export default function WorkflowDetail() {
             })()}
           </TabsContent>
         </Tabs>
+
+        {/* Create Workflow Step Dialog */}
+        <Dialog open={isStepDialogOpen} onOpenChange={setIsStepDialogOpen}>
+          <DialogContent className="max-w-2xl" data-testid="dialog-create-step">
+            <DialogHeader>
+              <DialogTitle>Create Workflow Step</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="step-name" className="text-sm font-medium mb-2 block">
+                  Step Name
+                </label>
+                <Input
+                  id="step-name"
+                  value={stepName}
+                  onChange={(e) => setStepName(e.target.value)}
+                  placeholder="e.g., Review and approve invoice"
+                  data-testid="input-step-name"
+                />
+              </div>
+              <div>
+                <label htmlFor="step-description" className="text-sm font-medium mb-2 block">
+                  Step Description
+                </label>
+                <textarea
+                  id="step-description"
+                  value={stepDescription}
+                  onChange={(e) => setStepDescription(e.target.value)}
+                  placeholder="Brief description from stakeholder interviews..."
+                  rows={4}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  data-testid="input-step-description"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsStepDialogOpen(false);
+                    setStepName("");
+                    setStepDescription("");
+                  }}
+                  disabled={createStepMutation.isPending}
+                  data-testid="button-cancel-step"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (stepName.trim()) {
+                      createStepMutation.mutate({
+                        stepName: stepName.trim(),
+                        stepDescription: stepDescription.trim(),
+                      });
+                    }
+                  }}
+                  disabled={!stepName.trim() || createStepMutation.isPending}
+                  data-testid="button-save-step"
+                >
+                  {createStepMutation.isPending ? "Creating..." : "Create Step"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

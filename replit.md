@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Automat-IA Diagnostic Platform is a professional web application for consultants to manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics, including Technical Feasibility Assessments (TFA), Readiness Rubrics, and Business Impact calculations to determine ROI and implementation viability. The platform streamlines project management, generates shareable assessment links, and produces comprehensive Executive Diagnostic Reports. The business vision is to empower consultants with a robust tool for AI strategy, enhancing market potential by providing clear, data-driven insights for AI adoption.
+The Automat-IA Diagnostic Platform is a professional web application for consultants to manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics using step-level process assessment as the primary method. Each workflow is broken down into individual process steps, where each step is assessed independently through Technical Feasibility (TFA, shared across workflow) and Process Insight Forms (PIF, collected per step). The platform generates step-specific readiness scores, SWOT analyses, and implementation opportunities, producing comprehensive Executive Diagnostic Reports. The business vision is to empower consultants with granular, step-by-step insights for AI adoption, enabling precise scoping and impact attribution.
 
 ## User Preferences
 
@@ -33,11 +33,12 @@ Core entities include Companies, Workflows, Workflow Steps (step-level granulari
 
 ### Key Features
 
-- **TFA Survey & Analysis**: Collects technical feasibility data, detects "Don't Know" answers, supports gap resolution, provides auto-updating scores, visual analytics, 5-tier feasibility interpretation, and an Executive Summary with critical technical gaps, strengths, and an implementation roadmap.
-- **PIF Survey & Aggregation**: Multi-respondent Process Insight Form collecting 40 questions across 8 sections, including operational scores, ROI inputs, and qualitative insights. Aggregates scores with variance indicators across respondents.
-- **Readiness Rubric**: Unifies TFA and PIF into a combined 0-100 score with 7 component breakdowns, feasibility banding, visual analytics, and a comprehensive SWOT analysis Executive Summary.
-- **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of readiness, ramp-up, payback, and training). Features both a Base Impact Matrix and an Enhanced Impact Matrix with additive bonuses.
-- **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document for clients, including an Executive Summary, methodology, findings, automation roadmap, and six detailed technical appendices.
+- **Workflow Management**: Create and manage workflows, each broken down into individual process steps with participant assignments and descriptions from stakeholder interviews.
+- **TFA Survey & Analysis**: Workflow-level technical feasibility assessment shared across all steps. Collects feasibility data, detects "Don't Know" answers, supports gap resolution, provides auto-updating scores, visual analytics, 5-tier feasibility interpretation, and an Executive Summary with critical technical gaps, strengths, and an implementation roadmap.
+- **Step-Level PIF Survey**: Process Insight Form collected per workflow step, capturing operational realities at granular level with 40 questions across 8 sections, including operational scores, ROI inputs, and qualitative insights. Supports multiple respondents per step with variance indicators.
+- **Step-Level Readiness Rubric**: Each process step displays its own combined readiness score (60% shared TFA + 40% step-specific PIF) with 7 component breakdowns, radar chart visualization, feasibility banding, and comprehensive SWOT analysis. This is the primary assessment view.
+- **Opportunity Matrix**: A 2D scatter plot visualizing opportunities by Business Impact (X-axis, with a 10x multiplier for ROI and FTE) and Implementation Effort (Y-axis, weighted composite of readiness, ramp-up, payback, and training). Opportunities can be linked to specific workflow steps. Features both a Base Impact Matrix and an Enhanced Impact Matrix with additive bonuses.
+- **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document for clients, including an Executive Summary, methodology, findings, automation roadmap, and six detailed technical appendices (Appendix C aggregates all step-level SWOT analyses per workflow).
 
 ### Step-Level Assessment Architecture
 

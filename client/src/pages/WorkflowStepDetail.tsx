@@ -13,10 +13,14 @@ import { ChevronLeft, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
+import ReadinessRubric from "@/components/ReadinessRubric";
+import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity } from "@shared/schema";
-
+import type { AggregatedPIFScores } from "@shared/pifCalculations";
+import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
+import { tfaSections as allSections } from "@shared/tfaQuestions";
 export default function WorkflowStepDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId/step/:stepId");
   const companyId = params?.companyId || '';
@@ -123,27 +127,59 @@ export default function WorkflowStepDetail() {
   const hasTFA = tfaAssessment && tfaAssessment.score !== null;
   const hasStepPIF = stepPIFs.length > 0;
 
-  // Calculate step readiness
+  // Calculate step-specific aggregated PIF scores
+  let stepAggregatedPIF: AggregatedPIFScores | null = null;
+  let stepReadinessRubric = null;
   let stepReadiness: number | null = null;
+
   if (hasTFA && hasStepPIF) {
-    const tfaScore = tfaAssessment.score || 0;
-    
-    // Average PIF operational scores for this step
-    const avgOperationalScore = stepPIFs.reduce((sum, pif) => {
-      const scores = [
-        pif.processClarity,
-        pif.changeMagnitude,
-        pif.workflowBrittleness
-      ].filter(s => s !== null && s !== undefined) as number[];
+    // Use the same aggregation function as workflow-level
+    stepAggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+
+    // Calculate TFA section scores
+    const sectionScores = {
+      systemEnvironment: 0,
+      dataQuality: 0,
+      integrationFeasibility: 0,
+      securityCompliance: 0,
+    };
+
+    if (tfaAssessment.responses) {
+      const responses = tfaAssessment.responses as Record<string, string | number>;
       
-      const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-      return sum + avg;
-    }, 0) / stepPIFs.length;
+      allSections.forEach((section) => {
+        const sectionResponses = section.questions
+          .map(q => {
+            const val = responses[q.id];
+            return typeof val === 'string' ? parseInt(val, 10) : val;
+          })
+          .filter((score): score is number => 
+            score !== null && 
+            score !== undefined && 
+            !isNaN(score) &&
+            score !== 0
+          );
+        
+        if (sectionResponses.length > 0) {
+          const avgScore = sectionResponses.reduce((sum, score) => sum + score, 0) / sectionResponses.length;
+          const normalizedScore = Math.round((avgScore / 5) * 100);
+          
+          if (section.section === 'System Environment') sectionScores.systemEnvironment = normalizedScore;
+          if (section.section === 'Data Quality') sectionScores.dataQuality = normalizedScore;
+          if (section.section === 'Integration Feasibility') sectionScores.integrationFeasibility = normalizedScore;
+          if (section.section === 'Security/Compliance') sectionScores.securityCompliance = normalizedScore;
+        }
+      });
+    }
+
+    // Calculate readiness rubric for this step
+    stepReadinessRubric = calculateReadinessRubric(
+      tfaAssessment.score || 0,
+      sectionScores,
+      stepAggregatedPIF
+    );
     
-    // Normalize operational score from 1-5 scale to 0-100 scale
-    const normalizedOperationalScore = (avgOperationalScore / 5) * 100;
-    
-    stepReadiness = Math.round(tfaScore * 0.6 + normalizedOperationalScore * 0.4);
+    stepReadiness = stepReadinessRubric.totalScore;
   }
 
   return (
@@ -254,17 +290,19 @@ export default function WorkflowStepDetail() {
           </div>
         </Card>
 
-        {/* Create Opportunity Button */}
-        <div className="flex justify-center">
-          <Button
-            onClick={() => setIsOpportunityDialogOpen(true)}
-            size="lg"
-            data-testid="button-create-opportunity"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Implementation Opportunity
-          </Button>
-        </div>
+        {/* Create Opportunity Button - Only show when readiness rubric is available */}
+        {hasStepPIF && stepReadinessRubric && (
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setIsOpportunityDialogOpen(true)}
+              size="lg"
+              data-testid="button-create-opportunity"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Implementation Opportunity
+            </Button>
+          </div>
+        )}
 
         {/* Generate PIF Link for this specific step */}
         {!hasStepPIF && (
@@ -278,38 +316,31 @@ export default function WorkflowStepDetail() {
           />
         )}
 
-        {hasStepPIF && (
+        {hasStepPIF && stepReadinessRubric && (
           <>
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">PIF Responses</h3>
-              <p className="text-sm text-muted-foreground">
-                This step has {stepPIFs.length} PIF response{stepPIFs.length > 1 ? 's' : ''}.
-              </p>
-              {/* TODO: Add detailed PIF response display */}
-            </Card>
+            {/* Full Readiness Rubric Component */}
+            <ReadinessRubric rubric={stepReadinessRubric} workflowId={workflowId} />
 
+            {/* PIF Respondent Answers */}
             <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Readiness Rubric</h3>
-              <p className="text-sm text-muted-foreground">
-                Readiness rubric component will be displayed here.
-              </p>
-              {/* TODO: Add ReadinessRubric component for this step */}
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">SWOT Analysis</h3>
-              <p className="text-sm text-muted-foreground">
-                SWOT analysis for this step will be displayed here.
-              </p>
-              {/* TODO: Add SWOT analysis component */}
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Component Breakdown</h3>
-              <p className="text-sm text-muted-foreground">
-                Radar chart showing component scores will be displayed here.
-              </p>
-              {/* TODO: Add radar chart component */}
+              <h3 className="text-lg font-semibold mb-4">
+                PIF Responses ({stepPIFs.length} respondent{stepPIFs.length > 1 ? 's' : ''})
+              </h3>
+              <div className="space-y-6">
+                {stepPIFs.map((pif, index) => (
+                  <div key={pif.id} className="border-t border-border pt-6 first:border-t-0 first:pt-0">
+                    <h4 className="font-medium mb-4">
+                      Respondent {index + 1}: {pif.respondentName || 'Anonymous'}
+                      {pif.respondentRole && (
+                        <span className="text-sm text-muted-foreground ml-2">
+                          ({pif.respondentRole})
+                        </span>
+                      )}
+                    </h4>
+                    <PIFRespondentDetail response={pif} />
+                  </div>
+                ))}
+              </div>
             </Card>
           </>
         )}
