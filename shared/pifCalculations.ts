@@ -356,9 +356,60 @@ export function calculateReadinessRubric(
 export function generateSWOTAnalysis(
   readinessScore: ReadinessRubricScore,
   pifResponses: PIFResponse[],
-  tfaSectionScores: TFASectionScores
+  tfaSectionScores: TFASectionScores,
+  tfaResponses?: Record<string, string | number> | null
 ): SWOTAnalysis {
   const { componentScores, totalScore, feasibilityBand } = readinessScore;
+  
+  // Helper function to detect TFA knowledge gaps
+  function isKnowledgeGap(questionId: number): boolean {
+    if (!tfaResponses) return false;
+    const response = tfaResponses[questionId.toString()];
+    return response === "0" || response === 0;
+  }
+  
+  // Helper function to get meaningful component description for TFA components
+  function getTFAComponentInsight(componentName: string, score: number, isStrength: boolean): string[] {
+    const insights: string[] = [];
+    
+    // Map component names to their relevant questions
+    const componentQuestionMap: Record<string, number[]> = {
+      systemEnvironment: [1, 2, 3, 4, 5, 6],
+      dataQuality: [7, 8, 9, 10, 11],
+      integrationFeasibility: [12, 13, 14, 15, 16, 17],
+      securityCompliance: [18, 19, 20, 21]
+    };
+    
+    const questionIds = componentQuestionMap[componentName] || [];
+    
+    // Check each question for this component
+    questionIds.forEach(qId => {
+      if (isKnowledgeGap(qId)) {
+        // Knowledge gap found - add it to insights
+        const meaning = TFA_QUESTION_MEANINGS[qId];
+        insights.push(
+          `Unknown ${meaning.capability} - ${meaning.knowledgeGapAction}`
+        );
+      } else if (tfaResponses) {
+        const response = tfaResponses[qId.toString()];
+        const responseScore = typeof response === 'string' ? parseInt(response, 10) : response;
+        
+        if (!isNaN(responseScore) && responseScore > 0) {
+          const meaning = TFA_QUESTION_MEANINGS[qId];
+          
+          if (isStrength && responseScore >= 4) {
+            // High score - use high score meaning
+            insights.push(meaning.highScoreMeaning);
+          } else if (!isStrength && responseScore <= 2) {
+            // Low score - use low score meaning  
+            insights.push(meaning.lowScoreMeaning);
+          }
+        }
+      }
+    });
+    
+    return insights;
+  }
   
   // Calculate internal metrics from PIF ROI data
   let totalAnnualHours = 0;
@@ -413,153 +464,299 @@ export function generateSWOTAnalysis(
     componentScores
   );
   
-  // Generate Strengths (scores >= 70)
+  // Generate Strengths (ALL components >= 60 with meaningful descriptions)
   const strengths: string[] = [];
   
-  if (componentScores.dataQuality >= 70) {
+  // TFA Components - use question mappings for detailed insights
+  if (componentScores.systemEnvironment >= 60) {
+    const insights = getTFAComponentInsight('systemEnvironment', componentScores.systemEnvironment, true);
+    if (insights.length > 0) {
+      strengths.push(`System Environment (${componentScores.systemEnvironment}/100): ${insights[0]}`);
+    }
+  }
+  
+  if (componentScores.dataQuality >= 60) {
+    const insights = getTFAComponentInsight('dataQuality', componentScores.dataQuality, true);
+    if (insights.length > 0) {
+      strengths.push(`Data Quality (${componentScores.dataQuality}/100): ${insights[0]}`);
+    }
+  }
+  
+  if (componentScores.integrationFeasibility >= 60) {
+    const insights = getTFAComponentInsight('integrationFeasibility', componentScores.integrationFeasibility, true);
+    if (insights.length > 0) {
+      strengths.push(`Integration Feasibility (${componentScores.integrationFeasibility}/100): ${insights[0]}`);
+    }
+  }
+  
+  if (componentScores.securityCompliance >= 60) {
+    const insights = getTFAComponentInsight('securityCompliance', componentScores.securityCompliance, true);
+    if (insights.length > 0) {
+      strengths.push(`Security & Compliance (${componentScores.securityCompliance}/100): ${insights[0]}`);
+    }
+  }
+  
+  // PIF Components - operational strengths
+  if (componentScores.processClarity >= 60) {
     strengths.push(
-      `Strong data infrastructure with ${componentScores.dataQuality}/100 data quality score enables reliable AI model training and reduces implementation risk.`
+      `Process Clarity (${componentScores.processClarity}/100): Well-documented workflow with minimal variation enables accurate automation design and reduces implementation risk`
     );
   }
   
-  if (componentScores.processClarity >= 70) {
+  if (componentScores.changeMagnitude >= 60) {
     strengths.push(
-      `Process is well-documented with ${componentScores.processClarity}/100 clarity score, minimizing knowledge transfer requirements and accelerating automation design.`
+      `Change Readiness (${componentScores.changeMagnitude}/100): Strong organizational readiness for AI adoption minimizes disruption and accelerates user acceptance`
     );
   }
   
-  if (componentScores.integrationFeasibility >= 70) {
+  if (componentScores.workflowBrittleness >= 60) {
     strengths.push(
-      `Existing systems show ${componentScores.integrationFeasibility}/100 integration readiness, allowing seamless AI solution deployment without major infrastructure changes.`
+      `Process Stability (${componentScores.workflowBrittleness}/100): Standardized workflow with low variability supports reliable automated execution`
     );
   }
   
-  if (componentScores.changeMagnitude >= 70) {
-    strengths.push(
-      `Manageable change profile (${componentScores.changeMagnitude}/100) indicates strong organizational readiness for AI adoption with minimal disruption.`
-    );
-  }
-  
+  // Ensure minimum insights
   if (strengths.length === 0) {
     strengths.push(
-      `Assessment completed with ${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''}, providing baseline insights for improvement planning.`
+      `Assessment completed with ${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''}, establishing baseline for improvement planning and implementation strategy`
     );
   }
   
-  // Generate Weaknesses (scores < 50)
+  // Generate Weaknesses (ALL components < 60 + TFA knowledge gaps)
   const weaknesses: string[] = [];
   
-  if (componentScores.systemEnvironment < 50) {
+  // TFA Components - include gaps and knowledge gaps
+  if (componentScores.systemEnvironment < 60) {
+    const insights = getTFAComponentInsight('systemEnvironment', componentScores.systemEnvironment, false);
+    if (insights.length > 0) {
+      insights.forEach(insight => {
+        weaknesses.push(`System Environment (${componentScores.systemEnvironment}/100): ${insight}`);
+      });
+    } else {
+      weaknesses.push(
+        `System Environment (${componentScores.systemEnvironment}/100): Infrastructure limitations require assessment and potential modernization before AI deployment`
+      );
+    }
+  }
+  
+  if (componentScores.dataQuality < 60) {
+    const insights = getTFAComponentInsight('dataQuality', componentScores.dataQuality, false);
+    if (insights.length > 0) {
+      insights.forEach(insight => {
+        weaknesses.push(`Data Quality (${componentScores.dataQuality}/100): ${insight}`);
+      });
+    } else {
+      weaknesses.push(
+        `Data Quality (${componentScores.dataQuality}/100): Data standardization and cleanup initiatives needed to support reliable AI decision-making`
+      );
+    }
+  }
+  
+  if (componentScores.integrationFeasibility < 60) {
+    const insights = getTFAComponentInsight('integrationFeasibility', componentScores.integrationFeasibility, false);
+    if (insights.length > 0) {
+      insights.forEach(insight => {
+        weaknesses.push(`Integration Feasibility (${componentScores.integrationFeasibility}/100): ${insight}`);
+      });
+    } else {
+      weaknesses.push(
+        `Integration Feasibility (${componentScores.integrationFeasibility}/100): Integration complexity requires architectural planning and potential middleware development`
+      );
+    }
+  }
+  
+  if (componentScores.securityCompliance < 60) {
+    const insights = getTFAComponentInsight('securityCompliance', componentScores.securityCompliance, false);
+    if (insights.length > 0) {
+      insights.forEach(insight => {
+        weaknesses.push(`Security & Compliance (${componentScores.securityCompliance}/100): ${insight}`);
+      });
+    } else {
+      weaknesses.push(
+        `Security & Compliance (${componentScores.securityCompliance}/100): Governance framework requires strengthening to meet AI implementation requirements`
+      );
+    }
+  }
+  
+  // PIF Components - operational weaknesses
+  if (componentScores.processClarity < 60) {
     weaknesses.push(
-      `System infrastructure gaps (${componentScores.systemEnvironment}/100) require modernization before AI deployment to ensure compatibility and performance.`
+      `Process Clarity (${componentScores.processClarity}/100): Limited documentation creates knowledge gaps that complicate automation design and increase implementation timeline`
     );
   }
   
-  if (componentScores.dataQuality < 50) {
+  if (componentScores.changeMagnitude < 60) {
     weaknesses.push(
-      `Data quality challenges (${componentScores.dataQuality}/100) necessitate cleanup and standardization efforts to support accurate AI decision-making.`
+      `Change Readiness (${componentScores.changeMagnitude}/100): Change management challenges risk user resistance and require comprehensive stakeholder engagement strategy`
     );
   }
   
-  if (componentScores.securityCompliance < 50) {
+  if (componentScores.workflowBrittleness < 60) {
     weaknesses.push(
-      `Security and compliance framework (${componentScores.securityCompliance}/100) needs strengthening to meet AI governance requirements and protect sensitive data.`
+      `Process Stability (${componentScores.workflowBrittleness}/100): High process variability requires standardization initiatives before reliable automation deployment`
     );
   }
   
-  if (componentScores.processClarity < 50) {
-    weaknesses.push(
-      `Limited process documentation (${componentScores.processClarity}/100) creates knowledge gaps that increase automation complexity and implementation timeline.`
-    );
-  }
-  
-  if (componentScores.workflowBrittleness < 50) {
-    weaknesses.push(
-      `Process fragility (${componentScores.workflowBrittleness}/100) indicates high variability requiring standardization before reliable automation can be achieved.`
-    );
-  }
-  
+  // Ensure minimum insights
   if (weaknesses.length === 0) {
     weaknesses.push(
-      `All component scores meet minimum thresholds, though strategic improvements in lower-scoring areas will accelerate implementation.`
+      `All component scores exceed 60/100 threshold, though targeted improvements in 50-60 range components will optimize implementation success`
     );
   }
   
-  // Generate Opportunities (business impact potential)
+  // Generate Opportunities (directional business impact - no ROI calculations)
   const opportunities: string[] = [];
   
+  // Business impact potential from high-scoring foundations
+  const strongComponents = [];
+  if (componentScores.dataQuality >= 60) strongComponents.push('data quality');
+  if (componentScores.processClarity >= 60) strongComponents.push('process documentation');
+  if (componentScores.integrationFeasibility >= 60) strongComponents.push('integration readiness');
+  if (componentScores.systemEnvironment >= 60) strongComponents.push('technical infrastructure');
+  
+  if (strongComponents.length >= 2) {
+    opportunities.push(
+      `Strong ${strongComponents.slice(0, 2).join(' and ')} foundations enable confident phased AI implementation, starting with high-value use cases and expanding progressively`
+    );
+  }
+  
+  // Capacity release potential (directional only)
   if (estimatedFTE >= 0.5) {
     opportunities.push(
-      `Significant capacity release opportunity detected through process optimization, enabling team reallocation to higher-value strategic initiatives.`
+      `Substantial capacity release potential through automation enables team reallocation to higher-value strategic initiatives and growth activities`
+    );
+  } else if (estimatedFTE >= 0.2) {
+    opportunities.push(
+      `Meaningful efficiency gains available through automation, supporting operational optimization goals`
     );
   }
   
+  // Quality improvement potential
   if (avgErrorRate > 5) {
     opportunities.push(
-      `Quality improvement potential through AI-driven consistency and validation, reducing rework cycles and enhancing operational reliability.`
+      `Significant quality improvement opportunity through AI-driven consistency and validation, reducing rework cycles and enhancing operational reliability`
     );
-  }
-  
-  if (volumeDescriptions.length > 0 && volumeContext.includes('daily')) {
+  } else if (avgErrorRate > 0) {
     opportunities.push(
-      `High-frequency process provides rapid ROI accumulation with daily efficiency gains compounding to substantial annual impact.`
+      `Error reduction potential through automated validation supports quality and compliance objectives`
     );
   }
   
-  if (componentScores.processClarity >= 60 && componentScores.dataQuality >= 60) {
+  // Frequency/volume advantages (directional)
+  if (volumeDescriptions.length > 0) {
+    if (volumeContext.includes('daily')) {
+      opportunities.push(
+        `High-frequency daily process enables rapid ROI accumulation with efficiency gains compounding to substantial annual business impact`
+      );
+    } else if (volumeContext.includes('weekly')) {
+      opportunities.push(
+        `Regular weekly cadence provides consistent automation value and measurable performance tracking`
+      );
+    }
+  }
+  
+  // Readiness-based timing opportunities
+  if (totalScore >= 65) {
     opportunities.push(
-      `Strong process and data foundations enable phased AI implementation, starting with high-confidence automation and expanding progressively.`
+      `Strong overall readiness supports immediate pilot program initiation, generating early wins and building stakeholder confidence for broader rollout`
     );
-  }
-  
-  if (totalScore >= 50) {
+  } else if (totalScore >= 50) {
     opportunities.push(
-      `Moderate-to-high readiness enables pilot program initiation within current quarter, generating early wins and stakeholder confidence.`
+      `Moderate readiness enables targeted pilot program within current quarter after addressing specific preparatory items`
+    );
+  } else if (totalScore >= 35) {
+    opportunities.push(
+      `Foundation-building phase presents opportunity to establish AI governance best practices that will benefit future automation initiatives across the organization`
     );
   }
   
+  // Ensure minimum insights
   if (opportunities.length === 0) {
     opportunities.push(
-      `Foundation-building phase presents opportunity to establish best practices that will benefit future automation initiatives across the organization.`
+      `Early-stage assessment provides opportunity to develop comprehensive automation roadmap aligned with business priorities and technical capabilities`
     );
   }
   
-  // Generate Threats (implementation risks)
+  // Generate Threats (implementation risks + TFA knowledge gaps as uncertainty risks)
   const threats: string[] = [];
+  
+  // Critical low scores create implementation risks
+  if (componentScores.systemEnvironment < 40) {
+    threats.push(
+      `System Environment (${componentScores.systemEnvironment}/100): Critical infrastructure limitations threaten project timeline and budget; foundation modernization required before automation deployment`
+    );
+  }
+  
+  if (componentScores.dataQuality < 40) {
+    threats.push(
+      `Data Quality (${componentScores.dataQuality}/100): Severe data issues risk automation accuracy and reliability; comprehensive data cleanup initiatives must precede AI implementation`
+    );
+  }
+  
+  if (componentScores.integrationFeasibility < 40) {
+    threats.push(
+      `Integration Feasibility (${componentScores.integrationFeasibility}/100): Integration complexity threatens implementation timeline and cost; architectural planning and middleware development required`
+    );
+  }
+  
+  if (componentScores.securityCompliance < 40) {
+    threats.push(
+      `Security & Compliance (${componentScores.securityCompliance}/100): Regulatory gaps create deployment blockers; comprehensive governance framework needed before vendor selection`
+    );
+  }
   
   if (componentScores.changeMagnitude < 40) {
     threats.push(
-      `Low change readiness (${componentScores.changeMagnitude}/100) risks user resistance and adoption challenges without comprehensive change management support.`
+      `Change Readiness (${componentScores.changeMagnitude}/100): Low organizational readiness risks user resistance and adoption failure; comprehensive change management program essential`
     );
   }
   
   if (componentScores.workflowBrittleness < 40) {
     threats.push(
-      `Process instability (${componentScores.workflowBrittleness}/100) threatens automation reliability; standardization must precede AI deployment to avoid multiplying inconsistencies.`
+      `Process Stability (${componentScores.workflowBrittleness}/100): Severe process variability threatens automation reliability; standardization initiatives must precede deployment to avoid multiplying inconsistencies`
     );
   }
   
-  if (componentScores.systemEnvironment < 40 && componentScores.integrationFeasibility < 40) {
+  if (componentScores.processClarity < 40) {
     threats.push(
-      `Technical infrastructure limitations risk project delays and cost overruns; foundation-building investment required before automation work begins.`
+      `Process Clarity (${componentScores.processClarity}/100): Critical documentation gaps increase implementation risk; comprehensive process mapping required before automation design`
     );
   }
   
+  // Add TFA knowledge gaps as uncertainty threats
+  const knowledgeGapThreats: string[] = [];
+  for (let qId = 1; qId <= 21; qId++) {
+    if (isKnowledgeGap(qId)) {
+      const meaning = TFA_QUESTION_MEANINGS[qId];
+      knowledgeGapThreats.push(
+        `Unknown ${meaning.capability} creates implementation uncertainty - ${meaning.knowledgeGapAction}`
+      );
+    }
+  }
+  threats.push(...knowledgeGapThreats);
+  
+  // Stakeholder coverage risks
   if (pifResponses.length < 2 && totalEmployees > 5) {
     threats.push(
-      `Limited stakeholder input (${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''} from ${totalEmployees}+ affected employees) may miss critical process nuances affecting implementation success.`
+      `Limited stakeholder participation (${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''} from ${totalEmployees}+ employees) risks missing critical process insights that could derail implementation`
     );
   }
   
+  // Overall readiness risks
   if (totalScore < 35) {
     threats.push(
-      `Low overall readiness (${totalScore}/100) indicates premature automation would likely fail; focus on foundational improvements before revisiting AI implementation.`
+      `Critical overall readiness gap (${totalScore}/100): Premature automation deployment would likely fail; prioritize foundational improvements and reassess in 6-12 months`
+    );
+  } else if (totalScore < 50) {
+    threats.push(
+      `Moderate readiness challenges require structured preparation phase before pilot initiation to mitigate implementation risks`
     );
   }
   
+  // Ensure minimum insights
   if (threats.length === 0) {
     threats.push(
-      `Standard implementation risks apply; maintain stakeholder engagement and monitor for scope creep as automation design evolves.`
+      `Standard implementation risks apply: maintain proactive stakeholder engagement, monitor scope creep, and validate assumptions as automation design evolves`
     );
   }
   
