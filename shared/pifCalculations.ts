@@ -484,13 +484,13 @@ export function generateSWOTAnalysis(
       
       if (descriptions.strengths.length > 0) {
         // Use first specific insight from high-scoring questions
-        strengths.push(`${meta.label} (${score}/100): ${descriptions.strengths[0]}`);
+        strengths.push(`${meta.label} (${Math.round(score)}/100): ${descriptions.strengths[0]}`);
       } else {
         // Fallback: generic strength statement based on score range
         const fallbackMsg = score >= 75 
           ? 'Strong capability foundation supports confident AI implementation'
           : 'Solid capability baseline enables structured automation approach';
-        strengths.push(`${meta.label} (${score}/100): ${fallbackMsg}`);
+        strengths.push(`${meta.label} (${Math.round(score)}/100): ${fallbackMsg}`);
       }
     }
   });
@@ -498,19 +498,19 @@ export function generateSWOTAnalysis(
   // PIF Components
   if (componentScores.processClarity >= 60) {
     strengths.push(
-      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Well-documented workflow with minimal variation enables accurate automation design and reduces implementation risk`
+      `${componentMeta.processClarity.label} (${Math.round(componentScores.processClarity)}/100): Well-documented workflow with minimal variation enables accurate automation design and reduces implementation risk`
     );
   }
   
   if (componentScores.changeMagnitude >= 60) {
     strengths.push(
-      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Strong organizational readiness for AI adoption minimizes disruption and accelerates user acceptance`
+      `${componentMeta.changeMagnitude.label} (${Math.round(componentScores.changeMagnitude)}/100): Strong organizational readiness for AI adoption minimizes disruption and accelerates user acceptance`
     );
   }
   
   if (componentScores.workflowBrittleness >= 60) {
     strengths.push(
-      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): Standardized workflow with low variability supports reliable automated execution`
+      `${componentMeta.workflowBrittleness.label} (${Math.round(componentScores.workflowBrittleness)}/100): Standardized workflow with low variability supports reliable automated execution`
     );
   }
   
@@ -542,20 +542,20 @@ export function generateSWOTAnalysis(
     
     // Add knowledge gaps FIRST (these are critical weaknesses regardless of score)
     descriptions.knowledgeGaps.forEach(gap => {
-      weaknesses.push(`${meta.label} (${score}/100): ${gap}`);
+      weaknesses.push(`${meta.label} (${Math.round(score)}/100): ${gap}`);
     });
     
     // Then add score-based weaknesses if < 60
     if (score < 60) {
       if (descriptions.weaknesses.length > 0) {
         // Use first specific weakness from low-scoring questions
-        weaknesses.push(`${meta.label} (${score}/100): ${descriptions.weaknesses[0]}`);
+        weaknesses.push(`${meta.label} (${Math.round(score)}/100): ${descriptions.weaknesses[0]}`);
       } else if (descriptions.knowledgeGaps.length === 0) {
         // Fallback: generic weakness if no specific insights and no knowledge gaps
         const fallbackMsg = score < 40
           ? 'Critical capability gap requires foundation-building before AI implementation'
           : 'Moderate capability limitations necessitate targeted improvements during preparation phase';
-        weaknesses.push(`${meta.label} (${score}/100): ${fallbackMsg}`);
+        weaknesses.push(`${meta.label} (${Math.round(score)}/100): ${fallbackMsg}`);
       }
     }
   });
@@ -563,19 +563,19 @@ export function generateSWOTAnalysis(
   // PIF Components - operational weaknesses
   if (componentScores.processClarity < 60) {
     weaknesses.push(
-      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Limited documentation creates knowledge gaps that complicate automation design and increase implementation timeline`
+      `${componentMeta.processClarity.label} (${Math.round(componentScores.processClarity)}/100): Limited documentation creates knowledge gaps that complicate automation design and increase implementation timeline`
     );
   }
   
   if (componentScores.changeMagnitude < 60) {
     weaknesses.push(
-      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Change management challenges risk user resistance and require comprehensive stakeholder engagement strategy`
+      `${componentMeta.changeMagnitude.label} (${Math.round(componentScores.changeMagnitude)}/100): Change management challenges risk user resistance and require comprehensive stakeholder engagement strategy`
     );
   }
   
   if (componentScores.workflowBrittleness < 60) {
     weaknesses.push(
-      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): High process variability requires standardization initiatives before reliable automation deployment`
+      `${componentMeta.workflowBrittleness.label} (${Math.round(componentScores.workflowBrittleness)}/100): High process variability requires standardization initiatives before reliable automation deployment`
     );
   }
   
@@ -704,19 +704,19 @@ export function generateSWOTAnalysis(
   // PIF Components - critical operational risks (<40)
   if (componentScores.processClarity < 40) {
     threats.push(
-      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Severe documentation gaps increase implementation risk and cost; comprehensive process mapping essential before design phase`
+      `${componentMeta.processClarity.label} (${Math.round(componentScores.processClarity)}/100): Severe documentation gaps increase implementation risk and cost; comprehensive process mapping essential before design phase`
     );
   }
   
   if (componentScores.changeMagnitude < 40) {
     threats.push(
-      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Low organizational readiness risks user resistance and adoption failure; intensive change management program required`
+      `${componentMeta.changeMagnitude.label} (${Math.round(componentScores.changeMagnitude)}/100): Low organizational readiness risks user resistance and adoption failure; intensive change management program required`
     );
   }
   
   if (componentScores.workflowBrittleness < 40) {
     threats.push(
-      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): Severe process variability threatens automation reliability; standardization must precede deployment to avoid multiplying inconsistencies`
+      `${componentMeta.workflowBrittleness.label} (${Math.round(componentScores.workflowBrittleness)}/100): Severe process variability threatens automation reliability; standardization must precede deployment to avoid multiplying inconsistencies`
     );
   }
   
@@ -730,7 +730,7 @@ export function generateSWOTAnalysis(
   // Overall readiness risks
   if (totalScore < 35) {
     threats.push(
-      `Critical overall readiness gap (${totalScore}/100): Premature automation would likely fail; prioritize foundational improvements and reassess readiness in 6-12 months`
+      `Critical overall readiness gap (${Math.round(totalScore)}/100): Premature automation would likely fail; prioritize foundational improvements and reassess readiness in 6-12 months`
     );
   } else if (totalScore < 50) {
     threats.push(
@@ -934,10 +934,10 @@ function generateExecutiveSummary(
   const gapName = bottomGap[0].replace(/([A-Z])/g, ' $1').trim().toLowerCase();
   
   if (totalScore >= 65) {
-    return `This process demonstrates ${feasibilityBand.toLowerCase()} readiness for AI automation with an overall score of ${totalScore}/100. The assessment reveals strong ${strengthName} capabilities supporting implementation feasibility. ${estimatedFTE >= 0.5 ? 'Significant capacity release potential justifies investment prioritization.' : 'Implementation should focus on quality and consistency improvements beyond pure efficiency gains.'} Key success factor: leveraging existing strengths while addressing ${gapName} considerations during deployment planning.`;
+    return `This process demonstrates ${feasibilityBand.toLowerCase()} readiness for AI automation with an overall score of ${Math.round(totalScore)}/100. The assessment reveals strong ${strengthName} capabilities supporting implementation feasibility. ${estimatedFTE >= 0.5 ? 'Significant capacity release potential justifies investment prioritization.' : 'Implementation should focus on quality and consistency improvements beyond pure efficiency gains.'} Key success factor: leveraging existing strengths while addressing ${gapName} considerations during deployment planning.`;
   } else if (totalScore >= 50) {
-    return `This process shows ${feasibilityBand.toLowerCase()} readiness (${totalScore}/100) for AI automation with preparatory work required. While ${strengthName} capabilities provide a foundation, ${gapName} gaps must be addressed for successful implementation. ${estimatedFTE >= 0.3 ? 'Moderate efficiency opportunity warrants measured investment with realistic timeline expectations.' : 'Focus implementation value proposition on quality, compliance, or strategic benefits rather than pure labor savings.'} Recommended approach: phased deployment beginning with lower-risk process components.`;
+    return `This process shows ${feasibilityBand.toLowerCase()} readiness (${Math.round(totalScore)}/100) for AI automation with preparatory work required. While ${strengthName} capabilities provide a foundation, ${gapName} gaps must be addressed for successful implementation. ${estimatedFTE >= 0.3 ? 'Moderate efficiency opportunity warrants measured investment with realistic timeline expectations.' : 'Focus implementation value proposition on quality, compliance, or strategic benefits rather than pure labor savings.'} Recommended approach: phased deployment beginning with lower-risk process components.`;
   } else {
-    return `This process currently exhibits ${feasibilityBand.toLowerCase()} readiness (${totalScore}/100) for AI automation. Critical gaps in ${gapName} require foundational improvements before automation becomes viable. While ${strengthName} shows relative strength, multiple components need enhancement to support reliable AI deployment. Recommended path: address infrastructure and process maturity gaps first, then reassess automation potential in 6-12 months as improvements materialize.`;
+    return `This process currently exhibits ${feasibilityBand.toLowerCase()} readiness (${Math.round(totalScore)}/100) for AI automation. Critical gaps in ${gapName} require foundational improvements before automation becomes viable. While ${strengthName} shows relative strength, multiple components need enhancement to support reliable AI deployment. Recommended path: address infrastructure and process maturity gaps first, then reassess automation potential in 6-12 months as improvements materialize.`;
   }
 }
