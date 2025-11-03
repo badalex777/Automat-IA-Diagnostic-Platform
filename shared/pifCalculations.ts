@@ -1,6 +1,149 @@
 // PIF Aggregation and Variance Calculations
 import type { PIFResponse } from "./schema";
 
+// TFA Question Meaning Mapping for SWOT Analysis
+// Maps each TFA question to business-friendly descriptions for client-facing reports
+export const TFA_QUESTION_MEANINGS: Record<number, {
+  capability: string;
+  highScoreMeaning: string;
+  lowScoreMeaning: string;
+  knowledgeGapAction: string;
+}> = {
+  // System Environment
+  1: {
+    capability: "cloud infrastructure and deployment model",
+    highScoreMeaning: "Modern cloud-based systems enable flexible AI deployment with minimal infrastructure investment",
+    lowScoreMeaning: "Legacy on-premises infrastructure requires modernization or hybrid integration layer before AI deployment",
+    knowledgeGapAction: "Conduct IT infrastructure assessment to document deployment architecture and cloud migration roadmap"
+  },
+  2: {
+    capability: "API availability and system connectivity",
+    highScoreMeaning: "Comprehensive modern APIs enable seamless AI integration with real-time data exchange",
+    lowScoreMeaning: "Limited or absent APIs require custom integration middleware or RPA workarounds, increasing implementation complexity",
+    knowledgeGapAction: "Request technical documentation from IT/vendors to identify available API endpoints and integration options"
+  },
+  3: {
+    capability: "programmatic system access for automation",
+    highScoreMeaning: "Native automation support with service accounts and SDKs enables reliable unattended AI processing",
+    lowScoreMeaning: "UI-only access requires RPA screen automation, creating brittleness and maintenance overhead",
+    knowledgeGapAction: "Engage IT team to verify service account capabilities and programmatic access methods"
+  },
+  4: {
+    capability: "system performance and reliability",
+    highScoreMeaning: "Sub-second response times and high uptime ensure AI automation meets business SLAs",
+    lowScoreMeaning: "Frequent timeouts and system instability threaten automation reliability and require infrastructure improvements",
+    knowledgeGapAction: "Review system monitoring dashboards with IT to establish baseline performance metrics"
+  },
+  5: {
+    capability: "monitoring and observability infrastructure",
+    highScoreMeaning: "Real-time monitoring with automated alerts enables proactive AI performance management and rapid issue resolution",
+    lowScoreMeaning: "Lack of monitoring visibility hampers troubleshooting and limits ability to track automation ROI",
+    knowledgeGapAction: "Audit existing monitoring tools with IT team to determine logging and alerting capabilities"
+  },
+  6: {
+    capability: "backup and disaster recovery capabilities",
+    highScoreMeaning: "Enterprise disaster recovery with automated failover protects AI automation from data loss and downtime",
+    lowScoreMeaning: "Inadequate backup systems create risk of catastrophic automation failures without recovery options",
+    knowledgeGapAction: "Review disaster recovery documentation with IT to understand RTO/RPO commitments"
+  },
+  
+  // Data Quality
+  7: {
+    capability: "data structure and format consistency",
+    highScoreMeaning: "Fully structured data with standardized schemas enables accurate AI model training with minimal preprocessing",
+    lowScoreMeaning: "Unstructured or inconsistent data formats require significant data engineering and increase AI error rates",
+    knowledgeGapAction: "Conduct data sampling exercise to document actual data formats and structure variations"
+  },
+  8: {
+    capability: "data accuracy and completeness",
+    highScoreMeaning: "High-quality validated data reduces AI training requirements and ensures reliable automated decisions",
+    lowScoreMeaning: "Frequent errors and missing fields necessitate data cleanup initiatives before AI implementation can succeed",
+    knowledgeGapAction: "Perform data quality audit to quantify error rates and identify root causes of data issues"
+  },
+  9: {
+    capability: "historical data availability for training",
+    highScoreMeaning: "Extensive historical records provide rich training examples, enabling sophisticated AI pattern recognition",
+    lowScoreMeaning: "Insufficient training data limits AI capabilities or requires synthetic data generation approaches",
+    knowledgeGapAction: "Query databases with IT support to determine actual record counts and historical data depth"
+  },
+  10: {
+    capability: "data consistency across sources and time",
+    highScoreMeaning: "Single source of truth with enforced standards enables confident AI deployment across data sources",
+    lowScoreMeaning: "Conflicting data formats across systems require complex mapping logic and ongoing maintenance",
+    knowledgeGapAction: "Map data flows between systems to document format variations and transformation requirements"
+  },
+  11: {
+    capability: "data validation and error handling",
+    highScoreMeaning: "Robust validation framework with automated correction reduces manual exception handling in AI workflows",
+    lowScoreMeaning: "Lack of validation rules allows bad data to propagate through automation, causing downstream failures",
+    knowledgeGapAction: "Review existing validation logic with development team to identify gaps in error handling"
+  },
+  
+  // Integration Feasibility
+  12: {
+    capability: "number of systems requiring integration",
+    highScoreMeaning: "Simple integration landscape with few touchpoints reduces implementation complexity and accelerates deployment",
+    lowScoreMeaning: "Complex multi-system integration requires orchestration layer and increases points of failure",
+    knowledgeGapAction: "Create system integration map to document all touchpoints and data flows in the workflow"
+  },
+  13: {
+    capability: "compatibility with integration platforms",
+    highScoreMeaning: "Native integration support enables rapid deployment using low-code platforms like Zapier or Make",
+    lowScoreMeaning: "Proprietary systems with no connectors necessitate custom middleware development and ongoing maintenance",
+    knowledgeGapAction: "Check vendor documentation and integration marketplaces to identify available connectors"
+  },
+  14: {
+    capability: "authentication complexity",
+    highScoreMeaning: "Simple API key authentication enables straightforward automation setup with minimal security overhead",
+    lowScoreMeaning: "Complex multi-factor authentication schemes complicate unattended automation and may require architectural workarounds",
+    knowledgeGapAction: "Consult security team to understand authentication requirements and available service account options"
+  },
+  15: {
+    capability: "API rate limits and throughput capacity",
+    highScoreMeaning: "Generous API limits support high-volume automation without throttling concerns",
+    lowScoreMeaning: "Strict rate limits constrain automation throughput and may require batch processing or caching strategies",
+    knowledgeGapAction: "Review vendor SLAs and API documentation to confirm rate limit tiers and upgrade options"
+  },
+  16: {
+    capability: "error handling and retry mechanisms",
+    highScoreMeaning: "Advanced error handling with circuit breakers ensures graceful degradation and automatic recovery",
+    lowScoreMeaning: "Absence of retry logic causes automation failures to propagate, requiring manual intervention",
+    knowledgeGapAction: "Review integration architecture with technical team to document current error handling patterns"
+  },
+  17: {
+    capability: "API stability and version management",
+    highScoreMeaning: "Enterprise-grade API stability with long deprecation cycles minimizes automation maintenance burden",
+    lowScoreMeaning: "Frequent breaking changes create ongoing maintenance overhead and automation fragility",
+    knowledgeGapAction: "Review vendor API changelog and roadmap to assess historical stability and versioning practices"
+  },
+  
+  // Security/Compliance
+  18: {
+    capability: "data sensitivity classification",
+    highScoreMeaning: "Non-sensitive data reduces compliance requirements and accelerates AI vendor selection",
+    lowScoreMeaning: "Highly regulated data (PHI, PCI, PII) requires stringent vendor vetting and limits AI solution options",
+    knowledgeGapAction: "Engage compliance team to formally classify data sensitivity and applicable regulations"
+  },
+  19: {
+    capability: "regulatory compliance requirements",
+    highScoreMeaning: "Minimal compliance overhead allows flexible AI vendor selection and rapid implementation",
+    lowScoreMeaning: "Strict regulatory requirements (HIPAA, SOC 2, PCI-DSS) necessitate specialized vendors and extensive auditing",
+    knowledgeGapAction: "Review compliance obligations with legal/InfoSec to document specific AI governance requirements"
+  },
+  20: {
+    capability: "security approval timeline",
+    highScoreMeaning: "Rapid security approval process enables agile AI vendor selection and quick implementation cycles",
+    lowScoreMeaning: "Lengthy security reviews create extended timelines and may require early vendor engagement",
+    knowledgeGapAction: "Meet with InfoSec team to understand approval process and identify opportunities for pre-approval"
+  },
+  21: {
+    capability: "data retention and archival policies",
+    highScoreMeaning: "Flexible retention policies simplify AI solution design and reduce storage complexity",
+    lowScoreMeaning: "Complex long-term retention mandates require specialized archival solutions and increase infrastructure costs",
+    knowledgeGapAction: "Review retention policies with legal/compliance to document exact requirements and their AI implications"
+  }
+};
+
 // SWOT Analysis Types
 export interface SWOTAnalysis {
   strengths: string[];
