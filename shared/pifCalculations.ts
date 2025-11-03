@@ -368,28 +368,33 @@ export function generateSWOTAnalysis(
     return response === "0" || response === 0;
   }
   
-  // Helper function to get meaningful component description for TFA components
-  function getTFAComponentInsight(componentName: string, score: number, isStrength: boolean): string[] {
-    const insights: string[] = [];
+  // Component metadata for consistent labeling
+  const componentMeta = {
+    systemEnvironment: { label: 'System Environment', tfaQuestions: [1, 2, 3, 4, 5, 6] },
+    dataQuality: { label: 'Data Quality', tfaQuestions: [7, 8, 9, 10, 11] },
+    integrationFeasibility: { label: 'Integration Feasibility', tfaQuestions: [12, 13, 14, 15, 16, 17] },
+    securityCompliance: { label: 'Security & Compliance', tfaQuestions: [18, 19, 20, 21] },
+    processClarity: { label: 'Process Clarity', tfaQuestions: [] },
+    changeMagnitude: { label: 'Change Readiness', tfaQuestions: [] },
+    workflowBrittleness: { label: 'Process Stability', tfaQuestions: [] }
+  };
+  
+  // Helper to get TFA component insights with knowledge gaps
+  function getTFAComponentDescriptions(
+    componentName: 'systemEnvironment' | 'dataQuality' | 'integrationFeasibility' | 'securityCompliance',
+    score: number
+  ): { strengths: string[], weaknesses: string[], knowledgeGaps: string[] } {
+    const meta = componentMeta[componentName];
+    const strengths: string[] = [];
+    const weaknesses: string[] = [];
+    const knowledgeGaps: string[] = [];
     
-    // Map component names to their relevant questions
-    const componentQuestionMap: Record<string, number[]> = {
-      systemEnvironment: [1, 2, 3, 4, 5, 6],
-      dataQuality: [7, 8, 9, 10, 11],
-      integrationFeasibility: [12, 13, 14, 15, 16, 17],
-      securityCompliance: [18, 19, 20, 21]
-    };
-    
-    const questionIds = componentQuestionMap[componentName] || [];
-    
-    // Check each question for this component
-    questionIds.forEach(qId => {
+    // Check each question in this component
+    meta.tfaQuestions.forEach(qId => {
       if (isKnowledgeGap(qId)) {
-        // Knowledge gap found - add it to insights
+        // Knowledge gap found
         const meaning = TFA_QUESTION_MEANINGS[qId];
-        insights.push(
-          `Unknown ${meaning.capability} - ${meaning.knowledgeGapAction}`
-        );
+        knowledgeGaps.push(`Unknown ${meaning.capability} - ${meaning.knowledgeGapAction}`);
       } else if (tfaResponses) {
         const response = tfaResponses[qId.toString()];
         const responseScore = typeof response === 'string' ? parseInt(response, 10) : response;
@@ -397,18 +402,16 @@ export function generateSWOTAnalysis(
         if (!isNaN(responseScore) && responseScore > 0) {
           const meaning = TFA_QUESTION_MEANINGS[qId];
           
-          if (isStrength && responseScore >= 4) {
-            // High score - use high score meaning
-            insights.push(meaning.highScoreMeaning);
-          } else if (!isStrength && responseScore <= 2) {
-            // Low score - use low score meaning  
-            insights.push(meaning.lowScoreMeaning);
+          if (responseScore >= 4) {
+            strengths.push(meaning.highScoreMeaning);
+          } else if (responseScore <= 2) {
+            weaknesses.push(meaning.lowScoreMeaning);
           }
         }
       }
     });
     
-    return insights;
+    return { strengths, weaknesses, knowledgeGaps };
   }
   
   // Calculate internal metrics from PIF ROI data
@@ -464,144 +467,133 @@ export function generateSWOTAnalysis(
     componentScores
   );
   
-  // Generate Strengths (ALL components >= 60 with meaningful descriptions)
+  // STRENGTHS: Iterate ALL components, include those >= 60
   const strengths: string[] = [];
   
-  // TFA Components - use question mappings for detailed insights
-  if (componentScores.systemEnvironment >= 60) {
-    const insights = getTFAComponentInsight('systemEnvironment', componentScores.systemEnvironment, true);
-    if (insights.length > 0) {
-      strengths.push(`System Environment (${componentScores.systemEnvironment}/100): ${insights[0]}`);
-    }
-  }
+  // TFA Components
+  const tfaComponents: Array<'systemEnvironment' | 'dataQuality' | 'integrationFeasibility' | 'securityCompliance'> = [
+    'systemEnvironment', 'dataQuality', 'integrationFeasibility', 'securityCompliance'
+  ];
   
-  if (componentScores.dataQuality >= 60) {
-    const insights = getTFAComponentInsight('dataQuality', componentScores.dataQuality, true);
-    if (insights.length > 0) {
-      strengths.push(`Data Quality (${componentScores.dataQuality}/100): ${insights[0]}`);
+  tfaComponents.forEach(componentName => {
+    const score = componentScores[componentName];
+    const meta = componentMeta[componentName];
+    
+    if (score >= 60) {
+      const descriptions = getTFAComponentDescriptions(componentName, score);
+      
+      if (descriptions.strengths.length > 0) {
+        // Use first specific insight from high-scoring questions
+        strengths.push(`${meta.label} (${score}/100): ${descriptions.strengths[0]}`);
+      } else {
+        // Fallback: generic strength statement based on score range
+        const fallbackMsg = score >= 75 
+          ? 'Strong capability foundation supports confident AI implementation'
+          : 'Solid capability baseline enables structured automation approach';
+        strengths.push(`${meta.label} (${score}/100): ${fallbackMsg}`);
+      }
     }
-  }
+  });
   
-  if (componentScores.integrationFeasibility >= 60) {
-    const insights = getTFAComponentInsight('integrationFeasibility', componentScores.integrationFeasibility, true);
-    if (insights.length > 0) {
-      strengths.push(`Integration Feasibility (${componentScores.integrationFeasibility}/100): ${insights[0]}`);
-    }
-  }
-  
-  if (componentScores.securityCompliance >= 60) {
-    const insights = getTFAComponentInsight('securityCompliance', componentScores.securityCompliance, true);
-    if (insights.length > 0) {
-      strengths.push(`Security & Compliance (${componentScores.securityCompliance}/100): ${insights[0]}`);
-    }
-  }
-  
-  // PIF Components - operational strengths
+  // PIF Components
   if (componentScores.processClarity >= 60) {
     strengths.push(
-      `Process Clarity (${componentScores.processClarity}/100): Well-documented workflow with minimal variation enables accurate automation design and reduces implementation risk`
+      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Well-documented workflow with minimal variation enables accurate automation design and reduces implementation risk`
     );
   }
   
   if (componentScores.changeMagnitude >= 60) {
     strengths.push(
-      `Change Readiness (${componentScores.changeMagnitude}/100): Strong organizational readiness for AI adoption minimizes disruption and accelerates user acceptance`
+      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Strong organizational readiness for AI adoption minimizes disruption and accelerates user acceptance`
     );
   }
   
   if (componentScores.workflowBrittleness >= 60) {
     strengths.push(
-      `Process Stability (${componentScores.workflowBrittleness}/100): Standardized workflow with low variability supports reliable automated execution`
+      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): Standardized workflow with low variability supports reliable automated execution`
     );
   }
   
-  // Ensure minimum insights
-  if (strengths.length === 0) {
-    strengths.push(
-      `Assessment completed with ${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''}, establishing baseline for improvement planning and implementation strategy`
-    );
+  // Enforce minimum 3 insights - add targeted fallbacks
+  while (strengths.length < 3) {
+    if (strengths.length === 0) {
+      strengths.push(
+        `Assessment completed with ${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''}, establishing baseline for improvement planning and implementation strategy`
+      );
+    } else if (strengths.length === 1) {
+      strengths.push(
+        `Diagnostic findings provide data-driven foundation for solution scoping and vendor selection process`
+      );
+    } else {
+      strengths.push(
+        `Stakeholder engagement during assessment phase builds organizational alignment for successful implementation`
+      );
+    }
   }
   
-  // Generate Weaknesses (ALL components < 60 + TFA knowledge gaps)
+  // WEAKNESSES: Iterate ALL components, include those < 60 AND knowledge gaps
   const weaknesses: string[] = [];
   
-  // TFA Components - include gaps and knowledge gaps
-  if (componentScores.systemEnvironment < 60) {
-    const insights = getTFAComponentInsight('systemEnvironment', componentScores.systemEnvironment, false);
-    if (insights.length > 0) {
-      insights.forEach(insight => {
-        weaknesses.push(`System Environment (${componentScores.systemEnvironment}/100): ${insight}`);
-      });
-    } else {
-      weaknesses.push(
-        `System Environment (${componentScores.systemEnvironment}/100): Infrastructure limitations require assessment and potential modernization before AI deployment`
-      );
+  // TFA Components - systematically check each
+  tfaComponents.forEach(componentName => {
+    const score = componentScores[componentName];
+    const meta = componentMeta[componentName];
+    const descriptions = getTFAComponentDescriptions(componentName, score);
+    
+    // Add knowledge gaps FIRST (these are critical weaknesses regardless of score)
+    descriptions.knowledgeGaps.forEach(gap => {
+      weaknesses.push(`${meta.label} (${score}/100): ${gap}`);
+    });
+    
+    // Then add score-based weaknesses if < 60
+    if (score < 60) {
+      if (descriptions.weaknesses.length > 0) {
+        // Use first specific weakness from low-scoring questions
+        weaknesses.push(`${meta.label} (${score}/100): ${descriptions.weaknesses[0]}`);
+      } else if (descriptions.knowledgeGaps.length === 0) {
+        // Fallback: generic weakness if no specific insights and no knowledge gaps
+        const fallbackMsg = score < 40
+          ? 'Critical capability gap requires foundation-building before AI implementation'
+          : 'Moderate capability limitations necessitate targeted improvements during preparation phase';
+        weaknesses.push(`${meta.label} (${score}/100): ${fallbackMsg}`);
+      }
     }
-  }
-  
-  if (componentScores.dataQuality < 60) {
-    const insights = getTFAComponentInsight('dataQuality', componentScores.dataQuality, false);
-    if (insights.length > 0) {
-      insights.forEach(insight => {
-        weaknesses.push(`Data Quality (${componentScores.dataQuality}/100): ${insight}`);
-      });
-    } else {
-      weaknesses.push(
-        `Data Quality (${componentScores.dataQuality}/100): Data standardization and cleanup initiatives needed to support reliable AI decision-making`
-      );
-    }
-  }
-  
-  if (componentScores.integrationFeasibility < 60) {
-    const insights = getTFAComponentInsight('integrationFeasibility', componentScores.integrationFeasibility, false);
-    if (insights.length > 0) {
-      insights.forEach(insight => {
-        weaknesses.push(`Integration Feasibility (${componentScores.integrationFeasibility}/100): ${insight}`);
-      });
-    } else {
-      weaknesses.push(
-        `Integration Feasibility (${componentScores.integrationFeasibility}/100): Integration complexity requires architectural planning and potential middleware development`
-      );
-    }
-  }
-  
-  if (componentScores.securityCompliance < 60) {
-    const insights = getTFAComponentInsight('securityCompliance', componentScores.securityCompliance, false);
-    if (insights.length > 0) {
-      insights.forEach(insight => {
-        weaknesses.push(`Security & Compliance (${componentScores.securityCompliance}/100): ${insight}`);
-      });
-    } else {
-      weaknesses.push(
-        `Security & Compliance (${componentScores.securityCompliance}/100): Governance framework requires strengthening to meet AI implementation requirements`
-      );
-    }
-  }
+  });
   
   // PIF Components - operational weaknesses
   if (componentScores.processClarity < 60) {
     weaknesses.push(
-      `Process Clarity (${componentScores.processClarity}/100): Limited documentation creates knowledge gaps that complicate automation design and increase implementation timeline`
+      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Limited documentation creates knowledge gaps that complicate automation design and increase implementation timeline`
     );
   }
   
   if (componentScores.changeMagnitude < 60) {
     weaknesses.push(
-      `Change Readiness (${componentScores.changeMagnitude}/100): Change management challenges risk user resistance and require comprehensive stakeholder engagement strategy`
+      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Change management challenges risk user resistance and require comprehensive stakeholder engagement strategy`
     );
   }
   
   if (componentScores.workflowBrittleness < 60) {
     weaknesses.push(
-      `Process Stability (${componentScores.workflowBrittleness}/100): High process variability requires standardization initiatives before reliable automation deployment`
+      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): High process variability requires standardization initiatives before reliable automation deployment`
     );
   }
   
-  // Ensure minimum insights
-  if (weaknesses.length === 0) {
-    weaknesses.push(
-      `All component scores exceed 60/100 threshold, though targeted improvements in 50-60 range components will optimize implementation success`
-    );
+  // Enforce minimum 3 insights - add targeted fallbacks
+  while (weaknesses.length < 3) {
+    if (weaknesses.length === 0) {
+      weaknesses.push(
+        `All component scores exceed 60/100 threshold, establishing strong foundation for implementation`
+      );
+    } else if (weaknesses.length === 1) {
+      weaknesses.push(
+        `Targeted improvements in moderate-scoring components (50-60 range) will optimize implementation timeline and reduce risk`
+      );
+    } else {
+      weaknesses.push(
+        `Continuous monitoring during implementation will identify emerging challenges early for proactive mitigation`
+      );
+    }
   }
   
   // Generate Opportunities (directional business impact - no ROI calculations)
@@ -670,94 +662,97 @@ export function generateSWOTAnalysis(
     );
   }
   
-  // Ensure minimum insights
-  if (opportunities.length === 0) {
-    opportunities.push(
-      `Early-stage assessment provides opportunity to develop comprehensive automation roadmap aligned with business priorities and technical capabilities`
-    );
+  // Enforce minimum 3 insights - add context-specific opportunities
+  while (opportunities.length < 3) {
+    if (opportunities.length === 0) {
+      opportunities.push(
+        `Early-stage assessment provides opportunity to develop comprehensive automation roadmap aligned with business priorities and technical capabilities`
+      );
+    } else if (opportunities.length === 1) {
+      opportunities.push(
+        `Structured preparation phase enables proactive risk mitigation and stakeholder alignment before implementation`
+      );
+    } else {
+      opportunities.push(
+        `Diagnostic insights support data-driven decision-making for solution selection and vendor evaluation`
+      );
+    }
   }
   
-  // Generate Threats (implementation risks + TFA knowledge gaps as uncertainty risks)
+  // THREATS: Implementation risks from low scores + knowledge gaps as uncertainty
   const threats: string[] = [];
   
-  // Critical low scores create implementation risks
-  if (componentScores.systemEnvironment < 40) {
-    threats.push(
-      `System Environment (${componentScores.systemEnvironment}/100): Critical infrastructure limitations threaten project timeline and budget; foundation modernization required before automation deployment`
-    );
-  }
+  // TFA Components - systematically check for critical risks (<40) AND knowledge gaps
+  tfaComponents.forEach(componentName => {
+    const score = componentScores[componentName];
+    const meta = componentMeta[componentName];
+    const descriptions = getTFAComponentDescriptions(componentName, score);
+    
+    // Add knowledge gaps as uncertainty threats (regardless of score)
+    descriptions.knowledgeGaps.forEach(gap => {
+      threats.push(`${meta.label}: ${gap}`);
+    });
+    
+    // Add critical score-based threats (<40)
+    if (score < 40) {
+      threats.push(
+        `${meta.label} (${score}/100): Critical capability gaps threaten implementation timeline and success; comprehensive foundation-building required before automation deployment`
+      );
+    }
+  });
   
-  if (componentScores.dataQuality < 40) {
+  // PIF Components - critical operational risks (<40)
+  if (componentScores.processClarity < 40) {
     threats.push(
-      `Data Quality (${componentScores.dataQuality}/100): Severe data issues risk automation accuracy and reliability; comprehensive data cleanup initiatives must precede AI implementation`
-    );
-  }
-  
-  if (componentScores.integrationFeasibility < 40) {
-    threats.push(
-      `Integration Feasibility (${componentScores.integrationFeasibility}/100): Integration complexity threatens implementation timeline and cost; architectural planning and middleware development required`
-    );
-  }
-  
-  if (componentScores.securityCompliance < 40) {
-    threats.push(
-      `Security & Compliance (${componentScores.securityCompliance}/100): Regulatory gaps create deployment blockers; comprehensive governance framework needed before vendor selection`
+      `${componentMeta.processClarity.label} (${componentScores.processClarity}/100): Severe documentation gaps increase implementation risk and cost; comprehensive process mapping essential before design phase`
     );
   }
   
   if (componentScores.changeMagnitude < 40) {
     threats.push(
-      `Change Readiness (${componentScores.changeMagnitude}/100): Low organizational readiness risks user resistance and adoption failure; comprehensive change management program essential`
+      `${componentMeta.changeMagnitude.label} (${componentScores.changeMagnitude}/100): Low organizational readiness risks user resistance and adoption failure; intensive change management program required`
     );
   }
   
   if (componentScores.workflowBrittleness < 40) {
     threats.push(
-      `Process Stability (${componentScores.workflowBrittleness}/100): Severe process variability threatens automation reliability; standardization initiatives must precede deployment to avoid multiplying inconsistencies`
+      `${componentMeta.workflowBrittleness.label} (${componentScores.workflowBrittleness}/100): Severe process variability threatens automation reliability; standardization must precede deployment to avoid multiplying inconsistencies`
     );
   }
-  
-  if (componentScores.processClarity < 40) {
-    threats.push(
-      `Process Clarity (${componentScores.processClarity}/100): Critical documentation gaps increase implementation risk; comprehensive process mapping required before automation design`
-    );
-  }
-  
-  // Add TFA knowledge gaps as uncertainty threats
-  const knowledgeGapThreats: string[] = [];
-  for (let qId = 1; qId <= 21; qId++) {
-    if (isKnowledgeGap(qId)) {
-      const meaning = TFA_QUESTION_MEANINGS[qId];
-      knowledgeGapThreats.push(
-        `Unknown ${meaning.capability} creates implementation uncertainty - ${meaning.knowledgeGapAction}`
-      );
-    }
-  }
-  threats.push(...knowledgeGapThreats);
   
   // Stakeholder coverage risks
   if (pifResponses.length < 2 && totalEmployees > 5) {
     threats.push(
-      `Limited stakeholder participation (${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''} from ${totalEmployees}+ employees) risks missing critical process insights that could derail implementation`
+      `Limited stakeholder input (${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''} from ${totalEmployees}+ employees) risks missing critical process nuances that could derail implementation`
     );
   }
   
   // Overall readiness risks
   if (totalScore < 35) {
     threats.push(
-      `Critical overall readiness gap (${totalScore}/100): Premature automation deployment would likely fail; prioritize foundational improvements and reassess in 6-12 months`
+      `Critical overall readiness gap (${totalScore}/100): Premature automation would likely fail; prioritize foundational improvements and reassess readiness in 6-12 months`
     );
   } else if (totalScore < 50) {
     threats.push(
-      `Moderate readiness challenges require structured preparation phase before pilot initiation to mitigate implementation risks`
+      `Moderate readiness challenges require structured preparation phase before pilot initiation to mitigate implementation risks and ensure success`
     );
   }
   
-  // Ensure minimum insights
-  if (threats.length === 0) {
-    threats.push(
-      `Standard implementation risks apply: maintain proactive stakeholder engagement, monitor scope creep, and validate assumptions as automation design evolves`
-    );
+  // Enforce minimum 3 insights - add standard risks if needed
+  while (threats.length < 3) {
+    if (threats.length === 0) {
+      threats.push(
+        `Standard implementation risks apply: maintain proactive stakeholder engagement and validate assumptions as design evolves`
+      );
+    } else if (threats.length === 1) {
+      threats.push(
+        `Monitor scope creep during solution design to prevent budget overruns and timeline delays`
+      );
+    } else {
+      threats.push(
+        `Ensure adequate training and support resources are allocated to minimize user adoption friction`
+      );
+    }
   }
   
   return {

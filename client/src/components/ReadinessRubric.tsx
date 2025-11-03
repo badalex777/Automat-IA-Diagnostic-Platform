@@ -180,7 +180,7 @@ export default function ReadinessRubric({ rubric, workflowId }: ReadinessRubricP
     securityCompliance: rubric.componentScores.securityCompliance,
   };
 
-  const swotAnalysis = generateSWOTAnalysis(rubric, pifResponses, tfaSectionScores);
+  const swotAnalysis = generateSWOTAnalysis(rubric, pifResponses, tfaSectionScores, tfaResponses);
 
   return (
     <div className="space-y-6">
