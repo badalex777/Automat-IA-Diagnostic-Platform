@@ -4,6 +4,8 @@
 
 The Automat-IA Diagnostic Platform is a professional web application for consultants to manage AI implementation diagnostics for client companies. It facilitates Phase-1 diagnostics using step-level process assessment as the primary method. Each workflow is broken down into individual process steps, where each step is assessed independently through Technical Feasibility (TFA, shared across workflow) and Process Insight Forms (PIF, collected per step). The platform generates step-specific readiness scores, SWOT analyses, and implementation opportunities, producing comprehensive Executive Diagnostic Reports. The business vision is to empower consultants with granular, step-by-step insights for AI adoption, enabling precise scoping and impact attribution.
 
+**Recent Update (Nov 2024):** Platform Handbook comprehensively updated to accurately document step-level readiness architecture as the primary assessment method. All sections now clearly explain step-level granularity, multi-respondent aggregation scope, readiness view architecture, opportunity table features, and data flow with structured bullet formatting.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

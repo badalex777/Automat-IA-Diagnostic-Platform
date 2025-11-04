@@ -215,11 +215,16 @@ export default function Documentation() {
       <li>${doc.pifMethodology.section7}</li>
       <li>${doc.pifMethodology.section8}</li>
     </ul>
+    <h3>${doc.pifMethodology.stepLevelCollection}</h3>
+    <p>${doc.pifMethodology.stepLevelCollectionContent}</p>
   </div>
 
   <div class="section" id="readiness-rubric">
     <h2>${doc.readinessRubric.title}</h2>
     <p>${doc.readinessRubric.intro}</p>
+    <h3>${doc.readinessRubric.assessmentArchitecture}</h3>
+    <p>${doc.readinessRubric.assessmentArchitectureContent}</p>
+    <h3>${doc.readinessRubric.weightingFormula}</h3>
     <div class="formula">${doc.readinessRubric.weightingFormulaContent}</div>
     <h3>${doc.readinessRubric.componentBreakdown}</h3>
     <ul>
@@ -269,6 +274,12 @@ export default function Documentation() {
       <li>${doc.opportunityMatrix.quadrant3}</li>
       <li>${doc.opportunityMatrix.quadrant4}</li>
     </ul>
+    <h3>${doc.opportunityMatrix.opportunitiesTable}</h3>
+    <p>${doc.opportunityMatrix.opportunitiesTableContent}</p>
+    <h3>${doc.opportunityMatrix.sortingFunctionality}</h3>
+    <p>${doc.opportunityMatrix.sortingFunctionalityContent}</p>
+    <h3>${doc.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
+    <p>${doc.opportunityMatrix.roadmapPriorityAlgorithmContent}</p>
   </div>
 
   <div class="section" id="roi-calculator-integration">
@@ -284,13 +295,25 @@ export default function Documentation() {
     <h2>${doc.dataFlow.title}</h2>
     <p>${doc.dataFlow.intro}</p>
     <h3>${doc.dataFlow.pifToCalculator}</h3>
-    <p>${doc.dataFlow.pifToCalculatorContent}</p>
+    ${doc.dataFlow.pifToCalculatorContent.split('**').filter((_, i) => i % 2 === 1).map(part => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }).join('')}
     <h3>${doc.dataFlow.calculatorToOpportunities}</h3>
-    <p>${doc.dataFlow.calculatorToOpportunitiesContent}</p>
+    ${doc.dataFlow.calculatorToOpportunitiesContent.split('**').filter((_, i) => i % 2 === 1).map(part => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }).join('')}
     <h3>${doc.dataFlow.opportunitiesToMatrix}</h3>
-    <p>${doc.dataFlow.opportunitiesToMatrixContent}</p>
+    ${doc.dataFlow.opportunitiesToMatrixContent.split('**').filter((_, i) => i % 2 === 1).map(part => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }).join('')}
     <h3>${doc.dataFlow.calculatorToReport}</h3>
-    <p>${doc.dataFlow.calculatorToReportContent}</p>
+    ${doc.dataFlow.calculatorToReportContent.split('**').filter((_, i) => i % 2 === 1).map(part => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }).join('')}
   </div>
 
   <div class="section" id="roi-calculations">
@@ -732,9 +755,9 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.pifMethodology.multiRespondent}</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.pifMethodology.stepLevelCollection}</h3>
                         <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.pifMethodology.multiRespondentContent}
+                          {t.documentation.pifMethodology.stepLevelCollectionContent}
                         </p>
                       </div>
                     </CardContent>
@@ -749,6 +772,15 @@ export default function Documentation() {
                       <CardDescription>{t.documentation.readinessRubric.intro}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.assessmentArchitecture}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.readinessRubric.assessmentArchitectureContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.weightingFormula}</h3>
                         <p className="text-muted-foreground leading-relaxed mb-3">
@@ -942,6 +974,33 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.opportunitiesTable}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.opportunityMatrix.opportunitiesTableContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.sortingFunctionality}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.opportunityMatrix.sortingFunctionalityContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.opportunityMatrix.roadmapPriorityAlgorithmContent}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.implementationEffortScoring}</h3>
                         <p className="text-muted-foreground leading-relaxed mb-3">
                           {t.documentation.opportunityMatrix.implementationEffortScoringContent}
@@ -998,36 +1057,88 @@ export default function Documentation() {
                     <CardContent className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.pifToCalculator}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.dataFlow.pifToCalculatorContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {t.documentation.dataFlow.pifToCalculatorContent.split('**').map((part, i) => {
+                            if (i % 2 === 1) {
+                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
+                              return (
+                                <div key={i} className="mt-3">
+                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+                                  <ul className="list-disc ml-6 space-y-1">
+                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
+                                  </ul>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToOpportunities}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.dataFlow.calculatorToOpportunitiesContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {t.documentation.dataFlow.calculatorToOpportunitiesContent.split('**').map((part, i) => {
+                            if (i % 2 === 1) {
+                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
+                              return (
+                                <div key={i} className="mt-3">
+                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+                                  <ul className="list-disc ml-6 space-y-1">
+                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
+                                  </ul>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.opportunitiesToMatrix}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.dataFlow.opportunitiesToMatrixContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {t.documentation.dataFlow.opportunitiesToMatrixContent.split('**').map((part, i) => {
+                            if (i % 2 === 1) {
+                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
+                              return (
+                                <div key={i} className="mt-3">
+                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+                                  <ul className="list-disc ml-6 space-y-1">
+                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
+                                  </ul>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToReport}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.dataFlow.calculatorToReportContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {t.documentation.dataFlow.calculatorToReportContent.split('**').map((part, i) => {
+                            if (i % 2 === 1) {
+                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
+                              return (
+                                <div key={i} className="mt-3">
+                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+                                  <ul className="list-disc ml-6 space-y-1">
+                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
+                                  </ul>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -1041,21 +1152,6 @@ export default function Documentation() {
                       <CardDescription>{t.documentation.roiCalculations.intro}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.annualRoiFormula}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.roiCalculations.annualRoiFormulaContent}
-                        </p>
-                        <div className="bg-muted p-4 rounded-md font-mono text-xs space-y-1">
-                          <div>Annual ROI = (Annual Hours Saved × Hourly Labor Cost) - Implementation Costs</div>
-                          <div className="text-muted-foreground">Where:</div>
-                          <div className="text-muted-foreground ml-4">Annual Hours Saved = Hours per Week × 52</div>
-                          <div className="text-muted-foreground ml-4">Hourly Labor Cost = (Total Labor Costs / Total Employees) / 2080</div>
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.fteSavingsFormula}</h3>
                         <p className="text-muted-foreground leading-relaxed mb-3">
@@ -1081,22 +1177,6 @@ export default function Documentation() {
                           <div className="text-muted-foreground ml-4">5% impact = score 50 (very good)</div>
                           <div className="text-muted-foreground ml-4">2% impact = score 20 (good)</div>
                           <div className="text-muted-foreground ml-4">1% impact = score 10 (notable)</div>
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.implementationEffort}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.roiCalculations.implementationEffortContent}
-                        </p>
-                        <div className="bg-muted p-4 rounded-md font-mono text-xs space-y-1">
-                          <div>Effort = (Inv.Readiness × 0.40) + (Rampup × 0.25) + (Payback × 0.25) + (Training × 0.10)</div>
-                          <div className="text-muted-foreground mt-2">Normalization:</div>
-                          <div className="text-muted-foreground ml-4">Rampup: 3mo=0, 18mo+=100, linear</div>
-                          <div className="text-muted-foreground ml-4">Payback: 6mo=0, 36mo+=100, linear</div>
-                          <div className="text-muted-foreground ml-4">Training: 2hr=0, 40hr+=100, linear</div>
                         </div>
                       </div>
                     </CardContent>
@@ -1193,9 +1273,9 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.implementationEffort}</h3>
+                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.implementationEffortScore}</h3>
                         <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.implementationEffortFormula}
+                          {t.documentation.formulasReference.implementationEffortScoreFormula}
                         </div>
                       </div>
                     </CardContent>
