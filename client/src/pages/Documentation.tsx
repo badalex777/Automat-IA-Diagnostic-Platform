@@ -18,19 +18,21 @@ export default function Documentation() {
 
   // Helper function to parse structured content with **bold** headers and • bullets
   const parseStructuredContent = (content: string) => {
-    return content.split('**').map((part, i) => {
-      if (i % 2 === 1) {
-        const [heading, ...bullets] = part.split('•').map(s => s.trim());
-        return (
-          <div key={i} className="mt-3">
-            <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+    // Split by ** and filter out empty parts
+    const parts = content.split('**').filter(part => part.trim());
+    
+    return parts.map((part, i) => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return (
+        <div key={i} className="mt-3">
+          <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+          {bullets.filter(b => b).length > 0 && (
             <ul className="list-disc ml-6 space-y-1">
               {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
             </ul>
-          </div>
-        );
-      }
-      return null;
+          )}
+        </div>
+      );
     });
   };
 
@@ -87,9 +89,15 @@ export default function Documentation() {
 
   // Helper function to parse structured content into HTML
   const parseStructuredContentToHTML = (content: string) => {
-    return content.split('**').filter((_, i) => i % 2 === 1).map(part => {
+    // Split by ** and filter out empty parts
+    const parts = content.split('**').filter(part => part.trim());
+    
+    return parts.map(part => {
       const [heading, ...bullets] = part.split('•').map(s => s.trim());
-      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+      const bulletsList = bullets.filter(b => b).length > 0 
+        ? `<ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`
+        : '';
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4>${bulletsList}`;
     }).join('');
   };
 
