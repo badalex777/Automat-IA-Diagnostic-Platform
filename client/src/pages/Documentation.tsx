@@ -241,6 +241,12 @@ export default function Documentation() {
       <li>${doc.pifMethodology.section7}</li>
       <li>${doc.pifMethodology.section8}</li>
     </ul>
+    <h3>${doc.pifMethodology.operationalScores}</h3>
+    ${parseStructuredContentToHTML(doc.pifMethodology.operationalScoresContent)}
+    <h3>${doc.pifMethodology.roiDataExtraction}</h3>
+    ${parseStructuredContentToHTML(doc.pifMethodology.roiDataExtractionContent)}
+    <h3>${doc.pifMethodology.qualitativeInsights}</h3>
+    ${parseStructuredContentToHTML(doc.pifMethodology.qualitativeInsightsContent)}
     <h3>${doc.pifMethodology.stepLevelCollection}</h3>
     <p>${doc.pifMethodology.stepLevelCollectionContent}</p>
   </div>
@@ -249,9 +255,9 @@ export default function Documentation() {
     <h2>${doc.readinessRubric.title}</h2>
     <p>${doc.readinessRubric.intro}</p>
     <h3>${doc.readinessRubric.assessmentArchitecture}</h3>
-    <p>${doc.readinessRubric.assessmentArchitectureContent}</p>
+    ${parseStructuredContentToHTML(doc.readinessRubric.assessmentArchitectureContent)}
     <h3>${doc.readinessRubric.weightingFormula}</h3>
-    <div class="formula">${doc.readinessRubric.weightingFormulaContent}</div>
+    ${parseStructuredContentToHTML(doc.readinessRubric.weightingFormulaContent)}
     <h3>${doc.readinessRubric.componentBreakdown}</h3>
     <ul>
       <li>${doc.readinessRubric.component1}</li>
@@ -284,6 +290,10 @@ export default function Documentation() {
       </div>
     </div>
     <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; font-size: 0.9rem;">${doc.readinessRubric.normalizationNote}</p>
+    <h3>${doc.readinessRubric.feasibilityBanding}</h3>
+    ${parseStructuredContentToHTML(doc.readinessRubric.feasibilityBandingContent)}
+    <h3>${doc.readinessRubric.swotAnalysis}</h3>
+    ${parseStructuredContentToHTML(doc.readinessRubric.swotAnalysisContent)}
   </div>
 
   <div class="section" id="opportunity-matrix">
@@ -291,8 +301,14 @@ export default function Documentation() {
     <p>${doc.opportunityMatrix.intro}</p>
     <h3>${doc.opportunityMatrix.businessImpactScoring}</h3>
     <p>${doc.opportunityMatrix.businessImpactScoringContent}</p>
-    <h3>${doc.opportunityMatrix.implementationEffortScoring}</h3>
-    <p>${doc.opportunityMatrix.implementationEffortScoringContent}</p>
+    <h3>${doc.opportunityMatrix.multiplierExplanation}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.multiplierExplanationContent)}
+    <h3>${doc.opportunityMatrix.baseMatrixTitle}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.baseMatrixContent)}
+    <h3>${doc.opportunityMatrix.enhancedMatrixTitle}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.enhancedMatrixContent)}
+    <h3>${doc.opportunityMatrix.scatterPlotInterpretation}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.scatterPlotInterpretationContent)}
     <h3>${doc.opportunityMatrix.quadrants}</h3>
     <ul>
       <li>${doc.opportunityMatrix.quadrant1}</li>
@@ -301,20 +317,26 @@ export default function Documentation() {
       <li>${doc.opportunityMatrix.quadrant4}</li>
     </ul>
     <h3>${doc.opportunityMatrix.opportunitiesTable}</h3>
-    <p>${doc.opportunityMatrix.opportunitiesTableContent}</p>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.opportunitiesTableContent)}
     <h3>${doc.opportunityMatrix.sortingFunctionality}</h3>
-    <p>${doc.opportunityMatrix.sortingFunctionalityContent}</p>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.sortingFunctionalityContent)}
     <h3>${doc.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
-    <p>${doc.opportunityMatrix.roadmapPriorityAlgorithmContent}</p>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.roadmapPriorityAlgorithmContent)}
+    <h3>${doc.opportunityMatrix.implementationEffortScoring}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.implementationEffortScoringContent)}
+    <h3>${doc.opportunityMatrix.effortWeightingRationale}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.effortWeightingRationaleContent)}
+    <h3>${doc.opportunityMatrix.effortNormalizationScales}</h3>
+    ${parseStructuredContentToHTML(doc.opportunityMatrix.effortNormalizationScalesContent)}
   </div>
 
   <div class="section" id="roi-calculator-integration">
     <h2>${doc.roiCalculatorIntegration.title}</h2>
     <p>${doc.roiCalculatorIntegration.intro}</p>
     <h3>${doc.roiCalculatorIntegration.workflowOverview}</h3>
-    <p>${doc.roiCalculatorIntegration.workflowOverviewContent}</p>
+    ${parseStructuredContentToHTML(doc.roiCalculatorIntegration.workflowOverviewContent)}
     <h3>${doc.roiCalculatorIntegration.platformRoles}</h3>
-    <p>${doc.roiCalculatorIntegration.platformRolesContent}</p>
+    ${parseStructuredContentToHTML(doc.roiCalculatorIntegration.platformRolesContent)}
   </div>
 
   <div class="section" id="data-flow">
@@ -1048,18 +1070,18 @@ export default function Documentation() {
                     <CardContent className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.workflowOverview}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.roiCalculatorIntegration.workflowOverviewContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.roiCalculatorIntegration.workflowOverviewContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.platformRoles}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.roiCalculatorIntegration.platformRolesContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.roiCalculatorIntegration.platformRolesContent)}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
