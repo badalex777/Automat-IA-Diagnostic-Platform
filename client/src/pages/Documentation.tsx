@@ -925,41 +925,26 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.multiplierExplanation}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.opportunityMatrix.multiplierExplanationContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.multiplierExplanationContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.dualMatrixSystem}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-4">
-                          {t.documentation.opportunityMatrix.dualMatrixIntro}
-                        </p>
-                        <div className="space-y-4">
-                          <div className="border border-border rounded-md p-4 bg-accent/5">
-                            <h4 className="font-semibold mb-2 text-primary">{t.documentation.opportunityMatrix.baseMatrixTitle}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed mb-2">{t.documentation.opportunityMatrix.baseMatrixContent}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                              Base Impact = (ROI × 0.60) + (Hours × 0.40)
-                            </div>
-                          </div>
-                          <div className="border border-border rounded-md p-4 bg-primary/5">
-                            <h4 className="font-semibold mb-2 text-primary">{t.documentation.opportunityMatrix.enhancedMatrixTitle}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed mb-2">{t.documentation.opportunityMatrix.enhancedMatrixContent}</p>
-                            <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                              Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.bonusCalculationTitle}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.bonusCalculationContent}</p>
-                          </div>
-                          <div className="border-l-4 border-primary pl-4 py-2 bg-primary/5">
-                            <h4 className="font-semibold text-sm mb-1 text-primary">{t.documentation.opportunityMatrix.matrixGuaranteeTitle}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.matrixGuaranteeContent}</p>
-                          </div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.baseMatrixTitle}</h3>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.baseMatrixContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.enhancedMatrixTitle}</h3>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.enhancedMatrixContent)}
                         </div>
                       </div>
                       
@@ -967,9 +952,9 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.scatterPlotInterpretation}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.opportunityMatrix.scatterPlotInterpretationContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.scatterPlotInterpretationContent)}
+                        </div>
                       </div>
                       
                       <Separator />
@@ -1000,45 +985,53 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.opportunitiesTable}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.opportunityMatrix.opportunitiesTableContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.opportunitiesTableContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.sortingFunctionality}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.opportunityMatrix.sortingFunctionalityContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.sortingFunctionalityContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.opportunityMatrix.roadmapPriorityAlgorithmContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.roadmapPriorityAlgorithmContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.implementationEffortScoring}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.opportunityMatrix.implementationEffortScoringContent}
-                        </p>
-                        <div className="space-y-3">
-                          <div className="border border-border rounded-md p-4 bg-accent/5">
-                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.effortWeightingRationale}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.effortWeightingRationaleContent}</p>
-                          </div>
-                          <div>
-                            <h4 className="font-semibold text-sm mb-2 text-primary">{t.documentation.opportunityMatrix.effortNormalizationScales}</h4>
-                            <p className="text-muted-foreground text-sm leading-relaxed">{t.documentation.opportunityMatrix.effortNormalizationScalesContent}</p>
-                          </div>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.implementationEffortScoringContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.effortWeightingRationale}</h3>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.effortWeightingRationaleContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.effortNormalizationScales}</h3>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.opportunityMatrix.effortNormalizationScalesContent)}
                         </div>
                       </div>
                     </CardContent>
