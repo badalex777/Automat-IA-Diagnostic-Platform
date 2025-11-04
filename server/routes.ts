@@ -314,6 +314,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         workflowId: req.params.workflowId,
       });
+
+      // Check if step number already exists in this workflow
+      const existingSteps = await storage.getWorkflowStepsByWorkflow(req.params.workflowId);
+      const duplicateStep = existingSteps.find(s => s.stepOrder === validatedData.stepOrder);
+      if (duplicateStep) {
+        return res.status(400).json({ 
+          error: `Step number ${validatedData.stepOrder} already exists for step "${duplicateStep.stepName}". Please choose a different number.` 
+        });
+      }
+
       const step = await storage.createWorkflowStep(validatedData);
       res.status(201).json(step);
     } catch (error: any) {

@@ -95,7 +95,7 @@ export default function WorkflowStepDetail() {
         <Card className="p-6 max-w-md">
           <h2 className="text-lg font-semibold text-destructive mb-2">Error Loading Step</h2>
           <p className="text-sm text-muted-foreground mb-4">{stepError.message}</p>
-          <Link href={`/company/${companyId}/workflow/${workflowId}`}>
+          <Link href={`/company/${companyId}/workflow/${workflowId}?tab=steps`}>
             <Button variant="outline">
               <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Workflow
@@ -122,7 +122,7 @@ export default function WorkflowStepDetail() {
           <p className="text-sm text-muted-foreground mb-4">
             The requested workflow step could not be found.
           </p>
-          <Link href={`/company/${companyId}/workflow/${workflowId}`}>
+          <Link href={`/company/${companyId}/workflow/${workflowId}?tab=steps`}>
             <Button variant="outline">
               <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Workflow
@@ -200,7 +200,7 @@ export default function WorkflowStepDetail() {
     <div className="min-h-screen bg-background">
       <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <Link href={`/company/${companyId}/workflow/${workflowId}`}>
+          <Link href={`/company/${companyId}/workflow/${workflowId}?tab=steps`}>
             <Button variant="ghost" size="sm" className="mb-3" data-testid="button-back-workflow">
               <ChevronLeft className="h-4 w-4 mr-1" />
               Back to Workflow

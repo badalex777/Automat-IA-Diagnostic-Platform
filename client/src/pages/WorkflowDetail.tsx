@@ -7,7 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus } from "lucide-react";
+import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import TFAExecutiveSummary from "@/components/TFAExecutiveSummary";
 import TFAScoreDisplay from "@/components/TFAScoreDisplay";
 import TFAVisualAnalytics from "@/components/TFAVisualAnalytics";
@@ -16,6 +24,7 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
+import { OpportunityForm } from "@/components/OpportunityForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -24,6 +33,8 @@ import { tfaSections as allSections, TFA_QUESTIONS, TFA_SECTIONS } from "@shared
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
 import { aggregateWorkflowSWOT, aggregateExecutiveSummaries, generateSWOTAnalysis, calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import type { ReadinessRubricScore, AggregatedPIFScores, SWOTAnalysis } from "@shared/pifCalculations";
+import { calculateImplementationEffort, calculateBaseImpact } from "@shared/opportunityCalculations";
+import type { CompanyContext } from "@shared/opportunityCalculations";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +56,14 @@ export default function WorkflowDetail() {
   const [stepDescription, setStepDescription] = useState("");
   const [participantName, setParticipantName] = useState("");
   const [participantRole, setParticipantRole] = useState("");
+  const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [oppSortColumn, setOppSortColumn] = useState<'name' | 'impact' | 'effort'>('impact');
+  const [oppSortDirection, setOppSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Read tab query parameter for navigation from step detail page
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = urlParams.get('tab');
+  const defaultTab = tabParam || 'tfa';
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -231,6 +250,28 @@ export default function WorkflowDetail() {
     },
   });
 
+  const updateOpportunityMutation = useMutation({
+    mutationFn: async (data: { opportunityId: string; updates: any }) => {
+      const res = await apiRequest('PATCH', `/api/opportunities/${data.opportunityId}`, data.updates);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity updated",
+        description: "Opportunity has been updated successfully.",
+      });
+      setEditOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating opportunity",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleStartEdit = () => {
     setEditedName(workflow?.name || '');
     setIsEditingName(true);
@@ -334,7 +375,7 @@ export default function WorkflowDetail() {
             {workflowError && <p className="text-sm text-destructive">Workflow: {workflowError.message}</p>}
           </div>
         )}
-        <Tabs defaultValue="tfa" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="tfa" data-testid="tab-tfa">Technical Feasibility</TabsTrigger>
             <TabsTrigger value="steps" data-testid="tab-steps">Workflow Steps</TabsTrigger>
@@ -614,87 +655,351 @@ export default function WorkflowDetail() {
           </TabsContent>
 
           <TabsContent value="opportunities" className="space-y-6">
-            <Card className="p-6">
-              <div className="mb-4">
-                <h2 className="text-xl font-semibold">Implementation Opportunities</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Opportunities are created within workflow steps once TFA and PIF assessments are complete
-                </p>
+            {opportunitiesError ? (
+              <div className="bg-destructive/10 rounded-lg border border-destructive/30 p-4">
+                <p className="text-destructive text-sm">Error loading opportunities: {opportunitiesError.message}</p>
               </div>
-
-              {opportunitiesError ? (
-                <div className="bg-destructive/10 rounded-lg border border-destructive/30 p-4">
-                  <p className="text-destructive text-sm">Error loading opportunities: {opportunitiesError.message}</p>
+            ) : opportunitiesLoading ? (
+              <p className="text-muted-foreground text-sm">Loading opportunities...</p>
+            ) : opportunities.length === 0 ? (
+              <Card className="p-6">
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold">Implementation Opportunities</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Opportunities are created within workflow steps once TFA and PIF assessments are complete
+                  </p>
                 </div>
-              ) : opportunitiesLoading ? (
-                <p className="text-muted-foreground text-sm">Loading opportunities...</p>
-              ) : opportunities.length === 0 ? (
                 <div className="text-center py-8 bg-muted/30 rounded-lg border border-border">
                   <h4 className="font-medium text-base mb-2">No Opportunities Yet</h4>
                   <p className="text-sm text-muted-foreground">
                     Opportunities will appear here once created within workflow steps
                   </p>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {opportunities.map((opportunity) => {
-                    // Find the step this opportunity is linked to
-                    const linkedStep = workflowSteps.find(s => s.id === opportunity.stepId);
-                    
-                    return (
-                      <Card key={opportunity.id} className="p-4" data-testid={`card-opportunity-${opportunity.id}`}>
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-base" data-testid={`text-opportunity-name-${opportunity.id}`}>
-                                {opportunity.name}
-                              </h3>
-                              {linkedStep && (
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  Linked to: {linkedStep.stepName}
-                                </p>
-                              )}
-                              {opportunity.description && (
-                                <p className="text-sm text-muted-foreground mt-2">
-                                  {opportunity.description}
-                                </p>
-                              )}
+              </Card>
+            ) : (() => {
+              // Helper function to calculate step readiness scores
+              const getStepReadinessScore = (stepId: string | null | undefined): number => {
+                if (!stepId || !tfaAssessment || !workflowPIFData) return 50; // Default placeholder
+                
+                // Get PIF responses for this specific step
+                const stepPIFs = workflowPIFData.responses.filter(
+                  pif => pif.stepId === stepId && !!pif.completedAt
+                );
+                
+                if (stepPIFs.length === 0) return 50; // No PIF data, use placeholder
+                
+                // Calculate TFA section scores
+                const tfaResponses = (tfaAssessment.responses as Record<string, string | number>) || {};
+                const tfaSectionScores = {
+                  systemEnvironment: 0,
+                  dataQuality: 0,
+                  integrationFeasibility: 0,
+                  securityCompliance: 0,
+                };
+                
+                let sysEnvCount = 0, dataCount = 0, integCount = 0, secCount = 0;
+                
+                Object.entries(tfaResponses).forEach(([qidStr, response]) => {
+                  const qid = parseInt(qidStr);
+                  const numResponse = typeof response === 'number' ? response : Number(response);
+                  if (isNaN(numResponse) || numResponse === 0) return;
+                  
+                  const question = TFA_QUESTIONS.find(q => q.id === qid);
+                  if (!question) return;
+                  
+                  const value = ((numResponse - 1) / 4) * 100;
+                  
+                  switch (question.section) {
+                    case 'System Environment':
+                      tfaSectionScores.systemEnvironment += value;
+                      sysEnvCount++;
+                      break;
+                    case 'Data Quality':
+                      tfaSectionScores.dataQuality += value;
+                      dataCount++;
+                      break;
+                    case 'Integration Feasibility':
+                      tfaSectionScores.integrationFeasibility += value;
+                      integCount++;
+                      break;
+                    case 'Security/Compliance':
+                      tfaSectionScores.securityCompliance += value;
+                      secCount++;
+                      break;
+                  }
+                });
+                
+                if (sysEnvCount > 0) tfaSectionScores.systemEnvironment /= sysEnvCount;
+                if (dataCount > 0) tfaSectionScores.dataQuality /= dataCount;
+                if (integCount > 0) tfaSectionScores.integrationFeasibility /= integCount;
+                if (secCount > 0) tfaSectionScores.securityCompliance /= secCount;
+                
+                const tfaScore = Math.round(
+                  (tfaSectionScores.systemEnvironment * 0.25) +
+                  (tfaSectionScores.dataQuality * 0.30) +
+                  (tfaSectionScores.integrationFeasibility * 0.30) +
+                  (tfaSectionScores.securityCompliance * 0.15)
+                );
+                
+                // Calculate aggregated PIF scores for this step
+                const aggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+                
+                // Calculate readiness rubric
+                const rubric = calculateReadinessRubric(tfaScore, tfaSectionScores, aggregatedPIF);
+                
+                return rubric.totalScore;
+              };
+              
+              // Prepare company context for calculations
+              const companyContext: CompanyContext = {
+                annualRevenue: company?.annualRevenue,
+                totalEmployees: company?.totalEmployees,
+              };
+              
+              // Calculate scores for each opportunity
+              const opportunitiesWithScores = opportunities.map(opp => {
+                const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
+                const readinessScore = getStepReadinessScore(opp.stepId);
+                const baseImpact = calculateBaseImpact(opp, companyContext);
+                const effortScore = calculateImplementationEffort(
+                  readinessScore,
+                  parseFloat(opp.rampupPeriodMonths || "0"),
+                  parseFloat(opp.paybackPeriodMonths || "0"),
+                  parseFloat(opp.trainingHoursPerEmployee || "0")
+                );
+                
+                return {
+                  ...opp,
+                  linkedStep,
+                  readinessScore,
+                  baseImpact,
+                  effortScore,
+                };
+              });
+
+              // Sort opportunities based on current sort column and direction
+              const sortedOpportunities = [...opportunitiesWithScores].sort((a, b) => {
+                let comparison = 0;
+                if (oppSortColumn === 'name') {
+                  comparison = a.name.localeCompare(b.name);
+                } else if (oppSortColumn === 'impact') {
+                  comparison = a.baseImpact - b.baseImpact;
+                } else if (oppSortColumn === 'effort') {
+                  comparison = a.effortScore - b.effortScore;
+                }
+                return oppSortDirection === 'asc' ? comparison : -comparison;
+              });
+
+              // Handler for table column sorting
+              const handleSort = (column: 'name' | 'impact' | 'effort') => {
+                if (oppSortColumn === column) {
+                  setOppSortDirection(oppSortDirection === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setOppSortColumn(column);
+                  setOppSortDirection(column === 'name' ? 'asc' : 'desc');
+                }
+              };
+              
+              // Calculate aggregated summary
+              const totalOpps = opportunitiesWithScores.length;
+              const avgBaseImpact = totalOpps > 0 
+                ? opportunitiesWithScores.reduce((sum, o) => sum + o.baseImpact, 0) / totalOpps 
+                : 0;
+              const avgEffort = totalOpps > 0 
+                ? opportunitiesWithScores.reduce((sum, o) => sum + o.effortScore, 0) / totalOpps 
+                : 0;
+              const totalAnnualRoi = opportunitiesWithScores.reduce(
+                (sum, o) => sum + parseFloat(o.annualRoi || "0"), 
+                0
+              );
+              const totalFteSavings = opportunitiesWithScores.reduce(
+                (sum, o) => sum + parseFloat(o.fteSavings || "0"), 
+                0
+              );
+              
+              return (
+                <>
+                  {/* Opportunities Data Table */}
+                  <Card className="p-6">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold">Opportunities Data</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Calculated scores for business impact and implementation effort
+                      </p>
+                    </div>
+                    <div className="border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>
+                              <button 
+                                onClick={() => handleSort('name')} 
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Opportunity Name
+                                {oppSortColumn === 'name' ? (
+                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
+                              </button>
+                            </TableHead>
+                            <TableHead>Source Workflow</TableHead>
+                            <TableHead>Source Step</TableHead>
+                            <TableHead className="text-right">
+                              <button 
+                                onClick={() => handleSort('impact')} 
+                                className="flex items-center gap-1 hover:text-foreground ml-auto"
+                              >
+                                Business Impact
+                                {oppSortColumn === 'impact' ? (
+                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
+                              </button>
+                            </TableHead>
+                            <TableHead className="text-right">
+                              <button 
+                                onClick={() => handleSort('effort')} 
+                                className="flex items-center gap-1 hover:text-foreground ml-auto"
+                              >
+                                Implementation Effort
+                                {oppSortColumn === 'effort' ? (
+                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
+                              </button>
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {sortedOpportunities.map((opp) => (
+                            <TableRow key={opp.id} data-testid={`table-row-opportunity-${opp.id}`}>
+                              <TableCell className="font-medium">{opp.name}</TableCell>
+                              <TableCell>{workflow?.name || 'N/A'}</TableCell>
+                              <TableCell>{opp.linkedStep?.stepName || 'N/A'}</TableCell>
+                              <TableCell className="text-right font-mono">{opp.baseImpact.toFixed(2)}</TableCell>
+                              <TableCell className="text-right font-mono">{opp.effortScore.toFixed(2)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </Card>
+
+                  {/* All Opportunities Cards */}
+                  <Card className="p-6">
+                    <div className="mb-4">
+                      <h2 className="text-xl font-semibold">All Opportunities</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Detailed view of each implementation opportunity with raw input metrics
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      {opportunitiesWithScores.map((opportunity) => (
+                        <Card key={opportunity.id} className="p-4" data-testid={`card-opportunity-${opportunity.id}`}>
+                          <div className="space-y-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-semibold text-base" data-testid={`text-opportunity-name-${opportunity.id}`}>
+                                    {opportunity.name}
+                                  </h3>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onClick={() => setEditOpportunity(opportunity)}
+                                    data-testid={`button-edit-opportunity-${opportunity.id}`}
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                                {opportunity.linkedStep && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    Linked to: {opportunity.linkedStep.stepName}
+                                  </p>
+                                )}
+                                {opportunity.description && (
+                                  <p className="text-sm text-muted-foreground mt-2">
+                                    {opportunity.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Raw Metrics Grid */}
+                            <div className="space-y-3 pt-3 border-t">
+                              <div>
+                                <h4 className="text-sm font-medium mb-2">Business Impact Inputs</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                  <div>
+                                    <div className="text-xs text-muted-foreground">Annual ROI</div>
+                                    <div className="font-semibold">${parseFloat(opportunity.annualRoi || "0").toLocaleString()}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-xs text-muted-foreground">FTE Saved</div>
+                                    <div className="font-semibold">{parseFloat(opportunity.fteSavings || "0").toFixed(2)}</div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <h4 className="text-sm font-medium mb-2">Implementation Effort Inputs</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                  {opportunity.rampupPeriodMonths && (
+                                    <div>
+                                      <div className="text-xs text-muted-foreground">Ramp-up Period</div>
+                                      <div className="font-semibold">{parseFloat(opportunity.rampupPeriodMonths).toFixed(1)} months</div>
+                                    </div>
+                                  )}
+                                  {opportunity.paybackPeriodMonths && (
+                                    <div>
+                                      <div className="text-xs text-muted-foreground">Payback Period</div>
+                                      <div className="font-semibold">{parseFloat(opportunity.paybackPeriodMonths).toFixed(1)} months</div>
+                                    </div>
+                                  )}
+                                  {opportunity.trainingHoursPerEmployee && (
+                                    <div>
+                                      <div className="text-xs text-muted-foreground">Training Hours per Employee</div>
+                                      <div className="font-semibold">{parseFloat(opportunity.trainingHoursPerEmployee).toFixed(1)} hours</div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-3 border-t">
-                            {opportunity.annualRoi && (
-                              <div>
-                                <div className="text-xs text-muted-foreground">Annual ROI</div>
-                                <div className="font-semibold">${parseFloat(opportunity.annualRoi).toLocaleString()}</div>
-                              </div>
-                            )}
-                            {opportunity.fteSavings && (
-                              <div>
-                                <div className="text-xs text-muted-foreground">FTE Savings</div>
-                                <div className="font-semibold">{parseFloat(opportunity.fteSavings).toFixed(2)}</div>
-                              </div>
-                            )}
-                            {opportunity.hoursSavedPerWeek && (
-                              <div>
-                                <div className="text-xs text-muted-foreground">Hours/Week Saved</div>
-                                <div className="font-semibold">{parseFloat(opportunity.hoursSavedPerWeek).toFixed(1)}</div>
-                              </div>
-                            )}
-                            {opportunity.paybackPeriodMonths && (
-                              <div>
-                                <div className="text-xs text-muted-foreground">Payback Period</div>
-                                <div className="font-semibold">{parseFloat(opportunity.paybackPeriodMonths).toFixed(1)} mo</div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
-              )}
-            </Card>
+                        </Card>
+                      ))}
+                    </div>
+                  </Card>
+
+                  {/* Aggregated Metrics Summary */}
+                  <Card className="p-6">
+                    <div className="mb-4">
+                      <h2 className="text-xl font-semibold">Aggregated Metrics Summary</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Combined totals and averages across all opportunities
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Average Business Impact</div>
+                        <div className="text-2xl font-bold font-mono">{avgBaseImpact.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Average Implementation Effort</div>
+                        <div className="text-2xl font-bold font-mono">{avgEffort.toFixed(2)}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Total Annual ROI</div>
+                        <div className="text-2xl font-bold">${totalAnnualRoi.toLocaleString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">Total FTE Saved</div>
+                        <div className="text-2xl font-bold">{totalFteSavings.toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </Card>
+                </>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="workflow-readiness" className="space-y-6">
@@ -1138,6 +1443,17 @@ export default function WorkflowDetail() {
                 <Button
                   onClick={() => {
                     if (stepName.trim() && stepOrder >= 1) {
+                      // Check if step number already exists
+                      const existingStep = workflowSteps.find(s => s.stepOrder === stepOrder);
+                      if (existingStep) {
+                        toast({
+                          title: "Duplicate Step Number",
+                          description: `Step number ${stepOrder} already exists for "${existingStep.stepName}". Please choose a different number.`,
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+
                       createStepMutation.mutate({
                         stepName: stepName.trim(),
                         stepOrder: stepOrder,
@@ -1154,6 +1470,29 @@ export default function WorkflowDetail() {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Opportunity Dialog */}
+        <Dialog open={!!editOpportunity} onOpenChange={(open) => !open && setEditOpportunity(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit-opportunity">
+            <DialogHeader>
+              <DialogTitle>Edit Opportunity</DialogTitle>
+            </DialogHeader>
+            {editOpportunity && (
+              <OpportunityForm
+                workflowId={workflowId}
+                initialData={editOpportunity}
+                onSubmit={(data) => {
+                  updateOpportunityMutation.mutate({
+                    opportunityId: editOpportunity.id,
+                    updates: data,
+                  });
+                }}
+                onCancel={() => setEditOpportunity(null)}
+                isLoading={updateOpportunityMutation.isPending}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </div>

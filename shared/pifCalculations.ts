@@ -579,16 +579,75 @@ export function generateSWOTAnalysis(
     );
   }
   
-  // Enforce minimum 3 insights - add targeted fallbacks
+  // Enforce minimum 3 insights - add targeted fallbacks with specific components
   while (weaknesses.length < 3) {
     if (weaknesses.length === 0) {
       weaknesses.push(
         `All component scores exceed 60/100 threshold, establishing strong foundation for implementation`
       );
     } else if (weaknesses.length === 1) {
-      weaknesses.push(
-        `Targeted improvements in moderate-scoring components (50-60 range) will optimize implementation timeline and reduce risk`
-      );
+      // Find components in 50-60 range (or closest to 60 if none in that range)
+      const componentsInRange: Array<{name: string, label: string, score: number}> = [];
+      Object.entries(componentScores).forEach(([key, score]) => {
+        if (score >= 50 && score < 60) {
+          componentsInRange.push({
+            name: key,
+            label: componentMeta[key as keyof typeof componentMeta].label,
+            score: Math.round(score)
+          });
+        }
+      });
+      
+      // If no components in 50-60 range, find the two closest to 60 that are below it
+      if (componentsInRange.length === 0) {
+        const belowSixty = Object.entries(componentScores)
+          .filter(([_, score]) => score < 60)
+          .map(([key, score]) => ({
+            name: key,
+            label: componentMeta[key as keyof typeof componentMeta].label,
+            score: Math.round(score)
+          }))
+          .sort((a, b) => b.score - a.score);
+        
+        componentsInRange.push(...belowSixty.slice(0, 2));
+      }
+      
+      if (componentsInRange.length > 0) {
+        const component = componentsInRange[0];
+        let actionableRec = '';
+        
+        // Provide specific recommendations based on component type
+        if (component.name === 'processClarity') {
+          actionableRec = 'conduct detailed process mapping sessions with stakeholders and create standardized documentation';
+        } else if (component.name === 'changeMagnitude') {
+          actionableRec = 'implement change management program with executive sponsorship and comprehensive stakeholder communication plan';
+        } else if (component.name === 'workflowBrittleness') {
+          actionableRec = 'establish standard operating procedures with version control and exception handling protocols';
+        } else if (component.name === 'dataQuality') {
+          actionableRec = 'implement data governance framework with automated validation rules and quality monitoring';
+        } else if (component.name === 'integrationFeasibility') {
+          actionableRec = 'complete API documentation review and establish integration testing protocols';
+        } else if (component.name === 'systemEnvironment') {
+          actionableRec = 'conduct infrastructure modernization assessment and create cloud migration roadmap';
+        } else if (component.name === 'securityCompliance') {
+          actionableRec = 'engage security team early for vendor pre-approval and establish compliance requirements checklist';
+        }
+        
+        if (componentsInRange.length > 1) {
+          const component2 = componentsInRange[1];
+          weaknesses.push(
+            `${component.label} (${component.score}/100) and ${component2.label} (${component2.score}/100) require targeted improvements: ${actionableRec} before implementation`
+          );
+        } else {
+          weaknesses.push(
+            `${component.label} (${component.score}/100) requires targeted improvement: ${actionableRec} before implementation`
+          );
+        }
+      } else {
+        weaknesses.push(
+          `Continuous monitoring during implementation will identify emerging challenges early for proactive mitigation`
+        );
+      }
     } else {
       weaknesses.push(
         `Continuous monitoring during implementation will identify emerging challenges early for proactive mitigation`
@@ -662,20 +721,94 @@ export function generateSWOTAnalysis(
     );
   }
   
-  // Enforce minimum 3 insights - add context-specific opportunities
+  // Enforce minimum 3 insights - add specific component-based opportunities
   while (opportunities.length < 3) {
     if (opportunities.length === 0) {
-      opportunities.push(
-        `Early-stage assessment provides opportunity to develop comprehensive automation roadmap aligned with business priorities and technical capabilities`
-      );
+      // Find strongest component to highlight as foundation for growth
+      const strongestComponents = Object.entries(componentScores)
+        .map(([key, score]) => ({
+          name: key,
+          label: componentMeta[key as keyof typeof componentMeta].label,
+          score: Math.round(score)
+        }))
+        .sort((a, b) => b.score - a.score);
+      
+      if (strongestComponents.length > 0 && strongestComponents[0].score >= 50) {
+        const strongest = strongestComponents[0];
+        let opportunity = '';
+        
+        if (strongest.name === 'dataQuality') {
+          opportunity = `${strongest.label} (${strongest.score}/100) provides foundation to build comprehensive data validation and quality monitoring that will benefit multiple automation initiatives across the organization`;
+        } else if (strongest.name === 'processClarity') {
+          opportunity = `${strongest.label} (${strongest.score}/100) enables creation of reusable process documentation framework that can accelerate future automation assessments and reduce discovery time`;
+        } else if (strongest.name === 'systemEnvironment') {
+          opportunity = `${strongest.label} (${strongest.score}/100) allows leveraging existing infrastructure investments to minimize upfront automation costs and accelerate deployment timeline`;
+        } else if (strongest.name === 'integrationFeasibility') {
+          opportunity = `${strongest.label} (${strongest.score}/100) enables building scalable integration architecture that can support expanded automation portfolio over time`;
+        } else {
+          opportunity = `${strongest.label} (${strongest.score}/100) provides solid foundation to build comprehensive automation capabilities aligned with business priorities`;
+        }
+        
+        opportunities.push(opportunity);
+      } else {
+        opportunities.push(
+          `Early-stage assessment provides opportunity to develop comprehensive automation roadmap aligned with business priorities and technical capabilities`
+        );
+      }
     } else if (opportunities.length === 1) {
-      opportunities.push(
-        `Structured preparation phase enables proactive risk mitigation and stakeholder alignment before implementation`
-      );
+      // Identify specific improvement areas with high ROI potential
+      const improvableComponents = Object.entries(componentScores)
+        .filter(([_, score]) => score >= 40 && score < 60)
+        .map(([key, score]) => ({
+          name: key,
+          label: componentMeta[key as keyof typeof componentMeta].label,
+          score: Math.round(score)
+        }))
+        .sort((a, b) => b.score - a.score);
+      
+      if (improvableComponents.length > 0) {
+        const target = improvableComponents[0];
+        let improvement = '';
+        
+        if (target.name === 'dataQuality') {
+          improvement = `${target.label} (${target.score}/100) represents high-value improvement opportunity - implementing data governance framework now will reduce AI training requirements and accelerate time-to-value`;
+        } else if (target.name === 'changeMagnitude') {
+          improvement = `${target.label} (${target.score}/100) improvement through structured change management program will reduce implementation risk and enhance user adoption across future automation projects`;
+        } else if (target.name === 'workflowBrittleness') {
+          improvement = `${target.label} (${target.score}/100) can be elevated through process standardization effort that will deliver immediate operational benefits even before automation deployment`;
+        } else if (target.name === 'integrationFeasibility') {
+          improvement = `${target.label} (${target.score}/100) presents opportunity to establish enterprise integration patterns that enable rapid deployment of future automation solutions`;
+        } else {
+          improvement = `${target.label} (${target.score}/100) represents targeted improvement opportunity that will optimize implementation timeline and reduce overall project risk`;
+        }
+        
+        opportunities.push(improvement);
+      } else {
+        opportunities.push(
+          `Structured preparation phase enables proactive risk mitigation and stakeholder alignment before implementation`
+        );
+      }
     } else {
-      opportunities.push(
-        `Diagnostic insights support data-driven decision-making for solution selection and vendor evaluation`
-      );
+      // Find components with knowledge gaps - these are discovery opportunities
+      let hasKnowledgeGaps = false;
+      if (tfaResponses) {
+        for (let qId = 1; qId <= 21; qId++) {
+          if (isKnowledgeGap(qId)) {
+            hasKnowledgeGaps = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasKnowledgeGaps) {
+        opportunities.push(
+          `Technical feasibility knowledge gaps present opportunity for comprehensive infrastructure assessment that will inform not just this automation but broader digital transformation strategy`
+        );
+      } else {
+        opportunities.push(
+          `Complete technical assessment enables confident vendor evaluation with specific integration requirements and clear success criteria`
+        );
+      }
     }
   }
   
@@ -738,20 +871,92 @@ export function generateSWOTAnalysis(
     );
   }
   
-  // Enforce minimum 3 insights - add standard risks if needed
+  // Enforce minimum 3 insights - add component-specific risk assessments
   while (threats.length < 3) {
     if (threats.length === 0) {
-      threats.push(
-        `Standard implementation risks apply: maintain proactive stakeholder engagement and validate assumptions as design evolves`
-      );
+      // Find lowest scoring component as potential risk area
+      const lowestComponents = Object.entries(componentScores)
+        .map(([key, score]) => ({
+          name: key,
+          label: componentMeta[key as keyof typeof componentMeta].label,
+          score: Math.round(score)
+        }))
+        .sort((a, b) => a.score - b.score);
+      
+      if (lowestComponents.length > 0 && lowestComponents[0].score < 70) {
+        const lowest = lowestComponents[0];
+        let riskStatement = '';
+        
+        if (lowest.name === 'dataQuality' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) below optimal threshold risks increased AI error rates and extended training cycles - validate data quality improvements before committing to vendor contracts`;
+        } else if (lowest.name === 'changeMagnitude' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) indicates potential user resistance - inadequate change management could undermine technical success and delay ROI realization`;
+        } else if (lowest.name === 'processClarity' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) creates risk of scope expansion during implementation - incomplete requirements discovery could drive budget overruns`;
+        } else if (lowest.name === 'workflowBrittleness' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) threatens automation reliability - high exception rates could require extensive manual intervention defeating automation purpose`;
+        } else if (lowest.name === 'integrationFeasibility' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) indicates potential integration complexity - underestimated technical challenges could extend timeline and increase costs`;
+        } else if (lowest.name === 'systemEnvironment' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) suggests infrastructure constraints - deployment limitations could restrict AI solution options and complicate vendor selection`;
+        } else if (lowest.name === 'securityCompliance' && lowest.score < 70) {
+          riskStatement = `${lowest.label} (${lowest.score}/100) presents governance risk - late-stage security objections could halt implementation after significant investment`;
+        } else {
+          riskStatement = `${lowest.label} (${lowest.score}/100) represents potential implementation constraint - proactive mitigation planning recommended to avoid project delays`;
+        }
+        
+        threats.push(riskStatement);
+      } else {
+        threats.push(
+          `Strong overall component scores reduce implementation risk - maintain proactive stakeholder engagement and validate assumptions as design evolves`
+        );
+      }
     } else if (threats.length === 1) {
-      threats.push(
-        `Monitor scope creep during solution design to prevent budget overruns and timeline delays`
-      );
+      // Identify components with highest variance as uncertainty risks
+      const moderateComponents = Object.entries(componentScores)
+        .filter(([_, score]) => score >= 40 && score < 65)
+        .map(([key, score]) => ({
+          name: key,
+          label: componentMeta[key as keyof typeof componentMeta].label,
+          score: Math.round(score)
+        }))
+        .sort((a, b) => a.score - b.score);
+      
+      if (moderateComponents.length > 0) {
+        const moderate = moderateComponents[0];
+        let uncertaintyRisk = '';
+        
+        if (moderate.name === 'dataQuality') {
+          uncertaintyRisk = `${moderate.label} (${moderate.score}/100) mid-range score creates uncertainty in effort estimates - comprehensive data profiling required before finalizing project timeline and budget`;
+        } else if (moderate.name === 'integrationFeasibility') {
+          uncertaintyRisk = `${moderate.label} (${moderate.score}/100) moderate score suggests hidden integration complexity - proof-of-concept recommended to validate technical assumptions before full commitment`;
+        } else if (moderate.name === 'processClarity') {
+          uncertaintyRisk = `${moderate.label} (${moderate.score}/100) indicates incomplete process understanding - scope creep risk requires rigorous requirements freeze and change control procedures`;
+        } else {
+          uncertaintyRisk = `${moderate.label} (${moderate.score}/100) mid-range score creates planning uncertainty - structured validation phase recommended to reduce estimation risk`;
+        }
+        
+        threats.push(uncertaintyRisk);
+      } else {
+        threats.push(
+          `Monitor scope evolution during solution design to prevent budget overruns and timeline delays through disciplined change control`
+        );
+      }
     } else {
-      threats.push(
-        `Ensure adequate training and support resources are allocated to minimize user adoption friction`
-      );
+      // Check for low PIF respondent count as adoption risk
+      if (pifResponses.length < 3) {
+        threats.push(
+          `Limited process stakeholder engagement (${pifResponses.length} respondent${pifResponses.length > 1 ? 's' : ''}) risks incomplete requirements and user adoption challenges - expand stakeholder input to validate automation design assumptions`
+        );
+      } else if (estimatedFTE < 0.3 && totalScore < 65) {
+        threats.push(
+          `Modest efficiency potential (${Math.round(estimatedFTE * 10) / 10} FTE) combined with moderate readiness (${Math.round(totalScore)}/100) risks negative ROI if implementation costs exceed projections - validate business case with conservative estimates`
+        );
+      } else {
+        threats.push(
+          `Ensure adequate training and support resources allocated during rollout to minimize user adoption friction and maximize automation utilization rates`
+        );
+      }
     }
   }
   
