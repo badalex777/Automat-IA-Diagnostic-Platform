@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ImplementationOpportunity, Workflow, WorkflowStep } from "@shared/schema";
-import { calculateBaseImpact, calculateImplementationEffort } from "@shared/opportunityCalculations";
+import { calculateBaseImpact, calculateEnhancedImpact, calculateImplementationEffort } from "@shared/opportunityCalculations";
 import type { CompanyContext } from "@shared/opportunityCalculations";
 
 interface OpportunitiesDataTableProps {
@@ -70,6 +70,14 @@ export function OpportunitiesDataTable({
     return opportunities.map(opp => {
       const readinessScore = opp.stepId ? (readinessScores[opp.stepId] || 0) : 0;
       const baseImpact = calculateBaseImpact(opp, companyContext);
+      
+      // For enhanced impact, enable all toggles (error + revenue metrics)
+      const enhancedImpact = calculateEnhancedImpact(
+        opp, 
+        { errorMetrics: true, revenueMetrics: true }, 
+        companyContext
+      );
+      
       const effortScore = calculateImplementationEffort(
         readinessScore,
         parseFloat(opp.rampupPeriodMonths || "0"),
@@ -80,24 +88,30 @@ export function OpportunitiesDataTable({
       const workflow = workflows.find(w => w.id === opp.workflowId);
       const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
       
+      // Select the appropriate impact score based on matrix type
+      const displayImpact = matrixType === 'enhanced' ? enhancedImpact : baseImpact;
+      
       return {
         ...opp,
         workflow,
         linkedStep,
         readinessScore,
         baseImpact,
+        enhancedImpact,
+        displayImpact, // The score to use for sorting and display
         effortScore,
       };
     });
-  }, [opportunities, readinessScores, workflows, workflowSteps, companyContext]);
+  }, [opportunities, readinessScores, workflows, workflowSteps, companyContext, matrixType]);
 
   // Sort opportunities
   const sortedOpportunities = useMemo(() => {
     const sorted = [...enrichedOpportunities];
     
     // Calculate max values with zero-protection for roadmap sorting
+    // Use displayImpact (which respects matrixType) for calculations
     const maxImpact = sorted.length > 0 
-      ? Math.max(...sorted.map(o => o.baseImpact), 0.001) // Guard against zero
+      ? Math.max(...sorted.map(o => o.displayImpact), 0.001) // Guard against zero
       : 1;
     const maxEffort = sorted.length > 0 
       ? Math.max(...sorted.map(o => o.effortScore), 0.001) // Guard against zero
@@ -105,9 +119,9 @@ export function OpportunitiesDataTable({
     
     switch (sortBy) {
       case 'impact-high':
-        return sorted.sort((a, b) => b.baseImpact - a.baseImpact);
+        return sorted.sort((a, b) => b.displayImpact - a.displayImpact);
       case 'impact-low':
-        return sorted.sort((a, b) => a.baseImpact - b.baseImpact);
+        return sorted.sort((a, b) => a.displayImpact - b.displayImpact);
       case 'effort-high':
         return sorted.sort((a, b) => b.effortScore - a.effortScore);
       case 'effort-low':
@@ -123,8 +137,8 @@ export function OpportunitiesDataTable({
         // Priority score = (normalized impact) - (normalized effort)
         // Higher score = better opportunity (quick win)
         return sorted.sort((a, b) => {
-          const aPriority = (a.baseImpact / maxImpact) - (a.effortScore / maxEffort);
-          const bPriority = (b.baseImpact / maxImpact) - (b.effortScore / maxEffort);
+          const aPriority = (a.displayImpact / maxImpact) - (a.effortScore / maxEffort);
+          const bPriority = (b.displayImpact / maxImpact) - (b.effortScore / maxEffort);
           
           return bPriority - aPriority;
         });
@@ -135,7 +149,8 @@ export function OpportunitiesDataTable({
 
   // Get color for business impact score (green = good, red = bad)
   const getImpactColor = (score: number) => {
-    const maxImpact = Math.max(...enrichedOpportunities.map(o => o.baseImpact));
+    // Use displayImpact for max calculation to respect current matrix type
+    const maxImpact = Math.max(...enrichedOpportunities.map(o => o.displayImpact), 0.001);
     const normalized = maxImpact > 0 ? (score / maxImpact) * 100 : 0;
     
     if (normalized >= 75) return 'text-green-700 dark:text-green-400 font-semibold';
@@ -210,8 +225,8 @@ export function OpportunitiesDataTable({
                   <TableCell className="text-muted-foreground">
                     {opp.linkedStep?.stepName || 'N/A'}
                   </TableCell>
-                  <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(opp.baseImpact)}`}>
-                    {opp.baseImpact.toFixed(2)}
+                  <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(opp.displayImpact)}`}>
+                    {opp.displayImpact.toFixed(2)}
                   </TableCell>
                   <TableCell className={`text-right font-mono tabular-nums ${getEffortColor(opp.effortScore)}`}>
                     {opp.effortScore.toFixed(2)}
