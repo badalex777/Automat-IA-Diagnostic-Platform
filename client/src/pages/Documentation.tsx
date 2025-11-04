@@ -757,27 +757,27 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.pifMethodology.operationalScores}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.pifMethodology.operationalScoresContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.pifMethodology.operationalScoresContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.pifMethodology.roiDataExtraction}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.pifMethodology.roiDataExtractionContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.pifMethodology.roiDataExtractionContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.pifMethodology.qualitativeInsights}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.pifMethodology.qualitativeInsightsContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.pifMethodology.qualitativeInsightsContent)}
+                        </div>
                       </div>
                       
                       <Separator />
@@ -802,20 +802,17 @@ export default function Documentation() {
                     <CardContent className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.assessmentArchitecture}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.readinessRubric.assessmentArchitectureContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.readinessRubric.assessmentArchitectureContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.weightingFormula}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.readinessRubric.weightingFormulaContent}
-                        </p>
-                        <div className="bg-muted p-4 rounded-md font-mono text-sm">
-                          Readiness = (TFA × 0.60) + (PIF × 0.40)
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.readinessRubric.weightingFormulaContent)}
                         </div>
                       </div>
                       
@@ -892,18 +889,18 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.feasibilityBanding}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.readinessRubric.feasibilityBandingContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.readinessRubric.feasibilityBandingContent)}
+                        </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.readinessRubric.swotAnalysis}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.readinessRubric.swotAnalysisContent}
-                        </p>
+                        <div className="text-muted-foreground leading-relaxed">
+                          {parseStructuredContent(t.documentation.readinessRubric.swotAnalysisContent)}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
