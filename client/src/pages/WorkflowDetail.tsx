@@ -7,7 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -57,8 +64,7 @@ export default function WorkflowDetail() {
   const [participantName, setParticipantName] = useState("");
   const [participantRole, setParticipantRole] = useState("");
   const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
-  const [oppSortColumn, setOppSortColumn] = useState<'name' | 'impact' | 'effort'>('impact');
-  const [oppSortDirection, setOppSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [oppSortBy, setOppSortBy] = useState<'impact-high' | 'impact-low' | 'effort-high' | 'effort-low' | 'name' | 'roadmap'>('roadmap');
 
   // Read tab query parameter for navigation from step detail page
   const urlParams = new URLSearchParams(window.location.search);
@@ -126,6 +132,8 @@ export default function WorkflowDetail() {
   const { data: workflowPIFData } = useQuery<WorkflowPIFData>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
     enabled: !!workflowId,
+    refetchInterval: 10000, // Refetch every 10 seconds like TFA
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
@@ -777,28 +785,36 @@ export default function WorkflowDetail() {
                 };
               });
 
-              // Sort opportunities based on current sort column and direction
+              // Sort opportunities based on selected sort option
+              const maxImpact = opportunitiesWithScores.length > 0 
+                ? Math.max(...opportunitiesWithScores.map(o => o.baseImpact), 0.001) // Guard against zero
+                : 1;
+              const maxEffort = opportunitiesWithScores.length > 0 
+                ? Math.max(...opportunitiesWithScores.map(o => o.effortScore), 0.001) // Guard against zero
+                : 1;
+              
               const sortedOpportunities = [...opportunitiesWithScores].sort((a, b) => {
-                let comparison = 0;
-                if (oppSortColumn === 'name') {
-                  comparison = a.name.localeCompare(b.name);
-                } else if (oppSortColumn === 'impact') {
-                  comparison = a.baseImpact - b.baseImpact;
-                } else if (oppSortColumn === 'effort') {
-                  comparison = a.effortScore - b.effortScore;
+                switch (oppSortBy) {
+                  case 'impact-high':
+                    return b.baseImpact - a.baseImpact;
+                  case 'impact-low':
+                    return a.baseImpact - b.baseImpact;
+                  case 'effort-high':
+                    return b.effortScore - a.effortScore;
+                  case 'effort-low':
+                    return a.effortScore - b.effortScore;
+                  case 'name':
+                    return a.name.localeCompare(b.name);
+                  case 'roadmap': {
+                    // Roadmap prioritization: high impact + low effort = quick wins
+                    const aPriority = (a.baseImpact / maxImpact) - (a.effortScore / maxEffort);
+                    const bPriority = (b.baseImpact / maxImpact) - (b.effortScore / maxEffort);
+                    return bPriority - aPriority;
+                  }
+                  default:
+                    return 0;
                 }
-                return oppSortDirection === 'asc' ? comparison : -comparison;
               });
-
-              // Handler for table column sorting
-              const handleSort = (column: 'name' | 'impact' | 'effort') => {
-                if (oppSortColumn === column) {
-                  setOppSortDirection(oppSortDirection === 'asc' ? 'desc' : 'asc');
-                } else {
-                  setOppSortColumn(column);
-                  setOppSortDirection(column === 'name' ? 'asc' : 'desc');
-                }
-              };
               
               // Calculate aggregated summary
               const totalOpps = opportunitiesWithScores.length;
@@ -821,51 +837,39 @@ export default function WorkflowDetail() {
                 <>
                   {/* Opportunities Data Table */}
                   <Card className="p-6">
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold">Opportunities Data</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Calculated scores for business impact and implementation effort
-                      </p>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">Opportunities Data</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Calculated scores for business impact and implementation effort
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Sort by:</span>
+                        <Select value={oppSortBy} onValueChange={(value) => setOppSortBy(value as typeof oppSortBy)}>
+                          <SelectTrigger className="w-[220px]" data-testid="select-sort-workflow-opportunities">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="roadmap">Roadmap Priority</SelectItem>
+                            <SelectItem value="impact-high">Highest Business Impact</SelectItem>
+                            <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
+                            <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
+                            <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
+                            <SelectItem value="name">Sort by Name</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <div className="border rounded-lg">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>
-                              <button 
-                                onClick={() => handleSort('name')} 
-                                className="flex items-center gap-1 hover:text-foreground"
-                              >
-                                Opportunity Name
-                                {oppSortColumn === 'name' ? (
-                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
-                              </button>
-                            </TableHead>
+                            <TableHead>Opportunity Name</TableHead>
                             <TableHead>Source Workflow</TableHead>
                             <TableHead>Source Step</TableHead>
-                            <TableHead className="text-right">
-                              <button 
-                                onClick={() => handleSort('impact')} 
-                                className="flex items-center gap-1 hover:text-foreground ml-auto"
-                              >
-                                Business Impact
-                                {oppSortColumn === 'impact' ? (
-                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
-                              </button>
-                            </TableHead>
-                            <TableHead className="text-right">
-                              <button 
-                                onClick={() => handleSort('effort')} 
-                                className="flex items-center gap-1 hover:text-foreground ml-auto"
-                              >
-                                Implementation Effort
-                                {oppSortColumn === 'effort' ? (
-                                  oppSortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                                ) : <ArrowUpDown className="h-4 w-4 opacity-30" />}
-                              </button>
-                            </TableHead>
+                            <TableHead className="text-right">Business Impact</TableHead>
+                            <TableHead className="text-right">Implementation Effort</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>

@@ -83,7 +83,8 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="hoursPerWeek"
               type="number"
-              step="0.1"
+              min="0"
+              step="0.01"
               placeholder="e.g., 40"
               value={formData.hoursPerWeek}
               onChange={(e) => handleChange('hoursPerWeek', e.target.value)}
@@ -95,7 +96,8 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="hoursPerYear"
               type="number"
-              step="0.1"
+              min="0"
+              step="0.01"
               placeholder="e.g., 2080"
               value={formData.hoursPerYear}
               onChange={(e) => handleChange('hoursPerYear', e.target.value)}
@@ -107,6 +109,7 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="fteEquivalent"
               type="number"
+              min="0"
               step="0.01"
               placeholder="e.g., 1.5"
               value={formData.fteEquivalent}
@@ -126,7 +129,8 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="annualBenefits"
               type="number"
-              step="1000"
+              min="0"
+              step="0.01"
               placeholder="e.g., 125000"
               value={formData.annualBenefits}
               onChange={(e) => handleChange('annualBenefits', e.target.value)}
@@ -138,7 +142,8 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="roiPercentage"
               type="number"
-              step="1"
+              min="0"
+              step="0.01"
               placeholder="e.g., 250"
               value={formData.roiPercentage}
               onChange={(e) => handleChange('roiPercentage', e.target.value)}
@@ -150,7 +155,8 @@ export default function BusinessImpactForm({ workflowId, initialData }: Business
             <Input
               id="paybackMonths"
               type="number"
-              step="0.5"
+              min="0"
+              step="0.01"
               placeholder="e.g., 8"
               value={formData.paybackMonths}
               onChange={(e) => handleChange('paybackMonths', e.target.value)}

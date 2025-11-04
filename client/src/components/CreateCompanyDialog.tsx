@@ -133,6 +133,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
                 <Input
                   id="annualRevenue"
                   type="number"
+                  min="0"
                   step="0.01"
                   placeholder="e.g., 5000000"
                   value={formData.annualRevenue}
@@ -147,6 +148,7 @@ export default function CreateCompanyDialog({ onSubmit }: CreateCompanyDialogPro
                 <Input
                   id="totalEmployees"
                   type="number"
+                  min="0"
                   step="1"
                   placeholder="e.g., 250"
                   value={formData.totalEmployees}

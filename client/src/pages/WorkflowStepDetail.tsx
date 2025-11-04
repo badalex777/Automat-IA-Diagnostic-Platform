@@ -60,6 +60,8 @@ export default function WorkflowStepDetail() {
   }>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
     enabled: !!workflowId,
+    refetchInterval: 10000, // Refetch every 10 seconds like TFA
+    refetchOnWindowFocus: true,
   });
 
   const { data: allOpportunities, isLoading: opportunitiesLoading } = useQuery<ImplementationOpportunity[]>({

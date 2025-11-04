@@ -510,6 +510,8 @@ export default function PIFForm() {
                     {question.type === 'number' && (
                       <Input
                         type="number"
+                        min="0"
+                        step="0.01"
                         data-testid={`input-q${question.id}`}
                         value={answers[question.id.toString()] || ""}
                         onChange={(e) => setAnswers(prev => ({ ...prev, [question.id.toString()]: e.target.value }))}

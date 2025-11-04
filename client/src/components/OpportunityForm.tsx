@@ -177,7 +177,8 @@ export function OpportunityForm({
                 <FormControl>
                   <Input 
                     type="number"
-                    step="any"
+                    min="0"
+                    step="0.01"
                     placeholder="e.g., 150000"
                     data-testid="input-annual-roi"
                     {...field}
@@ -202,7 +203,8 @@ export function OpportunityForm({
                 <FormControl>
                   <Input 
                     type="number"
-                    step="any"
+                    min="0"
+                    step="0.01"
                     placeholder="e.g., 350"
                     data-testid="input-annual-run-rate-roi"
                     {...field}
@@ -228,7 +230,8 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="any"
+                      min="0"
+                      step="0.01"
                       placeholder="e.g., 135000"
                       data-testid="input-net-benefit-3year"
                       {...field}
@@ -250,7 +253,8 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="any"
+                      min="0"
+                      step="0.01"
                       placeholder="e.g., 235000"
                       data-testid="input-net-benefit-5year"
                       {...field}
@@ -354,7 +358,8 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="any"
+                      min="0"
+                      step="0.01"
                       placeholder="e.g., 12"
                       data-testid="input-payback-period"
                       {...field}
@@ -376,7 +381,8 @@ export function OpportunityForm({
                   <FormControl>
                     <Input 
                       type="number"
-                      step="any"
+                      min="0"
+                      step="0.01"
                       placeholder="e.g., 8"
                       data-testid="input-training-hours"
                       {...field}

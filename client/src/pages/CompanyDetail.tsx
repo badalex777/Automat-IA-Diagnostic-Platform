@@ -9,6 +9,7 @@ import WorkflowListItem from "@/components/WorkflowListItem";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import BaseImpactMatrix from "@/components/BaseImpactMatrix";
 import { OpportunityCard } from "@/components/OpportunityCard";
+import { OpportunitiesDataTable } from "@/components/OpportunitiesDataTable";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -702,6 +703,17 @@ export default function CompanyDetail() {
                           totalEmployees: company?.totalEmployees,
                         }}
                       />
+                      <OpportunitiesDataTable 
+                        opportunities={filteredOpportunities}
+                        workflows={workflows}
+                        workflowSteps={allSteps}
+                        readinessScores={readinessScores}
+                        companyContext={{
+                          annualRevenue: company?.annualRevenue,
+                          totalEmployees: company?.totalEmployees,
+                        }}
+                        matrixType="base"
+                      />
                     </TabsContent>
                     
                     <TabsContent value="enhanced-impact" className="mt-4">
@@ -713,6 +725,17 @@ export default function CompanyDetail() {
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,
                         }}
+                      />
+                      <OpportunitiesDataTable 
+                        opportunities={filteredOpportunities}
+                        workflows={workflows}
+                        workflowSteps={allSteps}
+                        readinessScores={readinessScores}
+                        companyContext={{
+                          annualRevenue: company?.annualRevenue,
+                          totalEmployees: company?.totalEmployees,
+                        }}
+                        matrixType="enhanced"
                       />
                     </TabsContent>
                   </Tabs>
