@@ -16,6 +16,24 @@ export default function Documentation() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const isScrollingToSection = useRef(false);
 
+  // Helper function to parse structured content with **bold** headers and • bullets
+  const parseStructuredContent = (content: string) => {
+    return content.split('**').map((part, i) => {
+      if (i % 2 === 1) {
+        const [heading, ...bullets] = part.split('•').map(s => s.trim());
+        return (
+          <div key={i} className="mt-3">
+            <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
+            <ul className="list-disc ml-6 space-y-1">
+              {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
+            </ul>
+          </div>
+        );
+      }
+      return null;
+    });
+  };
+
   const scrollToSection = (sectionId: string) => {
     isScrollingToSection.current = true;
     setActiveSection(sectionId);
@@ -1154,11 +1172,8 @@ export default function Documentation() {
                     <CardContent className="space-y-6">
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.fteSavingsFormula}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.roiCalculations.fteSavingsFormulaContent}
-                        </p>
-                        <div className="bg-muted p-4 rounded-md font-mono text-xs">
-                          FTE Savings = Annual Hours Saved / 2080 hours
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.roiCalculations.fteSavingsFormulaContent)}
                         </div>
                       </div>
                       
@@ -1166,17 +1181,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.businessImpactScoring}</h3>
-                        <p className="text-muted-foreground leading-relaxed mb-3">
-                          {t.documentation.roiCalculations.businessImpactScoringContent}
-                        </p>
-                        <div className="bg-muted p-4 rounded-md font-mono text-xs space-y-2">
-                          <div>ROI Score = MIN(100, (Annual ROI / Company Revenue) × 1000)</div>
-                          <div>Hours Score = MIN(100, (FTE Savings / Total Employees) × 1000)</div>
-                          <div className="text-muted-foreground mt-2">Scoring Guide:</div>
-                          <div className="text-muted-foreground ml-4">10% impact = score 100 (exceptional)</div>
-                          <div className="text-muted-foreground ml-4">5% impact = score 50 (very good)</div>
-                          <div className="text-muted-foreground ml-4">2% impact = score 20 (good)</div>
-                          <div className="text-muted-foreground ml-4">1% impact = score 10 (notable)</div>
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.roiCalculations.businessImpactScoringContent)}
                         </div>
                       </div>
                     </CardContent>
@@ -1193,8 +1199,8 @@ export default function Documentation() {
                     <CardContent className="space-y-6">
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.tfaScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.tfaScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.tfaScoreFormula)}
                         </div>
                       </div>
                       
@@ -1202,8 +1208,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.readinessScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.readinessScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.readinessScoreFormula)}
                         </div>
                       </div>
                       
@@ -1211,8 +1217,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.roiScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.roiScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.roiScoreFormula)}
                         </div>
                       </div>
                       
@@ -1220,8 +1226,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.hoursScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.hoursScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.hoursScoreFormula)}
                         </div>
                       </div>
                       
@@ -1229,8 +1235,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.errorScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.errorScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.errorScoreFormula)}
                         </div>
                       </div>
                       
@@ -1238,8 +1244,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.revenueScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.revenueScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.revenueScoreFormula)}
                         </div>
                       </div>
                       
@@ -1247,8 +1253,8 @@ export default function Documentation() {
                       
                       <div className="border border-border rounded-md p-4 bg-accent/5">
                         <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.baseImpactMatrix}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.baseImpactMatrixFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.baseImpactMatrixFormula)}
                         </div>
                       </div>
                       
@@ -1256,8 +1262,8 @@ export default function Documentation() {
                       
                       <div className="border border-border rounded-md p-4 bg-primary/5">
                         <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.enhancedImpactMatrix}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.enhancedImpactMatrixFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.enhancedImpactMatrixFormula)}
                         </div>
                       </div>
                       
@@ -1265,8 +1271,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.bonusFormulas}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.bonusFormulasExplanation}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.bonusFormulasExplanation)}
                         </div>
                       </div>
                       
@@ -1274,8 +1280,8 @@ export default function Documentation() {
                       
                       <div>
                         <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.implementationEffortScore}</h3>
-                        <div className="bg-muted p-3 rounded-md font-mono text-xs">
-                          {t.documentation.formulasReference.implementationEffortScoreFormula}
+                        <div className="text-muted-foreground leading-relaxed text-sm">
+                          {parseStructuredContent(t.documentation.formulasReference.implementationEffortScoreFormula)}
                         </div>
                       </div>
                     </CardContent>
