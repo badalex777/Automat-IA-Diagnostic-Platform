@@ -1,0 +1,36 @@
+Let me explain what each task involves:
+
+Task 1: Real-Time Update Mechanisms
+What it is: Right now, when someone fills out a TFA or PIF survey, the platform automatically refreshes the data every 10 seconds. You don't have to manually hit "refresh" to see updated scores. The handbook doesn't mention this, so I'll add it.
+
+Task 2: Input Validation Rules
+What it is: Throughout the platform, all number fields (like ROI amounts, FTE counts, training hours) are set up to prevent negative numbers. You can't accidentally enter "-$50,000" instead of "$50,000". This protects your data quality. The handbook doesn't document this safeguard.
+
+Task 3: Professional Color-Coded Opportunities Table
+What it is: Below each matrix scatter plot, there's a beautiful table that shows opportunities with:
+
+Color-coded rows matching each workflow (subtle background colors + colored left borders)
+Green highlighting for high-impact/low-effort opportunities (good!)
+Red highlighting for low-impact/high-effort opportunities (avoid these!)
+The handbook mentions "a 2D scatter plot" but doesn't mention this professional table view at all.
+
+Task 4: Dropdown Sorting Functionality
+What it is: The opportunities table has a dropdown menu where you can sort by different criteria. The handbook doesn't explain that you can sort by:
+
+Roadmap Priority
+Highest/Lowest Business Impact
+Highest/Lowest Implementation Effort
+Sort by Workflow (only shows up in company-wide views)
+Sort by Name (only shows up in single-workflow views)
+The dropdown smartly adapts based on what you're viewing.
+
+Task 5: Roadmap Priority Algorithm
+What it is: When you select "Roadmap Priority" sorting, it's not random - there's a specific algorithm that creates an 18-month implementation roadmap. It prioritizes "quick wins" (high value + easy to do) first, then "strategic bets" (high value but harder). The handbook doesn't explain this at all.
+
+Task 6: Dynamic Impact Calculation
+What it is: This is what we just fixed! When you toggle between Base Impact Matrix and Enhanced Impact Matrix, the table below automatically recalculates all the scores, resort the opportunities, and adjusts the color coding. The handbook doesn't mention this dynamic behavior.
+
+Task 7: General Review
+What it is: A final pass through the entire handbook to catch anything else that's outdated or missing - basically a quality check to make sure everything else is accurate.
+
+Should I proceed with updating the handbook to include all these features?
