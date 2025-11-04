@@ -85,6 +85,14 @@ export default function Documentation() {
     };
   }, []);
 
+  // Helper function to parse structured content into HTML
+  const parseStructuredContentToHTML = (content: string) => {
+    return content.split('**').filter((_, i) => i % 2 === 1).map(part => {
+      const [heading, ...bullets] = part.split('•').map(s => s.trim());
+      return `<h4 style="font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem;">${heading.replace(':', '')}</h4><ul style="margin-left: 1.5rem; margin-bottom: 0.5rem;">${bullets.filter(b => b).map(b => `<li>${b}</li>`).join('')}</ul>`;
+    }).join('');
+  };
+
   const handleDownload = () => {
     const doc = t.documentation;
     const filename = 'Automat-IA_Platform_Handbook.html';
@@ -338,32 +346,34 @@ export default function Documentation() {
     <h2>${doc.roiCalculations.title}</h2>
     <p>${doc.roiCalculations.intro}</p>
     <h3>${doc.roiCalculations.fteSavingsFormula}</h3>
-    <div class="formula">${doc.roiCalculations.fteSavingsFormulaContent}</div>
+    ${parseStructuredContentToHTML(doc.roiCalculations.fteSavingsFormulaContent)}
     <h3>${doc.roiCalculations.businessImpactScoring}</h3>
-    <div class="formula">${doc.roiCalculations.businessImpactScoringContent}</div>
+    ${parseStructuredContentToHTML(doc.roiCalculations.businessImpactScoringContent)}
   </div>
 
   <div class="section" id="formulas-reference">
     <h2>${doc.formulasReference.title}</h2>
     <p>${doc.formulasReference.intro}</p>
     <h3>${doc.formulasReference.tfaScore}</h3>
-    <div class="formula">${doc.formulasReference.tfaScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.tfaScoreFormula)}
     <h3>${doc.formulasReference.readinessScore}</h3>
-    <div class="formula">${doc.formulasReference.readinessScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.readinessScoreFormula)}
     <h3>${doc.formulasReference.roiScore}</h3>
-    <div class="formula">${doc.formulasReference.roiScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.roiScoreFormula)}
     <h3>${doc.formulasReference.hoursScore}</h3>
-    <div class="formula">${doc.formulasReference.hoursScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.hoursScoreFormula)}
     <h3>${doc.formulasReference.errorScore}</h3>
-    <div class="formula">${doc.formulasReference.errorScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.errorScoreFormula)}
     <h3>${doc.formulasReference.revenueScore}</h3>
-    <div class="formula">${doc.formulasReference.revenueScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.revenueScoreFormula)}
     <h3>${doc.formulasReference.baseImpactMatrix}</h3>
-    <div class="formula">${doc.formulasReference.baseImpactMatrixFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.baseImpactMatrixFormula)}
     <h3>${doc.formulasReference.enhancedImpactMatrix}</h3>
-    <div class="formula">${doc.formulasReference.enhancedImpactMatrixFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.enhancedImpactMatrixFormula)}
+    <h3>${doc.formulasReference.bonusFormulas}</h3>
+    ${parseStructuredContentToHTML(doc.formulasReference.bonusFormulasExplanation)}
     <h3>${doc.formulasReference.implementationEffortScore}</h3>
-    <div class="formula">${doc.formulasReference.implementationEffortScoreFormula}</div>
+    ${parseStructuredContentToHTML(doc.formulasReference.implementationEffortScoreFormula)}
   </div>
 
 </body>
