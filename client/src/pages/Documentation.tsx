@@ -945,26 +945,38 @@ export default function Documentation() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.businessImpactScoring}</h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {t.documentation.opportunityMatrix.businessImpactScoringContent}
-                        </p>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.multiplierExplanation}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
-                          {parseStructuredContent(t.documentation.opportunityMatrix.multiplierExplanationContent)}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.businessImpactScoring}</h3>
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-md">
+                          <p className="text-foreground leading-relaxed text-sm">
+                            {t.documentation.opportunityMatrix.businessImpactScoringContent}
+                          </p>
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.baseMatrixTitle}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.multiplierExplanation}</h3>
+                        <div className="space-y-3">
+                          <div className="bg-primary/5 border border-primary/20 p-4 rounded-md">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-bold">10×</span>
+                              <span className="text-foreground font-semibold text-sm">Multiplier Applied</span>
+                            </div>
+                            {parseStructuredContent(t.documentation.opportunityMatrix.multiplierExplanationContent)}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.baseMatrixTitle}</h3>
+                        <div className="bg-blue-500/5 border-l-4 border-blue-500 p-4 rounded-r-md space-y-2">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-1 rounded text-xs font-bold">0-100 Scale</span>
+                            <span className="text-muted-foreground text-xs">Apples-to-Apples Comparison</span>
+                          </div>
                           {parseStructuredContent(t.documentation.opportunityMatrix.baseMatrixContent)}
                         </div>
                       </div>
@@ -972,8 +984,12 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.enhancedMatrixTitle}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.enhancedMatrixTitle}</h3>
+                        <div className="bg-green-500/5 border-l-4 border-primary p-4 rounded-r-md space-y-2">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded text-xs font-bold">0-150 Scale</span>
+                            <span className="text-muted-foreground text-xs">Dynamic with Bonuses</span>
+                          </div>
                           {parseStructuredContent(t.documentation.opportunityMatrix.enhancedMatrixContent)}
                         </div>
                       </div>
@@ -981,8 +997,8 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.scatterPlotInterpretation}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.scatterPlotInterpretation}</h3>
+                        <div className="bg-muted/50 border border-border p-4 rounded-md space-y-2">
                           {parseStructuredContent(t.documentation.opportunityMatrix.scatterPlotInterpretationContent)}
                         </div>
                       </div>
@@ -992,20 +1008,20 @@ export default function Documentation() {
                       <div>
                         <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.quadrants}</h3>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 border border-border rounded-md bg-green-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-green-600 dark:text-green-400 text-center">Quick Wins</h4>
+                          <div className="p-4 border-2 border-primary/30 rounded-md bg-primary/5">
+                            <h4 className="font-semibold text-sm mb-2 text-primary text-center">Quick Wins</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant1}</p>
                           </div>
-                          <div className="p-3 border border-border rounded-md bg-blue-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-blue-600 dark:text-blue-400 text-center">Strategic Bets</h4>
+                          <div className="p-4 border-2 border-blue-500/30 rounded-md bg-blue-500/5">
+                            <h4 className="font-semibold text-sm mb-2 text-blue-600 dark:text-blue-400 text-center">Strategic Bets</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant2}</p>
                           </div>
-                          <div className="p-3 border border-border rounded-md bg-yellow-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-yellow-600 dark:text-yellow-400 text-center">Nice-to-Have</h4>
+                          <div className="p-4 border-2 border-yellow-500/30 rounded-md bg-yellow-500/5">
+                            <h4 className="font-semibold text-sm mb-2 text-yellow-600 dark:text-yellow-400 text-center">Nice-to-Have</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant3}</p>
                           </div>
-                          <div className="p-3 border border-border rounded-md bg-red-500/5">
-                            <h4 className="font-semibold text-sm mb-1 text-red-600 dark:text-red-400 text-center">Deprioritize</h4>
+                          <div className="p-4 border-2 border-red-500/30 rounded-md bg-red-500/5">
+                            <h4 className="font-semibold text-sm mb-2 text-red-600 dark:text-red-400 text-center">Deprioritize</h4>
                             <p className="text-muted-foreground text-xs">{t.documentation.opportunityMatrix.quadrant4}</p>
                           </div>
                         </div>
@@ -1014,8 +1030,8 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.opportunitiesTable}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.opportunitiesTable}</h3>
+                        <div className="bg-muted/30 border-l-4 border-primary p-4 rounded-r-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.opportunitiesTableContent)}
                         </div>
                       </div>
@@ -1023,8 +1039,8 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.sortingFunctionality}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.sortingFunctionality}</h3>
+                        <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.sortingFunctionalityContent)}
                         </div>
                       </div>
@@ -1032,8 +1048,8 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.roadmapPriorityAlgorithmContent)}
                         </div>
                       </div>
@@ -1041,8 +1057,12 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.implementationEffortScoring}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.implementationEffortScoring}</h3>
+                        <div className="bg-orange-500/5 border-l-4 border-orange-500 p-4 rounded-r-md space-y-2">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-orange-500/10 text-orange-600 dark:text-orange-400 px-3 py-1 rounded text-xs font-bold">Y-axis: 0-100</span>
+                            <span className="text-muted-foreground text-xs">Lower = Easier Implementation</span>
+                          </div>
                           {parseStructuredContent(t.documentation.opportunityMatrix.implementationEffortScoringContent)}
                         </div>
                       </div>
@@ -1050,8 +1070,26 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.effortWeightingRationale}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.effortWeightingRationale}</h3>
+                        <div className="bg-muted/50 border border-border p-4 rounded-md space-y-3">
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-bold">50%</span>
+                              <span className="text-sm text-muted-foreground">Readiness</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold">20%</span>
+                              <span className="text-sm text-muted-foreground">Ramp-up</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold">20%</span>
+                              <span className="text-sm text-muted-foreground">Payback</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded text-xs font-bold">10%</span>
+                              <span className="text-sm text-muted-foreground">Training</span>
+                            </div>
+                          </div>
                           {parseStructuredContent(t.documentation.opportunityMatrix.effortWeightingRationaleContent)}
                         </div>
                       </div>
@@ -1059,8 +1097,8 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.opportunityMatrix.effortNormalizationScales}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.effortNormalizationScales}</h3>
+                        <div className="bg-amber-500/5 border-l-4 border-amber-500 p-4 rounded-r-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.effortNormalizationScalesContent)}
                         </div>
                       </div>
@@ -1077,8 +1115,11 @@ export default function Documentation() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.workflowOverview}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.roiCalculatorIntegration.workflowOverview}</h3>
+                        <div className="bg-primary/5 border border-primary/20 p-4 rounded-md space-y-2">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs font-bold">Two-Platform System</span>
+                          </div>
                           {parseStructuredContent(t.documentation.roiCalculatorIntegration.workflowOverviewContent)}
                         </div>
                       </div>
@@ -1086,9 +1127,11 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculatorIntegration.platformRoles}</h3>
-                        <div className="text-muted-foreground leading-relaxed">
-                          {parseStructuredContent(t.documentation.roiCalculatorIntegration.platformRolesContent)}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.roiCalculatorIntegration.platformRoles}</h3>
+                        <div className="grid gap-3">
+                          <div className="bg-blue-500/5 border-l-4 border-blue-500 p-4 rounded-r-md">
+                            {parseStructuredContent(t.documentation.roiCalculatorIntegration.platformRolesContent)}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -1104,88 +1147,60 @@ export default function Documentation() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.pifToCalculator}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {t.documentation.dataFlow.pifToCalculatorContent.split('**').map((part, i) => {
-                            if (i % 2 === 1) {
-                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
-                              return (
-                                <div key={i} className="mt-3">
-                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
-                                  <ul className="list-disc ml-6 space-y-1">
-                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
-                                  </ul>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.dataFlow.pifToCalculator}</h3>
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs font-bold">Manual Transfer</span>
+                            <span className="text-muted-foreground text-xs">PIF → ROI Calculator</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.dataFlow.pifToCalculatorContent)}
+                          </div>
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToOpportunities}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {t.documentation.dataFlow.calculatorToOpportunitiesContent.split('**').map((part, i) => {
-                            if (i % 2 === 1) {
-                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
-                              return (
-                                <div key={i} className="mt-3">
-                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
-                                  <ul className="list-disc ml-6 space-y-1">
-                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
-                                  </ul>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.dataFlow.calculatorToOpportunities}</h3>
+                        <div className="bg-blue-500/5 border-l-4 border-blue-500 p-4 rounded-r-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 px-3 py-1 rounded text-xs font-bold">Manual Entry</span>
+                            <span className="text-muted-foreground text-xs">ROI Calculator → Opportunities</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.dataFlow.calculatorToOpportunitiesContent)}
+                          </div>
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.opportunitiesToMatrix}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {t.documentation.dataFlow.opportunitiesToMatrixContent.split('**').map((part, i) => {
-                            if (i % 2 === 1) {
-                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
-                              return (
-                                <div key={i} className="mt-3">
-                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
-                                  <ul className="list-disc ml-6 space-y-1">
-                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
-                                  </ul>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.dataFlow.opportunitiesToMatrix}</h3>
+                        <div className="bg-green-500/5 border-l-4 border-green-500 p-4 rounded-r-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-green-500/10 text-green-600 dark:text-green-400 px-3 py-1 rounded text-xs font-bold">Automatic</span>
+                            <span className="text-muted-foreground text-xs">Opportunities → Matrix</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.dataFlow.opportunitiesToMatrixContent)}
+                          </div>
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.dataFlow.calculatorToReport}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {t.documentation.dataFlow.calculatorToReportContent.split('**').map((part, i) => {
-                            if (i % 2 === 1) {
-                              const [heading, ...bullets] = part.split('•').map(s => s.trim());
-                              return (
-                                <div key={i} className="mt-3">
-                                  <h4 className="font-semibold mb-1">{heading.replace(':', '')}</h4>
-                                  <ul className="list-disc ml-6 space-y-1">
-                                    {bullets.filter(b => b).map((bullet, j) => <li key={j}>{bullet}</li>)}
-                                  </ul>
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.dataFlow.calculatorToReport}</h3>
+                        <div className="bg-amber-500/5 border-l-4 border-amber-500 p-4 rounded-r-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-3 py-1 rounded text-xs font-bold">Stored for Later</span>
+                            <span className="text-muted-foreground text-xs">ROI Calculator → Executive Report</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.dataFlow.calculatorToReportContent)}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -1201,18 +1216,28 @@ export default function Documentation() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.fteSavingsFormula}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {parseStructuredContent(t.documentation.roiCalculations.fteSavingsFormulaContent)}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.roiCalculations.fteSavingsFormula}</h3>
+                        <div className="bg-primary/5 border border-primary/20 p-4 rounded-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs font-bold">FTE Conversion</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.roiCalculations.fteSavingsFormulaContent)}
+                          </div>
                         </div>
                       </div>
                       
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-2">{t.documentation.roiCalculations.businessImpactScoring}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
-                          {parseStructuredContent(t.documentation.roiCalculations.businessImpactScoringContent)}
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.roiCalculations.businessImpactScoring}</h3>
+                        <div className="bg-green-500/5 border-l-4 border-primary p-4 rounded-r-md">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded text-xs font-bold">Scoring Mathematics</span>
+                          </div>
+                          <div className="text-sm">
+                            {parseStructuredContent(t.documentation.roiCalculations.businessImpactScoringContent)}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -1226,91 +1251,85 @@ export default function Documentation() {
                       <CardTitle className="text-2xl">{t.documentation.formulasReference.title}</CardTitle>
                       <CardDescription>{t.documentation.formulasReference.intro}</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.tfaScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                    <CardContent className="space-y-4">
+                      <div className="bg-primary/5 border-l-4 border-primary p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-primary">{t.documentation.formulasReference.tfaScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.tfaScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.readinessScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-primary/5 border-l-4 border-primary p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-primary">{t.documentation.formulasReference.readinessScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.readinessScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
+                      <Separator className="my-4" />
                       
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.roiScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-blue-500/5 border-l-4 border-blue-500 p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-blue-600 dark:text-blue-400">{t.documentation.formulasReference.roiScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.roiScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.hoursScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-blue-500/5 border-l-4 border-blue-500 p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-blue-600 dark:text-blue-400">{t.documentation.formulasReference.hoursScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.hoursScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.errorScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-blue-500/5 border-l-4 border-blue-500 p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-blue-600 dark:text-blue-400">{t.documentation.formulasReference.errorScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.errorScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.revenueScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-blue-500/5 border-l-4 border-blue-500 p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-blue-600 dark:text-blue-400">{t.documentation.formulasReference.revenueScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.revenueScoreFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
+                      <Separator className="my-4" />
                       
-                      <div className="border border-border rounded-md p-4 bg-accent/5">
-                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.baseImpactMatrix}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-muted/50 border-2 border-primary/30 p-4 rounded-md">
+                        <h3 className="text-base font-semibold mb-3 text-primary flex items-center gap-2">
+                          {t.documentation.formulasReference.baseImpactMatrix}
+                          <span className="bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded text-xs font-bold">0-100</span>
+                        </h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.baseImpactMatrixFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div className="border border-border rounded-md p-4 bg-primary/5">
-                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.enhancedImpactMatrix}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-primary/10 border-2 border-primary p-4 rounded-md">
+                        <h3 className="text-base font-semibold mb-3 text-primary flex items-center gap-2">
+                          {t.documentation.formulasReference.enhancedImpactMatrix}
+                          <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold">0-150</span>
+                        </h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.enhancedImpactMatrixFormula)}
                         </div>
                       </div>
                       
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-base font-semibold mb-2 text-primary">{t.documentation.formulasReference.bonusFormulas}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-amber-500/10 border-l-4 border-amber-500 p-4 rounded-r-md">
+                        <h3 className="text-base font-semibold mb-3 text-amber-600 dark:text-amber-400">{t.documentation.formulasReference.bonusFormulas}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.bonusFormulasExplanation)}
                         </div>
                       </div>
                       
-                      <Separator />
+                      <Separator className="my-4" />
                       
-                      <div>
-                        <h3 className="text-base font-semibold mb-1">{t.documentation.formulasReference.implementationEffortScore}</h3>
-                        <div className="text-muted-foreground leading-relaxed text-sm">
+                      <div className="bg-orange-500/5 border-l-4 border-orange-500 p-3 rounded-r-md">
+                        <h3 className="text-sm font-semibold mb-1 text-orange-600 dark:text-orange-400">{t.documentation.formulasReference.implementationEffortScore}</h3>
+                        <div className="text-sm">
                           {parseStructuredContent(t.documentation.formulasReference.implementationEffortScoreFormula)}
                         </div>
                       </div>
