@@ -1228,7 +1228,7 @@ const en: Translations = {
       feasibilityBanding: "Feasibility Banding",
       feasibilityBandingContent: "**Classification Bands**: • Very High (80-100) • High (65-79) • Moderate (50-64) • Low (35-49) • Very Low (<35) **Key Distinction**: • Combined readiness score uses same bands as TFA • However, reflects both technical AND operational dimensions • Provides a more holistic implementation readiness assessment",
       swotAnalysis: "SWOT Analysis Generation",
-      swotAnalysisContent: "The platform automatically generates a SWOT analysis based on component scores: Strengths: Components scoring above 75, highlighting ready capabilities. Weaknesses: Components scoring below 50, identifying areas requiring improvement. Opportunities: High-scoring areas where quick wins are possible. Threats: Low-scoring areas that could derail implementation if not addressed. This framework translates scores into strategic insights for stakeholders.",
+      swotAnalysisContent: "**The Platform Automatically Generates SWOT Analysis Based on Component Scores**: • Strengths: Components scoring above 75, highlighting ready capabilities • Weaknesses: Components scoring below 50, identifying areas requiring improvement • Opportunities: High-scoring areas where quick wins are possible • Threats: Low-scoring areas that could derail implementation if not addressed **Purpose**: • Translates quantitative scores into strategic insights for stakeholders • Provides actionable framework for implementation planning",
     },
     
     opportunityMatrix: {
