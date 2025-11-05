@@ -509,30 +509,34 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   // Generate Quick Win list with workflow and step details
   const quickwinList = data.roadmapPhases.phase1QuickWins.length > 0
     ? data.roadmapPhases.phase1QuickWins
-        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepNumber}: ${opp.step.name})`)
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
     : "No Quick Win opportunities identified at this time. Focus on addressing foundational gaps to improve readiness scores.";
   
   // Generate foundational gaps list from common SWOT weaknesses
-  const foundationalGapsList = data.workflowSwot
-    .flatMap(ws => ws.weaknesses.slice(0, 2)) // Take top 2 weaknesses per workflow
-    .filter((gap, idx, arr) => arr.indexOf(gap) === idx) // Remove duplicates
-    .slice(0, 5) // Limit to top 5 unique gaps
-    .map((gap, idx) => `${idx + 1}. ${gap}`)
-    .join('\n') || "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies";
+  const foundationalGapsList = data.workflowSwot && data.workflowSwot.length > 0
+    ? data.workflowSwot
+        .flatMap(ws => ws.weaknesses.slice(0, 2)) // Take top 2 weaknesses per workflow
+        .filter((gap, idx, arr) => arr.indexOf(gap) === idx) // Remove duplicates
+        .slice(0, 5) // Limit to top 5 unique gaps
+        .map((gap, idx) => `${idx + 1}. ${gap}`)
+        .join('\n') || "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies"
+    : "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies";
   
   // Generate Strategic Bets list
   const strategicBetsList = [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic].length > 0
     ? [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic]
         .slice(0, 5) // Limit to top 5
-        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepNumber}: ${opp.step.name})`)
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
     : "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.";
   
   // Generate cultural readiness summary from PIF insights (broader filter)
-  const culturalInsights = data.questionInsights
-    .filter(qi => qi.section === 'Cultural Fit' || qi.section === 'Change Management' || qi.section.includes('Cultural') || qi.section.includes('Change'))
-    .slice(0, 4);
+  const culturalInsights = data.questionInsights && data.questionInsights.length > 0
+    ? data.questionInsights
+        .filter(qi => qi.section === 'Cultural Fit' || qi.section === 'Change Management' || qi.section.includes('Cultural') || qi.section.includes('Change'))
+        .slice(0, 4)
+    : [];
   
   const culturalReadinessSummary = culturalInsights.length > 0
     ? culturalInsights.map((qi, idx) => `${idx + 1}. ${qi.insight}`).join('\n')

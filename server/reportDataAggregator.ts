@@ -464,6 +464,8 @@ export interface PIFData {
 
 export interface OpportunityData {
   opportunity: ImplementationOpportunity;
+  workflow: { name: string };  // Workflow information
+  step: { stepOrder: number; name: string };  // Step information
   roiMetrics: {
     annualRoi: number;
     fteSavings: number;
@@ -550,7 +552,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       .select()
       .from(workflowSteps as any)
       .where(eq((workflowSteps as any).workflowId, workflow.id))
-      .orderBy((workflowSteps as any).stepNumber);
+      .orderBy(asc((workflowSteps as any).stepOrder));
 
     // Get implementation opportunities
     const opps = await db
@@ -611,8 +613,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       return {
         id: pif.id,
         stepId: pif.stepId,
-        stepNumber: step?.stepNumber || null,
-        stepName: step?.name || null,
+        stepNumber: step?.stepOrder || null,
+        stepName: step?.stepName || null,
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
         respondentResponsibilities: pif.respondentResponsibilities,
@@ -682,8 +684,13 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       const readinessScore = readinessData?.totalScore || 50; // Default to moderate if no readiness
       const matrixPosition = calculateOpportunityScore(opp, readinessScore, toggles, companyContext);
 
+      // Look up step information from workflowStepRecords
+      const step = opp.stepId ? workflowStepRecords.find((s: any) => s.id === opp.stepId) : null;
+
       return {
         opportunity: opp,
+        workflow: { name: workflow.name },
+        step: step ? { stepOrder: step.stepOrder, name: step.stepName } : { stepOrder: 0, name: "Unknown Step" },
         roiMetrics: {
           annualRoi: parseFloat(opp.annualRoi || "0"),
           fteSavings: parseFloat(opp.fteSavings || "0"),
