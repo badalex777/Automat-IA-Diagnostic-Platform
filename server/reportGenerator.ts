@@ -514,13 +514,27 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     : "No Quick Win opportunities identified at this time. Focus on addressing foundational gaps to improve readiness scores.";
   
   // Generate foundational gaps list from common SWOT weaknesses
-  const foundationalGapsList = data.workflowSwot && data.workflowSwot.length > 0
-    ? data.workflowSwot
-        .flatMap(ws => ws.weaknesses.slice(0, 2)) // Take top 2 weaknesses per workflow
-        .filter((gap, idx, arr) => arr.indexOf(gap) === idx) // Remove duplicates
-        .slice(0, 5) // Limit to top 5 unique gaps
-        .map((gap, idx) => `${idx + 1}. ${gap}`)
-        .join('\n') || "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies"
+  const allWeaknesses = data.appendixB
+    .flatMap(wb => {
+      // Collect weaknesses from both workflow-level and step-level SWOTs
+      const weaknesses: string[] = [];
+      if (wb.workflowLevelSWOT?.swotAnalysis?.weaknesses) {
+        weaknesses.push(...wb.workflowLevelSWOT.swotAnalysis.weaknesses.slice(0, 2));
+      }
+      if (wb.stepLevelSWOTs) {
+        wb.stepLevelSWOTs.forEach(step => {
+          if (step.swotAnalysis?.weaknesses) {
+            weaknesses.push(...step.swotAnalysis.weaknesses.slice(0, 1));
+          }
+        });
+      }
+      return weaknesses;
+    })
+    .filter((gap, idx, arr) => arr.indexOf(gap) === idx) // Remove duplicates
+    .slice(0, 5); // Limit to top 5 unique gaps
+  
+  const foundationalGapsList = allWeaknesses.length > 0
+    ? allWeaknesses.map((gap, idx) => `${idx + 1}. ${gap}`).join('\n')
     : "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies";
   
   // Generate Strategic Bets list
@@ -532,11 +546,24 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     : "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.";
   
   // Generate cultural readiness summary from PIF insights (broader filter)
-  const culturalInsights = data.questionInsights && data.questionInsights.length > 0
-    ? data.questionInsights
-        .filter(qi => qi.section === 'Cultural Fit' || qi.section === 'Change Management' || qi.section.includes('Cultural') || qi.section.includes('Change'))
-        .slice(0, 4)
-    : [];
+  const allQuestionInsights = data.appendixB.flatMap(wb => {
+    const insights: any[] = [];
+    if (wb.workflowLevelSWOT?.questionInsights) {
+      insights.push(...wb.workflowLevelSWOT.questionInsights);
+    }
+    if (wb.stepLevelSWOTs) {
+      wb.stepLevelSWOTs.forEach(step => {
+        if (step.questionInsights) {
+          insights.push(...step.questionInsights);
+        }
+      });
+    }
+    return insights;
+  });
+  
+  const culturalInsights = allQuestionInsights
+    .filter((qi: any) => qi.section === 'Cultural Fit' || qi.section === 'Change Management' || qi.section.includes('Cultural') || qi.section.includes('Change'))
+    .slice(0, 4);
   
   const culturalReadinessSummary = culturalInsights.length > 0
     ? culturalInsights.map((qi, idx) => `${idx + 1}. ${qi.insight}`).join('\n')
@@ -1048,7 +1075,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
             // Extract evidence from questionInsights if available
             const relevantInsight = stepSWOT.questionInsights[insightIndex] || null;
             const evidence = relevantInsight 
-              ? `${relevantInsight.section}: ${relevantInsight.factor} (Score: ${relevantInsight.score.toFixed(1)})`
+              ? `${relevantInsight.section}: ${relevantInsight.questionText}${relevantInsight.numericScore !== undefined && relevantInsight.numericScore !== null ? ` (Score: ${relevantInsight.numericScore.toFixed(1)})` : ''}`
               : "Process analysis";
 
             // Extract recommended action from followUpActions if available
