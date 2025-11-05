@@ -876,8 +876,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         
         stepLevelSWOTs.push({
           stepName: step.stepName,
-          participantName: step.participantName,
-          participantRole: step.participantRole,
+          participantName: step.participantName || 'N/A',
+          participantRole: step.participantRole || 'N/A',
           swotAnalysis: stepSWOT,
           questionInsights: stepQuestionInsights,
           followUpActions: stepFollowUpActions,
@@ -951,8 +951,23 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   const appendixF: AppendixFData[] = [];
   
   workflowsData.forEach(w => {
-    // Extract department/function from workflow name
-    const department = w.workflow.name.split(' - ')[0] || null;
+    // Extract department from workflow name (use part before " - " if exists, otherwise infer from context)
+    let department = 'General Operations';
+    if (w.workflow.name.includes(' - ')) {
+      department = w.workflow.name.split(' - ')[0].trim();
+    } else if (w.workflow.description) {
+      // Try to infer department from description
+      const desc = w.workflow.description.toLowerCase();
+      if (desc.includes('finance') || desc.includes('invoice') || desc.includes('payment')) {
+        department = 'Finance';
+      } else if (desc.includes('hr') || desc.includes('employee') || desc.includes('payroll')) {
+        department = 'Human Resources';
+      } else if (desc.includes('sales') || desc.includes('customer') || desc.includes('crm')) {
+        department = 'Sales & Marketing';
+      } else if (desc.includes('operations') || desc.includes('logistics') || desc.includes('supply')) {
+        department = 'Operations';
+      }
+    }
     
     // Add TFA provenance
     if (w.tfa) {
@@ -1036,7 +1051,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         respondentName: w.tfa.initialRespondent,
         respondentRole: 'Technical Contact',
         department,
-        collectionMethod: 'Technical Feasibility Assessment Form',
+        collectionMethod: 'Survey Form',
         submissionDate: w.tfa.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: gapSummary,
         validationStatus: validationStatus,
@@ -1054,7 +1069,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
         department,
-        collectionMethod: 'Process Insights Form',
+        collectionMethod: 'Survey Form',
         submissionDate: pif.completedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         knowledgeGaps: null,
         validationStatus: 'Complete', // PIFs are always complete when submitted

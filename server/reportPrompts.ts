@@ -294,7 +294,7 @@ Automat-IA applies a Two-Matrix Framework:
 
 2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
 
-Phase 7.5: Validation Session and Stakeholder Alignment
+Phase 8: Validation Session and Stakeholder Alignment
 
 After the Opportunity Matrix is generated, a validation session is conducted with key
 stakeholders to confirm prioritization, address hidden risks, and align automation opportunities
@@ -304,7 +304,7 @@ on implementation feasibility, resource availability, and strategic fit, allowin
 rankings and sequencing as needed. The validated Opportunity Matrix then feeds directly into
 the final automation roadmap and becomes the foundation for the Executive Diagnostic Report.
 
-Phase 8: Automation Roadmap Development
+Phase 9: Automation Roadmap Development
 
 Opportunities selected from the validated matrices are sequenced into a three-phase roadmap
 that converts diagnostic insights into actionable implementation steps:
@@ -321,13 +321,17 @@ transformations that leverage the foundation built earlier.
 The roadmap acts as a structured execution plan, ensuring a logical transition from immediate
 efficiency gains to organization-wide AI enablement.
 
-Phase 9: Final Deliverables
+Phase 10: Final Deliverables
 
 The diagnostic process concludes with the delivery of two comprehensive outputs:
 
-1. Executive Diagnostic Report (EDR): A detailed document consolidating all findings,
-readiness assessments, ROI analyses, opportunity matrices, and the automation roadmap,
-designed for executive and technical stakeholders to guide strategic decision-making.
+1. Executive Diagnostic Report (EDR): This document consolidates all findings, readiness
+assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation
+roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-10), diagnostic
+overview, findings and analysis, and six comprehensive appendices (A: Detailed Methodology,
+B: Readiness Score Metric Weighting, C: Step-Level SWOT Analysis, D: ROI Detailed Overview,
+E: ROI Calculation Methodology, F: Data Provenance and Audit Trail). Designed for executive
+and technical stakeholders to guide strategic decision-making and implementation planning.
 
 2. Executive Presentation: A summarized presentation highlighting key findings, validated
 opportunities, and the recommended roadmap, tailored for board-level and senior leadership
@@ -394,7 +398,23 @@ Wins are characterized by high step-level readiness scores (strong technical fea
 with clear operational data), minimal system integration requirements, and well-documented
 processes with engaged stakeholders.
 
-4.6 Foundational Gaps Hindering Scale
+[Analyst Commentary: Describe each Quick Win opportunity, what it automates, and expected impact]
+
+4.6 Strategic Bets for Long-Term Value
+
+A subset of high-impact opportunities offers significant potential but requires higher
+implementation effort due to technical debt, legacy system dependencies, or cross-departmental
+coordination requirements. These Strategic Bets include:
+
+{{strategic_bets_list}}
+
+These opportunities should be prioritized for later roadmap phases (Phase 2: Foundational or
+Phase 3: Strategic) once foundational enablers are strengthened, technical readiness improves,
+and early Quick Wins have built organizational capability and momentum.
+
+[Analyst Commentary: Describe each Strategic Bet opportunity, what it automates, and long-term value proposition]
+
+4.7 Foundational Gaps Hindering Scale
 
 Step-level readiness analysis revealed recurring weaknesses that limit scalability across multiple
 workflows. Common foundational gaps include:
@@ -406,17 +426,7 @@ improvements, process documentation initiatives, and establishing clear process 
 Addressing these foundational gaps will improve readiness scores for medium-effort opportunities
 and enable successful scaling of automation initiatives.
 
-4.7 Strategic Bets for Long-Term Value
-
-A subset of high-impact opportunities offers significant potential but requires higher
-implementation effort due to technical debt, legacy system dependencies, or cross-departmental
-coordination requirements. These Strategic Bets include:
-
-{{strategic_bets_list}}
-
-These opportunities should be prioritized for later roadmap phases (Phase 2: Foundational or
-Phase 3: Strategic) once foundational enablers are strengthened, technical readiness improves,
-and early Quick Wins have built organizational capability and momentum.
+[Analyst Commentary: Explain each foundational gap category, affected workflows, and recommended remediation timeline]
 
 4.8 Organizational and Cultural Readiness
 

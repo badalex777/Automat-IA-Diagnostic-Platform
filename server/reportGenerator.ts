@@ -146,7 +146,17 @@ function createTextParagraphs(text: string): Paragraph[] {
 
   const isSubsectionTitle = (line: string): boolean => {
     // Matches patterns like "7.1 Title", "A.1 Title", "E.1 Title", "4.1 Title", etc.
-    return /^(\d+\.\d+|[A-Z]\.\d+)\s+/.test(line.trim());
+    // BUT EXCLUDE methodology sub-phases 7.1-7.4 (they should be bold paragraphs, not headings)
+    const trimmed = line.trim();
+    if (/^7\.[1-4]\s+/.test(trimmed)) {
+      return false; // Methodology sub-phases should not be headings
+    }
+    return /^(\d+\.\d+|[A-Z]\.\d+)\s+/.test(trimmed);
+  };
+  
+  const isMethodologySubsection = (line: string): boolean => {
+    // Matches methodology sub-phases like "7.1 Title", "7.2 Title", etc.
+    return /^7\.[1-4]\s+/.test(line.trim());
   };
   
   const isFrameworkName = (line: string): boolean => {
@@ -165,6 +175,11 @@ function createTextParagraphs(text: string): Paragraph[] {
     ];
     const trimmed = line.trim();
     return frameworks.some(fw => trimmed.startsWith(fw));
+  };
+
+  const isBulletPoint = (line: string): boolean => {
+    // Matches lines starting with bullet symbols (•, -, *, ●)
+    return /^[•\-\*●]\s+/.test(line.trim());
   };
 
   const flushParagraph = () => {
@@ -202,10 +217,22 @@ function createTextParagraphs(text: string): Paragraph[] {
       continue;
     }
 
+    if (isMethodologySubsection(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Methodology subsections are rendered as bold paragraphs (not headings) to exclude from ToC
+      paragraphs.push(new Paragraph({
+        children: [new TextRun({ text: trimmed, bold: true })],
+        alignment: AlignmentType.BOTH,
+        spacing: { before: 120, after: 120 },
+      }));
+      continue;
+    }
+    
     if (isSubsectionTitle(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
-      // Add subsection as heading
+      // Add subsection as heading (will appear in ToC)
       paragraphs.push(new Paragraph({
         text: trimmed,
         heading: HeadingLevel.HEADING_3,
@@ -237,6 +264,20 @@ function createTextParagraphs(text: string): Paragraph[] {
           spacing: { after: 120 },
         }));
       }
+      continue;
+    }
+
+    if (isBulletPoint(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Remove bullet symbol and create proper DOCX bullet paragraph
+      const textWithoutBullet = trimmed.replace(/^[•\-\*●]\s+/, '');
+      paragraphs.push(new Paragraph({
+        text: textWithoutBullet,
+        alignment: AlignmentType.BOTH,
+        bullet: { level: 0 },
+        spacing: { after: 60 },
+      }));
       continue;
     }
 
@@ -1044,67 +1085,87 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
-  // Appendix C: Readiness SWOT Analysis - Step-Level Aggregation (Redesigned)
+  // Appendix C: Readiness SWOT Analysis - Step-Level Text Format
   sections.push(createHeading("Appendix C: Readiness SWOT Analysis", HeadingLevel.HEADING_1));
   sections.push(createBodyParagraph(
     "This appendix consolidates step-level SWOT analyses across all workflows, providing a " +
-    "comprehensive view of automation readiness at the process step level. Each row represents a " +
-    "specific SWOT insight tied to an individual process step, with evidence and recommended actions."
+    "comprehensive view of automation readiness at the process step level. Each workflow is presented " +
+    "with its constituent steps, followed by the Strengths, Weaknesses, Opportunities, and Threats " +
+    "identified through step-level readiness assessment."
   ));
 
-  // Build flattened SWOT rows
-  const flattenedSwotHeaders = ["Workflow", "Step #", "Step Name", "SWOT Category", "Readiness Insight", "Evidence", "Recommended Action"];
-  const flattenedSwotRows: string[][] = [];
+  // Generate text-based SWOT format
+  if (data.appendixB && data.appendixB.length > 0) {
+    data.appendixB.forEach(workflowData => {
+      // Workflow name as heading
+      sections.push(
+        new Paragraph({
+          text: workflowData.workflowName,
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 240, after: 120 },
+        })
+      );
 
-  data.appendixB.forEach(workflowData => {
-    // Group step-level SWOTs by workflow
-    if (workflowData.stepLevelSWOTs && workflowData.stepLevelSWOTs.length > 0) {
-      workflowData.stepLevelSWOTs.forEach((stepSWOT, stepIndex) => {
-        const stepNumber = (stepIndex + 1).toString();
-        
-        // Process each SWOT category
-        const categories = [
-          { name: "Strength", items: stepSWOT.swotAnalysis.strengths },
-          { name: "Weakness", items: stepSWOT.swotAnalysis.weaknesses },
-          { name: "Opportunity", items: stepSWOT.swotAnalysis.opportunities },
-          { name: "Threat", items: stepSWOT.swotAnalysis.threats },
-        ];
+      // Process each step within the workflow
+      if (workflowData.stepLevelSWOTs && workflowData.stepLevelSWOTs.length > 0) {
+        workflowData.stepLevelSWOTs.forEach((stepSWOT, stepIndex) => {
+          const stepNumber = stepIndex + 1;
+          
+          // Step identifier as subheading
+          sections.push(
+            new Paragraph({
+              text: `Step ${stepNumber} — ${stepSWOT.stepName}`,
+              heading: HeadingLevel.HEADING_4,
+              spacing: { before: 180, after: 90 },
+            })
+          );
 
-        categories.forEach(category => {
-          category.items.forEach((insight, insightIndex) => {
-            // Extract evidence from questionInsights if available
-            const relevantInsight = stepSWOT.questionInsights[insightIndex] || null;
-            const evidence = relevantInsight 
-              ? `${relevantInsight.section}: ${relevantInsight.questionText}${relevantInsight.numericScore !== undefined && relevantInsight.numericScore !== null ? ` (Score: ${relevantInsight.numericScore.toFixed(1)})` : ''}`
-              : "Process analysis";
+          // Strengths
+          if (stepSWOT.swotAnalysis.strengths && stepSWOT.swotAnalysis.strengths.length > 0) {
+            sections.push(new Paragraph({
+              children: [new TextRun({ text: "Strengths:", bold: true })],
+              spacing: { before: 60, after: 30 },
+            }));
+            stepSWOT.swotAnalysis.strengths.forEach(strength => {
+              sections.push(createBulletParagraph(strength));
+            });
+          }
 
-            // Extract recommended action from followUpActions if available
-            const relevantAction = stepSWOT.followUpActions.find((action: any) => 
-              category.name === "Weakness" || category.name === "Threat"
-            ) || stepSWOT.followUpActions[0];
-            const recommendedAction = relevantAction
-              ? `[${relevantAction.priority}] ${relevantAction.recommendation}`
-              : category.name === "Strength" || category.name === "Opportunity"
-                ? "Leverage for automation design"
-                : "Address during implementation planning";
+          // Weaknesses
+          if (stepSWOT.swotAnalysis.weaknesses && stepSWOT.swotAnalysis.weaknesses.length > 0) {
+            sections.push(new Paragraph({
+              children: [new TextRun({ text: "Weaknesses:", bold: true })],
+              spacing: { before: 60, after: 30 },
+            }));
+            stepSWOT.swotAnalysis.weaknesses.forEach(weakness => {
+              sections.push(createBulletParagraph(weakness));
+            });
+          }
 
-            flattenedSwotRows.push([
-              workflowData.workflowName,
-              stepNumber,
-              stepSWOT.stepName,
-              category.name,
-              insight,
-              evidence,
-              recommendedAction,
-            ]);
-          });
+          // Opportunities
+          if (stepSWOT.swotAnalysis.opportunities && stepSWOT.swotAnalysis.opportunities.length > 0) {
+            sections.push(new Paragraph({
+              children: [new TextRun({ text: "Opportunities:", bold: true })],
+              spacing: { before: 60, after: 30 },
+            }));
+            stepSWOT.swotAnalysis.opportunities.forEach(opportunity => {
+              sections.push(createBulletParagraph(opportunity));
+            });
+          }
+
+          // Threats
+          if (stepSWOT.swotAnalysis.threats && stepSWOT.swotAnalysis.threats.length > 0) {
+            sections.push(new Paragraph({
+              children: [new TextRun({ text: "Threats:", bold: true })],
+              spacing: { before: 60, after: 30 },
+            }));
+            stepSWOT.swotAnalysis.threats.forEach(threat => {
+              sections.push(createBulletParagraph(threat));
+            });
+          }
         });
-      });
-    }
-  });
-
-  if (flattenedSwotRows.length > 0) {
-    sections.push(createTable(flattenedSwotHeaders, flattenedSwotRows, [12, 5, 12, 10, 22, 17, 22]));
+      }
+    });
   } else {
     sections.push(createBodyParagraph("No step-level SWOT analyses available."));
   }
@@ -1269,22 +1330,28 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
 
   // Appendix F - Data Provenance and Audit Trail
   sections.push(createHeading("Appendix F: Data Provenance and Audit Trail", HeadingLevel.HEADING_1));
-  const provenanceHeaders = ["Workflow", "Step #", "Step Name", "Type", "Method", "Respondent", "Role", "Department", "Date", "Status", "Gaps"];
-  const provenanceRows = data.appendixF.map(prov => [
-    prov.workflowName,
-    prov.stepNumber,
-    prov.stepName,
-    prov.dataType,
-    prov.collectionMethod,
-    prov.respondentName,
-    prov.respondentRole,
-    prov.department || "N/A",
-    prov.submissionDate,
-    prov.validationStatus,
-    prov.knowledgeGaps || "None",
-  ]);
+  const provenanceHeaders = ["Workflow", "Department", "Step", "Type", "Method", "Respondent", "Role", "Date", "Status", "Gaps"];
+  const provenanceRows = data.appendixF.map(prov => {
+    // Merge Step # and Step Name into single column
+    const stepIdentifier = prov.stepNumber === "N/A" 
+      ? "N/A" 
+      : `Step ${prov.stepNumber} — ${prov.stepName}`;
+    
+    return [
+      prov.workflowName,
+      prov.department || "General Operations",
+      stepIdentifier,
+      prov.dataType,
+      prov.collectionMethod,
+      prov.respondentName,
+      prov.respondentRole,
+      prov.submissionDate,
+      prov.validationStatus,
+      prov.knowledgeGaps || "None",
+    ];
+  });
   if (provenanceRows.length > 0) {
-    sections.push(createTable(provenanceHeaders, provenanceRows, [13, 5, 10, 8, 12, 12, 10, 8, 8, 7, 7]));
+    sections.push(createTable(provenanceHeaders, provenanceRows, [14, 12, 14, 7, 10, 12, 10, 8, 7, 6]));
   }
   
   // Add detailed knowledge gap resolution tables if available
