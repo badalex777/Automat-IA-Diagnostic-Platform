@@ -196,7 +196,7 @@ projections presented herein.
 export const METHODOLOGY_OVERVIEW = `
 Our diagnostic approach integrates technical feasibility analysis with business impact
 evaluation to produce a complete, data-driven view of automation potential. The methodology
-unfolds through eight key phases, ensuring analytical depth, stakeholder validation, and
+unfolds through ten key phases, ensuring analytical depth, stakeholder validation, and
 traceability of insights.
 
 Phase 1: Stakeholder Discovery and Context Definition
@@ -207,17 +207,23 @@ This ensures that the diagnostic scope and business priorities are aligned.
 
 Phase 2: Technical Feasibility Assessment (TFA)
 
+The TFA is conducted at the workflow level and shared across all steps within that workflow.
 Each workflow is evaluated across four weighted dimensions: System Environment, Data
 Quality, Integration Feasibility, and Security and Compliance, using Automat-IA's
 21-question rubric. Responses generate a Technical Readiness Rating (0 to 100), with
-knowledge gaps recorded for clarification to maintain data integrity.
+knowledge gaps recorded for clarification to maintain data integrity. This workflow-level
+assessment provides a foundation for understanding the technical environment that affects all
+steps within the process.
 
 Phase 3: Process Insights Form (PIF)
 
-Operational participants complete the PIF to provide quantitative data such as frequency,
-duration, and participant count, as well as qualitative observations including exceptions, manual
-steps, and dependencies. This captures the operational realities that influence automation
-potential.
+PIFs are collected at the step level—each individual process step within a workflow receives its
+own PIF assessment. Operational participants complete the PIF to provide quantitative data
+such as frequency, duration, and participant count, as well as qualitative observations including
+exceptions, manual steps, and dependencies. This step-level granularity captures the operational
+realities at each specific point in the workflow, enabling precise identification of automation
+opportunities and readiness assessment for individual process steps rather than relying on
+aggregated workflow averages.
 
 Phase 4: End-User Validation and Workflow Mapping
 
@@ -227,9 +233,10 @@ technical assumptions align with real execution conditions.
 
 Phase 5: Opportunity Identification
 
-By combining TFA and PIF data, potential automation opportunities are identified and
-categorized according to feasibility, process complexity, and expected business value. Each
-opportunity is linked to its originating workflow for auditability.
+By combining workflow-level TFA data with step-level PIF data, potential automation
+opportunities are identified and categorized according to feasibility, process complexity, and
+expected business value. Each opportunity is linked to its specific originating workflow step for
+auditability and precise impact attribution.
 
 Phase 6: ROI Modeling and Quantification
 
@@ -255,7 +262,8 @@ Vertical Axis: Business Impact combines ROI percentage, annual benefit, and
 strategic contribution to organizational goals.
 
 Horizontal Axis: Implementation Effort reflects the technical difficulty, integration
-complexity, and readiness level derived from TFA scores.
+complexity, and step-level readiness scores derived from the combination of
+workflow-level TFA and step-specific PIF assessments.
 
 This two-axis approach highlights which opportunities deliver the highest return for the lowest
 relative effort.
@@ -286,10 +294,20 @@ Automat-IA applies a Two-Matrix Framework:
 
 2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
 
+Phase 7.5: Validation Session and Stakeholder Alignment
+
+After the Opportunity Matrix is generated, a validation session is conducted with key
+stakeholders to confirm prioritization, address hidden risks, and align automation opportunities
+with organizational strategy and culture. This collaborative review ensures that the roadmap
+reflects both analytical rigor and practical business considerations. Stakeholders provide input
+on implementation feasibility, resource availability, and strategic fit, allowing the team to adjust
+rankings and sequencing as needed. The validated Opportunity Matrix then feeds directly into
+the final automation roadmap and becomes the foundation for the Executive Diagnostic Report.
+
 Phase 8: Automation Roadmap Development
 
-Opportunities selected from the matrices are sequenced into a three-phase roadmap that
-converts diagnostic insights into actionable implementation steps:
+Opportunities selected from the validated matrices are sequenced into a three-phase roadmap
+that converts diagnostic insights into actionable implementation steps:
 
 Phase 1: Quick Wins (0 to 6 months) focus on low-complexity automations that deliver
 early ROI and demonstrate measurable results.
@@ -302,6 +320,21 @@ transformations that leverage the foundation built earlier.
 
 The roadmap acts as a structured execution plan, ensuring a logical transition from immediate
 efficiency gains to organization-wide AI enablement.
+
+Phase 9: Final Deliverables
+
+The diagnostic process concludes with the delivery of two comprehensive outputs:
+
+1. Executive Diagnostic Report (EDR): A detailed document consolidating all findings,
+readiness assessments, ROI analyses, opportunity matrices, and the automation roadmap,
+designed for executive and technical stakeholders to guide strategic decision-making.
+
+2. Executive Presentation: A summarized presentation highlighting key findings, validated
+opportunities, and the recommended roadmap, tailored for board-level and senior leadership
+communication.
+
+These deliverables provide both the depth required for implementation planning and the clarity
+needed for executive buy-in and resource allocation.
 `;
 
 // Continue with remaining prompts...
@@ -327,11 +360,11 @@ that are both technically feasible and financially justified.
 
 4.2 Key Diagnostic Findings
 
-Total Workflows Analyzed: {{workflow_count}}
-Validated Automation Opportunities: {{opportunity_count}}
-Total Annual Benefit Potential: {{annual_benefit}}
-Average Payback Period: {{avg_payback}} months
-FTE Saved: {{fte_savings}}
+• Total Workflows Analyzed: {{workflow_count}}
+• Validated Automation Opportunities: {{opportunity_count}}
+• Total Annual Benefit Potential: {{annual_benefit}}
+• Average Payback Period: {{avg_payback}} months
+• FTE Saved: {{fte_savings}}
 
 Readiness scores varied across workflows, reflecting differences in data quality, process
 structure, and integration maturity.
@@ -351,38 +384,51 @@ operations, and any interdependencies.]
 export const DIAGNOSTIC_OVERVIEW_PART3 = `
 4.5 Immediate Implementation Potential (Quick Wins)
 
-{{quickwin_count}} workflows demonstrated high readiness and low implementation effort,
-classifying them as Quick Wins.
-These can be executed in the short term to generate early ROI and internal momentum.
+{{quickwin_count}} opportunities demonstrated high readiness and low implementation effort,
+classifying them as Quick Wins. These opportunities span the following workflows and steps:
 
-[Commentary: Describe Quick Win characteristics and business areas where they occur.]
+{{quickwin_list}}
+
+These can be executed in the short term to generate early ROI and internal momentum. Quick
+Wins are characterized by high step-level readiness scores (strong technical feasibility combined
+with clear operational data), minimal system integration requirements, and well-documented
+processes with engaged stakeholders.
 
 4.6 Foundational Gaps Hindering Scale
 
-Readiness analysis revealed recurring weaknesses that limit scalability, including [weaknesses
-or threats identified in the workflow].
+Step-level readiness analysis revealed recurring weaknesses that limit scalability across multiple
+workflows. Common foundational gaps include:
 
-[Commentary: Identify specific remediation actions such as system integration upgrades, data
-governance improvements, or process documentation initiatives.]
+{{foundational_gaps_list}}
+
+Recommended remediation actions include system integration upgrades, data governance
+improvements, process documentation initiatives, and establishing clear process ownership.
+Addressing these foundational gaps will improve readiness scores for medium-effort opportunities
+and enable successful scaling of automation initiatives.
 
 4.7 Strategic Bets for Long-Term Value
 
-A subset of high-impact opportunities offers significant potential but requires higher effort due to
-[technical debt, legacy systems, or cross-department dependencies, this is populated by the
-main issued that would hinder speed and increase implementation effort].
+A subset of high-impact opportunities offers significant potential but requires higher
+implementation effort due to technical debt, legacy system dependencies, or cross-departmental
+coordination requirements. These Strategic Bets include:
 
-These Strategic Bets should be prioritized for later phases once foundational enablers are
-strengthened.
+{{strategic_bets_list}}
 
-[Commentary: Mention key examples and rationale for sequencing.]
+These opportunities should be prioritized for later roadmap phases (Phase 2: Foundational or
+Phase 3: Strategic) once foundational enablers are strengthened, technical readiness improves,
+and early Quick Wins have built organizational capability and momentum.
 
 4.8 Organizational and Cultural Readiness
 
-Interviews and PIF responses revealed differing levels of automation awareness and change
-adaptability.
+Stakeholder interviews and step-level PIF responses revealed differing levels of automation
+awareness and change adaptability across departments. Cultural readiness factors include:
 
-[Commentary: Summarize cultural sentiment by department and provide recommendations for
-change management, communication, and capability-building.]
+{{cultural_readiness_summary}}
+
+Recommendations for organizational readiness include targeted change management programs,
+cross-departmental communication initiatives, automation literacy training, and establishing
+internal champions to build confidence and capability. Strong cultural readiness accelerates
+implementation timelines and improves adoption rates for all automation initiatives.
 
 4.9 Recommended Focus
 

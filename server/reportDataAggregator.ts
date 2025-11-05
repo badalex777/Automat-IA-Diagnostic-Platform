@@ -380,6 +380,8 @@ export interface AppendixBData {
 
 export interface AppendixFData {
   workflowName: string;
+  stepNumber: string;  // "N/A" for TFA (workflow-level), or step number for PIF
+  stepName: string;    // "Workflow-level (TFA)" for TFA, or actual step name for PIF
   dataType: 'TFA' | 'PIF';
   respondentName: string;
   respondentRole: string;
@@ -425,6 +427,9 @@ export interface TFAData {
 
 export interface PIFData {
   id: string;
+  stepId: string | null;  // Step ID for joining with workflowSteps
+  stepNumber: number | null;  // Step number within workflow
+  stepName: string | null;  // Step name
   respondentName: string;
   respondentRole: string;
   respondentResponsibilities: string | null;
@@ -540,6 +545,13 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         )
       );
 
+    // Get workflow steps for step information
+    const workflowStepRecords = await db
+      .select()
+      .from(workflowSteps as any)
+      .where(eq((workflowSteps as any).workflowId, workflow.id))
+      .orderBy((workflowSteps as any).stepNumber);
+
     // Get implementation opportunities
     const opps = await db
       .select()
@@ -593,8 +605,14 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       const roiInputs = pif.roiInputs as any || {};
       const qualitative = pif.qualitativeResponses as any || {};
 
+      // Look up step information if stepId exists
+      const step = pif.stepId ? workflowStepRecords.find((s: any) => s.id === pif.stepId) : null;
+
       return {
         id: pif.id,
+        stepId: pif.stepId,
+        stepNumber: step?.stepNumber || null,
+        stepName: step?.name || null,
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
         respondentResponsibilities: pif.respondentResponsibilities,
@@ -1005,6 +1023,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       
       appendixF.push({
         workflowName: w.workflow.name,
+        stepNumber: "N/A",
+        stepName: "Workflow-level (TFA)",
         dataType: 'TFA',
         respondentName: w.tfa.initialRespondent,
         respondentRole: 'Technical Contact',
@@ -1021,6 +1041,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     w.pifs.forEach(pif => {
       appendixF.push({
         workflowName: w.workflow.name,
+        stepNumber: pif.stepNumber ? pif.stepNumber.toString() : "N/A",
+        stepName: pif.stepName || "Step-level (PIF)",
         dataType: 'PIF',
         respondentName: pif.respondentName,
         respondentRole: pif.respondentRole,
