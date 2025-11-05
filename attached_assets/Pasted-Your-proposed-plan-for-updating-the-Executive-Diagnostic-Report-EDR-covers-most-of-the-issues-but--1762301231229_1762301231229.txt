@@ -1,0 +1,35 @@
+Your proposed plan for updating the Executive Diagnostic Report (EDR) covers most of the issues but is still missing several critical details. Please revise the implementation plan to include the following missing elements:
+
+Validation Session — Add a dedicated subsection under the Methodology explaining that after the Opportunity Matrix is generated, a validation session is conducted with key stakeholders to confirm priorities, address hidden risks, and align automation opportunities with strategy and culture. Include its purpose, goals, and outcome, and clarify that the validated Opportunity Matrix feeds into the final roadmap and the Executive Diagnostic Report.
+
+Final Deliverables — Explicitly mention that the last step of the process includes delivering two outputs:
+
+The Executive Diagnostic Report (EDR)
+
+The Executive Presentation summarizing the findings and validated roadmap.
+
+Bullet Rendering Rule — In the Formatting section, add a fallback rule: if true bullet rendering fails during generation, enforce one consistent symbol (•) via export stylesheet for visual consistency.
+
+Matrix Placeholder Layout — In Section 5.3, clarify the layout rules:
+
+Show Base Impact Matrix followed by Base Prioritization List
+
+Show Enhanced Impact Matrix followed by Enhanced Prioritization List
+
+Remove all duplicate placeholders from Section 5.4.
+
+Personalization for Sections 4.5–4.8 — Specify that these sections must reference opportunities by name, workflow, and step number, and include insights derived from PIF readiness deltas (e.g., knowledge gaps, process inconsistencies, etc.) to highlight differences between steps and workflows.
+
+Appendix C: SWOT Structure — Redesign this appendix so that it’s divided by workflow, with a table for each workflow listing readiness insights for each step. Include columns: Workflow, Step #, Step Name, SWOT Category, Readiness Insight, Evidence (component signal), Recommended Action.
+
+Appendix F: Data Mapping Fixes — Update table headers and data sources:
+
+Headers: Workflow, Step #, Step Name, Type, Method, Respondent, Role, Department, Date, Status, Gaps
+
+Ensure “Workflow ≠ Department” and “Type ≠ Method” are distinct fields
+
+Pull the Role value directly from TFA/PIF respondent metadata.
+
+Color & Branding Consistency — Apply Automat-IA’s visual brand elements (green accents and color-coded boxes) consistently across tables, charts, and appendices within the EDR, matching the style used in the Platform Handbook.
+
+When you update the plan, make sure all of these are explicitly represented as separate, actionable tasks — not implied.
