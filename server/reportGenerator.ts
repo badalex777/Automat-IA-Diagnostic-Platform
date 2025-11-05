@@ -271,7 +271,7 @@ function createTable(
   const headerRow = new TableRow({
     children: headers.map((h, i) => new TableCell({
       children: [new Paragraph({
-        children: [new TextRun({ text: h, bold: true })],
+        children: [new TextRun({ text: h, bold: true, color: COLORS.DARK_GRAY })],
         alignment: AlignmentType.CENTER,
       })],
       shading: {
@@ -1300,6 +1300,17 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
           },
           paragraph: {
             spacing: { before: 480, after: 240 },
+          },
+        },
+        heading2: {
+          run: {
+            font: "Roboto",
+            size: 28, // 14pt
+            bold: true,
+            color: COLORS.PRIMARY_GREEN,
+          },
+          paragraph: {
+            spacing: { before: 360, after: 180 },
           },
         },
         heading3: {
