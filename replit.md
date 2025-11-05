@@ -6,6 +6,8 @@ The Automat-IA Diagnostic Platform is a professional web application for consult
 
 **Recent Update (Nov 2024):** Platform Handbook comprehensively updated to accurately document step-level readiness architecture as the primary assessment method. All sections now clearly explain step-level granularity, multi-respondent aggregation scope, readiness view architecture, opportunity table features, and data flow with structured bullet formatting.
 
+**EDR Generation Update (Nov 2024):** Executive Diagnostic Report generation system enhanced to fully implement step-level readiness architecture. Key improvements: (1) Methodology section expanded from 8 to 10 phases, clarifying TFA as workflow-level and PIF as step-level; (2) Diagnostic Overview sections 4.5-4.8 personalized with dynamic template variables (opportunity lists, foundational gaps, strategic bets, cultural insights) with comprehensive fallback handling; (3) Appendix C redesigned from traditional SWOT tables to flattened columnar format [Workflow, Step #, Step Name, SWOT Category, Readiness Insight, Evidence, Recommended Action]; (4) Appendix F enhanced with Step # and Step Name columns to differentiate TFA (workflow-level) from PIF (step-level) entries; (5) All data aggregation updated to include step metadata with proper database joins and naming conventions.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
