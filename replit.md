@@ -8,6 +8,13 @@ The Automat-IA Diagnostic Platform is a professional web application for consult
 
 **EDR Generation Update (Nov 2024):** Executive Diagnostic Report generation system enhanced to fully implement step-level readiness architecture. Key improvements: (1) Methodology section expanded from 8 to 10 phases, clarifying TFA as workflow-level and PIF as step-level; (2) Diagnostic Overview sections 4.5-4.8 personalized with dynamic template variables (opportunity lists, foundational gaps, strategic bets, cultural insights) with comprehensive fallback handling; (3) Appendix C redesigned from traditional SWOT tables to flattened columnar format [Workflow, Step #, Step Name, SWOT Category, Readiness Insight, Evidence, Recommended Action]; (4) Appendix F enhanced with Step # and Step Name columns to differentiate TFA (workflow-level) from PIF (step-level) entries; (5) All data aggregation updated to include step metadata with proper database joins and naming conventions.
 
+**EDR Data Model Integration (Nov 5, 2024):** Fixed critical data model integration bugs in report generation:
+- **AppendixB Data Access**: Corrected template variable extraction to access nested `data.appendixB` structure instead of non-existent top-level `workflowSwot` and `questionInsights` fields
+- **QuestionInsight Type Safety**: Fixed property access throughout report generation - using `numericScore` instead of `score`, `questionText` instead of `factor`
+- **Comprehensive Null Safety**: Enhanced all template variable generators (foundationalGapsList, culturalReadinessSummary, evidence extraction) with proper null guards for missing SWOT data, question insights, and scores
+- **Data Flow Contract**: DiagnosticData → appendixB[] → workflowLevelSWOT/stepLevelSWOTs → questionInsights/swotAnalysis/followUpActions
+- **End-to-End Verification**: Report generation tested and confirmed working with proper Content-Type (application/vnd.openxmlformats-officedocument.wordprocessingml.document) and successful downloads
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
