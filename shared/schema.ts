@@ -51,11 +51,16 @@ export const tfaAssessments = pgTable("tfa_assessments", {
   initialRespondentRole: text("initial_respondent_role"),
   responseSources: jsonb("response_sources").default({}),
   gapMetadata: jsonb("gap_metadata").default({}),
+  email: text("email"),
+  verificationToken: varchar("verification_token").unique(),
+  verified: boolean("verified").default(false).notNull(),
+  verifiedAt: timestamp("verified_at"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("tfa_assessments_workflow_id_idx").on(table.workflowId),
   shareableIdIdx: index("tfa_assessments_shareable_id_idx").on(table.shareableId),
+  verificationTokenIdx: index("tfa_assessments_verification_token_idx").on(table.verificationToken),
 }));
 
 export const pifResponses = pgTable("pif_responses", {
@@ -72,12 +77,17 @@ export const pifResponses = pgTable("pif_responses", {
   workflowBrittleness: integer("workflow_brittleness"),
   roiInputs: jsonb("roi_inputs").default({}),
   qualitativeResponses: jsonb("qualitative_responses").default({}),
+  email: text("email"),
+  verificationToken: varchar("verification_token").unique(),
+  verified: boolean("verified").default(false).notNull(),
+  verifiedAt: timestamp("verified_at"),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("pif_responses_workflow_id_idx").on(table.workflowId),
   stepIdIdx: index("pif_responses_step_id_idx").on(table.stepId),
   shareableIdIdx: index("pif_responses_shareable_id_idx").on(table.shareableId),
+  verificationTokenIdx: index("pif_responses_verification_token_idx").on(table.verificationToken),
 }));
 
 export const businessImpact = pgTable("business_impact", {
@@ -160,6 +170,7 @@ export const tfaResponsesSchema = z.object({
   comments: z.string().optional(),
   initialRespondent: z.string().optional(),
   initialRespondentRole: z.string().optional(),
+  email: z.string().email("Please enter a valid email address").optional(),
   gapMetadata: z.record(z.string(), z.object({
     why: z.string(),
     whoMightKnow: z.string(),
@@ -205,6 +216,7 @@ export const pifSubmitSchema = z.object({
   respondentName: z.string().min(1, "Name is required"),
   respondentRole: z.string().min(1, "Role is required"),
   respondentResponsibilities: z.string().min(1, "Responsibilities are required"),
+  email: z.string().email("Please enter a valid email address").optional(),
   responses: z.record(z.string(), z.string()),
   stepId: z.string().optional(), // Optional step ID for step-level PIFs
   roiInputs: z.object({
