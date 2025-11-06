@@ -1182,10 +1182,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/pif/shareable/:shareableId", async (req, res) => {
     try {
-      // For PIF, shareableId IS the workflowId (no separate registration needed)
-      const workflow = await storage.getWorkflow(req.params.shareableId);
-      if (!workflow) {
+      // Fetch the PIF template by shareableId
+      const templates = await storage.getPIFByShareableId(req.params.shareableId);
+      if (!templates || templates.length === 0) {
         return res.status(404).json({ error: "Survey not found" });
+      }
+      
+      const template = templates[0]; // Use first template (all should have same workflow/step)
+      
+      const workflow = await storage.getWorkflow(template.workflowId);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
       }
 
       const company = await storage.getCompany(workflow.companyId);
@@ -1193,10 +1200,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Company not found" });
       }
 
+      // Sanitize template to exclude verification code and other sensitive fields
+      const { verificationCode, ...sanitizedTemplate } = template;
+
       res.json({
+        template: sanitizedTemplate,
         workflow,
         company,
-        shareableId: req.params.shareableId
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

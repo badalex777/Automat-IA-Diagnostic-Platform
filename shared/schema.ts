@@ -218,6 +218,8 @@ export const pifSubmitSchema = z.object({
   respondentName: z.string().min(1, "Name is required"),
   respondentRole: z.string().min(1, "Role is required"),
   respondentResponsibilities: z.string().min(1, "Responsibilities are required"),
+  verificationCode: z.string().min(1, "Verification code is required"),
+  shareableId: z.string().min(1, "Shareable ID is required"),
   email: z.string().email("Please enter a valid email address").optional(),
   responses: z.record(z.string(), z.string()),
   stepId: z.string().optional(), // Optional step ID for step-level PIFs
