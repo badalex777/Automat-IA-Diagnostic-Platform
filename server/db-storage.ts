@@ -1,4 +1,4 @@
-import { eq, desc, sql, and, or, isNull } from "drizzle-orm";
+import { eq, desc, sql, and, or, isNull, isNotNull } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { db } from "./db";
 import { 
@@ -316,6 +316,7 @@ export class DbStorage implements IStorage {
       .where(
         and(
           eq(pifResponses.workflowId, workflowId),
+          isNotNull(pifResponses.completedAt), // Only return completed submissions, not templates
           or(
             isNull(pifResponses.email),
             eq(pifResponses.verified, true)
