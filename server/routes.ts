@@ -1242,7 +1242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create new PIF response with verified data
       const pifResponse = await storage.createPIFResponse({
         workflowId: template.workflowId,
-        stepId: stepId || null,
+        stepId: template.stepId || null, // Use stepId from template, not request body
         respondentName,
         respondentRole,
         respondentResponsibilities,
