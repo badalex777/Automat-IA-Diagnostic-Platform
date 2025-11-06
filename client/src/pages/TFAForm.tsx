@@ -308,67 +308,70 @@ export default function TFAForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Verification Code Section */}
-        <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-2">
-            {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
-          </h2>
-          <p className="text-sm text-muted-foreground mb-4">
-            {language === 'en' 
-              ? 'Enter the verification code provided with this assessment link. This code was shared by your consultant.' 
-              : 'Ingrese el código de verificación proporcionado con este enlace de evaluación. Este código fue compartido por su consultor.'}
-          </p>
-          <div className="max-w-md">
-            <Label htmlFor="verification-code">
-              {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
-            </Label>
-            <Input
-              id="verification-code"
-              value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
-              placeholder={language === 'en' ? 'TFA-XXXXX' : 'TFA-XXXXX'}
-              className="font-mono text-lg tracking-wider"
-              data-testid="input-verification-code"
-              maxLength={9}
-            />
-          </div>
-        </div>
-
-          {currentSection === 0 && (
-          <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
-            <div>
-              <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
-              <Input
-                id="respondent-name"
-                placeholder={t.enterFullName}
-                value={respondentName}
-                onChange={(e) => setRespondentName(e.target.value)}
-                className="mt-2"
-                data-testid="input-respondent-name"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                {t.nameHelperText}
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="respondent-role" className="text-sm font-medium">
-                {language === 'en' ? 'Your Role/Title' : 'Su Rol/Título'}
-              </Label>
-              <Input
-                id="respondent-role"
-                placeholder={language === 'en' ? 'e.g., IT Director, Operations Manager' : 'ej., Director de TI, Gerente de Operaciones'}
-                value={respondentRole}
-                onChange={(e) => setRespondentRole(e.target.value)}
-                className="mt-2"
-                data-testid="input-respondent-role"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
+        {currentSection === 0 && (
+          <>
+            {/* Verification Code Section */}
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-6">
+              <h2 className="text-lg font-semibold mb-2">
+                {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
                 {language === 'en' 
-                  ? 'Your role helps us understand your perspective on technical capabilities' 
-                  : 'Su rol nos ayuda a comprender su perspectiva sobre las capacidades técnicas'}
+                  ? 'Enter the verification code provided with this assessment link. This code was shared by your consultant.' 
+                  : 'Ingrese el código de verificación proporcionado con este enlace de evaluación. Este código fue compartido por su consultor.'}
               </p>
+              <div className="max-w-md">
+                <Label htmlFor="verification-code">
+                  {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
+                </Label>
+                <Input
+                  id="verification-code"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+                  placeholder={language === 'en' ? 'TFA-XXXXX' : 'TFA-XXXXX'}
+                  className="font-mono text-lg tracking-wider"
+                  data-testid="input-verification-code"
+                  maxLength={9}
+                />
+              </div>
             </div>
-          </div>
+
+            {/* Respondent Info Section */}
+            <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
+              <div>
+                <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
+                <Input
+                  id="respondent-name"
+                  placeholder={t.enterFullName}
+                  value={respondentName}
+                  onChange={(e) => setRespondentName(e.target.value)}
+                  className="mt-2"
+                  data-testid="input-respondent-name"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {t.nameHelperText}
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="respondent-role" className="text-sm font-medium">
+                  {language === 'en' ? 'Your Role/Title' : 'Su Rol/Título'}
+                </Label>
+                <Input
+                  id="respondent-role"
+                  placeholder={language === 'en' ? 'e.g., IT Director, Operations Manager' : 'ej., Director de TI, Gerente de Operaciones'}
+                  value={respondentRole}
+                  onChange={(e) => setRespondentRole(e.target.value)}
+                  className="mt-2"
+                  data-testid="input-respondent-role"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {language === 'en' 
+                    ? 'Your role helps us understand your perspective on technical capabilities' 
+                    : 'Su rol nos ayuda a comprender su perspectiva sobre las capacidades técnicas'}
+                </p>
+              </div>
+            </div>
+          </>
         )}
 
         {currentSection < tfaSections.length ? (
