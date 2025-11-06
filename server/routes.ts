@@ -118,6 +118,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Executive Report Generation
   app.get("/api/companies/:id/executive-report", async (req, res) => {
     try {
+      // Get language from query parameter (default: 'en')
+      const language = (req.query.lang as string || 'en').toLowerCase();
+      
+      // Validate language parameter
+      if (language !== 'en' && language !== 'es') {
+        return res.status(400).json({ error: "Invalid language parameter. Must be 'en' or 'es'" });
+      }
+      
       // Aggregate all diagnostic data for the company
       const diagnosticData = await aggregateCompanyDiagnosticData(req.params.id);
       
@@ -133,13 +141,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Generate the Word document
-      const buffer = await generateExecutiveReport(diagnosticData);
+      // Generate the Word document with selected language
+      const buffer = await generateExecutiveReport(diagnosticData, language as 'en' | 'es');
 
       // Set headers for file download
       const companyName = diagnosticData.company.name.replace(/[^a-z0-9]/gi, '_');
-      const diagnosticPeriod = diagnosticData.diagnosticPeriod.end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).replace(' ', '_');
-      const filename = `Automat-IA_Executive_Diagnostic_Report_${companyName}_${diagnosticPeriod}.docx`;
+      const locale = language === 'es' ? 'es-ES' : 'en-US';
+      const diagnosticPeriod = diagnosticData.diagnosticPeriod.end.toLocaleDateString(locale, { month: 'short', year: 'numeric' }).replace(' ', '_');
+      const langSuffix = language === 'es' ? '_ES' : '_EN';
+      const filename = `Automat-IA_Executive_Diagnostic_Report_${companyName}_${diagnosticPeriod}${langSuffix}.docx`;
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

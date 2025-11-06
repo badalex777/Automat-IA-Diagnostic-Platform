@@ -20,38 +20,7 @@ import {
   type IRunOptions,
 } from "docx";
 import { DiagnosticData } from "./reportDataAggregator";
-import {
-  EXECUTIVE_SUMMARY,
-  CONFIDENTIALITY_DISCLAIMER,
-  METHODOLOGY_OVERVIEW,
-  DIAGNOSTIC_OVERVIEW_PART1,
-  DIAGNOSTIC_OVERVIEW_PART2,
-  DIAGNOSTIC_OVERVIEW_PART3,
-  FINDINGS_ANALYSIS_PART1,
-  FINDINGS_ANALYSIS_PART2,
-  FINDINGS_ANALYSIS_PART3,
-  FINDINGS_ANALYSIS_PART4,
-  FINDINGS_ANALYSIS_PART5,
-  FINDINGS_ANALYSIS_PART6,
-  AUTOMATION_ROADMAP_INTRO,
-  AUTOMATION_ROADMAP_PHASE1,
-  AUTOMATION_ROADMAP_PHASE1_OUTCOMES,
-  AUTOMATION_ROADMAP_PHASE2,
-  AUTOMATION_ROADMAP_PHASE2_OUTCOMES,
-  AUTOMATION_ROADMAP_PHASE3,
-  AUTOMATION_ROADMAP_PHASE3_OUTCOMES,
-  AUTOMATION_ROADMAP_SUMMARY,
-  APPENDIX_A,
-  APPENDIX_D_INTRO,
-  APPENDIX_D_MODELING_NOTES,
-  APPENDIX_E_PART1,
-  APPENDIX_E_PART2,
-  APPENDIX_E_PART3,
-  APPENDIX_E_PART4,
-  APPENDIX_E_PART5,
-  replaceVariables,
-  formatDiagnosticDate,
-} from "./reportPrompts";
+// Dynamic import will be used based on language parameter
 
 /**
  * Custom error class for report validation failures
@@ -544,8 +513,48 @@ function validateTemplateVars(vars: Record<string, string>): { valid: boolean; e
 
 /**
  * Main function to generate Executive Diagnostic Report
+ * @param data - Aggregated diagnostic data
+ * @param language - Report language ('en' or 'es'), defaults to 'en'
  */
-export async function generateExecutiveReport(data: DiagnosticData): Promise<Buffer> {
+export async function generateExecutiveReport(data: DiagnosticData, language: 'en' | 'es' = 'en'): Promise<Buffer> {
+  // Dynamically import the correct language prompts
+  const prompts = language === 'es' 
+    ? await import("./reportPrompts_es")
+    : await import("./reportPrompts");
+  
+  // Destructure all needed constants from the selected language module
+  const {
+    EXECUTIVE_SUMMARY,
+    CONFIDENTIALITY_DISCLAIMER,
+    METHODOLOGY_OVERVIEW,
+    DIAGNOSTIC_OVERVIEW_PART1,
+    DIAGNOSTIC_OVERVIEW_PART2,
+    DIAGNOSTIC_OVERVIEW_PART3,
+    FINDINGS_ANALYSIS_PART1,
+    FINDINGS_ANALYSIS_PART2,
+    FINDINGS_ANALYSIS_PART3,
+    FINDINGS_ANALYSIS_PART4,
+    FINDINGS_ANALYSIS_PART5,
+    FINDINGS_ANALYSIS_PART6,
+    AUTOMATION_ROADMAP_INTRO,
+    AUTOMATION_ROADMAP_PHASE1,
+    AUTOMATION_ROADMAP_PHASE1_OUTCOMES,
+    AUTOMATION_ROADMAP_PHASE2,
+    AUTOMATION_ROADMAP_PHASE2_OUTCOMES,
+    AUTOMATION_ROADMAP_PHASE3,
+    AUTOMATION_ROADMAP_PHASE3_OUTCOMES,
+    AUTOMATION_ROADMAP_SUMMARY,
+    APPENDIX_A,
+    APPENDIX_D_INTRO,
+    APPENDIX_D_MODELING_NOTES,
+    APPENDIX_E_PART1,
+    APPENDIX_E_PART2,
+    APPENDIX_E_PART3,
+    APPENDIX_E_PART4,
+    APPENDIX_E_PART5,
+    replaceVariables,
+    formatDiagnosticDate,
+  } = prompts;
   // Pre-export validation - data structure
   const dataValidation = validateDiagnosticData(data);
   if (!dataValidation.valid) {
