@@ -63,13 +63,20 @@ export default function ShareableLinkCard({
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
 
+  const verificationCode = type === 'tfa' && existingAssessment 
+    ? existingAssessment.verificationCode 
+    : null;
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareableUrl);
       setCopied(true);
+      const codeMessage = verificationCode 
+        ? `Verification code: ${verificationCode}`
+        : '';
       toast({
         title: "Link copied!",
-        description: "The shareable link has been copied to your clipboard.",
+        description: codeMessage ? `${codeMessage}. Share both the link and code with the respondent.` : "The shareable link has been copied to your clipboard.",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -149,6 +156,20 @@ export default function ShareableLinkCard({
             <ExternalLink className="h-4 w-4" />
           </Button>
         </div>
+
+        {verificationCode && (
+          <div className="bg-primary/10 border border-primary/20 rounded-md p-4 space-y-2">
+            <p className="font-semibold text-sm">Verification Code Required</p>
+            <div className="flex items-center gap-2">
+              <code className="text-2xl font-mono font-bold tracking-wider" data-testid="text-verification-code">
+                {verificationCode}
+              </code>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Share this code with the respondent. They must enter it when submitting the form.
+            </p>
+          </div>
+        )}
 
         <div className="bg-muted rounded-md p-3 text-sm space-y-1">
           <p className="font-medium">Pre-filled Information:</p>
