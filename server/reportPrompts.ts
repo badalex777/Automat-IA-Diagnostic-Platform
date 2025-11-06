@@ -328,10 +328,11 @@ The diagnostic process concludes with the delivery of two comprehensive outputs:
 1. Executive Diagnostic Report (EDR): This document consolidates all findings, readiness
 assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation
 roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-10), diagnostic
-overview, findings and analysis, and six comprehensive appendices (A: Detailed Methodology,
-B: Readiness Score Metric Weighting, C: Step-Level SWOT Analysis, D: ROI Detailed Overview,
-E: ROI Calculation Methodology, F: Data Provenance and Audit Trail). Designed for executive
-and technical stakeholders to guide strategic decision-making and implementation planning.
+overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six
+comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Weighting,
+C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology,
+F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide
+strategic decision-making and implementation planning.
 
 2. Executive Presentation: A summarized presentation highlighting key findings, validated
 opportunities, and the recommended roadmap, tailored for board-level and senior leadership
@@ -414,7 +415,21 @@ and early Quick Wins have built organizational capability and momentum.
 
 [Analyst Commentary: Describe each Strategic Bet opportunity, what it automates, and long-term value proposition]
 
-4.7 Foundational Gaps Hindering Scale
+4.7 Nice-to-Have Opportunities
+
+A set of moderate or low-impact opportunities offers optimization potential with relatively low
+implementation effort. These Nice-to-Have opportunities can serve as proof-of-concept initiatives,
+training exercises, or incremental improvements:
+
+{{nice_to_have_list}}
+
+While not prioritized for the immediate 18-month roadmap, these opportunities may become more
+strategic as foundational capabilities mature or business priorities shift. They can also provide
+valuable learning experiences for teams new to automation technologies.
+
+[Analyst Commentary: Describe each Nice-to-Have opportunity, what it automates, and optimization potential]
+
+4.8 Foundational Gaps Hindering Scale
 
 Step-level readiness analysis revealed recurring weaknesses that limit scalability across multiple
 workflows. Common foundational gaps include:
@@ -428,7 +443,7 @@ and enable successful scaling of automation initiatives.
 
 [Analyst Commentary: Explain each foundational gap category, affected workflows, and recommended remediation timeline]
 
-4.8 Organizational and Cultural Readiness
+4.9 Organizational and Cultural Readiness
 
 Stakeholder interviews and step-level PIF responses revealed differing levels of automation
 awareness and change adaptability across departments. Cultural readiness factors include:
@@ -440,7 +455,7 @@ cross-departmental communication initiatives, automation literacy training, and 
 internal champions to build confidence and capability. Strong cultural readiness accelerates
 implementation timelines and improves adoption rates for all automation initiatives.
 
-4.9 Recommended Focus
+4.10 Recommended Focus
 
 ● Prioritize Quick Wins in Phase 1 to demonstrate ROI and build internal confidence.
 
@@ -468,7 +483,7 @@ Automation Roadmap.
 export const FINDINGS_ANALYSIS_PART2 = `
 [readiness_commentary]
 
-For detailed, per-workflow qualitative insights including identified strengths, weaknesses, and
+For detailed, per-step qualitative insights including identified strengths, weaknesses, and
 dependencies, refer to Appendix B: Readiness SWOT Analysis.
 `;
 
@@ -684,7 +699,7 @@ cross-check form data and confirm process conditions. Where available, policy do
 screen captures, or task logs are incorporated as supporting evidence.
 
 For a complete record of data inputs, see Appendix F: Data Provenance and Audit Trail. It
-lists, per workflow, the data type, source, respondent name and role, department, collection
+lists, per step, the data type, source, respondent name and role, department, collection
 method, and date.
 
 A.2 Diagnostic Frameworks
@@ -703,9 +718,9 @@ workflow brittleness, plus quantitative metrics for volumes, times, participants
 multiple respondents exist, responses are aggregated with variance tracking.
 
 Readiness Rubric.
-Combined readiness score per workflow or opportunity using TFA 60 percent and PIF 40
-percent, normalized 0 to 100. This score is a primary input (50 percent weight) into the
-Implementation Effort calculation detailed in Section A.5.
+Combined readiness score per step using TFA (shared workflow-level, 60%) and step-specific
+PIF (40%), normalized 0 to 100. This step-level readiness score is the primary input for
+Implementation Effort calculation in the Opportunity Matrix, as detailed in Section A.5.
 
 Automat-IA ROI Calculator.
 Quantifies financial impact using PIF operational data and cost assumptions from the
@@ -915,11 +930,10 @@ respondent names, roles, dates, and any midpoint assumptions.
 ● When quality or revenue data is not verified, values are held at zero until validated to
 avoid inflating benefit.
 
-● Payback is computed as Implementation Cost divided by Annual Benefit multiplied by
-12.
+● Payback period is sourced directly from opportunity modeling inputs and stakeholder
+validation.
 
-● FTE conversions assume 2,080 hours per year unless client-specific contracts dictate
-otherwise.
+● FTE conversions are based on 2,080 hours per year (standard full-time equivalent).
 `;
 
 export const APPENDIX_E_PART1 = `
@@ -987,16 +1001,23 @@ E.6 Key Modeling Assumptions
 export const APPENDIX_E_PART5 = `
 E.7 Formula Integrity and Audit Trail
 
-All formulas are implemented in Automat-IA's ROI Calculator engine with:
+All calculations are performed using Automat-IA's proprietary ROI Calculator Framework, a
+structured analytical engine built on the Conservative Scenario Framework. This methodology
+prioritizes credibility over optimism through:
 
-● Version-controlled formula library and revision logs
+● Multi-layered rubric system: TFA (21 weighted questions across 4 technical dimensions)
+and PIF (40 questions across 8 operational dimensions) provide step-level granularity for
+precise readiness assessment.
 
-● Parameter provenance linking each input to respondent and collection date
+● Transparent audit trail: Every input is linked to its source respondent, collection method,
+and validation date, enabling complete traceability from raw data to final projections.
 
-● Automatic rounding to the nearest hundred for presentation consistency
+● Research-backed methodology: Conservative multipliers reflect real-world implementation
+challenges, ensuring defensible financial estimates that clients can verify internally.
 
-● Validation checks ensuring all ROI, payback, and FTE values reconcile across
-appendices
+● Step-level analysis architecture: Each workflow step receives independent assessment,
+with TFA shared at workflow level (60% weight) and PIF collected per step (40% weight)
+for accurate Implementation Effort calculation.
 
 Every figure in this report can be traced back to its originating dataset in Appendix F: Data
 Provenance and Audit Trail.

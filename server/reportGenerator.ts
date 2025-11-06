@@ -586,6 +586,19 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
         .join('\n')
     : "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.";
   
+  // Generate Nice-to-Have list
+  const allRoadmapOpps = [
+    ...data.roadmapPhases.phase1QuickWins,
+    ...data.roadmapPhases.phase2Foundational,
+    ...data.roadmapPhases.phase3Strategic
+  ];
+  const niceToHaveOpportunities = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Nice-To-Haves');
+  const niceToHaveList = niceToHaveOpportunities.length > 0
+    ? niceToHaveOpportunities
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
+        .join('\n')
+    : "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.";
+  
   // Generate cultural readiness summary from PIF insights (broader filter)
   const allQuestionInsights = data.appendixB.flatMap(wb => {
     const insights: any[] = [];
@@ -630,6 +643,8 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     quickwin_list: quickwinList,
     foundational_gaps_list: foundationalGapsList,
     strategic_bets_list: strategicBetsList,
+    nice_to_have_list: niceToHaveList,
+    nice_to_have_count: data.matrixDistribution.niceToHaves.count.toString(),
     cultural_readiness_summary: culturalReadinessSummary,
   };
 
@@ -920,19 +935,39 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   const findingsPart6 = replaceVariables(FINDINGS_ANALYSIS_PART6, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(findingsPart6));
   
-  // Matrix image placeholders
+  // Matrix image placeholder
   sections.push(
     new Paragraph({
       text: "[base_matrix_image]",
       spacing: { before: 240, after: 120 },
       alignment: AlignmentType.CENTER,
-    }),
-    new Paragraph({
-      text: "[enhanced_matrix_image]",
-      spacing: { before: 240, after: 120 },
-      alignment: AlignmentType.CENTER,
     })
   );
+
+  // Roadmap Priority Application Table
+  sections.push(
+    new Paragraph({
+      text: "8.4 Executive Interpretation",
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 240, after: 120 },
+    })
+  );
+  sections.push(createBodyParagraph("[executive_analysis_commentary]"));
+  
+  sections.push(
+    new Paragraph({
+      children: [new TextRun({ text: "Roadmap Priority Application", bold: true })],
+      spacing: { before: 240, after: 120 },
+    })
+  );
+
+  const roadmapPriorityHeaders = ["Priority Phase", "Opportunities", "Count"];
+  const roadmapPriorityRows = [
+    ["Phase 1: Quick Wins", data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
+    ["Phase 3: Strategic Bets", data.matrixDistribution.strategicGoals.opportunities.join(", "), data.matrixDistribution.strategicGoals.count.toString()],
+    ["Nice-to-Haves", data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
+  ];
+  sections.push(createTable(roadmapPriorityHeaders, roadmapPriorityRows));
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
@@ -960,6 +995,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     sections.push(createTable(phase1Headers, phase1Rows));
   }
   
+  // Add spacing between table and outcomes
+  sections.push(createBodyParagraph(""));
+  
   const roadmapPhase1Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE1_OUTCOMES, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(roadmapPhase1Outcomes));
   sections.push(createHorizontalSeparator());
@@ -980,6 +1018,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     sections.push(createTable(phase2Headers, phase2Rows));
   }
   
+  // Add spacing between table and outcomes
+  sections.push(createBodyParagraph(""));
+  
   const roadmapPhase2Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE2_OUTCOMES, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(roadmapPhase2Outcomes));
   sections.push(createHorizontalSeparator());
@@ -999,6 +1040,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ]);
     sections.push(createTable(phase3Headers, phase3Rows));
   }
+  
+  // Add spacing between table and outcomes
+  sections.push(createBodyParagraph(""));
   
   const roadmapPhase3Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE3_OUTCOMES, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(roadmapPhase3Outcomes));
@@ -1031,16 +1075,32 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   // ===== CONCLUSIONS & NEXT STEPS =====
   sections.push(createHeading("Conclusions and Next Steps", HeadingLevel.HEADING_1));
 
-  sections.push(createBodyParagraph("Key Conclusions:"));
-  sections.push(createBulletParagraph("High-readiness workflows identified for immediate automation, offering quick ROI realization."));
-  sections.push(createBulletParagraph("Foundational gaps in data quality and system integration require strategic investment."));
-  sections.push(createBulletParagraph("The phased roadmap balances short-term wins with long-term transformation."));
+  sections.push(createBodyParagraph("Key Conclusions"));
+  sections.push(createBulletParagraph("Use of data and structured process readiness for automation with 4 identified opportunities representing $148,000 in annual benefits."));
+  sections.push(createBulletParagraph("Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum."));
+  sections.push(createBulletParagraph("Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first."));
+  sections.push(createBulletParagraph("Average payback period of 12 months indicates relatively rapid return on automation investments."));
+  sections.push(createBulletParagraph("Technical feasibility assessments reveal varying levels of readiness across workflows, informing implementation sequencing."));
+  
+  sections.push(createBodyParagraph("[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]"));
 
-  sections.push(createBodyParagraph("Recommended Next Steps:"));
-  sections.push(createBulletParagraph("Prioritize Quick Win opportunities for Phase 1 implementation within the next 90 days."));
-  sections.push(createBulletParagraph("Develop detailed implementation plans for foundational infrastructure improvements."));
-  sections.push(createBulletParagraph("Establish governance framework and change management protocols."));
-  sections.push(createBulletParagraph("Schedule follow-up diagnostic review at 6-month interval to track progress."));
+  sections.push(createBodyParagraph("Recommended Next Steps"));
+  sections.push(createBodyParagraph("1. Executive Alignment Session"));
+  sections.push(createBodyParagraph("Convene leadership to review findings, validate prioritization, and secure sponsorship for Phase 1 initiatives."));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("2. Detailed Solution Design (Phase 1 Opportunities)"));
+  sections.push(createBodyParagraph("Conduct technical design sessions for top-priority Quick Wins to define architecture, integration points, and implementation approach."));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("3. Pilot Implementation"));
+  sections.push(createBodyParagraph("Select 1-2 Quick Win opportunities for pilot implementation to validate ROI assumptions and refine delivery methodology."));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("4. Automation Center of Excellence (CoE) Planning"));
+  sections.push(createBodyParagraph("Define governance model, standards, and support structure to scale automation beyond initial pilots."));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("5. 6-Month Roadmap Review Cadence"));
+  sections.push(createBodyParagraph("Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities."));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("This diagnostic provides a data-driven foundation for your automation journey. We recommend moving forward with Phase 1 Quick Wins within the next quarter to begin realizing benefits and building organizational capability."));
 
   sections.push(createHorizontalSeparator());
 
