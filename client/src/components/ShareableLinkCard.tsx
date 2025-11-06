@@ -219,13 +219,24 @@ export default function ShareableLinkCard({
         
         {type === 'tfa' && (
           <Button 
-            onClick={() => generateLinkMutation.mutate()}
+            onClick={() => generateTFALinkMutation.mutate()}
             variant="outline"
             size="sm"
-            disabled={generateLinkMutation.isPending}
+            disabled={generateTFALinkMutation.isPending}
             data-testid="button-regenerate-link"
           >
-            {generateLinkMutation.isPending ? 'Regenerating...' : 'Regenerate Link'}
+            {generateTFALinkMutation.isPending ? 'Regenerating...' : 'Regenerate Link'}
+          </Button>
+        )}
+        {type === 'pif' && (
+          <Button 
+            onClick={() => generatePIFLinkMutation.mutate()}
+            variant="outline"
+            size="sm"
+            disabled={generatePIFLinkMutation.isPending}
+            data-testid="button-regenerate-pif-link"
+          >
+            {generatePIFLinkMutation.isPending ? 'Regenerating...' : 'Regenerate PIF Link'}
           </Button>
         )}
       </div>

@@ -12,7 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, ChevronLeft, ChevronRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { EmailVerificationGate } from "@/components/EmailVerificationGate";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getAllPIFQuestions, PIF_SECTIONS } from "@shared/pifQuestions";
@@ -53,8 +52,7 @@ export default function PIFForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [verifiedEmail, setVerifiedEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
@@ -78,12 +76,13 @@ export default function PIFForm() {
       respondentName: string;
       respondentRole: string;
       respondentResponsibilities?: string;
-      email?: string;
+      verificationCode: string;
       responses: Record<string, string>;
       stepId?: string;
+      shareableId: string;
     }) => {
       if (!pifData?.workflow?.id) throw new Error("Workflow not found");
-      return await apiRequest('POST', `/api/workflows/${pifData.workflow.id}/pif/submit`, data);
+      return await apiRequest('POST', `/api/pif/shareable/${data.shareableId}/submit`, data);
     },
     onSuccess: () => {
       if (pifData?.workflow?.id) {
@@ -132,6 +131,17 @@ export default function PIFForm() {
       return;
     }
 
+    if (!verificationCode.trim()) {
+      toast({
+        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
+        description: language === 'en' 
+          ? 'Please enter the verification code provided by your consultant.' 
+          : 'Por favor ingrese el código de verificación proporcionado por su consultor.',
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check all required questions are answered
     const q32Answer = answers['32'];
     const isErrorProne = q32Answer === 'yes';
@@ -161,7 +171,8 @@ export default function PIFForm() {
       respondentName: respondentName.trim(),
       respondentRole: respondentRole.trim(),
       respondentResponsibilities: respondentResponsibilities.trim(),
-      email: verifiedEmail,
+      verificationCode: verificationCode.trim().toUpperCase(),
+      shareableId,
       responses: answers,
       ...(stepId && { stepId }), // Include stepId if present
     });
@@ -331,35 +342,35 @@ export default function PIFForm() {
         </div>
       </div>
 
-      <EmailVerificationGate
-        formType="pif"
-        language={language}
-        translations={{
-          title: language === 'en' ? 'Email Verification Required' : 'Verificación de Correo Requerida',
-          description: language === 'en' 
-            ? 'Please verify your email address to continue with the Process Insight Form.' 
-            : 'Por favor verifique su dirección de correo electrónico para continuar con el Formulario de Perspectivas del Proceso.',
-          emailLabel: language === 'en' ? 'Email Address' : 'Dirección de Correo',
-          emailPlaceholder: language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com',
-          sendCodeButton: language === 'en' ? 'Send Code' : 'Enviar Código',
-          codeLabel: language === 'en' ? 'Verification Code' : 'Código de Verificación',
-          codePlaceholder: language === 'en' ? 'Enter 6-digit code' : 'Ingrese código de 6 dígitos',
-          verifyButton: language === 'en' ? 'Verify' : 'Verificar',
-          resendButton: language === 'en' ? 'Resend Code' : 'Reenviar Código',
-          verifiedMessage: language === 'en' ? 'Email verified successfully!' : '¡Correo verificado exitosamente!',
-          expiresIn: language === 'en' ? 'Code expires in' : 'El código expira en',
-          codeExpired: language === 'en' ? 'Verification code has expired. Please request a new code.' : 'El código de verificación ha expirado. Por favor solicite un nuevo código.',
-          sendingCode: language === 'en' ? 'Sending...' : 'Enviando...',
-          verifyingCode: language === 'en' ? 'Verifying...' : 'Verificando...',
-        }}
-        onVerified={(email) => {
-          setVerifiedEmail(email);
-          setEmailVerified(true);
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          {isDisclaimerSection ? (
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {isDisclaimerSection ? (
           <div className="space-y-6">
+            {/* Verification Code Section */}
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
+              <h2 className="text-lg font-semibold mb-2">
+                {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                {language === 'en' 
+                  ? 'Enter the verification code provided with this survey link. This code was shared by your consultant.' 
+                  : 'Ingrese el código de verificación proporcionado con este enlace de encuesta. Este código fue compartido por su consultor.'}
+              </p>
+              <div className="max-w-md">
+                <Label htmlFor="verification-code">
+                  {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
+                </Label>
+                <Input
+                  id="verification-code"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+                  placeholder={language === 'en' ? 'PIF-XXXXX' : 'PIF-XXXXX'}
+                  className="font-mono text-lg tracking-wider"
+                  data-testid="input-verification-code"
+                  maxLength={10}
+                />
+              </div>
+            </div>
+
             <div>
               <h2 className="text-xl font-semibold mb-4">{t.disclaimer.welcome}</h2>
               <div className="bg-muted/50 border rounded-lg p-6 space-y-4 text-sm">
@@ -527,7 +538,7 @@ export default function PIFForm() {
                                   {(optionTranslation?.description || option.description) && (
                                     <p className="text-sm text-muted-foreground mt-0.5">
                                       {question.id === 11 
-                                        ? (optionTranslation?.description || option.description).split(':')[1]?.trim() 
+                                        ? (optionTranslation?.description || option.description)?.split(':')[1]?.trim() || ''
                                         : (optionTranslation?.description || option.description)}
                                     </p>
                                   )}
@@ -597,7 +608,6 @@ export default function PIFForm() {
           )}
         </div>
       </div>
-      </EmailVerificationGate>
     </div>
   );
 }
