@@ -1026,3 +1026,134 @@ para cálculo preciso de Esfuerzo de Implementación.
 Cada cifra en este informe puede rastrearse hasta su conjunto de datos de origen en el Apéndice F: 
 Procedencia de Datos y Pista de Auditoría.
 `;
+
+/**
+ * Traducciones de UI para Elementos del Informe
+ * Se utilizan en todo el documento para encabezados de tablas, títulos, etiquetas, etc.
+ */
+export const TRANSLATIONS = {
+  // Portada
+  coverTitle: "Análisis de Preparación y Oportunidades de Automatización",
+  
+  // Títulos de tablas
+  tableCaptions: {
+    "4.3": "Tres Principales Oportunidades de Automatización",
+    "4.4": "Resumen Financiero de Principales Oportunidades",
+    "5.1": "Resumen de Preparación por Flujo de Trabajo",
+    "5.2": "Información de ROI por Oportunidad",
+    "5.3": "Distribución de Matriz de Oportunidades",
+    "6.1": "Fase 1 — Victorias Rápidas",
+    "6.2": "Fase 2 — Fundacional",
+    "6.3": "Fase 3 — Estratégica",
+    "6.4": "Cronograma de Implementación de 18 Meses",
+    "B.1": "Ponderación de Componentes de Puntuación de Preparación",
+    "D.1": "Resumen de Cartera — Todas las Oportunidades",
+    "E.2": "Fórmulas de Beneficio Neto",
+    "E.4": "Desglose de Beneficio Anual",
+    "E.5": "Marco de Ajuste de Escenarios",
+    "E.6": "Supuestos Clave de Modelado",
+    "F.1": "Procedencia de Datos y Pista de Auditoría",
+  },
+  
+  // Encabezados de columnas para varias tablas
+  headers: {
+    workflow: "Flujo de Trabajo",
+    opportunity: "Oportunidad",
+    annualBenefit: "Beneficio Anual",
+    roi: "ROI %",
+    payback: "Recuperación (meses)",
+    fteSaved: "FTE Ahorrados",
+    tfaScore: "Puntuación TFA",
+    pifScore: "Puntuación PIF",
+    readiness: "Preparación",
+    band: "Banda",
+    estCost: "Costo Est.",
+    stepNumber: "Paso #",
+    stepName: "Nombre del Paso",
+    swotCategory: "Categoría FODA",
+    readinessInsight: "Percepción de Preparación",
+    evidence: "Evidencia",
+    recommendedAction: "Acción Recomendada",
+    metric: "Métrica",
+    weight: "Peso",
+    description: "Descripción",
+    quadrant: "Cuadrante",
+    opportunities: "Oportunidades",
+    count: "Cantidad",
+    component: "Componente",
+    value: "Valor",
+    formula: "Fórmula",
+    category: "Categoría",
+    workflowName: "Nombre del Flujo de Trabajo",
+    dataField: "Campo de Datos",
+    source: "Fuente",
+    respondentName: "Nombre del Encuestado",
+    respondentRole: "Rol del Encuestado",
+    collectionDate: "Fecha de Recopilación",
+    verificationStatus: "Estado de Verificación",
+    questionText: "Texto de la Pregunta",
+    score: "Puntuación",
+    notes: "Notas",
+  },
+  
+  // Etiquetas FODA
+  swot: {
+    strengths: "Fortalezas:",
+    weaknesses: "Debilidades:",
+    opportunities: "Oportunidades:",
+    threats: "Amenazas:",
+  },
+  
+  // Nombres de cuadrantes de matriz
+  matrix: {
+    quickWins: "Victorias Rápidas",
+    strategicGoals: "Objetivos Estratégicos",
+    niceToHave: "Deseable",
+    deprioritize: "Despriorizar",
+  },
+  
+  // Encabezados de secciones
+  sections: {
+    executiveSummary: "Resumen Ejecutivo",
+    confidentialityDisclaimer: "Descargo de Confidencialidad",
+    methodologyOverview: "Resumen de Metodología",
+    diagnosticOverview: "Resumen Diagnóstico",
+    findingsAnalysis: "Hallazgos y Análisis",
+    automationRoadmap: "Hoja de Ruta de Automatización",
+    keyConclusions: "Conclusiones Clave",
+    matrixVisualizations: "Visualizaciones de Matriz",
+    baseOpportunityMatrix: "Matriz de Oportunidades Base (Vista de Impacto Operacional)",
+    enhancedOpportunityMatrix: "Matriz de Oportunidades Mejorada (Vista de Impacto Estratégico)",
+  },
+  
+  // Títulos de apéndices
+  appendices: {
+    a: "Apéndice A: Alcance del Proyecto y Resumen de Entrevistas",
+    b: "Apéndice B: Ponderación de Métricas de Puntuación de Preparación",
+    c: "Apéndice C: Análisis FODA a Nivel de Paso por Flujo de Trabajo",
+    d: "Apéndice D: Detalles Financieros a Nivel de Oportunidad",
+    e: "Apéndice E: Marco de Modelado de ROI",
+    f: "Apéndice F: Procedencia de Datos y Pista de Auditoría",
+  },
+  
+  // Etiquetas varias
+  labels: {
+    table: "Tabla",
+    phase: "Fase",
+    keyMetric: "Métrica Clave",
+    financialMetric: "Métrica Financiera",
+    businessImpactComponent: "Componente de Impacto Empresarial",
+    knowledgeGapResolution: "Resolución de Brecha de Conocimiento",
+  },
+  
+  // Etiquetas de componentes de preparación
+  readinessComponents: {
+    systemEnvironment: "Entorno del Sistema",
+    dataQuality: "Calidad de Datos",
+    integrationFeasibility: "Viabilidad de Integración",
+    securityCompliance: "Seguridad/Cumplimiento",
+    processClarity: "Claridad del Proceso",
+    changeMagnitude: "Magnitud del Cambio",
+    workflowBrittleness: "Fragilidad del Flujo de Trabajo",
+  },
+};
