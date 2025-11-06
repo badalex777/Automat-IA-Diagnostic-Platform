@@ -1,0 +1,88 @@
+Deep Research on FTE Time-Savings Significance (for a 100-Employee Company)
+
+Goal
+Write a rigorous research paper that determines how many full-time equivalents (FTEs) in time savings should be considered “100% business impact” on a 0–100 scale for a company with 100 employees. Also quantify what 1 FTE saved represents on that same 0–100 scale. Use external evidence to justify the thresholds.
+
+Deliverables (2000–3000 words, with tables, figures, and citations)
+
+Executive Summary (key findings, recommended threshold for 100% impact, what 1 FTE equals on the 0–100 scale)
+
+Definitions & Assumptions
+
+Define FTE; state typical annual hours (e.g., 2,080) and discuss regional variations.
+
+Define “time savings,” “FTE-equivalent,” “productivity gain,” and “capacity redeployment vs. cost reduction.”
+
+Literature Review (with citations)
+
+Evidence on typical automation/productivity gains and FTE reductions in SMEs and mid-market firms.
+
+Thresholds where savings move from incremental to transformative (e.g., effects on margins, cycle time, service levels, or the ability to avoid hiring).
+
+Quantitative Modeling for a 100-Employee Company
+
+Compute how FTE savings translate to % of workforce capacity: %CapacitySaved = (FTE_Saved / 100) × 100%.
+
+Test candidate “100% impact” thresholds (e.g., 5, 8, 10, 12, 15 FTEs) and justify which is most defensible based on evidence.
+
+Distinguish two scenarios:
+a) Pure cost take-out (headcount avoidance or external spend reduction).
+b) Capacity redeployment (time reallocated to higher-value work).
+
+Include sensitivity to: utilization (e.g., 70–90%), operating margin bands, salary mix, and variability in annual hours (1,800–2,200).
+
+Scoring Model (clear, auditable)
+
+Propose a mapping from FTE saved → Impact Score (0–100) for a 100-employee company. Provide at least two forms and defend one:
+• Linear: Impact = min(100, (FTE_Saved / FTE_100%_Threshold) × 100)
+• Piecewise / S-curve to capture diminishing or compounding returns; specify breakpoints and rationale.
+
+Explicitly state the recommended FTE_100%_Threshold and compute what 1 FTE equals on the 0–100 scale (e.g., if threshold = 10 FTE, then 1 FTE = 10 points).
+
+Impact Tables & Charts
+
+Table: FTE saved from 1 to 20 → Impact Score (0–100) under each candidate threshold.
+
+Chart: The chosen scoring curve vs. alternatives (linear vs. S-curve).
+
+Table: Sensitivity results (how the recommended threshold shifts with utilization, margin, wage mix).
+
+Practical Interpretation
+
+When would smaller FTE savings still merit a 100 score (e.g., if the savings bottleneck a critical function)? Provide criteria and examples.
+
+How to adapt the threshold for different company sizes (e.g., 50, 200 employees).
+
+Limitations
+
+Note data gaps, sector differences, and any assumptions that meaningfully affect the threshold.
+
+References
+
+Use numbered citations to reputable sources (academic, government, industry). Provide a bibliography.
+
+Method Requirements
+
+Use real benchmarks from studies on automation, productivity, and labor reallocation; cite all figures.
+
+Provide at least three candidate thresholds for “100% impact,” evaluate them against evidence, and choose one.
+
+Show the math for all formulas. Include a reproducible example with concrete numbers (e.g., wage mix, utilization).
+
+Be neutral and evidence-driven; avoid vendor or tool marketing.
+
+Key Questions to Answer Explicitly
+
+For a 100-employee company, what FTE savings level is the most defensible boundary for calling the impact “transformative” (i.e., a 100 score)?
+
+Given that boundary, what score does 1 FTE saved represent?
+
+Under what conditions (e.g., role criticality, bottlenecks, high external spend) should the threshold be adjusted up or down?
+
+How do cost-reduction vs. capacity-redeployment pathways change interpretation of the score?
+
+Output Format
+
+Professional research report with numbered sections, tables, figures, and a numbered bibliography.
+
+Provide the scoring formula(s) in a boxed “Model Specification” section and a one-page appendix with the full parameter list so the scoring can be implemented elsewhere.
