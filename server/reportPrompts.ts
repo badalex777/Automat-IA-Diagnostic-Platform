@@ -337,9 +337,6 @@ strategic decision-making and implementation planning.
 2. Executive Presentation: A summarized presentation highlighting key findings, validated
 opportunities, and the recommended roadmap, tailored for board-level and senior leadership
 communication.
-
-These deliverables provide both the depth required for implementation planning and the clarity
-needed for executive buy-in and resource allocation.
 `;
 
 // Continue with remaining prompts...
@@ -523,22 +520,6 @@ and readiness.
 
 export const FINDINGS_ANALYSIS_PART6 = `
 [matrix_distribution_commentary]
-
-Matrix Visualizations
-
-Base Opportunity Matrix (Operational Impact View)
-[base_matrix_image]
-
-Enhanced Opportunity Matrix (Strategic Impact View)
-[enhanced_matrix_image]
-
-The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the
-Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a
-balanced view of short-term gains and long-term automation potential.
-
-5.4 Executive Interpretation
-
-[executive_analysis_commentary]
 `;
 
 export const AUTOMATION_ROADMAP_INTRO = `

@@ -935,39 +935,45 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   const findingsPart6 = replaceVariables(FINDINGS_ANALYSIS_PART6, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(findingsPart6));
   
-  // Matrix image placeholder
+  sections.push(
+    new Paragraph({
+      children: [new TextRun({ text: "Matrix Visualizations", bold: true })],
+      spacing: { before: 240, after: 120 },
+    })
+  );
+  
+  sections.push(createBodyParagraph("Base Opportunity Matrix (Operational Impact View)"));
   sections.push(
     new Paragraph({
       text: "[base_matrix_image]",
-      spacing: { before: 240, after: 120 },
+      spacing: { before: 120, after: 240 },
       alignment: AlignmentType.CENTER,
     })
   );
 
-  // Roadmap Priority Application Table
+  sections.push(createBodyParagraph("Enhanced Opportunity Matrix (Strategic Impact View)"));
   sections.push(
     new Paragraph({
-      text: "8.4 Executive Interpretation",
+      text: "[enhanced_matrix_image]",
+      spacing: { before: 120, after: 240 },
+      alignment: AlignmentType.CENTER,
+    })
+  );
+  
+  sections.push(createBodyParagraph("The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a balanced view of short-term gains and long-term automation potential."));
+
+  // 5.4 Executive Interpretation
+  sections.push(
+    new Paragraph({
+      text: "5.4 Executive Interpretation",
       heading: HeadingLevel.HEADING_3,
       spacing: { before: 240, after: 120 },
     })
   );
   sections.push(createBodyParagraph("[executive_analysis_commentary]"));
   
-  sections.push(
-    new Paragraph({
-      children: [new TextRun({ text: "Roadmap Priority Application", bold: true })],
-      spacing: { before: 240, after: 120 },
-    })
-  );
-
-  const roadmapPriorityHeaders = ["Priority Phase", "Opportunities", "Count"];
-  const roadmapPriorityRows = [
-    ["Phase 1: Quick Wins", data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
-    ["Phase 3: Strategic Bets", data.matrixDistribution.strategicGoals.opportunities.join(", "), data.matrixDistribution.strategicGoals.count.toString()],
-    ["Nice-to-Haves", data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
-  ];
-  sections.push(createTable(roadmapPriorityHeaders, roadmapPriorityRows));
+  sections.push(createBodyParagraph(""));
+  sections.push(createBodyParagraph("[Insert Roadmap Prioritization Table]"));
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
