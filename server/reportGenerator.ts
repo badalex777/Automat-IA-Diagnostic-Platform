@@ -1148,7 +1148,6 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   sections.push(createBulletParagraph("Data Quality and Integration Feasibility receive the highest individual weights (18% each) as they are the primary determinants of automation viability."));
   sections.push(createBulletParagraph("Combined, these seven components produce a holistic readiness score that balances technical feasibility with operational reality."));
   
-  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
   // Appendix C: Readiness SWOT Analysis - Step-Level Text Format
@@ -1236,7 +1235,6 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     sections.push(createBodyParagraph("No step-level SWOT analyses available."));
   }
   
-  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix D
@@ -1332,7 +1330,6 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   
   // D.3 Modeling Notes
   sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES));
-  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix E
@@ -1391,7 +1388,6 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
 
   // E.7 Formula Integrity (text)
   sections.push(...createTextParagraphs(APPENDIX_E_PART5));
-  sections.push(createHorizontalSeparator());
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix F - Data Provenance and Audit Trail
