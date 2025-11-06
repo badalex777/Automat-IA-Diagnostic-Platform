@@ -139,13 +139,14 @@ export class DbStorage implements IStorage {
       .where(
         and(
           eq(tfaAssessments.workflowId, workflowId),
+          isNotNull(tfaAssessments.completedAt), // Only return completed assessments, not templates
           or(
             isNull(tfaAssessments.email),
             eq(tfaAssessments.verified, true)
           )
         )
       )
-      .orderBy(sql`${tfaAssessments.completedAt} DESC NULLS LAST`)
+      .orderBy(desc(tfaAssessments.completedAt))
       .limit(1);
     return assessment;
   }
