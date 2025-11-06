@@ -172,7 +172,7 @@ export const tfaResponsesSchema = z.object({
   comments: z.string().optional(),
   initialRespondent: z.string().optional(),
   initialRespondentRole: z.string().optional(),
-  email: z.string().email("Please enter a valid email address").optional(),
+  verificationCode: z.string(),
   gapMetadata: z.record(z.string(), z.object({
     why: z.string(),
     whoMightKnow: z.string(),

@@ -745,12 +745,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tfa/shareable/:shareableId/submit", async (req, res) => {
     try {
       const validatedData = tfaResponsesSchema.parse(req.body);
-      const { responses, comments, initialRespondent, initialRespondentRole, gapMetadata, email } = validatedData;
+      const { responses, comments, initialRespondent, initialRespondentRole, gapMetadata, verificationCode } = validatedData;
 
       // Get assessment by shareableId
       const assessment = await storage.getTFAByShareableId(req.params.shareableId);
       if (!assessment) {
         return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      // Validate verification code (server-side security check)
+      if (!verificationCode || !verificationCode.trim()) {
+        return res.status(400).json({ 
+          error: "Verification code is required." 
+        });
+      }
+
+      if (verificationCode.trim() !== assessment.verificationCode) {
+        return res.status(400).json({ 
+          error: "Invalid verification code. Please check the code provided with the assessment link." 
+        });
       }
 
       // Validate all questions are answered
@@ -784,17 +797,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const score = calculateTFAScore(responses);
       const sectionScores = calculateSectionScores(responses);
 
-      // Validate email verification (server-side security check)
-      let isVerified = false;
-      if (email && email.trim().length > 0) {
-        isVerified = consumeVerifiedEmail(email);
-        if (!isVerified) {
-          return res.status(400).json({ 
-            error: "Email not verified. Please verify your email address before submitting." 
-          });
-        }
-      }
-
       // Update TFA with responses and mark as complete with all data in one operation
       await storage.updateTFAResponses(
         assessment.id, 
@@ -803,10 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         comments, 
         initialRespondent, 
         initialRespondentRole, 
-        gapMetadata,
-        email,
-        undefined, // No verification token needed for new flow
-        isVerified
+        gapMetadata
       );
       const updatedAssessment = await storage.completeTFA(assessment.id, score, comments);
       
@@ -821,7 +820,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         assessment: updatedAssessment, 
         score,
         sectionScores,
-        emailSent,
       });
     } catch (error: any) {
       if (error.name === 'ZodError') {

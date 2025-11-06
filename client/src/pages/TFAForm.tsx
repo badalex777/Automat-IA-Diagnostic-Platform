@@ -11,7 +11,6 @@ import { AlertCircle, Languages } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { EmailVerificationGate } from "@/components/EmailVerificationGate";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { tfaSections } from "@shared/tfaQuestions";
@@ -33,8 +32,7 @@ export default function TFAForm() {
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [verifiedEmail, setVerifiedEmail] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
   
@@ -78,7 +76,7 @@ export default function TFAForm() {
       comments?: string; 
       initialRespondent?: string;
       initialRespondentRole?: string;
-      email?: string;
+      verificationCode: string;
       gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
     }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
@@ -99,6 +97,14 @@ export default function TFAForm() {
   });
 
   const handleSubmit = () => {
+    if (!verificationCode.trim()) {
+      toast({
+        title: language === 'en' ? "Verification code required" : "Código de verificación requerido",
+        description: language === 'en' ? "Please enter the verification code provided with the assessment link" : "Por favor ingrese el código de verificación proporcionado con el enlace de evaluación",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!respondentName.trim()) {
       toast({
         title: t.nameRequired,
@@ -150,7 +156,7 @@ export default function TFAForm() {
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
       initialRespondentRole: respondentRole.trim(),
-      email: verifiedEmail,
+      verificationCode: verificationCode.trim(),
       gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
@@ -301,33 +307,33 @@ export default function TFAForm() {
         </div>
       </div>
 
-      <EmailVerificationGate
-        formType="tfa"
-        language={language}
-        translations={{
-          title: language === 'en' ? 'Email Verification Required' : 'Verificación de Correo Requerida',
-          description: language === 'en' 
-            ? 'Please verify your email address to continue with the Technical Feasibility Assessment.' 
-            : 'Por favor verifique su dirección de correo electrónico para continuar con la Evaluación de Viabilidad Técnica.',
-          emailLabel: language === 'en' ? 'Email Address' : 'Dirección de Correo',
-          emailPlaceholder: language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com',
-          sendCodeButton: language === 'en' ? 'Send Code' : 'Enviar Código',
-          codeLabel: language === 'en' ? 'Verification Code' : 'Código de Verificación',
-          codePlaceholder: language === 'en' ? 'Enter 6-digit code' : 'Ingrese código de 6 dígitos',
-          verifyButton: language === 'en' ? 'Verify' : 'Verificar',
-          resendButton: language === 'en' ? 'Resend Code' : 'Reenviar Código',
-          verifiedMessage: language === 'en' ? 'Email verified successfully!' : '¡Correo verificado exitosamente!',
-          expiresIn: language === 'en' ? 'Code expires in' : 'El código expira en',
-          codeExpired: language === 'en' ? 'Verification code has expired. Please request a new code.' : 'El código de verificación ha expirado. Por favor solicite un nuevo código.',
-          sendingCode: language === 'en' ? 'Sending...' : 'Enviando...',
-          verifyingCode: language === 'en' ? 'Verifying...' : 'Verificando...',
-        }}
-        onVerified={(email) => {
-          setVerifiedEmail(email);
-          setEmailVerified(true);
-        }}
-      >
-        <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* Verification Code Section */}
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-2">
+            {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            {language === 'en' 
+              ? 'Enter the verification code provided with this assessment link. This code was shared by your consultant.' 
+              : 'Ingrese el código de verificación proporcionado con este enlace de evaluación. Este código fue compartido por su consultor.'}
+          </p>
+          <div className="max-w-md">
+            <Label htmlFor="verification-code">
+              {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
+            </Label>
+            <Input
+              id="verification-code"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+              placeholder={language === 'en' ? 'TFA-XXXXX' : 'TFA-XXXXX'}
+              className="font-mono text-lg tracking-wider"
+              data-testid="input-verification-code"
+              maxLength={9}
+            />
+          </div>
+        </div>
+
           {currentSection === 0 && (
           <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
             <div>
@@ -535,7 +541,6 @@ export default function TFAForm() {
           </div>
         </div>
       </div>
-      </EmailVerificationGate>
     </div>
   );
 }
