@@ -1037,6 +1037,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ questions: ALL_PIF_QUESTIONS });
   });
 
+  // Create PIF shareable link with verification code
+  app.post("/api/workflows/:workflowId/pif/create-shareable", async (req, res) => {
+    try {
+      const { workflowId } = req.params;
+      const { stepId } = req.body;
+
+      // Verify workflow exists
+      const workflow = await storage.getWorkflow(workflowId);
+      if (!workflow) {
+        return res.status(404).json({ error: "Workflow not found" });
+      }
+
+      // If stepId is provided, verify the step exists and belongs to this workflow
+      if (stepId) {
+        const step = await storage.getWorkflowStep(stepId);
+        if (!step) {
+          return res.status(404).json({ error: "Workflow step not found" });
+        }
+        if (step.workflowId !== workflowId) {
+          return res.status(400).json({ error: "Step does not belong to this workflow" });
+        }
+      }
+
+      // Create a template PIF response with verification code
+      const pifTemplate = await storage.createPIFResponse({
+        workflowId,
+        stepId: stepId || null,
+        respondentName: '', // Empty until filled
+        respondentRole: '', // Empty until filled
+        respondentResponsibilities: null,
+        responses: {},
+        processClarity: null,
+        changeMagnitude: null,
+        workflowBrittleness: null,
+        roiInputs: {},
+        qualitativeResponses: {},
+        email: null,
+        verificationToken: null,
+        verified: false,
+        verifiedAt: null,
+        completedAt: null, // Not completed yet
+      });
+
+      res.status(201).json({ 
+        shareableId: pifTemplate.shareableId,
+        verificationCode: pifTemplate.verificationCode,
+        workflow,
+        step: stepId ? await storage.getWorkflowStep(stepId) : null
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.post("/api/workflows/:workflowId/pif/submit", async (req, res) => {
     try {
       const validatedData = pifSubmitSchema.parse(req.body);
