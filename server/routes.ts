@@ -1213,6 +1213,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/pif/shareable/:shareableId/submit", async (req, res) => {
+    try {
+      const validatedData = pifSubmitSchema.parse(req.body);
+      const { respondentName, respondentRole, respondentResponsibilities, verificationCode, shareableId, responses, stepId, email } = validatedData;
+
+      // Get PIF template by shareableId
+      const templates = await storage.getPIFByShareableId(shareableId);
+      if (!templates || templates.length === 0) {
+        return res.status(404).json({ error: "Survey not found" });
+      }
+
+      const template = templates[0];
+
+      // Validate verification code (server-side security check)
+      if (!verificationCode || !verificationCode.trim()) {
+        return res.status(400).json({ 
+          error: "Verification code is required." 
+        });
+      }
+
+      if (verificationCode.trim() !== template.verificationCode) {
+        return res.status(400).json({ 
+          error: "Invalid verification code. Please check the code provided with the survey link." 
+        });
+      }
+
+      // Create new PIF response with verified data
+      const pifResponse = await storage.createPIFResponse({
+        workflowId: template.workflowId,
+        stepId: stepId || null,
+        respondentName,
+        respondentRole,
+        respondentResponsibilities,
+        email: email || null,
+        verificationCode,
+        responses,
+        verified: true,
+      });
+
+      res.status(201).json(pifResponse);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.delete("/api/pif/:id", async (req, res) => {
     try {
       const success = await storage.deletePIFResponse(req.params.id);

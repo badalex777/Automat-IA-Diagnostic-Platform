@@ -16,12 +16,12 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getAllPIFQuestions, PIF_SECTIONS } from "@shared/pifQuestions";
 import { pifTranslations } from "@shared/pifTranslations";
-import type { Workflow, Company } from "@shared/schema";
+import type { Workflow, Company, PIFResponse } from "@shared/schema";
 
 interface PIFData {
+  template: PIFResponse;
   workflow: Workflow;
   company: Company;
-  shareableId: string;
 }
 
 export default function PIFForm() {
