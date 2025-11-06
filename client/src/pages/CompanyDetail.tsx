@@ -20,6 +20,7 @@ import { tfaSections } from "@shared/tfaQuestions";
 import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
 import ScoringGuideDialog from "@/components/ScoringGuideDialog";
+import LanguageSelectionDialog from "@/components/LanguageSelectionDialog";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -29,6 +30,7 @@ export default function CompanyDetail() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [scoringGuideOpen, setScoringGuideOpen] = useState(false);
+  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -208,8 +210,8 @@ export default function CompanyDetail() {
   });
 
   const downloadReportMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/companies/${companyId}/executive-report`);
+    mutationFn: async (language: 'en' | 'es') => {
+      const response = await fetch(`/api/companies/${companyId}/executive-report?lang=${language}`);
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to generate report');
@@ -226,6 +228,9 @@ export default function CompanyDetail() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      // Close language dialog after successful download
+      setLanguageDialogOpen(false);
       
       toast({
         title: "Report generated",
@@ -572,7 +577,7 @@ export default function CompanyDetail() {
                 <Button
                   variant="default"
                   size="sm"
-                  onClick={() => downloadReportMutation.mutate()}
+                  onClick={() => setLanguageDialogOpen(true)}
                   disabled={downloadReportMutation.isPending}
                   data-testid="button-generate-report"
                 >
@@ -787,6 +792,13 @@ export default function CompanyDetail() {
           companyName={company.name}
         />
       )}
+      
+      <LanguageSelectionDialog
+        open={languageDialogOpen}
+        onOpenChange={setLanguageDialogOpen}
+        onConfirm={(language) => downloadReportMutation.mutate(language)}
+        isPending={downloadReportMutation.isPending}
+      />
     </div>
   );
 }
