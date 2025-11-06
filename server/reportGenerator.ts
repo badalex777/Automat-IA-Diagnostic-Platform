@@ -608,7 +608,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         .slice(0, 5) // Limit to top 5
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
-    : "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.";
+    : TRANSLATIONS.fallbackMessages.noStrategicBets;
   
   // Generate Nice-to-Have list
   const allRoadmapOpps = [
@@ -621,7 +621,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ? niceToHaveOpportunities
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
-    : "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.";
+    : TRANSLATIONS.fallbackMessages.noNiceToHave;
   
   // Generate cultural readiness summary from PIF insights (broader filter)
   const allQuestionInsights = data.appendixB.flatMap(wb => {
@@ -989,7 +989,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     })
   );
   
-  sections.push(createBodyParagraph("The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a balanced view of short-term gains and long-term automation potential."));
+  sections.push(createBodyParagraph(TRANSLATIONS.matrixDescriptions.baseMatrix));
 
   // 5.4 Executive Interpretation
   sections.push(
@@ -1098,9 +1098,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   const ganttHeaders = ["Phase", "0-3 mo", "3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo", "15-18 mo"];
   const ganttRows = [
-    ["Phase 1: Quick Wins", "█████", "█████", "", "", "", ""],
-    ["Phase 2: Foundational", "", "", "█████", "█████", "", ""],
-    ["Phase 3: Strategic", "", "", "", "", "█████", "█████"],
+    [TRANSLATIONS.phaseHeaders.phase1, "█████", "█████", "", "", "", ""],
+    [TRANSLATIONS.phaseHeaders.phase2, "", "", "█████", "█████", "", ""],
+    [TRANSLATIONS.phaseHeaders.phase3, "", "", "", "", "█████", "█████"],
   ];
   sections.push(createTableCaption("6.4", TRANSLATIONS.tableCaptions["6.4"], TRANSLATIONS.labels.table));
   sections.push(createTable(ganttHeaders, ganttRows));
@@ -1112,9 +1112,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
   // ===== CONCLUSIONS & NEXT STEPS =====
-  sections.push(createHeading("Conclusions and Next Steps", HeadingLevel.HEADING_1));
+  sections.push(createHeading(TRANSLATIONS.conclusions.title, HeadingLevel.HEADING_1));
 
-  sections.push(createBodyParagraph("Key Conclusions"));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.keyConclusions));
   sections.push(createBulletParagraph("Use of data and structured process readiness for automation with 4 identified opportunities representing $148,000 in annual benefits."));
   sections.push(createBulletParagraph("Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum."));
   sections.push(createBulletParagraph("Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first."));
@@ -1123,23 +1123,23 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   sections.push(createBodyParagraph("[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]"));
 
-  sections.push(createBodyParagraph("Recommended Next Steps"));
-  sections.push(createBodyParagraph("1. Executive Alignment Session"));
-  sections.push(createBodyParagraph("Convene leadership to review findings, validate prioritization, and secure sponsorship for Phase 1 initiatives."));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.recommendedNextSteps));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step1Title));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step1Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph("2. Detailed Solution Design (Phase 1 Opportunities)"));
-  sections.push(createBodyParagraph("Conduct technical design sessions for top-priority Quick Wins to define architecture, integration points, and implementation approach."));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step2Title));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step2Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph("3. Pilot Implementation"));
-  sections.push(createBodyParagraph("Select 1-2 Quick Win opportunities for pilot implementation to validate ROI assumptions and refine delivery methodology."));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step3Title));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step3Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph("4. Automation Center of Excellence (CoE) Planning"));
-  sections.push(createBodyParagraph("Define governance model, standards, and support structure to scale automation beyond initial pilots."));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step4Title));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step4Content));
   sections.push(createBodyParagraph(""));
   sections.push(createBodyParagraph("5. 6-Month Roadmap Review Cadence"));
   sections.push(createBodyParagraph("Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities."));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph("This diagnostic provides a data-driven foundation for your automation journey. We recommend moving forward with Phase 1 Quick Wins within the next quarter to begin realizing benefits and building organizational capability."));
+  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.closingStatement));
 
   sections.push(createHorizontalSeparator());
 

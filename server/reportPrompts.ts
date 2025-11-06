@@ -1008,6 +1008,52 @@ Provenance and Audit Trail.
 export const TRANSLATIONS = {
   // Cover page
   coverTitle: "Automation Readiness & Opportunity Analysis",
+  coverPage: {
+    preparedFor: "Prepared for",
+    by: "by",
+    confidential: "Confidential",
+    executiveDiagnosticReport: "Automat-IA Executive Diagnostic Report",
+  },
+  
+  // Fallback messages (when no data exists)
+  fallbackMessages: {
+    noStrategicBets: "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.",
+    noNiceToHave: "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.",
+    systemEnvironmentLimitations: "System environment limitations",
+  },
+  
+  // Matrix descriptions
+  matrixDescriptions: {
+    baseMatrix: "The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a balanced view of short-term gains and long-term automation potential.",
+  },
+  
+  // Roadmap phase headers
+  phaseHeaders: {
+    phase1: "Phase 1: Quick Wins",
+    phase2: "Phase 2: Foundational",
+    phase3: "Phase 3: Strategic",
+  },
+  
+  // Conclusions section
+  conclusions: {
+    title: "Conclusions and Next Steps",
+    keyConclusions: "Key Conclusions",
+    recommendedNextSteps: "Recommended Next Steps",
+    step1Title: "1. Executive Alignment Session",
+    step1Content: "Convene leadership to review findings, validate prioritization, and secure sponsorship for Phase 1 initiatives.",
+    step2Title: "2. Detailed Solution Design (Phase 1 Opportunities)",
+    step2Content: "Conduct technical design sessions for top-priority Quick Wins to define architecture, integration points, and implementation approach.",
+    step3Title: "3. Tool Procurement and Vendor Setup",
+    step3Content: "Finalize automation platform selection, execute contracts, and initiate environment setup.",
+    step4Title: "4. Center of Excellence (CoE) Readiness",
+    step4Content: "Establish governance, standards, and support capabilities to sustain automation efforts beyond Phase 1.",
+    closingStatement: "This diagnostic provides a data-driven foundation for your automation journey. We recommend moving forward with Phase 1 Quick Wins within the next quarter to begin realizing benefits and building organizational capability.",
+  },
+  
+  // Appendix subsections
+  appendixSubsections: {
+    a7: "A.7 Opportunity Matrix Methodology",
+  },
   
   // Table captions
   tableCaptions: {
