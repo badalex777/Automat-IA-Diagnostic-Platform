@@ -15,6 +15,15 @@ The Automat-IA Diagnostic Platform is a professional web application for consult
 - **Data Flow Contract**: DiagnosticData → appendixB[] → workflowLevelSWOT/stepLevelSWOTs → questionInsights/swotAnalysis/followUpActions
 - **End-to-End Verification**: Report generation tested and confirmed working with proper Content-Type (application/vnd.openxmlformats-officedocument.wordprocessingml.document) and successful downloads
 
+**Email Verification Security Architecture (Nov 6, 2024):** Redesigned email verification from optional post-submission to mandatory pre-submission with server-side validation:
+- **Design Change**: Email verification now requires pre-submission code entry (6-digit codes, 10-minute lifespan) via shared EmailVerificationGate component used by both TFAForm and PIFForm
+- **Security Fix**: Backend validates verified emails using `consumeVerifiedEmail()` in both TFA/PIF submission endpoints to prevent direct API bypass attacks (returns 400 if email not verified)
+- **Implementation**: Verification codes stored in-memory (ephemeral, 10-minute lifespan); verified emails cached for 15-minute submission window after successful code verification
+- **Architecture**: `consumeVerifiedEmail()` enforces one-time use to prevent replay attacks; verified emails removed from storage upon consumption during submission
+- **Backwards Compatibility**: Old token-based verification endpoints remain functional during transition period
+- **Recommended Enhancements**: Add automated tests for verification flows, normalize emails (trim/lowercase) to avoid mismatches, monitor UX for reverification scenarios after errors
+- **Data Quality**: All new TFA/PIF submissions are pre-verified (verified=true), shifting data quality responsibility to form respondents with mandatory verification before submission
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
