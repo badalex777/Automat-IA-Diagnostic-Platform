@@ -52,6 +52,7 @@ export default function PIFForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
+  const [respondentEmail, setRespondentEmail] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
@@ -75,7 +76,9 @@ export default function PIFForm() {
       respondentName: string;
       respondentRole: string;
       respondentResponsibilities?: string;
+      email?: string;
       responses: Record<string, string>;
+      stepId?: string;
     }) => {
       if (!pifData?.workflow?.id) throw new Error("Workflow not found");
       return await apiRequest('POST', `/api/workflows/${pifData.workflow.id}/pif/submit`, data);
@@ -156,6 +159,7 @@ export default function PIFForm() {
       respondentName: respondentName.trim(),
       respondentRole: respondentRole.trim(),
       respondentResponsibilities: respondentResponsibilities.trim(),
+      email: respondentEmail.trim() || undefined,
       responses: answers,
       ...(stepId && { stepId }), // Include stepId if present
     });
@@ -399,6 +403,26 @@ export default function PIFForm() {
                   placeholder={t.respondentInfo.rolePlaceholder}
                   className="mt-1.5"
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="respondent-email">
+                  {language === 'en' ? 'Your Email (Optional but Recommended)' : 'Su Correo Electrónico (Opcional pero Recomendado)'}
+                </Label>
+                <Input
+                  id="respondent-email"
+                  type="email"
+                  data-testid="input-respondent-email"
+                  value={respondentEmail}
+                  onChange={(e) => setRespondentEmail(e.target.value)}
+                  placeholder={language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com'}
+                  className="mt-1.5"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {language === 'en' 
+                    ? 'Providing your email helps verify your submission and ensures your responses are included in the diagnostic report' 
+                    : 'Proporcionar su correo electrónico ayuda a verificar su envío y garantiza que sus respuestas se incluyan en el informe diagnóstico'}
+                </p>
               </div>
 
               <div>

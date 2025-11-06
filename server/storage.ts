@@ -33,16 +33,20 @@ export interface IStorage {
   getTFAAssessment(id: string): Promise<TFAAssessment | undefined>;
   getTFAByShareableId(shareableId: string): Promise<TFAAssessment | undefined>;
   getTFAByWorkflowId(workflowId: string): Promise<TFAAssessment | undefined>;
+  getTFAByVerificationToken(token: string): Promise<TFAAssessment | undefined>;
   createTFAAssessment(assessment: InsertTFAAssessment): Promise<TFAAssessment>;
-  updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string): Promise<TFAAssessment | undefined>;
-  completeTFA(id: string, score: number): Promise<TFAAssessment | undefined>;
+  updateTFAResponses(id: string, responses: Record<string, string>, score?: number, comments?: string, initialRespondent?: string, initialRespondentRole?: string, gapMetadata?: any, email?: string, verificationToken?: string): Promise<TFAAssessment | undefined>;
+  completeTFA(id: string, score: number, comments?: string): Promise<TFAAssessment | undefined>;
+  verifyTFA(token: string): Promise<TFAAssessment | undefined>;
   deleteTFAAssessment(id: string): Promise<boolean>;
   
   // PIF Responses
   getPIFResponse(id: string): Promise<PIFResponse | undefined>;
   getPIFByShareableId(shareableId: string): Promise<PIFResponse[]>;
+  getPIFByVerificationToken(token: string): Promise<PIFResponse | undefined>;
   getAllPIFResponsesForWorkflow(workflowId: string): Promise<PIFResponse[]>;
   createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse>;
+  verifyPIF(token: string): Promise<PIFResponse | undefined>;
   deletePIFResponse(id: string): Promise<boolean>;
   
   // Business Impact

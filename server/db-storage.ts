@@ -141,6 +141,11 @@ export class DbStorage implements IStorage {
     return assessment;
   }
 
+  async getTFAByVerificationToken(token: string): Promise<TFAAssessment | undefined> {
+    const [assessment] = await db.select().from(tfaAssessments).where(eq(tfaAssessments.verificationToken, token));
+    return assessment;
+  }
+
   async createTFAAssessment(assessment: InsertTFAAssessment): Promise<TFAAssessment> {
     // Generate unique shareable ID with collision retry
     let shareableId = nanoid(10);
@@ -174,7 +179,9 @@ export class DbStorage implements IStorage {
     comments?: string, 
     initialRespondent?: string,
     initialRespondentRole?: string,
-    gapMetadata?: Record<string, { why: string; whoMightKnow: string }>
+    gapMetadata?: Record<string, { why: string; whoMightKnow: string }>,
+    email?: string,
+    verificationToken?: string
   ): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
     if (score !== undefined) {
@@ -191,6 +198,13 @@ export class DbStorage implements IStorage {
     }
     if (gapMetadata !== undefined) {
       updateData.gapMetadata = gapMetadata;
+    }
+    if (email !== undefined) {
+      updateData.email = email;
+      updateData.verified = false;
+    }
+    if (verificationToken !== undefined) {
+      updateData.verificationToken = verificationToken;
     }
     const [updated] = await db.update(tfaAssessments).set(updateData).where(eq(tfaAssessments.id, id)).returning();
     return updated;
@@ -272,6 +286,14 @@ export class DbStorage implements IStorage {
     return updated;
   }
 
+  async verifyTFA(token: string): Promise<TFAAssessment | undefined> {
+    const [updated] = await db.update(tfaAssessments)
+      .set({ verified: true, verifiedAt: new Date() })
+      .where(eq(tfaAssessments.verificationToken, token))
+      .returning();
+    return updated;
+  }
+
   async deleteTFAAssessment(id: string): Promise<boolean> {
     const result = await db.delete(tfaAssessments).where(eq(tfaAssessments.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
@@ -291,10 +313,23 @@ export class DbStorage implements IStorage {
     return db.select().from(pifResponses).where(eq(pifResponses.workflowId, workflowId)).orderBy(desc(pifResponses.createdAt));
   }
 
+  async getPIFByVerificationToken(token: string): Promise<PIFResponse | undefined> {
+    const [response] = await db.select().from(pifResponses).where(eq(pifResponses.verificationToken, token));
+    return response;
+  }
+
   async createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse> {
     const shareableId = nanoid(10);
     const [newResponse] = await db.insert(pifResponses).values({ ...response, shareableId }).returning();
     return newResponse;
+  }
+
+  async verifyPIF(token: string): Promise<PIFResponse | undefined> {
+    const [updated] = await db.update(pifResponses)
+      .set({ verified: true, verifiedAt: new Date() })
+      .where(eq(pifResponses.verificationToken, token))
+      .returning();
+    return updated;
   }
 
   async deletePIFResponse(id: string): Promise<boolean> {

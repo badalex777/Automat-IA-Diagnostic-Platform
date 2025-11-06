@@ -32,6 +32,7 @@ export default function TFAForm() {
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
+  const [respondentEmail, setRespondentEmail] = useState("");
   const [currentSection, setCurrentSection] = useState(0);
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
   
@@ -75,6 +76,7 @@ export default function TFAForm() {
       comments?: string; 
       initialRespondent?: string;
       initialRespondentRole?: string;
+      email?: string;
       gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
     }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
@@ -146,6 +148,7 @@ export default function TFAForm() {
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
       initialRespondentRole: respondentRole.trim(),
+      email: respondentEmail.trim() || undefined,
       gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
@@ -329,6 +332,25 @@ export default function TFAForm() {
                 {language === 'en' 
                   ? 'Your role helps us understand your perspective on technical capabilities' 
                   : 'Su rol nos ayuda a comprender su perspectiva sobre las capacidades técnicas'}
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="respondent-email" className="text-sm font-medium">
+                {language === 'en' ? 'Your Email (Optional but Recommended)' : 'Su Correo Electrónico (Opcional pero Recomendado)'}
+              </Label>
+              <Input
+                id="respondent-email"
+                type="email"
+                placeholder={language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com'}
+                value={respondentEmail}
+                onChange={(e) => setRespondentEmail(e.target.value)}
+                className="mt-2"
+                data-testid="input-respondent-email"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                {language === 'en' 
+                  ? 'Providing your email helps verify your submission and ensures your responses are included in the diagnostic report' 
+                  : 'Proporcionar su correo electrónico ayuda a verificar su envío y garantiza que sus respuestas se incluyan en el informe diagnóstico'}
               </p>
             </div>
           </div>
