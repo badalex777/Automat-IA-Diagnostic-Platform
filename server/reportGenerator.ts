@@ -112,6 +112,17 @@ function createBulletParagraph(text: string): Paragraph {
 }
 
 /**
+ * Create a table caption with bold formatting
+ */
+function createTableCaption(tableNumber: string, description: string): Paragraph {
+  return new Paragraph({
+    children: [new TextRun({ text: `Table ${tableNumber}: ${description}`, bold: true })],
+    alignment: AlignmentType.LEFT,
+    spacing: { before: 120, after: 60 },
+  });
+}
+
+/**
  * Create horizontal separator line for subsection breaks
  */
 function createHorizontalSeparator(): Paragraph {
@@ -792,6 +803,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       Math.round(opp.paybackMonths).toString(),
       formatNumber(opp.fteSavings, 2),
     ]);
+    sections.push(createTableCaption("4.3", "Top Three Automation Opportunities"));
     sections.push(createTable(top3Headers, top3Rows));
   }
   
@@ -826,6 +838,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       ["Total FTE Capacity Saved", formatNumber(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
     ];
 
+    sections.push(createTableCaption("4.4", "Financial Summary of Top Opportunities"));
     sections.push(createTable(financialSummaryHeaders, financialSummaryRows));
     sections.push(createBodyParagraph("All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the nearest hundred."));
   }
@@ -880,6 +893,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   });
 
   if (readinessRows.length > 0) {
+    sections.push(createTableCaption("5.1", "Readiness Summary by Workflow"));
     sections.push(createTable(readinessHeaders, readinessRows));
   }
   
@@ -909,6 +923,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
   });
 
   if (roiRows.length > 0) {
+    sections.push(createTableCaption("5.2", "ROI Insights by Opportunity"));
     sections.push(createTable(roiHeaders, roiRows));
   }
   
@@ -929,6 +944,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Nice-to-Haves", data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
     ["Deprioritize", data.matrixDistribution.deprioritize.opportunities.join(", "), data.matrixDistribution.deprioritize.count.toString()],
   ];
+  sections.push(createTableCaption("5.3", "Opportunity Matrix Distribution"));
   sections.push(createTable(matrixHeaders, matrixRows));
   
   // Part 6: Commentary and matrix image placeholders
@@ -998,6 +1014,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       formatNumber(opp.roiMetrics.fteSavings, 2),
     ]);
+    sections.push(createTableCaption("6.1", "Phase 1 — Quick Wins"));
     sections.push(createTable(phase1Headers, phase1Rows));
   }
   
@@ -1021,6 +1038,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       formatNumber(opp.roiMetrics.fteSavings, 2),
     ]);
+    sections.push(createTableCaption("6.2", "Phase 2 — Foundational"));
     sections.push(createTable(phase2Headers, phase2Rows));
   }
   
@@ -1044,6 +1062,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       formatNumber(opp.roiMetrics.fteSavings, 2),
     ]);
+    sections.push(createTableCaption("6.3", "Phase 3 — Strategic"));
     sections.push(createTable(phase3Headers, phase3Rows));
   }
   
@@ -1070,6 +1089,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Phase 2: Foundational", "", "", "█████", "█████", "", ""],
     ["Phase 3: Strategic", "", "", "", "", "█████", "█████"],
   ];
+  sections.push(createTableCaption("6.4", "18-Month Implementation Timeline"));
   sections.push(createTable(ganttHeaders, ganttRows));
   
   // Narrative Summary
@@ -1140,6 +1160,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Change Magnitude", "15%", "Frequency of process changes, adaptability requirements, and rules stability"],
     ["Workflow Brittleness", "10%", "Error frequency, exception handling needs, and input consistency challenges"],
   ];
+  sections.push(createTableCaption("B.1", "Readiness Score Component Weighting"));
   sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
   sections.push(createBodyParagraph("Why These Weights Matter:"));
@@ -1259,6 +1280,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     });
   });
   if (portfolioRows.length > 0) {
+    sections.push(createTableCaption("D.1", "Portfolio Overview — All Opportunities"));
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
   sections.push(createBodyParagraph("Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. Detailed per-opportunity pages follow."));
@@ -1303,6 +1325,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
         ["Annual Hours Saved", formatNumber(annualHours, 0)],
         ["Weekly Hours Saved", formatNumber(weeklyHours, 1)],
       ];
+      sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics"));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
       sections.push(createBodyParagraph("All values modeled under Automat-IA Conservative Scenario."));
       
@@ -1314,6 +1337,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
         ["Revenue Uplift", "To be validated", "Capacity reallocation potential subject to business validation"],
         ["Ramp-Up Period", "3 months", "Time to reach steady-state performance after implementation"],
       ];
+      sections.push(createTableCaption(`D.2.${oppCounter}b`, "Business Impact Components"));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
       // Dominant component paragraph
@@ -1345,6 +1369,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["3-Year", "(Annual Benefit × 3) − Implementation Cost", "Cumulative value over initial contract period"],
     ["5-Year", "(Annual Benefit × 5) − Implementation Cost", "Long-term strategic value assessment"],
   ];
+  sections.push(createTableCaption("E.2", "Net Benefit Formulas"));
   sections.push(createTable(netBenefitHeaders, netBenefitRows, [25, 40, 35]));
 
   // E.3 FTE Conversions (text)
@@ -1357,6 +1382,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Error Reduction Benefits", "Error Rate × Rework Cost × Volume × Improvement %", "Value of quality improvements and rework avoided"],
     ["Revenue Uplift Benefits", "Capacity Reallocation × Revenue per Hour × Realization %", "Value from redirecting capacity to revenue-generating activities"],
   ];
+  sections.push(createTableCaption("E.4", "Annual Benefit Breakdown"));
   sections.push(createTable(benefitHeaders, benefitRows, [25, 40, 35]));
   sections.push(createBodyParagraph("All benefit calculations apply downward multipliers in conservative modeling to avoid overstatement."));
 
@@ -1370,6 +1396,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Cost Overrun Adjustment", "Add 20% contingency to implementation costs to reflect typical project overruns"],
     ["Ramp-Up Efficiency Adjustment", "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization"],
   ];
+  sections.push(createTableCaption("E.5", "Scenario Adjustment Framework"));
   sections.push(createTable(scenarioHeaders, scenarioRows, [35, 65]));
   sections.push(createBodyParagraph("Together these controls form the Conservative Scenario Framework, ensuring projections remain achievable, evidence-based, and comparable across diagnostics."));
 
@@ -1384,6 +1411,7 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ["Recurring Costs", "10-15% of implementation", "Annual software licenses, maintenance, and support"],
     ["One-Time Costs", "Implementation + Training", "Includes build, configuration, testing, and change management"],
   ];
+  sections.push(createTableCaption("E.6", "Key Modeling Assumptions"));
   sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
 
   // E.7 Formula Integrity (text)
@@ -1413,10 +1441,12 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
     ];
   });
   if (provenanceRows.length > 0) {
+    sections.push(createTableCaption("F.1", "Data Provenance and Audit Trail"));
     sections.push(createTable(provenanceHeaders, provenanceRows, [14, 12, 14, 7, 10, 12, 10, 8, 7, 6]));
   }
   
   // Add detailed knowledge gap resolution tables if available
+  let gapTableCounter = 2; // Start at F.2 since F.1 is the main provenance table
   data.appendixF.forEach(prov => {
     if (prov.knowledgeGapDetails && prov.knowledgeGapDetails.length > 0) {
       sections.push(
@@ -1437,7 +1467,9 @@ export async function generateExecutiveReport(data: DiagnosticData): Promise<Buf
         detail.isKnowledgeGap ? "Yes" : "No",
         detail.resolvedAt,
       ]);
+      sections.push(createTableCaption(`F.${gapTableCounter}`, `Knowledge Gap Resolution — ${prov.workflowName}`));
       sections.push(createTable(gapHeaders, gapRows, [5, 30, 15, 12, 15, 8, 15]));
+      gapTableCounter++;
     }
   });
 
