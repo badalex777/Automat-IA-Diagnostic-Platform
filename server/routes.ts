@@ -1250,6 +1250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         verificationCode,
         responses,
         verified: true,
+        completedAt: new Date(), // Mark as completed on submission
       });
 
       res.status(201).json(pifResponse);
