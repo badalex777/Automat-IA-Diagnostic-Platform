@@ -911,8 +911,8 @@ respondent names, roles, dates, and any midpoint assumptions.
 ● When quality or revenue data is not verified, values are held at zero until validated to
 avoid inflating benefit.
 
-● Payback period is sourced directly from opportunity modeling inputs and stakeholder
-validation.
+● Payback period is calculated using the ROI engine based on implementation cost and
+annual benefit.
 
 ● FTE conversions are based on 2,080 hours per year (standard full-time equivalent).
 `;

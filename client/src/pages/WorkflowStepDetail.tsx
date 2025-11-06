@@ -331,16 +331,7 @@ export default function WorkflowStepDetail() {
 
           {/* Tab 2: PIF Data */}
           <TabsContent value="pif-data" className="space-y-6">
-            {!hasStepPIF ? (
-              <ShareableLinkCard
-                workflowId={workflowId}
-                companyName={company?.name || ''}
-                workflowTitle={workflow?.name || ''}
-                type="pif"
-                stepId={stepId}
-                stepName={step.stepName}
-              />
-            ) : (
+            {hasStepPIF && (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">
                   PIF Responses ({stepPIFs.length} respondent{stepPIFs.length > 1 ? 's' : ''})
@@ -362,6 +353,15 @@ export default function WorkflowStepDetail() {
                 </div>
               </Card>
             )}
+            
+            <ShareableLinkCard
+              workflowId={workflowId}
+              companyName={company?.name || ''}
+              workflowTitle={workflow?.name || ''}
+              type="pif"
+              stepId={stepId}
+              stepName={step.stepName}
+            />
           </TabsContent>
 
           {/* Tab 3: Readiness Analysis */}
