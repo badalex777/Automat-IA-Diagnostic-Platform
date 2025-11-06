@@ -13,7 +13,7 @@ import {
   type Workflow,
   type WorkflowStep
 } from "@shared/schema";
-import { eq, and, isNotNull } from "drizzle-orm";
+import { eq, and, isNotNull, or, isNull } from "drizzle-orm";
 import { asc } from "drizzle-orm";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
@@ -525,25 +525,33 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   let latestDate: Date | null = null;
 
   for (const workflow of companyWorkflows) {
-    // Get TFA assessment
+    // Get TFA assessment (only verified responses, or legacy responses without email)
     const [tfa] = await db
       .select()
       .from(tfaAssessments)
       .where(
         and(
           eq(tfaAssessments.workflowId, workflow.id),
-          isNotNull(tfaAssessments.completedAt)
+          isNotNull(tfaAssessments.completedAt),
+          or(
+            isNull(tfaAssessments.email),
+            eq(tfaAssessments.verified, true)
+          )
         )
       );
 
-    // Get all PIF responses
+    // Get all PIF responses (only verified responses, or legacy responses without email)
     const pifs = await db
       .select()
       .from(pifResponses)
       .where(
         and(
           eq(pifResponses.workflowId, workflow.id),
-          isNotNull(pifResponses.completedAt)
+          isNotNull(pifResponses.completedAt),
+          or(
+            isNull(pifResponses.email),
+            eq(pifResponses.verified, true)
+          )
         )
       );
 

@@ -1,4 +1,4 @@
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, sql, and, or, isNull } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { db } from "./db";
 import { 
@@ -135,7 +135,15 @@ export class DbStorage implements IStorage {
   async getTFAByWorkflowId(workflowId: string): Promise<TFAAssessment | undefined> {
     const [assessment] = await db.select()
       .from(tfaAssessments)
-      .where(eq(tfaAssessments.workflowId, workflowId))
+      .where(
+        and(
+          eq(tfaAssessments.workflowId, workflowId),
+          or(
+            isNull(tfaAssessments.email),
+            eq(tfaAssessments.verified, true)
+          )
+        )
+      )
       .orderBy(sql`${tfaAssessments.completedAt} DESC NULLS LAST`)
       .limit(1);
     return assessment;
@@ -310,7 +318,18 @@ export class DbStorage implements IStorage {
   }
 
   async getAllPIFResponsesForWorkflow(workflowId: string): Promise<PIFResponse[]> {
-    return db.select().from(pifResponses).where(eq(pifResponses.workflowId, workflowId)).orderBy(desc(pifResponses.createdAt));
+    return db.select()
+      .from(pifResponses)
+      .where(
+        and(
+          eq(pifResponses.workflowId, workflowId),
+          or(
+            isNull(pifResponses.email),
+            eq(pifResponses.verified, true)
+          )
+        )
+      )
+      .orderBy(desc(pifResponses.createdAt));
   }
 
   async getPIFByVerificationToken(token: string): Promise<PIFResponse | undefined> {
