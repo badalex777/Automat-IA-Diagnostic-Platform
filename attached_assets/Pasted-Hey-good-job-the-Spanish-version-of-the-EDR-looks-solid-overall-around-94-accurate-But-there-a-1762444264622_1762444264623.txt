@@ -1,0 +1,25 @@
+Hey, good job — the Spanish version of the EDR looks solid overall, around 94% accurate. But there are still a few things that didn’t get translated. Please fix these:
+
+The whole “Conclusions and Next Steps” section (including “Key Conclusions” and “Recommended Next Steps”) — still in English.
+
+The paragraph that starts with “The Base Matrix illustrates…” — still in English.
+
+The quadrant label “Strategic Goals” — should be “Objetivos Estratégicos.”
+
+Some headers like “Phase 1: Quick Wins”, “Phase 2: Foundational”, “Phase 3: Strategic” — should be fully in Spanish (e.g. “Fase 1: Logros Rápidos”).
+
+The phrase “System environment limitations (1)” — needs to be “Limitaciones del entorno del sistema (1).”
+
+A few titles in the appendices like “A.7 Opportunity Matrix Methodology” — should be translated to “A.7 Metodología de la Matriz de Oportunidades.”
+
+Also, in section 4.6 (Apuestas Estratégicas), when no opportunities are identified, the auto-generated text still appears in English:
+
+“No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.”
+That needs to be translated to Spanish, for example:
+“No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.”
+please check auto generated text that gets outputed in english gets outputed in spanish throughout the document
+the cover page is still mostly in english.
+Everything else looks consistent — just clean up those untranslated bits
+
+in terms of the email verification feature:
+optional email fields are not it. i need them to be mandatory. the current optional functionality is faulty because its possible that a PIF respondent forgets to write their email down or writes it down with a typo and hence they cant verify their email and therefore the response isnt recorded in the app. instead, make the email field mandatory and dont let for fillers send the form until they verify the email. this way, i shift responsibility from Automat-IA for not collecting data to the user who isnt even able to send in the form if they dont verify their identity.
