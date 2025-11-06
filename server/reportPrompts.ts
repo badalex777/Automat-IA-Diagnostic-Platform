@@ -458,11 +458,9 @@ implementation timelines and improves adoption rates for all automation initiati
 
 ● Address foundational readiness gaps before initiating high-effort initiatives.
 
-● Reassess opportunity scores after each implementation cycle to update the Opportunity
-Matrix dynamically.
+● Reassess opportunity scores after each implementation cycle to update the Opportunity Matrix dynamically.
 
-● Use early successes to strengthen advocacy and technical competence for subsequent
-phases.
+● Use early successes to strengthen advocacy and technical competence for subsequent phases.
 `;
 
 export const FINDINGS_ANALYSIS_PART1 = `
@@ -530,8 +528,7 @@ implementation plan.
 
 The roadmap is designed to:
 
-● Deliver measurable value early through Quick Wins that validate the automation
-strategy.
+● Deliver measurable value early through Quick Wins that validate the automation strategy.
 
 ● Strengthen the data, process, and integration foundations required for scale.
 
