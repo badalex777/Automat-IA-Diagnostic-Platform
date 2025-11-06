@@ -24,6 +24,7 @@ import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { aggregateCompanyDiagnosticData } from "./reportDataAggregator";
 import { generateExecutiveReport, ReportValidationError } from "./reportGenerator";
 import { sendVerificationEmail, generateVerificationToken } from "./emailService";
+import { sendVerificationCode, verifyCode } from "./verificationCodeService";
 
 /**
  * Generate bilingual HTML page for successful email verification
@@ -1319,6 +1320,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== NEW VERIFICATION CODE ENDPOINTS (Pre-submission verification) =====
+  
+  // Send verification code to email
+  app.post("/api/send-verification-code", async (req, res) => {
+    try {
+      const { email, formType, language } = req.body;
+      
+      if (!email || !formType) {
+        return res.status(400).json({ error: "Email and formType are required" });
+      }
+      
+      if (formType !== 'tfa' && formType !== 'pif') {
+        return res.status(400).json({ error: "Invalid formType. Must be 'tfa' or 'pif'" });
+      }
+      
+      const lang: 'en' | 'es' = language === 'es' ? 'es' : 'en';
+      
+      const result = await sendVerificationCode(email, formType, lang);
+      
+      if (result.success) {
+        return res.json({ success: true, message: result.message });
+      } else {
+        return res.status(500).json({ success: false, error: result.message });
+      }
+    } catch (error: any) {
+      console.error('[API] Error sending verification code:', error);
+      res.status(500).json({ error: "Failed to send verification code" });
+    }
+  });
+  
+  // Verify code
+  app.post("/api/verify-code", async (req, res) => {
+    try {
+      const { email, code } = req.body;
+      
+      if (!email || !code) {
+        return res.status(400).json({ error: "Email and code are required" });
+      }
+      
+      const result = verifyCode(email, code);
+      
+      if (result.success) {
+        return res.json({ success: true, message: result.message });
+      } else {
+        return res.status(400).json({ success: false, error: result.message });
+      }
+    } catch (error: any) {
+      console.error('[API] Error verifying code:', error);
+      res.status(500).json({ error: "Failed to verify code" });
+    }
+  });
+
+  // ===== OLD VERIFICATION ENDPOINTS (To be removed after frontend migration) =====
+  
   // TFA Email Verification Endpoint
   app.get("/api/tfa/verify/:token", async (req, res) => {
     try {
