@@ -189,10 +189,7 @@ export class DbStorage implements IStorage {
     comments?: string, 
     initialRespondent?: string,
     initialRespondentRole?: string,
-    gapMetadata?: Record<string, { why: string; whoMightKnow: string }>,
-    email?: string,
-    verificationToken?: string,
-    verified?: boolean
+    gapMetadata?: Record<string, { why: string; whoMightKnow: string }>
   ): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
     if (score !== undefined) {
@@ -209,18 +206,6 @@ export class DbStorage implements IStorage {
     }
     if (gapMetadata !== undefined) {
       updateData.gapMetadata = gapMetadata;
-    }
-    if (email !== undefined) {
-      updateData.email = email;
-    }
-    if (verified !== undefined) {
-      updateData.verified = verified;
-      if (verified) {
-        updateData.verifiedAt = new Date();
-      }
-    }
-    if (verificationToken !== undefined) {
-      updateData.verificationToken = verificationToken;
     }
     const [updated] = await db.update(tfaAssessments).set(updateData).where(eq(tfaAssessments.id, id)).returning();
     return updated;

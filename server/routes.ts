@@ -683,8 +683,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Company not found" });
       }
 
+      // Sanitize assessment to exclude verification code and other sensitive fields
+      const { verificationCode, verificationToken, ...sanitizedAssessment } = assessment;
+
       res.json({
-        assessment,
+        assessment: sanitizedAssessment,
         workflow,
         company,
       });
@@ -754,17 +757,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Validate verification code (server-side security check)
+      console.log('[TFA Submit] Verification code validation:', {
+        providedCode: verificationCode,
+        providedCodeTrimmed: verificationCode?.trim(),
+        storedCode: assessment.verificationCode,
+        match: verificationCode?.trim() === assessment.verificationCode,
+        assessmentId: assessment.id,
+        shareableId: req.params.shareableId,
+        alreadyCompleted: !!assessment.completedAt,
+      });
+
       if (!verificationCode || !verificationCode.trim()) {
+        console.log('[TFA Submit] Verification code missing');
         return res.status(400).json({ 
           error: "Verification code is required." 
         });
       }
 
       if (verificationCode.trim() !== assessment.verificationCode) {
+        console.log('[TFA Submit] Verification code mismatch - rejecting submission');
         return res.status(400).json({ 
           error: "Invalid verification code. Please check the code provided with the assessment link." 
         });
       }
+
+      console.log('[TFA Submit] Verification code validated successfully');
 
       // Validate all questions are answered
       const allQuestionIds = TFA_QUESTIONS.map(q => q.id.toString());
