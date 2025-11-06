@@ -1000,3 +1000,134 @@ for accurate Implementation Effort calculation.
 Every figure in this report can be traced back to its originating dataset in Appendix F: Data
 Provenance and Audit Trail.
 `;
+
+/**
+ * UI Translations for Report Elements
+ * These are used throughout the document for table headers, captions, labels, etc.
+ */
+export const TRANSLATIONS = {
+  // Cover page
+  coverTitle: "Automation Readiness & Opportunity Analysis",
+  
+  // Table captions
+  tableCaptions: {
+    "4.3": "Top Three Automation Opportunities",
+    "4.4": "Financial Summary of Top Opportunities",
+    "5.1": "Readiness Summary by Workflow",
+    "5.2": "ROI Insights by Opportunity",
+    "5.3": "Opportunity Matrix Distribution",
+    "6.1": "Phase 1 — Quick Wins",
+    "6.2": "Phase 2 — Foundational",
+    "6.3": "Phase 3 — Strategic",
+    "6.4": "18-Month Implementation Timeline",
+    "B.1": "Readiness Score Component Weighting",
+    "D.1": "Portfolio Overview — All Opportunities",
+    "E.2": "Net Benefit Formulas",
+    "E.4": "Annual Benefit Breakdown",
+    "E.5": "Scenario Adjustment Framework",
+    "E.6": "Key Modeling Assumptions",
+    "F.1": "Data Provenance and Audit Trail",
+  },
+  
+  // Column headers for various tables
+  headers: {
+    workflow: "Workflow",
+    opportunity: "Opportunity",
+    annualBenefit: "Annual Benefit",
+    roi: "ROI %",
+    payback: "Payback (months)",
+    fteSaved: "FTE Saved",
+    tfaScore: "TFA Score",
+    pifScore: "PIF Score",
+    readiness: "Readiness",
+    band: "Band",
+    estCost: "Est. Cost",
+    stepNumber: "Step #",
+    stepName: "Step Name",
+    swotCategory: "SWOT Category",
+    readinessInsight: "Readiness Insight",
+    evidence: "Evidence",
+    recommendedAction: "Recommended Action",
+    metric: "Metric",
+    weight: "Weight",
+    description: "Description",
+    quadrant: "Quadrant",
+    opportunities: "Opportunities",
+    count: "Count",
+    component: "Component",
+    value: "Value",
+    formula: "Formula",
+    category: "Category",
+    workflowName: "Workflow Name",
+    dataField: "Data Field",
+    source: "Source",
+    respondentName: "Respondent Name",
+    respondentRole: "Respondent Role",
+    collectionDate: "Collection Date",
+    verificationStatus: "Verification Status",
+    questionText: "Question Text",
+    score: "Score",
+    notes: "Notes",
+  },
+  
+  // SWOT labels
+  swot: {
+    strengths: "Strengths:",
+    weaknesses: "Weaknesses:",
+    opportunities: "Opportunities:",
+    threats: "Threats:",
+  },
+  
+  // Matrix quadrant names
+  matrix: {
+    quickWins: "Quick Wins",
+    strategicGoals: "Strategic Goals",
+    niceToHave: "Nice to Have",
+    deprioritize: "Deprioritize",
+  },
+  
+  // Section headers
+  sections: {
+    executiveSummary: "Executive Summary",
+    confidentialityDisclaimer: "Confidentiality Disclaimer",
+    methodologyOverview: "Methodology Overview",
+    diagnosticOverview: "Diagnostic Overview",
+    findingsAnalysis: "Findings & Analysis",
+    automationRoadmap: "Automation Roadmap",
+    keyConclusions: "Key Conclusions",
+    matrixVisualizations: "Matrix Visualizations",
+    baseOpportunityMatrix: "Base Opportunity Matrix (Operational Impact View)",
+    enhancedOpportunityMatrix: "Enhanced Opportunity Matrix (Strategic Impact View)",
+  },
+  
+  // Appendix titles
+  appendices: {
+    a: "Appendix A: Project Scope and Interview Summary",
+    b: "Appendix B: Readiness Score Metric Weighting",
+    c: "Appendix C: Step-Level SWOT Analysis by Workflow",
+    d: "Appendix D: Opportunity-Level Financial Details",
+    e: "Appendix E: ROI Modeling Framework",
+    f: "Appendix F: Data Provenance and Audit Trail",
+  },
+  
+  // Misc labels
+  labels: {
+    table: "Table",
+    phase: "Phase",
+    keyMetric: "Key Metric",
+    financialMetric: "Financial Metric",
+    businessImpactComponent: "Business Impact Component",
+    knowledgeGapResolution: "Knowledge Gap Resolution",
+  },
+  
+  // Readiness component labels
+  readinessComponents: {
+    systemEnvironment: "System Environment",
+    dataQuality: "Data Quality",
+    integrationFeasibility: "Integration Feasibility",
+    securityCompliance: "Security/Compliance",
+    processClarity: "Process Clarity",
+    changeMagnitude: "Change Magnitude",
+    workflowBrittleness: "Workflow Brittleness",
+  },
+};
