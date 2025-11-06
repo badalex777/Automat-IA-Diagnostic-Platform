@@ -699,7 +699,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== COVER PAGE =====
   sections.push(
     new Paragraph({
-      text: "EXECUTIVE DIAGNOSTIC REPORT",
+      text: TRANSLATIONS.coverPage.executiveDiagnosticReport.toUpperCase(),
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { before: 1000, after: 200 },
@@ -1549,7 +1549,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `Prepared for ${data.company.name} by Automat-IA | Confidential`,
+                    text: `${TRANSLATIONS.coverPage.preparedFor} ${data.company.name} ${TRANSLATIONS.coverPage.by} Automat-IA | ${TRANSLATIONS.coverPage.confidential}`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
                     font: "Roboto",
@@ -1574,7 +1574,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `Automat-IA Executive Diagnostic Report – ${diagnosticPeriod}`,
+                    text: `${TRANSLATIONS.coverPage.executiveDiagnosticReport} – ${diagnosticPeriod}`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
                     font: "Roboto",
