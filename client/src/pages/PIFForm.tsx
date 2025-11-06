@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, ChevronLeft, ChevronRight, Languages } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { EmailVerificationGate } from "@/components/EmailVerificationGate";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getAllPIFQuestions, PIF_SECTIONS } from "@shared/pifQuestions";
@@ -52,7 +53,8 @@ export default function PIFForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [respondentEmail, setRespondentEmail] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
@@ -159,7 +161,7 @@ export default function PIFForm() {
       respondentName: respondentName.trim(),
       respondentRole: respondentRole.trim(),
       respondentResponsibilities: respondentResponsibilities.trim(),
-      email: respondentEmail.trim() || undefined,
+      email: verifiedEmail,
       responses: answers,
       ...(stepId && { stepId }), // Include stepId if present
     });
@@ -329,8 +331,34 @@ export default function PIFForm() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {isDisclaimerSection ? (
+      <EmailVerificationGate
+        formType="pif"
+        language={language}
+        translations={{
+          title: language === 'en' ? 'Email Verification Required' : 'Verificación de Correo Requerida',
+          description: language === 'en' 
+            ? 'Please verify your email address to continue with the Process Insight Form.' 
+            : 'Por favor verifique su dirección de correo electrónico para continuar con el Formulario de Perspectivas del Proceso.',
+          emailLabel: language === 'en' ? 'Email Address' : 'Dirección de Correo',
+          emailPlaceholder: language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com',
+          sendCodeButton: language === 'en' ? 'Send Code' : 'Enviar Código',
+          codeLabel: language === 'en' ? 'Verification Code' : 'Código de Verificación',
+          codePlaceholder: language === 'en' ? 'Enter 6-digit code' : 'Ingrese código de 6 dígitos',
+          verifyButton: language === 'en' ? 'Verify' : 'Verificar',
+          resendButton: language === 'en' ? 'Resend Code' : 'Reenviar Código',
+          verifiedMessage: language === 'en' ? 'Email verified successfully!' : '¡Correo verificado exitosamente!',
+          expiresIn: language === 'en' ? 'Code expires in' : 'El código expira en',
+          codeExpired: language === 'en' ? 'Verification code has expired. Please request a new code.' : 'El código de verificación ha expirado. Por favor solicite un nuevo código.',
+          sendingCode: language === 'en' ? 'Sending...' : 'Enviando...',
+          verifyingCode: language === 'en' ? 'Verifying...' : 'Verificando...',
+        }}
+        onVerified={(email) => {
+          setVerifiedEmail(email);
+          setEmailVerified(true);
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {isDisclaimerSection ? (
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold mb-4">{t.disclaimer.welcome}</h2>
@@ -403,26 +431,6 @@ export default function PIFForm() {
                   placeholder={t.respondentInfo.rolePlaceholder}
                   className="mt-1.5"
                 />
-              </div>
-
-              <div>
-                <Label htmlFor="respondent-email">
-                  {language === 'en' ? 'Your Email (Optional but Recommended)' : 'Su Correo Electrónico (Opcional pero Recomendado)'}
-                </Label>
-                <Input
-                  id="respondent-email"
-                  type="email"
-                  data-testid="input-respondent-email"
-                  value={respondentEmail}
-                  onChange={(e) => setRespondentEmail(e.target.value)}
-                  placeholder={language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com'}
-                  className="mt-1.5"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  {language === 'en' 
-                    ? 'Providing your email helps verify your submission and ensures your responses are included in the diagnostic report' 
-                    : 'Proporcionar su correo electrónico ayuda a verificar su envío y garantiza que sus respuestas se incluyan en el informe diagnóstico'}
-                </p>
               </div>
 
               <div>
@@ -589,6 +597,7 @@ export default function PIFForm() {
           )}
         </div>
       </div>
+      </EmailVerificationGate>
     </div>
   );
 }

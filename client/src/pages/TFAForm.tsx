@@ -11,6 +11,7 @@ import { AlertCircle, Languages } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TFAQuestionCard from "@/components/TFAQuestionCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { EmailVerificationGate } from "@/components/EmailVerificationGate";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { tfaSections } from "@shared/tfaQuestions";
@@ -32,7 +33,8 @@ export default function TFAForm() {
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [respondentEmail, setRespondentEmail] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const [currentSection, setCurrentSection] = useState(0);
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
   
@@ -148,7 +150,7 @@ export default function TFAForm() {
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
       initialRespondentRole: respondentRole.trim(),
-      email: respondentEmail.trim() || undefined,
+      email: verifiedEmail,
       gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
@@ -299,8 +301,34 @@ export default function TFAForm() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {currentSection === 0 && (
+      <EmailVerificationGate
+        formType="tfa"
+        language={language}
+        translations={{
+          title: language === 'en' ? 'Email Verification Required' : 'Verificación de Correo Requerida',
+          description: language === 'en' 
+            ? 'Please verify your email address to continue with the Technical Feasibility Assessment.' 
+            : 'Por favor verifique su dirección de correo electrónico para continuar con la Evaluación de Viabilidad Técnica.',
+          emailLabel: language === 'en' ? 'Email Address' : 'Dirección de Correo',
+          emailPlaceholder: language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com',
+          sendCodeButton: language === 'en' ? 'Send Code' : 'Enviar Código',
+          codeLabel: language === 'en' ? 'Verification Code' : 'Código de Verificación',
+          codePlaceholder: language === 'en' ? 'Enter 6-digit code' : 'Ingrese código de 6 dígitos',
+          verifyButton: language === 'en' ? 'Verify' : 'Verificar',
+          resendButton: language === 'en' ? 'Resend Code' : 'Reenviar Código',
+          verifiedMessage: language === 'en' ? 'Email verified successfully!' : '¡Correo verificado exitosamente!',
+          expiresIn: language === 'en' ? 'Code expires in' : 'El código expira en',
+          codeExpired: language === 'en' ? 'Verification code has expired. Please request a new code.' : 'El código de verificación ha expirado. Por favor solicite un nuevo código.',
+          sendingCode: language === 'en' ? 'Sending...' : 'Enviando...',
+          verifyingCode: language === 'en' ? 'Verifying...' : 'Verificando...',
+        }}
+        onVerified={(email) => {
+          setVerifiedEmail(email);
+          setEmailVerified(true);
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {currentSection === 0 && (
           <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
             <div>
               <Label htmlFor="respondent-name" className="text-sm font-medium">{t.yourName}</Label>
@@ -332,25 +360,6 @@ export default function TFAForm() {
                 {language === 'en' 
                   ? 'Your role helps us understand your perspective on technical capabilities' 
                   : 'Su rol nos ayuda a comprender su perspectiva sobre las capacidades técnicas'}
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="respondent-email" className="text-sm font-medium">
-                {language === 'en' ? 'Your Email (Optional but Recommended)' : 'Su Correo Electrónico (Opcional pero Recomendado)'}
-              </Label>
-              <Input
-                id="respondent-email"
-                type="email"
-                placeholder={language === 'en' ? 'your.email@company.com' : 'su.correo@empresa.com'}
-                value={respondentEmail}
-                onChange={(e) => setRespondentEmail(e.target.value)}
-                className="mt-2"
-                data-testid="input-respondent-email"
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                {language === 'en' 
-                  ? 'Providing your email helps verify your submission and ensures your responses are included in the diagnostic report' 
-                  : 'Proporcionar su correo electrónico ayuda a verificar su envío y garantiza que sus respuestas se incluyan en el informe diagnóstico'}
               </p>
             </div>
           </div>
@@ -526,6 +535,7 @@ export default function TFAForm() {
           </div>
         </div>
       </div>
+      </EmailVerificationGate>
     </div>
   );
 }

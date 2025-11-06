@@ -28,13 +28,26 @@ interface EmailConfig {
 // In-memory storage for verification codes (ephemeral, 10-minute lifespan)
 const verificationCodes = new Map<string, VerificationCode>();
 
-// Cleanup interval to remove expired codes
+// In-memory storage for verified emails (ephemeral, 15-minute lifespan for submission window)
+const verifiedEmails = new Map<string, { verifiedAt: number; expiresAt: number }>();
+
+// Cleanup interval to remove expired codes and verified emails
 setInterval(() => {
   const now = Date.now();
-  const entries = Array.from(verificationCodes.entries());
-  for (const [email, data] of entries) {
+  
+  // Clean up expired verification codes
+  const codeEntries = Array.from(verificationCodes.entries());
+  for (const [email, data] of codeEntries) {
     if (data.expiresAt < now) {
       verificationCodes.delete(email);
+    }
+  }
+  
+  // Clean up expired verified emails
+  const verifiedEntries = Array.from(verifiedEmails.entries());
+  for (const [email, data] of verifiedEntries) {
+    if (data.expiresAt < now) {
+      verifiedEmails.delete(email);
     }
   }
 }, 60000); // Cleanup every minute
@@ -252,6 +265,14 @@ export function verifyCode(email: string, code: string): { success: boolean; mes
   // Verify code
   if (stored.code === code) {
     verificationCodes.delete(email);
+    
+    // Store verified email with 15-minute expiry for submission window
+    const now = Date.now();
+    verifiedEmails.set(email, {
+      verifiedAt: now,
+      expiresAt: now + 15 * 60 * 1000, // 15 minutes to submit
+    });
+    
     return {
       success: true,
       message: 'Email verified successfully',
@@ -263,4 +284,42 @@ export function verifyCode(email: string, code: string): { success: boolean; mes
       message: 'Invalid verification code. Please try again.',
     };
   }
+}
+
+/**
+ * Check if an email was recently verified (server-side validation for submissions)
+ */
+export function isEmailVerified(email: string): boolean {
+  const verified = verifiedEmails.get(email);
+  if (!verified) {
+    return false;
+  }
+  
+  // Check if expired
+  if (verified.expiresAt < Date.now()) {
+    verifiedEmails.delete(email);
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Consume a verified email (one-time use for submission)
+ */
+export function consumeVerifiedEmail(email: string): boolean {
+  const verified = verifiedEmails.get(email);
+  if (!verified) {
+    return false;
+  }
+  
+  // Check if expired
+  if (verified.expiresAt < Date.now()) {
+    verifiedEmails.delete(email);
+    return false;
+  }
+  
+  // Remove from verified list (one-time use)
+  verifiedEmails.delete(email);
+  return true;
 }

@@ -189,7 +189,8 @@ export class DbStorage implements IStorage {
     initialRespondentRole?: string,
     gapMetadata?: Record<string, { why: string; whoMightKnow: string }>,
     email?: string,
-    verificationToken?: string
+    verificationToken?: string,
+    verified?: boolean
   ): Promise<TFAAssessment | undefined> {
     const updateData: any = { responses };
     if (score !== undefined) {
@@ -209,7 +210,12 @@ export class DbStorage implements IStorage {
     }
     if (email !== undefined) {
       updateData.email = email;
-      updateData.verified = false;
+    }
+    if (verified !== undefined) {
+      updateData.verified = verified;
+      if (verified) {
+        updateData.verifiedAt = new Date();
+      }
     }
     if (verificationToken !== undefined) {
       updateData.verificationToken = verificationToken;

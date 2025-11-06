@@ -24,7 +24,7 @@ import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { aggregateCompanyDiagnosticData } from "./reportDataAggregator";
 import { generateExecutiveReport, ReportValidationError } from "./reportGenerator";
 import { sendVerificationEmail, generateVerificationToken } from "./emailService";
-import { sendVerificationCode, verifyCode } from "./verificationCodeService";
+import { sendVerificationCode, verifyCode, consumeVerifiedEmail } from "./verificationCodeService";
 
 /**
  * Generate bilingual HTML page for successful email verification
@@ -784,34 +784,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const score = calculateTFAScore(responses);
       const sectionScores = calculateSectionScores(responses);
 
-      // Handle email verification if email provided
-      let verificationToken: string | undefined;
-      let emailSent = false;
-      
+      // Validate email verification (server-side security check)
+      let isVerified = false;
       if (email && email.trim().length > 0) {
-        verificationToken = generateVerificationToken();
-        
-        // Get workflow and company data for email template
-        const workflow = await storage.getWorkflow(assessment.workflowId);
-        if (workflow) {
-          const company = await storage.getCompany(workflow.companyId);
-          if (company) {
-            // Detect language from comments or default to English
-            const language = (comments && comments.toLowerCase().includes('español')) ? 'es' : 'en';
-            
-            const emailResult = await sendVerificationEmail({
-              recipientEmail: email,
-              recipientName: initialRespondent || 'Respondent',
-              verificationToken,
-              formType: 'tfa',
-              workflowName: workflow.name,
-              companyName: company.name,
-              language,
-            });
-            
-            emailSent = emailResult.success;
-            console.log(`[TFA Submission] Email verification ${emailSent ? 'sent' : 'failed'} for ${email}`);
-          }
+        isVerified = consumeVerifiedEmail(email);
+        if (!isVerified) {
+          return res.status(400).json({ 
+            error: "Email not verified. Please verify your email address before submitting." 
+          });
         }
       }
 
@@ -825,7 +805,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         initialRespondentRole, 
         gapMetadata,
         email,
-        verificationToken
+        undefined, // No verification token needed for new flow
+        isVerified
       );
       const updatedAssessment = await storage.completeTFA(assessment.id, score, comments);
       
@@ -1074,35 +1055,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extractedQualitative = extractQualitativeResponses(responses);
       const finalQualitative = qualitativeResponses || extractedQualitative;
 
-      // Handle email verification if email provided
-      let verificationToken: string | undefined;
-      let emailSent = false;
-      
+      // Validate email verification (server-side security check)
+      let isVerified = false;
       if (email && email.trim().length > 0) {
-        verificationToken = generateVerificationToken();
-        
-        // Get company data for email template
-        const company = await storage.getCompany(workflow.companyId);
-        if (company) {
-          // Detect language from respondent responsibilities or default to English
-          const language = (respondentResponsibilities && respondentResponsibilities.toLowerCase().includes('español')) ? 'es' : 'en';
-          
-          const emailResult = await sendVerificationEmail({
-            recipientEmail: email,
-            recipientName: respondentName,
-            verificationToken,
-            formType: 'pif',
-            workflowName: workflow.name,
-            companyName: company.name,
-            language,
+        isVerified = consumeVerifiedEmail(email);
+        if (!isVerified) {
+          return res.status(400).json({ 
+            error: "Email not verified. Please verify your email address before submitting." 
           });
-          
-          emailSent = emailResult.success;
-          console.log(`[PIF Submission] Email verification ${emailSent ? 'sent' : 'failed'} for ${email}`);
         }
       }
 
-      // Create PIF response with email and verification token
+      // Create PIF response with verified email
       const pifResponse = await storage.createPIFResponse({
         workflowId: req.params.workflowId,
         stepId: stepId || null,
@@ -1116,12 +1080,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         roiInputs: finalROI,
         qualitativeResponses: finalQualitative,
         email: email || null,
-        verificationToken: verificationToken || null,
-        verified: false,
+        verificationToken: null, // No verification token needed for new flow
+        verified: isVerified,
+        verifiedAt: isVerified ? new Date() : null,
         completedAt: new Date(),
       });
 
-      res.status(201).json({ ...pifResponse, emailSent });
+      res.status(201).json({ ...pifResponse, emailVerified: isVerified });
     } catch (error: any) {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: error.message });
