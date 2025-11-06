@@ -17,6 +17,11 @@ interface ShareableLinkCardProps {
   stepName?: string;
 }
 
+interface PIFTemplate {
+  shareableId: string;
+  verificationCode: string;
+}
+
 export default function ShareableLinkCard({
   workflowId,
   companyName,
@@ -26,6 +31,7 @@ export default function ShareableLinkCard({
   stepName,
 }: ShareableLinkCardProps) {
   const [copied, setCopied] = useState(false);
+  const [pifTemplate, setPifTemplate] = useState<PIFTemplate | null>(null);
   const { toast } = useToast();
 
   const { data: existingAssessment } = useQuery<TFAAssessment>({
@@ -33,10 +39,7 @@ export default function ShareableLinkCard({
     enabled: !!workflowId && type === 'tfa',
   });
 
-  // For PIF, we generate a new shareableId with each workflow
-  const pifShareableId = type === 'pif' ? workflowId : '';
-
-  const generateLinkMutation = useMutation({
+  const generateTFALinkMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('POST', '/api/tfa', { workflowId });
       return await res.json();
@@ -57,14 +60,40 @@ export default function ShareableLinkCard({
     },
   });
 
-  const shareableUrl = type === 'pif' && pifShareableId
-    ? `${window.location.origin}/pif/${pifShareableId}${stepId ? `?stepId=${stepId}` : ''}`
+  const generatePIFLinkMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/pif/create-shareable`, { stepId });
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      setPifTemplate({
+        shareableId: data.shareableId,
+        verificationCode: data.verificationCode
+      });
+      toast({
+        title: "PIF link generated",
+        description: "A new shareable link has been created with verification code.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error generating link",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const shareableUrl = type === 'pif' && pifTemplate
+    ? `${window.location.origin}/pif/${pifTemplate.shareableId}`
     : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
 
   const verificationCode = type === 'tfa' && existingAssessment 
     ? existingAssessment.verificationCode 
+    : type === 'pif' && pifTemplate
+    ? pifTemplate.verificationCode
     : null;
 
   const handleCopy = async () => {
@@ -93,7 +122,7 @@ export default function ShareableLinkCard({
       : 'Share this link with end users and process owners to collect operational insights. Multiple responses can be submitted.')
     : 'Send this link to the technical contact to complete the Technical Feasibility Assessment';
 
-  if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pif' && !shareableUrl)) {
+  if ((type === 'tfa' && (!existingAssessment || !shareableUrl)) || (type === 'pif' && !pifTemplate)) {
     return (
       <Card className="p-6" data-testid="card-shareable-link">
         <div className="space-y-4">
@@ -101,18 +130,26 @@ export default function ShareableLinkCard({
             <h3 className="font-semibold text-base mb-1">{linkTitle}</h3>
             <p className="text-sm text-muted-foreground">
               {type === 'pif' 
-                ? 'Share a link with end users and process owners to collect operational insights about this workflow.'
+                ? 'Generate a unique link with verification code to share with end users and process owners for collecting operational insights.'
                 : 'Generate a unique link to send to your technical contact for completing the assessment.'
               }
             </p>
           </div>
-          {type === 'tfa' && (
+          {type === 'tfa' ? (
             <Button 
-              onClick={() => generateLinkMutation.mutate()}
-              disabled={generateLinkMutation.isPending}
+              onClick={() => generateTFALinkMutation.mutate()}
+              disabled={generateTFALinkMutation.isPending}
               data-testid="button-generate-link"
             >
-              {generateLinkMutation.isPending ? 'Generating...' : 'Generate Shareable Link'}
+              {generateTFALinkMutation.isPending ? 'Generating...' : 'Generate Shareable Link'}
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => generatePIFLinkMutation.mutate()}
+              disabled={generatePIFLinkMutation.isPending}
+              data-testid="button-generate-pif-link"
+            >
+              {generatePIFLinkMutation.isPending ? 'Generating...' : 'Generate PIF Link'}
             </Button>
           )}
         </div>
