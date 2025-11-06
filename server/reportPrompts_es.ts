@@ -1034,6 +1034,52 @@ Procedencia de Datos y Pista de Auditoría.
 export const TRANSLATIONS = {
   // Portada
   coverTitle: "Análisis de Preparación y Oportunidades de Automatización",
+  coverPage: {
+    preparedFor: "Preparado para",
+    by: "por",
+    confidential: "Confidencial",
+    executiveDiagnosticReport: "Informe Ejecutivo de Diagnóstico de Automat-IA",
+  },
+  
+  // Mensajes de respaldo (cuando no hay datos)
+  fallbackMessages: {
+    noStrategicBets: "No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.",
+    noNiceToHave: "No se identificaron oportunidades Deseables. Todas las oportunidades son Logros Rápidos, Apuestas Estratégicas o requieren mejoras fundacionales.",
+    systemEnvironmentLimitations: "Limitaciones del entorno del sistema",
+  },
+  
+  // Descripciones de matriz
+  matrixDescriptions: {
+    baseMatrix: "La Matriz Base ilustra la eficiencia relativa y viabilidad de cada oportunidad, mientras que la Matriz Mejorada incorpora impacto estratégico y funcional cruzado. Juntas, presentan una vista equilibrada de ganancias a corto plazo y potencial de automatización a largo plazo.",
+  },
+  
+  // Encabezados de fases de hoja de ruta
+  phaseHeaders: {
+    phase1: "Fase 1: Logros Rápidos",
+    phase2: "Fase 2: Fundacional",
+    phase3: "Fase 3: Estratégica",
+  },
+  
+  // Sección de conclusiones
+  conclusions: {
+    title: "Conclusiones y Próximos Pasos",
+    keyConclusions: "Conclusiones Clave",
+    recommendedNextSteps: "Próximos Pasos Recomendados",
+    step1Title: "1. Sesión de Alineación Ejecutiva",
+    step1Content: "Reunir al liderazgo para revisar hallazgos, validar priorización y asegurar patrocinio para iniciativas de Fase 1.",
+    step2Title: "2. Diseño Detallado de Solución (Oportunidades de Fase 1)",
+    step2Content: "Realizar sesiones de diseño técnico para Logros Rápidos de alta prioridad para definir arquitectura, puntos de integración y enfoque de implementación.",
+    step3Title: "3. Adquisición de Herramientas y Configuración de Proveedores",
+    step3Content: "Finalizar selección de plataforma de automatización, ejecutar contratos e iniciar configuración de entorno.",
+    step4Title: "4. Preparación del Centro de Excelencia (CoE)",
+    step4Content: "Establecer gobierno, estándares y capacidades de soporte para sostener los esfuerzos de automatización más allá de la Fase 1.",
+    closingStatement: "Este diagnóstico proporciona una base basada en datos para su viaje de automatización. Recomendamos avanzar con los Logros Rápidos de Fase 1 dentro del próximo trimestre para comenzar a realizar beneficios y desarrollar capacidad organizacional.",
+  },
+  
+  // Subtítulos de apéndices
+  appendixSubsections: {
+    a7: "A.7 Metodología de la Matriz de Oportunidades",
+  },
   
   // Títulos de tablas
   tableCaptions: {
