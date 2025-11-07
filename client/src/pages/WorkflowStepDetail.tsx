@@ -21,6 +21,7 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
 import ReadinessRubric from "@/components/ReadinessRubric";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
+import PIFExecutiveSummary from "@/components/PIFExecutiveSummary";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity, ImplementationOpportunity } from "@shared/schema";
@@ -331,6 +332,13 @@ export default function WorkflowStepDetail() {
 
           {/* Tab 2: PIF Data */}
           <TabsContent value="pif-data" className="space-y-6">
+            {hasStepPIF && stepAggregatedPIF && (
+              <PIFExecutiveSummary 
+                aggregatedScores={stepAggregatedPIF}
+                stepName={step.stepName}
+              />
+            )}
+            
             {hasStepPIF && (
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">
