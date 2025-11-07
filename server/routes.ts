@@ -1239,7 +1239,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Create new PIF response with verified data
+      // Calculate PIF scores from responses
+      const pifScores = calculatePIFScores(responses);
+      const roiInputs = extractROIInputs(responses);
+      const qualitativeResponses = extractQualitativeResponses(responses);
+
+      // Create new PIF response with verified data and calculated scores
       const pifResponse = await storage.createPIFResponse({
         workflowId: template.workflowId,
         stepId: template.stepId || null, // Use stepId from template, not request body
@@ -1249,6 +1254,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: email || null,
         verificationCode,
         responses,
+        processClarity: pifScores.processClarity,
+        changeMagnitude: pifScores.changeMagnitude,
+        workflowBrittleness: pifScores.workflowBrittleness,
+        roiInputs,
+        qualitativeResponses,
         verified: true,
         completedAt: new Date(), // Mark as completed on submission
       });
