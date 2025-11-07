@@ -25,6 +25,15 @@ The Automat-IA Diagnostic Platform is a professional web application for consult
 - **End-to-End Testing**: Automated Playwright tests verify both TFA and PIF flows including invalid code rejection
 - **Data Quality**: All new TFA/PIF submissions are marked as verified=true, confirming successful code validation
 
+**PIF Score Calculation & Display (Nov 7, 2024):** Fixed PIF operational score calculation and implemented executive summary display:
+- **Bug Fix**: PIF submission endpoint (POST /api/pif/shareable/:shareableId/submit) now calculates and persists processClarity, changeMagnitude, and workflowBrittleness scores using calculatePIFScores function from shared/pifQuestions.ts
+- **Data Architecture**: Individual PIF responses store their three operational scores as integers; variance/statistics are calculated dynamically via calculateAggregatedPIFScores when aggregating multiple respondents (not stored per-response)
+- **PIFExecutiveSummary Component**: Created new executive summary component (client/src/components/PIFExecutiveSummary.tsx) mirroring TFA Executive Summary pattern with operational insights, strength/concern analysis, and action recommendations
+- **Integration**: PIFExecutiveSummary added to WorkflowStepDetail PIF Data tab, positioned above raw respondent details, showing aggregated analysis for all step-level respondents
+- **Readiness Display**: Step-level readiness analysis now correctly displays non-zero PIF operational scores in both PIF Data tab (executive summary) and Readiness Analysis tab (radar chart and component breakdown)
+- **Data Backfill**: Existing PIF responses backfilled with calculated scores to ensure historical data displays correctly in all views
+- **End-to-End Verification**: Automated Playwright tests confirm PIF scores calculate correctly, persist to database, and display in both PIF Data and Readiness Analysis tabs
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
