@@ -6,6 +6,16 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ## Recent Changes
 
+### November 9, 2025 - Complete Spanish Translation Implementation for EDR
+- Implemented centralized translation system with 300+ type-safe translation keys in `server/reportTranslations.ts`
+- Created locale-aware formatting module `server/reportFormatters.ts` using Intl APIs for currency, numbers, dates, and month names
+- Introduced `createReportContext(lang)` helper providing unified `ctx.t` (translations) and `ctx.fmt` (formatters) API
+- Migrated entire `reportGenerator.ts` to use context-based translations and formatters (zero hardcoded strings)
+- Spanish formatting: currency uses "$1.234,56" format, dates show "Noviembre 2025", all UI elements fully localized
+- End-to-end tested: Both English and Spanish EDR generation confirmed working via API (`?lang=en` / `?lang=es`)
+- TypeScript interface enforces translation key parity between English/Spanish dictionaries
+- Resolved circular dependency between translation and formatter modules using Intl.DateTimeFormat
+
 ### November 9, 2025 - EDR Formatting Refinements
 - Reduced spacing after Phase titles, methodology subsections, and subsection headings from 120pt to 60pt to eliminate excessive white space
 - Added conditional consolidation count to Section 4.2 Key Diagnostic Findings (displays only when consolidations exist)
