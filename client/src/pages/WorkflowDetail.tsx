@@ -33,6 +33,8 @@ import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
 import { OpportunityForm } from "@/components/OpportunityForm";
 import { ConsolidationDialog } from "@/components/ConsolidationDialog";
+import OpportunityMatrix from "@/components/OpportunityMatrix";
+import OpportunitiesTable from "@/components/OpportunitiesTable";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -909,68 +911,62 @@ export default function WorkflowDetail() {
                 0
               );
               
+              // Build readiness scores map for matrix and table
+              const stepReadinessScores: Record<string, number> = {};
+              workflowSteps.forEach(step => {
+                stepReadinessScores[step.id] = getStepReadinessScore(step.id);
+              });
+              
               return (
                 <>
-                  {/* Opportunities Data Table */}
+                  {/* Opportunity Matrix */}
                   <Card className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="text-lg font-semibold">Opportunities Data</h3>
+                        <h3 className="text-lg font-semibold">Opportunity Matrix</h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Calculated scores for business impact and implementation effort
+                          Visual positioning by business impact and implementation effort
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          onClick={() => setIsConsolidationDialogOpen(true)}
-                          size="sm"
-                          data-testid="button-create-consolidation"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Create Consolidation
-                        </Button>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Sort by:</span>
-                          <Select value={oppSortBy} onValueChange={(value) => setOppSortBy(value as typeof oppSortBy)}>
-                            <SelectTrigger className="w-[220px]" data-testid="select-sort-workflow-opportunities">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="roadmap">Roadmap Priority</SelectItem>
-                              <SelectItem value="impact-high">Highest Business Impact</SelectItem>
-                              <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
-                              <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
-                              <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
-                              <SelectItem value="name">Sort by Name</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                      <Button
+                        onClick={() => setIsConsolidationDialogOpen(true)}
+                        size="sm"
+                        data-testid="button-create-consolidation"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Create Consolidation
+                      </Button>
+                    </div>
+                    <OpportunityMatrix
+                      opportunities={opportunitiesWithScores}
+                      consolidations={consolidations}
+                      workflowId={workflowId}
+                      readinessScores={stepReadinessScores}
+                      companyContext={companyContext}
+                      onOpportunityClick={(opp) => setEditOpportunity(opp)}
+                      onConsolidationClick={(cons) => setEditConsolidation(cons)}
+                    />
+                  </Card>
+
+                  {/* Opportunities and Consolidations Table */}
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">Opportunities & Consolidations</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Detailed breakdown with metrics and constituent analysis
+                        </p>
                       </div>
                     </div>
-                    <div className="border rounded-lg">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Opportunity Name</TableHead>
-                            <TableHead>Source Workflow</TableHead>
-                            <TableHead>Source Step</TableHead>
-                            <TableHead className="text-right">Business Impact</TableHead>
-                            <TableHead className="text-right">Implementation Effort</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {sortedOpportunities.map((opp) => (
-                            <TableRow key={opp.id} data-testid={`table-row-opportunity-${opp.id}`}>
-                              <TableCell className="font-medium">{opp.name}</TableCell>
-                              <TableCell>{workflow?.name || 'N/A'}</TableCell>
-                              <TableCell>{opp.linkedStep?.stepName || 'N/A'}</TableCell>
-                              <TableCell className="text-right font-mono">{opp.baseImpact.toFixed(2)}</TableCell>
-                              <TableCell className="text-right font-mono">{opp.effortScore.toFixed(2)}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                    <OpportunitiesTable
+                      opportunities={opportunitiesWithScores}
+                      consolidations={consolidations}
+                      workflowName={workflow?.name || ''}
+                      readinessScores={stepReadinessScores}
+                      companyContext={companyContext}
+                      onOpportunityClick={(opp) => setEditOpportunity(opp)}
+                      onConsolidationClick={(cons) => setEditConsolidation(cons)}
+                    />
                   </Card>
 
                   {/* All Opportunities Cards */}
