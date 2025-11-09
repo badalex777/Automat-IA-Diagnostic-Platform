@@ -6,6 +6,8 @@
  * both languages in a single, strongly-typed structure.
  */
 
+import { createReportFormatters } from './reportFormatters';
+
 /**
  * Translation structure type definition
  */
@@ -938,4 +940,30 @@ export function getMonthName(monthIndex: number, language: 'en' | 'es' = 'en'): 
     'july', 'august', 'september', 'october', 'november', 'december'
   ];
   return t.months[monthKeys[monthIndex]];
+}
+
+/**
+ * Report Context - bundles translations and formatters
+ */
+export interface ReportContext {
+  /** Translation strings */
+  t: ReportTranslations;
+  /** Locale-aware formatters */
+  fmt: import('./reportFormatters').ReportFormatters;
+  /** Report language */
+  language: 'en' | 'es';
+}
+
+/**
+ * Create a report context with translations and formatters for a given language
+ * 
+ * @param language - Report language ('en' or 'es')
+ * @returns Context object with translations (t) and formatters (fmt)
+ */
+export function createReportContext(language: 'en' | 'es' = 'en'): ReportContext {
+  return {
+    t: getTranslations(language),
+    fmt: createReportFormatters(language),
+    language,
+  };
 }

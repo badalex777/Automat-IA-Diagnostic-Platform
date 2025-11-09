@@ -20,6 +20,7 @@ import {
   type IRunOptions,
 } from "docx";
 import { DiagnosticData } from "./reportDataAggregator";
+import { createReportContext, type ReportContext } from "./reportTranslations";
 // Dynamic import will be used based on language parameter
 
 /**
@@ -45,17 +46,8 @@ const COLORS = {
 };
 
 // ===== HELPER FUNCTIONS =====
-
-function formatCurrency(value: number): string {
-  return `$${Math.round(value).toLocaleString()}`;
-}
-
-function formatNumber(value: number, decimals: number = 1): string {
-  return value.toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-}
+// Note: formatCurrency and formatNumber are now accessed via ctx.fmt.currency() and ctx.fmt.number()
+// The context is created in generateExecutiveReport() and passed through helper functions
 
 /**
  * Create a body paragraph with justified alignment (for content after cover page)
@@ -525,6 +517,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ? await import("./reportPrompts_es")
     : await import("./reportPrompts");
   
+  // Create report context with translations and formatters
+  const ctx = createReportContext(language);
+  
   // Destructure all needed constants from the selected language module
   const {
     EXECUTIVE_SUMMARY,
@@ -663,11 +658,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     total_opportunities: data.portfolioMetrics.totalOpportunities.toString(),
     opportunity_count: data.portfolioMetrics.totalOpportunities.toString(),
     consolidation_count_line: consolidationCountLine,
-    annual_benefit: formatCurrency(data.portfolioMetrics.totalAnnualBenefit),
+    annual_benefit: ctx.fmt.currency(data.portfolioMetrics.totalAnnualBenefit),
     payback_period: Math.round(data.portfolioMetrics.averagePaybackMonths).toString(),
     avg_payback: Math.round(data.portfolioMetrics.averagePaybackMonths).toString(),
-    roi_percent: formatNumber(data.portfolioMetrics.averageRoi, 1),
-    fte_savings: formatNumber(data.portfolioMetrics.totalFteSavings, 2),
+    roi_percent: ctx.fmt.number(data.portfolioMetrics.averageRoi, 1),
+    fte_savings: ctx.fmt.number(data.portfolioMetrics.totalFteSavings, 2),
     functions_list: data.portfolioMetrics.functionsList,
     quickwin_count: data.matrixDistribution.quickWins.count.toString(),
     diagnostic_date: diagnosticPeriod,
@@ -735,17 +730,17 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       spacing: { after: 400 },
     }),
     new Paragraph({
-      text: `Diagnostic Period: ${diagnosticPeriod}`,
+      text: `${ctx.t.labels.diagnosticPeriod}: ${diagnosticPeriod}`,
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
     }),
     new Paragraph({
-      text: `Lead Analyst: ${data.company.leadAnalystName || "[Lead Analyst Name]"}`,
+      text: `${ctx.t.labels.leadAnalyst}: ${data.company.leadAnalystName || "[Lead Analyst Name]"}`,
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
     }),
     new Paragraph({
-      text: `Version: v1 - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
+      text: `${ctx.t.labels.version}: v1 - ${ctx.fmt.monthYear(new Date())}`,
       alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
     }),
@@ -781,8 +776,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   // ===== TABLE OF CONTENTS =====
   sections.push(
-    createHeading("Table of Contents", HeadingLevel.HEADING_1),
-    new TableOfContents("Table of Contents", {
+    createHeading(ctx.t.labels.tableOfContents, HeadingLevel.HEADING_1),
+    new TableOfContents(ctx.t.labels.tableOfContents, {
       hyperlink: true,
       headingStyleRange: "1-3",
     }),
@@ -818,10 +813,10 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const top3Rows = data.top3Opportunities.map(opp => [
       opp.workflowName,
       opp.opportunityName,
-      formatCurrency(opp.annualBenefit),
-      formatNumber(opp.roi, 0) + "%",
+      ctx.fmt.currency(opp.annualBenefit),
+      ctx.fmt.number(opp.roi, 0) + "%",
       Math.round(opp.paybackMonths).toString(),
-      formatNumber(opp.fteSavings, 2),
+      ctx.fmt.number(opp.fteSavings, 2),
     ]);
     sections.push(createTableCaption("4.3", TRANSLATIONS.tableCaptions["4.3"], TRANSLATIONS.labels.table));
     sections.push(createTable(top3Headers, top3Rows));
@@ -851,11 +846,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const totalTopFTE = data.top3Opportunities.reduce((sum, opp) => sum + opp.fteSavings, 0);
 
     const financialSummaryRows = [
-      ["Total Annual Benefit", formatCurrency(totalTopBenefit), "Combined quantifiable value across identified opportunities"],
-      ["Total Estimated Implementation Cost", formatCurrency(totalTopCost), "Includes implementation, training, and change management"],
-      ["Average ROI", formatNumber(avgTopROI, 1) + "%", "Modeled under the Conservative Scenario Framework"],
-      ["Average Payback Period", formatNumber(avgTopPayback, 1) + " months", "Time to recover implementation cost"],
-      ["Total FTE Capacity Saved", formatNumber(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
+      ["Total Annual Benefit", ctx.fmt.currency(totalTopBenefit), "Combined quantifiable value across identified opportunities"],
+      ["Total Estimated Implementation Cost", ctx.fmt.currency(totalTopCost), "Includes implementation, training, and change management"],
+      ["Average ROI", ctx.fmt.number(avgTopROI, 1) + "%", "Modeled under the Conservative Scenario Framework"],
+      ["Average Payback Period", ctx.fmt.number(avgTopPayback, 1) + " months", "Time to recover implementation cost"],
+      ["Total FTE Capacity Saved", ctx.fmt.number(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
     ];
 
     sections.push(createTableCaption("4.4", TRANSLATIONS.tableCaptions["4.4"], TRANSLATIONS.labels.table));
@@ -934,9 +929,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       roiRows.push([
         w.workflow.name,
         opp.opportunity.name,
-        formatCurrency(opp.roiMetrics.annualRoi),
-        formatCurrency(parseFloat(opp.opportunity.implementationCost || "0")),
-        formatNumber(opp.roiMetrics.fteSavings, 2),
+        ctx.fmt.currency(opp.roiMetrics.annualRoi),
+        ctx.fmt.currency(parseFloat(opp.opportunity.implementationCost || "0")),
+        ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
         Math.round(opp.roiMetrics.paybackMonths) + " mo",
       ]);
     });
@@ -1030,9 +1025,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase1Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
     const phase1Rows = data.roadmapPhases.phase1QuickWins.map(opp => [
       opp.opportunity.name,
-      formatCurrency(opp.roiMetrics.annualRoi),
+      ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
-      formatNumber(opp.roiMetrics.fteSavings, 2),
+      ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.1", TRANSLATIONS.tableCaptions["6.1"], TRANSLATIONS.labels.table));
     sections.push(createTable(phase1Headers, phase1Rows));
@@ -1054,9 +1049,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase2Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
     const phase2Rows = data.roadmapPhases.phase2Foundational.map(opp => [
       opp.opportunity.name,
-      formatCurrency(opp.roiMetrics.annualRoi),
+      ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
-      formatNumber(opp.roiMetrics.fteSavings, 2),
+      ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.2", TRANSLATIONS.tableCaptions["6.2"], TRANSLATIONS.labels.table));
     sections.push(createTable(phase2Headers, phase2Rows));
@@ -1078,9 +1073,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase3Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
     const phase3Rows = data.roadmapPhases.phase3Strategic.map(opp => [
       opp.opportunity.name,
-      formatCurrency(opp.roiMetrics.annualRoi),
+      ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
-      formatNumber(opp.roiMetrics.fteSavings, 2),
+      ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.3", TRANSLATIONS.tableCaptions["6.3"], TRANSLATIONS.labels.table));
     sections.push(createTable(phase3Headers, phase3Rows));
@@ -1320,8 +1315,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           cons.workflow.name,
           cons.consolidation.name,
           cons.constituentOpportunities.length.toString(),
-          formatCurrency(cons.aggregatedMetrics.totalAnnualRoi),
-          formatNumber(cons.aggregatedMetrics.totalFteSavings, 2),
+          ctx.fmt.currency(cons.aggregatedMetrics.totalAnnualRoi),
+          ctx.fmt.number(cons.aggregatedMetrics.totalFteSavings, 2),
           Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " mo",
           cons.matrixPosition.quadrant,
         ]);
@@ -1373,11 +1368,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       portfolioRows.push([
         w.workflow.name,
         opp.opportunity.name,
-        formatCurrency(opp.roiMetrics.annualRoi),
-        formatCurrency(parseFloat(opp.opportunity.implementationCost || "0")),
-        formatNumber(opp.roiMetrics.fteSavings, 2),
+        ctx.fmt.currency(opp.roiMetrics.annualRoi),
+        ctx.fmt.currency(parseFloat(opp.opportunity.implementationCost || "0")),
+        ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
         Math.round(opp.roiMetrics.paybackMonths) + " mo",
-        formatNumber(weeklyHours, 1),
+        ctx.fmt.number(weeklyHours, 1),
       ]);
     });
   });
@@ -1408,8 +1403,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       const annualHours = opp.roiMetrics.fteSavings * 2080;
       sections.push(createBodyParagraph(
         `Performance Summary. Under the conservative scenario, estimated annual benefit is ` +
-        `${formatCurrency(opp.roiMetrics.annualRoi)}, equivalent to ${formatNumber(opp.roiMetrics.fteSavings, 2)} FTEs or approximately ` +
-        `${formatNumber(annualHours, 0)} hours per year, with an expected payback of ${Math.round(opp.roiMetrics.paybackMonths)} months.`
+        `${ctx.fmt.currency(opp.roiMetrics.annualRoi)}, equivalent to ${ctx.fmt.number(opp.roiMetrics.fteSavings, 2)} FTEs or approximately ` +
+        `${ctx.fmt.number(annualHours, 0)} hours per year, with an expected payback of ${Math.round(opp.roiMetrics.paybackMonths)} months.`
       ));
       
       // Key Metrics Table (9 rows)
@@ -1421,15 +1416,15 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       
       const keyMetricsHeaders = ["Metric", "Value"];
       const keyMetricsRows = [
-        ["Annual Benefit", formatCurrency(opp.roiMetrics.annualRoi)],
-        ["Estimated Implementation Cost", formatCurrency(implCost)],
+        ["Annual Benefit", ctx.fmt.currency(opp.roiMetrics.annualRoi)],
+        ["Estimated Implementation Cost", ctx.fmt.currency(implCost)],
         ["Payback Period", `${Math.round(opp.roiMetrics.paybackMonths)} months`],
-        ["1-Year Net Benefit", formatCurrency(year1Net)],
-        ["3-Year Net Benefit", formatCurrency(year3Net)],
-        ["5-Year Net Benefit", formatCurrency(year5Net)],
-        ["FTE Saved", formatNumber(opp.roiMetrics.fteSavings, 2)],
-        ["Annual Hours Saved", formatNumber(annualHours, 0)],
-        ["Weekly Hours Saved", formatNumber(weeklyHours, 1)],
+        ["1-Year Net Benefit", ctx.fmt.currency(year1Net)],
+        ["3-Year Net Benefit", ctx.fmt.currency(year3Net)],
+        ["5-Year Net Benefit", ctx.fmt.currency(year5Net)],
+        ["FTE Saved", ctx.fmt.number(opp.roiMetrics.fteSavings, 2)],
+        ["Annual Hours Saved", ctx.fmt.number(annualHours, 0)],
+        ["Weekly Hours Saved", ctx.fmt.number(weeklyHours, 1)],
       ];
       sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics", TRANSLATIONS.labels.table));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
@@ -1438,7 +1433,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       // Business Impact Components Table
       const impactHeaders = ["Impact Area", "Key Metrics", "Description"];
       const impactRows = [
-        ["Time Savings", `${formatNumber(annualHours, 0)} hours/year`, "Primary efficiency gain from process automation"],
+        ["Time Savings", `${ctx.fmt.number(annualHours, 0)} hours/year`, "Primary efficiency gain from process automation"],
         ["Quality Impact", "Conservative estimate", "Error reduction benefits modeled conservatively where data available"],
         ["Revenue Uplift", "To be validated", "Capacity reallocation potential subject to business validation"],
         ["Ramp-Up Period", "3 months", "Time to reach steady-state performance after implementation"],
