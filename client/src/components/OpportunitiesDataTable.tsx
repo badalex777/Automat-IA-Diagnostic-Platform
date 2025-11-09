@@ -1,5 +1,8 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { ChevronRight, ChevronDown } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,9 +18,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ImplementationOpportunity, Workflow, WorkflowStep } from "@shared/schema";
+import type { ImplementationOpportunity, Workflow, WorkflowStep, WorkflowConsolidation } from "@shared/schema";
 import { calculateBaseImpact, calculateEnhancedImpact, calculateImplementationEffort } from "@shared/opportunityCalculations";
 import type { CompanyContext } from "@shared/opportunityCalculations";
+import {
+  calculateConsolidatedMetrics,
+  calculateConsolidationBusinessImpact,
+  type ConsolidatedMetrics,
+} from "@shared/consolidationCalculations";
 
 interface OpportunitiesDataTableProps {
   opportunities: ImplementationOpportunity[];
@@ -26,6 +34,7 @@ interface OpportunitiesDataTableProps {
   readinessScores: Record<string, number>;
   companyContext: CompanyContext;
   matrixType: 'base' | 'enhanced';
+  consolidations?: WorkflowConsolidation[];
 }
 
 type SortOption = 
@@ -36,6 +45,46 @@ type SortOption =
   | 'workflow'
   | 'roadmap';
 
+// Discriminated union for unified table rows
+type TableRow =
+  | {
+      kind: 'opportunity';
+      id: string;
+      name: string;
+      workflowId: string;
+      workflow?: Workflow;
+      linkedStep?: WorkflowStep;
+      displayImpact: number;
+      effortScore: number;
+      readinessScore: number;
+      opportunity: ImplementationOpportunity;
+    }
+  | {
+      kind: 'consolidation';
+      id: string;
+      name: string;
+      workflowId: string;
+      workflow?: Workflow;
+      displayImpact: number;
+      effortScore: number;
+      readinessScore: number;
+      constituentCount: number;
+      consolidation: WorkflowConsolidation;
+      constituentOpportunities: ImplementationOpportunity[];
+    }
+  | {
+      kind: 'constituent';
+      id: string;
+      parentId: string;
+      name: string;
+      workflowId: string;
+      workflow?: Workflow;
+      linkedStep?: WorkflowStep;
+      displayImpact: number;
+      effortScore: number;
+      opportunity: ImplementationOpportunity;
+    };
+
 export function OpportunitiesDataTable({
   opportunities,
   workflows,
@@ -43,8 +92,11 @@ export function OpportunitiesDataTable({
   readinessScores,
   companyContext,
   matrixType,
+  consolidations = [],
 }: OpportunitiesDataTableProps) {
   const [sortBy, setSortBy] = useState<SortOption>('roadmap');
+  const [showConsolidations, setShowConsolidations] = useState(true);
+  const [expandedConsolidations, setExpandedConsolidations] = useState<Set<string>>(new Set());
 
   // Workflow colors for visual coding - professional palette
   const workflowColors = useMemo(() => {
@@ -65,56 +117,118 @@ export function OpportunitiesDataTable({
     return workflowColorMap;
   }, [workflows]);
 
-  // Calculate scores and enrich opportunities
-  const enrichedOpportunities = useMemo(() => {
-    return opportunities.map(opp => {
+  // Build unified row array with both opportunities and consolidations
+  const unifiedRows = useMemo((): TableRow[] => {
+    const rows: TableRow[] = [];
+    
+    // Add opportunity rows
+    opportunities.forEach(opp => {
       const readinessScore = opp.stepId ? (readinessScores[opp.stepId] || 0) : 0;
       const baseImpact = calculateBaseImpact(opp, companyContext);
-      
-      // For enhanced impact, enable all toggles (error + revenue metrics)
       const enhancedImpact = calculateEnhancedImpact(
         opp, 
         { errorMetrics: true, revenueMetrics: true }, 
         companyContext
       );
-      
       const effortScore = calculateImplementationEffort(
         readinessScore,
         parseFloat(opp.rampupPeriodMonths || "0"),
         parseFloat(opp.paybackPeriodMonths || "0"),
         parseFloat(opp.trainingHoursPerEmployee || "0")
       );
-      
       const workflow = workflows.find(w => w.id === opp.workflowId);
       const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
-      
-      // Select the appropriate impact score based on matrix type
       const displayImpact = matrixType === 'enhanced' ? enhancedImpact : baseImpact;
       
-      return {
-        ...opp,
+      rows.push({
+        kind: 'opportunity',
+        id: opp.id,
+        name: opp.name,
+        workflowId: opp.workflowId,
         workflow,
         linkedStep,
-        readinessScore,
-        baseImpact,
-        enhancedImpact,
-        displayImpact, // The score to use for sorting and display
+        displayImpact,
         effortScore,
-      };
+        readinessScore,
+        opportunity: opp,
+      });
     });
-  }, [opportunities, readinessScores, workflows, workflowSteps, companyContext, matrixType]);
+    
+    // Add consolidation rows if showConsolidations is enabled
+    if (showConsolidations) {
+      consolidations.forEach(consolidation => {
+        // Get constituent opportunities
+        const constituentOpps = opportunities.filter(opp => 
+          consolidation.opportunityIds.includes(opp.id)
+        );
+        
+        if (constituentOpps.length === 0) return; // Skip empty consolidations
+        
+        const workflow = workflows.find(w => w.id === consolidation.workflowId);
+        
+        // Calculate consolidation metrics using shared calculations
+        const metrics = calculateConsolidatedMetrics(constituentOpps);
+        
+        // Calculate weighted average readiness from constituents
+        let totalReadinessWeight = 0;
+        let weightedReadinessSum = 0;
+        constituentOpps.forEach(opp => {
+          if (opp.stepId) {
+            const readiness = readinessScores[opp.stepId] || 0;
+            const weight = parseFloat(opp.fteSavings?.toString() || '0');
+            if (weight > 0) {
+              weightedReadinessSum += readiness * weight;
+              totalReadinessWeight += weight;
+            }
+          }
+        });
+        const consolidationReadiness = totalReadinessWeight > 0 
+          ? weightedReadinessSum / totalReadinessWeight 
+          : 0;
+        
+        // Calculate business impact from consolidated metrics
+        const consolidationImpact = calculateConsolidationBusinessImpact(
+          metrics,
+          companyContext
+        );
+        
+        // Calculate implementation effort using weighted periods from metrics
+        const consolidationEffort = calculateImplementationEffort(
+          consolidationReadiness,
+          metrics.weightedAvgRampupPeriodMonths,
+          metrics.weightedAvgPaybackPeriodMonths,
+          metrics.weightedAvgTrainingHoursPerEmployee
+        );
+        
+        rows.push({
+          kind: 'consolidation',
+          id: consolidation.id,
+          name: consolidation.name,
+          workflowId: consolidation.workflowId,
+          workflow,
+          displayImpact: consolidationImpact,
+          effortScore: consolidationEffort,
+          readinessScore: consolidationReadiness,
+          constituentCount: constituentOpps.length,
+          consolidation,
+          constituentOpportunities: constituentOpps,
+        });
+      });
+    }
+    
+    return rows;
+  }, [opportunities, consolidations, readinessScores, workflows, workflowSteps, companyContext, matrixType, showConsolidations]);
 
-  // Sort opportunities
-  const sortedOpportunities = useMemo(() => {
-    const sorted = [...enrichedOpportunities];
+  // Sort unified rows
+  const sortedRows = useMemo(() => {
+    const sorted = [...unifiedRows];
     
     // Calculate max values with zero-protection for roadmap sorting
-    // Use displayImpact (which respects matrixType) for calculations
     const maxImpact = sorted.length > 0 
-      ? Math.max(...sorted.map(o => o.displayImpact), 0.001) // Guard against zero
+      ? Math.max(...sorted.map(r => r.displayImpact), 0.001) // Guard against zero
       : 1;
     const maxEffort = sorted.length > 0 
-      ? Math.max(...sorted.map(o => o.effortScore), 0.001) // Guard against zero
+      ? Math.max(...sorted.map(r => r.effortScore), 0.001) // Guard against zero
       : 1;
     
     switch (sortBy) {
@@ -127,7 +241,7 @@ export function OpportunitiesDataTable({
       case 'effort-low':
         return sorted.sort((a, b) => a.effortScore - b.effortScore);
       case 'workflow':
-        // Compare each opportunity's associated workflow name, fall back to opportunity name
+        // Sort by workflow name, then by row name
         return sorted.sort((a, b) => {
           const workflowComparison = (a.workflow?.name || '').localeCompare(b.workflow?.name || '');
           return workflowComparison !== 0 ? workflowComparison : a.name.localeCompare(b.name);
@@ -145,12 +259,12 @@ export function OpportunitiesDataTable({
       default:
         return sorted;
     }
-  }, [enrichedOpportunities, sortBy]);
+  }, [unifiedRows, sortBy]);
 
   // Get color for business impact score (green = good, red = bad)
   const getImpactColor = (score: number) => {
-    // Use displayImpact for max calculation to respect current matrix type
-    const maxImpact = Math.max(...enrichedOpportunities.map(o => o.displayImpact), 0.001);
+    // Use displayImpact for max calculation from current rows
+    const maxImpact = Math.max(...sortedRows.map(r => r.displayImpact), 0.001);
     const normalized = maxImpact > 0 ? (score / maxImpact) * 100 : 0;
     
     if (normalized >= 75) return 'text-green-700 dark:text-green-400 font-semibold';
@@ -161,7 +275,7 @@ export function OpportunitiesDataTable({
 
   // Get color for implementation effort score (green = low effort/good, red = high effort/bad)
   const getEffortColor = (score: number) => {
-    const maxEffort = Math.max(...enrichedOpportunities.map(o => o.effortScore));
+    const maxEffort = Math.max(...sortedRows.map(r => r.effortScore), 0.001);
     const normalized = maxEffort > 0 ? (score / maxEffort) * 100 : 0;
     
     // Inverse: lower effort is better (green), higher effort is worse (red)
@@ -171,31 +285,63 @@ export function OpportunitiesDataTable({
     return 'text-green-700 dark:text-green-400 font-semibold';
   };
 
+  // Toggle consolidation expansion
+  const toggleConsolidationExpansion = (consolidationId: string) => {
+    setExpandedConsolidations(prev => {
+      const next = new Set(prev);
+      if (next.has(consolidationId)) {
+        next.delete(consolidationId);
+      } else {
+        next.add(consolidationId);
+      }
+      return next;
+    });
+  };
+
   return (
     <Card className="p-6 mt-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold">Opportunities Overview</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            {matrixType === 'base' ? 'Base Impact' : 'Enhanced Impact'} analysis with {sortedOpportunities.length} opportunities
+            {matrixType === 'base' ? 'Base Impact' : 'Enhanced Impact'} analysis with {sortedRows.length} items
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Sort by:</span>
-          <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-            <SelectTrigger className="w-[220px]" data-testid="select-sort-opportunities">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="roadmap">Roadmap Priority</SelectItem>
-              <SelectItem value="impact-high">Highest Business Impact</SelectItem>
-              <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
-              <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
-              <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
-              <SelectItem value="workflow">Sort by Workflow</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-4">
+          {consolidations.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Checkbox 
+                id="show-table-consolidations" 
+                checked={showConsolidations}
+                onCheckedChange={(checked) => setShowConsolidations(!!checked)}
+                data-testid="checkbox-show-table-consolidations"
+              />
+              <Label 
+                htmlFor="show-table-consolidations" 
+                className="text-sm cursor-pointer"
+              >
+                Show Consolidations ({consolidations.length})
+              </Label>
+            </div>
+          )}
+          
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Sort by:</span>
+            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
+              <SelectTrigger className="w-[220px]" data-testid="select-sort-opportunities">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="roadmap">Roadmap Priority</SelectItem>
+                <SelectItem value="impact-high">Highest Business Impact</SelectItem>
+                <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
+                <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
+                <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
+                <SelectItem value="workflow">Sort by Workflow</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -203,7 +349,8 @@ export function OpportunitiesDataTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Opportunity Name</TableHead>
+              <TableHead className="w-[180px]">Type</TableHead>
+              <TableHead>Name</TableHead>
               <TableHead>Source Workflow</TableHead>
               <TableHead>Source Step</TableHead>
               <TableHead className="text-right">Business Impact</TableHead>
@@ -211,28 +358,106 @@ export function OpportunitiesDataTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedOpportunities.map((opp) => {
-              const colors = opp.workflow ? workflowColors[opp.workflow.id] : null;
+            {sortedRows.flatMap((row) => {
+              const colors = row.workflow ? workflowColors[row.workflow.id] : null;
+              const rows: JSX.Element[] = [];
               
-              return (
-                <TableRow 
-                  key={opp.id} 
-                  className={`${colors?.bg || ''} border-l-4 ${colors?.border || 'border-l-transparent'}`}
-                  data-testid={`table-row-opportunity-${opp.id}`}
-                >
-                  <TableCell className="font-medium">{opp.name}</TableCell>
-                  <TableCell>{opp.workflow?.name || 'N/A'}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {opp.linkedStep?.stepName || 'N/A'}
-                  </TableCell>
-                  <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(opp.displayImpact)}`}>
-                    {opp.displayImpact.toFixed(2)}
-                  </TableCell>
-                  <TableCell className={`text-right font-mono tabular-nums ${getEffortColor(opp.effortScore)}`}>
-                    {opp.effortScore.toFixed(2)}
-                  </TableCell>
-                </TableRow>
-              );
+              if (row.kind === 'opportunity') {
+                rows.push(
+                  <TableRow 
+                    key={row.id} 
+                    className={`${colors?.bg || ''} border-l-4 ${colors?.border || 'border-l-transparent'}`}
+                    data-testid={`table-row-opportunity-${row.id}`}
+                  >
+                    <TableCell className="text-sm text-muted-foreground">Opportunity</TableCell>
+                    <TableCell className="font-medium">{row.name}</TableCell>
+                    <TableCell>{row.workflow?.name || 'N/A'}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {row.linkedStep?.stepName || 'N/A'}
+                    </TableCell>
+                    <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(row.displayImpact)}`}>
+                      {row.displayImpact.toFixed(2)}
+                    </TableCell>
+                    <TableCell className={`text-right font-mono tabular-nums ${getEffortColor(row.effortScore)}`}>
+                      {row.effortScore.toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                );
+              } else if (row.kind === 'consolidation') {
+                const isExpanded = expandedConsolidations.has(row.id);
+                
+                rows.push(
+                  <TableRow 
+                    key={row.id} 
+                    className={`${colors?.bg || ''} border-l-4 ${colors?.border || 'border-l-transparent'} font-semibold`}
+                    data-testid={`table-row-consolidation-${row.id}`}
+                  >
+                    <TableCell>
+                      <button
+                        onClick={() => toggleConsolidationExpansion(row.id)}
+                        className="flex items-center gap-1 text-sm hover-elevate active-elevate-2"
+                        data-testid={`button-expand-consolidation-${row.id}`}
+                      >
+                        {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        <span>Consolidation ({row.constituentCount})</span>
+                      </button>
+                    </TableCell>
+                    <TableCell className="font-semibold">{row.name}</TableCell>
+                    <TableCell>{row.workflow?.name || 'N/A'}</TableCell>
+                    <TableCell className="text-muted-foreground">—</TableCell>
+                    <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(row.displayImpact)}`}>
+                      {row.displayImpact.toFixed(2)}
+                    </TableCell>
+                    <TableCell className={`text-right font-mono tabular-nums ${getEffortColor(row.effortScore)}`}>
+                      {row.effortScore.toFixed(2)}
+                    </TableCell>
+                  </TableRow>
+                );
+                
+                // Render constituent rows if expanded
+                if (isExpanded) {
+                  row.constituentOpportunities.forEach(opp => {
+                    const oppReadiness = opp.stepId ? (readinessScores[opp.stepId] || 0) : 0;
+                    const oppBaseImpact = calculateBaseImpact(opp, companyContext);
+                    const oppEnhancedImpact = calculateEnhancedImpact(
+                      opp,
+                      { errorMetrics: true, revenueMetrics: true },
+                      companyContext
+                    );
+                    const oppDisplayImpact = matrixType === 'enhanced' ? oppEnhancedImpact : oppBaseImpact;
+                    const oppEffort = calculateImplementationEffort(
+                      oppReadiness,
+                      parseFloat(opp.rampupPeriodMonths || "0"),
+                      parseFloat(opp.paybackPeriodMonths || "0"),
+                      parseFloat(opp.trainingHoursPerEmployee || "0")
+                    );
+                    const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
+                    
+                    rows.push(
+                      <TableRow 
+                        key={`constituent-${row.id}-${opp.id}`} 
+                        className={`${colors?.bg || 'bg-muted/30'} border-l-4 ${colors?.border || 'border-l-transparent'} opacity-80`}
+                        data-testid={`table-row-constituent-${opp.id}`}
+                      >
+                        <TableCell className="text-sm text-muted-foreground pl-6">—</TableCell>
+                        <TableCell className="pl-6">{opp.name}</TableCell>
+                        <TableCell>{row.workflow?.name || 'N/A'}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {linkedStep?.stepName || 'N/A'}
+                        </TableCell>
+                        <TableCell className={`text-right font-mono tabular-nums ${getImpactColor(oppDisplayImpact)}`}>
+                          {oppDisplayImpact.toFixed(2)}
+                        </TableCell>
+                        <TableCell className={`text-right font-mono tabular-nums ${getEffortColor(oppEffort)}`}>
+                          {oppEffort.toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  });
+                }
+              }
+              
+              return rows;
             })}
           </TableBody>
         </Table>

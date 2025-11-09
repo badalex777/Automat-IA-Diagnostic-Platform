@@ -718,6 +718,7 @@ export default function CompanyDetail() {
                         workflows={workflows}
                         workflowSteps={allSteps}
                         readinessScores={readinessScores}
+                        consolidations={consolidations}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,
@@ -742,6 +743,7 @@ export default function CompanyDetail() {
                         workflows={workflows}
                         workflowSteps={allSteps}
                         readinessScores={readinessScores}
+                        consolidations={consolidations}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,
