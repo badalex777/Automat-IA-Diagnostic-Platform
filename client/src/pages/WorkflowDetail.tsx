@@ -32,10 +32,11 @@ import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
 import { OpportunityForm } from "@/components/OpportunityForm";
+import { ConsolidationDialog } from "@/components/ConsolidationDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep, PIFResponse } from "@shared/schema";
+import type { Workflow, Company, TFAAssessment, BusinessImpact, ImplementationOpportunity, WorkflowStep, PIFResponse, WorkflowConsolidation, InsertWorkflowConsolidation } from "@shared/schema";
 import { tfaSections as allSections, TFA_QUESTIONS, TFA_SECTIONS } from "@shared/tfaQuestions";
 import { detectKnowledgeGaps, hasKnowledgeGaps } from "@shared/knowledgeGaps";
 import { aggregateWorkflowSWOT, aggregateExecutiveSummaries, generateSWOTAnalysis, calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
@@ -65,6 +66,8 @@ export default function WorkflowDetail() {
   const [participantRole, setParticipantRole] = useState("");
   const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [oppSortBy, setOppSortBy] = useState<'impact-high' | 'impact-low' | 'effort-high' | 'effort-low' | 'name' | 'roadmap'>('roadmap');
+  const [isConsolidationDialogOpen, setIsConsolidationDialogOpen] = useState(false);
+  const [editConsolidation, setEditConsolidation] = useState<WorkflowConsolidation | null>(null);
 
   // Read tab query parameter for navigation from step detail page
   const urlParams = new URLSearchParams(window.location.search);
@@ -101,6 +104,11 @@ export default function WorkflowDetail() {
 
   const { data: workflowSteps = [], isLoading: stepsLoading, error: stepsError } = useQuery<WorkflowStep[]>({
     queryKey: [`/api/workflows/${workflowId}/steps`],
+    enabled: !!workflowId,
+  });
+
+  const { data: consolidations = [], isLoading: consolidationsLoading } = useQuery<WorkflowConsolidation[]>({
+    queryKey: [`/api/workflows/${workflowId}/consolidations`],
     enabled: !!workflowId,
   });
 
@@ -275,6 +283,72 @@ export default function WorkflowDetail() {
       toast({
         title: "Error updating opportunity",
         description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createConsolidationMutation = useMutation({
+    mutationFn: async (data: InsertWorkflowConsolidation) => {
+      const res = await apiRequest('POST', `/api/workflows/${workflowId}/consolidations`, data);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      toast({
+        title: "Consolidation created",
+        description: "Workflow consolidation has been created successfully.",
+      });
+      setIsConsolidationDialogOpen(false);
+      setEditConsolidation(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create consolidation",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateConsolidationMutation = useMutation({
+    mutationFn: async (data: { consolidationId: string; updates: Partial<InsertWorkflowConsolidation> }) => {
+      const res = await apiRequest('PATCH', `/api/consolidations/${data.consolidationId}`, data.updates);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      toast({
+        title: "Consolidation updated",
+        description: "Workflow consolidation has been updated successfully.",
+      });
+      setIsConsolidationDialogOpen(false);
+      setEditConsolidation(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update consolidation",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteConsolidationMutation = useMutation({
+    mutationFn: async (consolidationId: string) => {
+      await apiRequest('DELETE', `/api/consolidations/${consolidationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      toast({
+        title: "Consolidation deleted",
+        description: "Workflow consolidation has been deleted successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete consolidation",
         variant: "destructive",
       });
     },
@@ -844,21 +918,31 @@ export default function WorkflowDetail() {
                           Calculated scores for business impact and implementation effort
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Sort by:</span>
-                        <Select value={oppSortBy} onValueChange={(value) => setOppSortBy(value as typeof oppSortBy)}>
-                          <SelectTrigger className="w-[220px]" data-testid="select-sort-workflow-opportunities">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="roadmap">Roadmap Priority</SelectItem>
-                            <SelectItem value="impact-high">Highest Business Impact</SelectItem>
-                            <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
-                            <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
-                            <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
-                            <SelectItem value="name">Sort by Name</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          onClick={() => setIsConsolidationDialogOpen(true)}
+                          size="sm"
+                          data-testid="button-create-consolidation"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Create Consolidation
+                        </Button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Sort by:</span>
+                          <Select value={oppSortBy} onValueChange={(value) => setOppSortBy(value as typeof oppSortBy)}>
+                            <SelectTrigger className="w-[220px]" data-testid="select-sort-workflow-opportunities">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="roadmap">Roadmap Priority</SelectItem>
+                              <SelectItem value="impact-high">Highest Business Impact</SelectItem>
+                              <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
+                              <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
+                              <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
+                              <SelectItem value="name">Sort by Name</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                     <div className="border rounded-lg">
@@ -1499,6 +1583,31 @@ export default function WorkflowDetail() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Consolidation Dialog */}
+        <ConsolidationDialog
+          workflowId={workflowId}
+          opportunities={opportunities}
+          steps={workflowSteps}
+          open={isConsolidationDialogOpen}
+          onOpenChange={setIsConsolidationDialogOpen}
+          onSubmit={(data) => {
+            if (editConsolidation) {
+              updateConsolidationMutation.mutate({
+                consolidationId: editConsolidation.id,
+                updates: data,
+              });
+            } else {
+              createConsolidationMutation.mutate(data);
+            }
+          }}
+          isLoading={createConsolidationMutation.isPending || updateConsolidationMutation.isPending}
+          initialData={editConsolidation ? {
+            id: editConsolidation.id,
+            name: editConsolidation.name,
+            opportunityIds: editConsolidation.opportunityIds,
+          } : undefined}
+        />
       </div>
     </div>
   );
