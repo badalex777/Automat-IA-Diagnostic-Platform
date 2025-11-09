@@ -1424,10 +1424,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/opportunities/:id", async (req, res) => {
     try {
-      const success = await storage.deleteImplementationOpportunity(req.params.id);
+      const opportunityId = req.params.id;
+      
+      // Get the opportunity to find its workflow
+      const opportunity = await storage.getImplementationOpportunity(opportunityId);
+      if (!opportunity) {
+        return res.status(404).json({ error: "Opportunity not found" });
+      }
+
+      // Get all consolidations for this workflow
+      const consolidations = await storage.getConsolidationsByWorkflow(opportunity.workflowId);
+      
+      // Find consolidations that include this opportunity
+      const affectedConsolidations = consolidations.filter(c => 
+        c.opportunityIds.includes(opportunityId)
+      );
+
+      // Update or delete affected consolidations
+      for (const consolidation of affectedConsolidations) {
+        const newOpportunityIds = consolidation.opportunityIds.filter(id => id !== opportunityId);
+        
+        if (newOpportunityIds.length < 2) {
+          // Delete consolidation if fewer than 2 constituents remain
+          await storage.deleteWorkflowConsolidation(consolidation.id);
+        } else {
+          // Update consolidation with remaining opportunity IDs
+          await storage.updateWorkflowConsolidation(consolidation.id, {
+            opportunityIds: newOpportunityIds
+          });
+        }
+      }
+
+      // Delete the opportunity
+      const success = await storage.deleteImplementationOpportunity(opportunityId);
       if (!success) {
         return res.status(404).json({ error: "Opportunity not found" });
       }
+      
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: "Internal server error" });

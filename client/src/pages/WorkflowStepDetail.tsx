@@ -15,7 +15,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChevronLeft, Plus, FileText, BarChart3, Target, Info } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ChevronLeft, Plus, FileText, BarChart3, Target, Info, Pencil, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
@@ -35,6 +45,8 @@ export default function WorkflowStepDetail() {
   const stepId = params?.stepId || '';
   const { toast } = useToast();
   const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
+  const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
 
   const { data: company, isLoading: companyLoading } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -88,6 +100,54 @@ export default function WorkflowStepDetail() {
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to create opportunity",
+      });
+    },
+  });
+
+  const updateOpportunityMutation = useMutation({
+    mutationFn: async (data: { opportunityId: string; updates: any }) => {
+      const res = await apiRequest('PATCH', `/api/opportunities/${data.opportunityId}`, data.updates);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      toast({
+        title: "Opportunity updated",
+        description: "Opportunity has been updated successfully.",
+      });
+      setEditOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error updating opportunity",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteOpportunityMutation = useMutation({
+    mutationFn: async (opportunityId: string) => {
+      const res = await apiRequest('DELETE', `/api/opportunities/${opportunityId}`);
+      if (!res.ok) throw new Error('Failed to delete opportunity');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      if (workflow?.companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${workflow.companyId}/consolidations`] });
+      }
+      toast({
+        title: "Opportunity deleted",
+        description: "Opportunity has been deleted successfully.",
+      });
+      setDeleteOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting opportunity",
+        description: error.message,
+        variant: "destructive",
       });
     },
   });
@@ -405,7 +465,27 @@ export default function WorkflowStepDetail() {
                   <Card key={opp.id} className="p-6" data-testid={`card-opportunity-${opp.id}`}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold">{opp.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold">{opp.name}</h3>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            onClick={() => setEditOpportunity(opp)}
+                            data-testid={`button-edit-opportunity-${opp.id}`}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7"
+                            onClick={() => setDeleteOpportunity(opp)}
+                            data-testid={`button-delete-opportunity-${opp.id}`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                         {opp.description && (
                           <p className="text-sm text-muted-foreground mt-1">{opp.description}</p>
                         )}
@@ -468,6 +548,73 @@ export default function WorkflowStepDetail() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Edit Opportunity Dialog */}
+      <Dialog open={!!editOpportunity} onOpenChange={(open) => !open && setEditOpportunity(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit-opportunity">
+          <DialogHeader>
+            <DialogTitle>Edit Opportunity</DialogTitle>
+          </DialogHeader>
+          {editOpportunity && (
+            <OpportunityForm
+              workflowId={workflowId}
+              stepId={stepId}
+              initialData={{
+                ...editOpportunity,
+                annualRoi: editOpportunity.annualRoi ? parseFloat(editOpportunity.annualRoi.toString()) : undefined,
+                implementationCost: editOpportunity.implementationCost ? parseFloat(editOpportunity.implementationCost.toString()) : undefined,
+                annualRunRateRoi: editOpportunity.annualRunRateRoi ? parseFloat(editOpportunity.annualRunRateRoi.toString()) : undefined,
+                cumulativeNetBenefit3Year: editOpportunity.cumulativeNetBenefit3Year ? parseFloat(editOpportunity.cumulativeNetBenefit3Year.toString()) : undefined,
+                cumulativeNetBenefit5Year: editOpportunity.cumulativeNetBenefit5Year ? parseFloat(editOpportunity.cumulativeNetBenefit5Year.toString()) : undefined,
+                hoursSavedPerWeek: editOpportunity.hoursSavedPerWeek ? parseFloat(editOpportunity.hoursSavedPerWeek.toString()) : undefined,
+                annualHoursSaved: editOpportunity.annualHoursSaved ? parseFloat(editOpportunity.annualHoursSaved.toString()) : undefined,
+                fteSavings: editOpportunity.fteSavings ? parseFloat(editOpportunity.fteSavings.toString()) : undefined,
+                errorReductionPct: editOpportunity.errorReductionPct ? parseFloat(editOpportunity.errorReductionPct.toString()) : undefined,
+                hoursReallocatedToRevenue: editOpportunity.hoursReallocatedToRevenue ? parseFloat(editOpportunity.hoursReallocatedToRevenue.toString()) : undefined,
+                revenueUpliftAnnual: editOpportunity.revenueUpliftAnnual ? parseFloat(editOpportunity.revenueUpliftAnnual.toString()) : undefined,
+                rampupPeriodMonths: editOpportunity.rampupPeriodMonths ? parseFloat(editOpportunity.rampupPeriodMonths.toString()) : undefined,
+                paybackPeriodMonths: editOpportunity.paybackPeriodMonths ? parseFloat(editOpportunity.paybackPeriodMonths.toString()) : undefined,
+                trainingHoursPerEmployee: editOpportunity.trainingHoursPerEmployee ? parseFloat(editOpportunity.trainingHoursPerEmployee.toString()) : undefined,
+                errorsAvoidedAnnually: editOpportunity.errorsAvoidedAnnually ?? undefined,
+              }}
+              onSubmit={(data) => {
+                updateOpportunityMutation.mutate({
+                  opportunityId: editOpportunity.id,
+                  updates: data,
+                });
+              }}
+              onCancel={() => setEditOpportunity(null)}
+              isLoading={updateOpportunityMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Opportunity Confirmation Dialog */}
+      <AlertDialog open={!!deleteOpportunity} onOpenChange={(open) => !open && setDeleteOpportunity(null)}>
+        <AlertDialogContent data-testid="dialog-delete-opportunity">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Opportunity</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{deleteOpportunity?.name}"? This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteOpportunity) {
+                  deleteOpportunityMutation.mutate(deleteOpportunity.id);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {deleteOpportunityMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

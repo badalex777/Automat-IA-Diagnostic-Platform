@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus } from "lucide-react";
+import { ChevronLeft, Pencil, Check, X, ChevronDown, Plus, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -51,6 +51,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
@@ -67,6 +77,7 @@ export default function WorkflowDetail() {
   const [participantName, setParticipantName] = useState("");
   const [participantRole, setParticipantRole] = useState("");
   const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [oppSortBy, setOppSortBy] = useState<'impact-high' | 'impact-low' | 'effort-high' | 'effort-low' | 'name' | 'roadmap'>('roadmap');
   const [isConsolidationDialogOpen, setIsConsolidationDialogOpen] = useState(false);
   const [editConsolidation, setEditConsolidation] = useState<WorkflowConsolidation | null>(null);
@@ -286,6 +297,32 @@ export default function WorkflowDetail() {
     onError: (error: Error) => {
       toast({
         title: "Error updating opportunity",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteOpportunityMutation = useMutation({
+    mutationFn: async (opportunityId: string) => {
+      const res = await apiRequest('DELETE', `/api/opportunities/${opportunityId}`);
+      if (!res.ok) throw new Error('Failed to delete opportunity');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/opportunities`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      if (workflow?.companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${workflow.companyId}/consolidations`] });
+      }
+      toast({
+        title: "Opportunity deleted",
+        description: "Opportunity has been deleted successfully.",
+      });
+      setDeleteOpportunity(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error deleting opportunity",
         description: error.message,
         variant: "destructive",
       });
@@ -965,6 +1002,15 @@ export default function WorkflowDetail() {
                                   >
                                     <Pencil className="h-3.5 w-3.5" />
                                   </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onClick={() => setDeleteOpportunity(opportunity)}
+                                    data-testid={`button-delete-opportunity-${opportunity.id}`}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
                                 </div>
                                 {opportunity.linkedStep && (
                                   <p className="text-sm text-muted-foreground mt-1">
@@ -1553,6 +1599,7 @@ export default function WorkflowDetail() {
                   rampupPeriodMonths: editOpportunity.rampupPeriodMonths ? parseFloat(editOpportunity.rampupPeriodMonths.toString()) : undefined,
                   paybackPeriodMonths: editOpportunity.paybackPeriodMonths ? parseFloat(editOpportunity.paybackPeriodMonths.toString()) : undefined,
                   trainingHoursPerEmployee: editOpportunity.trainingHoursPerEmployee ? parseFloat(editOpportunity.trainingHoursPerEmployee.toString()) : undefined,
+                  errorsAvoidedAnnually: editOpportunity.errorsAvoidedAnnually ?? undefined,
                 }}
                 onSubmit={(data) => {
                   updateOpportunityMutation.mutate({
@@ -1566,6 +1613,37 @@ export default function WorkflowDetail() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Delete Opportunity Confirmation Dialog */}
+        <AlertDialog open={!!deleteOpportunity} onOpenChange={(open) => !open && setDeleteOpportunity(null)}>
+          <AlertDialogContent data-testid="dialog-delete-opportunity">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Opportunity</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{deleteOpportunity?.name}"? This cannot be undone.
+                {consolidations.some(c => c.opportunityIds.includes(deleteOpportunity?.id || '')) && (
+                  <span className="block mt-2 text-orange-600 dark:text-orange-400 font-medium">
+                    This opportunity is part of a consolidation and will be automatically removed from it.
+                  </span>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (deleteOpportunity) {
+                    deleteOpportunityMutation.mutate(deleteOpportunity.id);
+                  }
+                }}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                data-testid="button-confirm-delete"
+              >
+                {deleteOpportunityMutation.isPending ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Consolidation Dialog */}
         <ConsolidationDialog
