@@ -4,6 +4,14 @@
 
 The Automat-IA Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level. The platform uses Technical Feasibility Assessments (TFA, workflow-level) and Process Insight Forms (PIF, step-level) to evaluate each process step. It generates step-specific readiness scores, SWOT analyses, and identifies implementation opportunities, culminating in comprehensive Executive Diagnostic Reports. The platform's vision is to provide consultants with detailed insights for AI adoption, enabling precise project scoping and impact measurement.
 
+## Recent Changes
+
+### November 9, 2025 - EDR Formatting Refinements
+- Reduced spacing after Phase titles, methodology subsections, and subsection headings from 120pt to 60pt to eliminate excessive white space
+- Added conditional consolidation count to Section 4.2 Key Diagnostic Findings (displays only when consolidations exist)
+- Removed "culture" reference from Phase 8 methodology description
+- EDR generation endpoint validates that company has at least one workflow with both TFA and PIF completed before allowing report generation
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
