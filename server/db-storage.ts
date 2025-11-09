@@ -9,6 +9,7 @@ import {
   pifResponses,
   businessImpact,
   implementationOpportunities,
+  workflowConsolidations,
   type Company,
   type InsertCompany,
   type Workflow,
@@ -23,6 +24,8 @@ import {
   type InsertBusinessImpact,
   type ImplementationOpportunity,
   type InsertImplementationOpportunity,
+  type WorkflowConsolidation,
+  type InsertWorkflowConsolidation,
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 import { generateTFAVerificationCode, generatePIFVerificationCode } from "./verificationCodeGenerator";
@@ -444,6 +447,38 @@ export class DbStorage implements IStorage {
 
   async deleteImplementationOpportunity(id: string): Promise<boolean> {
     const result = await db.delete(implementationOpportunities).where(eq(implementationOpportunities.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  // Workflow Consolidations
+  async getWorkflowConsolidation(id: string): Promise<WorkflowConsolidation | undefined> {
+    const [consolidation] = await db.select().from(workflowConsolidations).where(eq(workflowConsolidations.id, id));
+    return consolidation;
+  }
+
+  async getConsolidationsByWorkflow(workflowId: string): Promise<WorkflowConsolidation[]> {
+    return db.select().from(workflowConsolidations)
+      .where(eq(workflowConsolidations.workflowId, workflowId))
+      .orderBy(desc(workflowConsolidations.createdAt));
+  }
+
+  async createWorkflowConsolidation(consolidation: InsertWorkflowConsolidation): Promise<WorkflowConsolidation> {
+    const [newConsolidation] = await db.insert(workflowConsolidations)
+      .values(consolidation)
+      .returning();
+    return newConsolidation;
+  }
+
+  async updateWorkflowConsolidation(id: string, data: Partial<InsertWorkflowConsolidation>): Promise<WorkflowConsolidation | undefined> {
+    const [updated] = await db.update(workflowConsolidations)
+      .set(data)
+      .where(eq(workflowConsolidations.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteWorkflowConsolidation(id: string): Promise<boolean> {
+    const result = await db.delete(workflowConsolidations).where(eq(workflowConsolidations.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 }

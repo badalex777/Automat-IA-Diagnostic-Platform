@@ -11,6 +11,8 @@ import {
   type InsertBusinessImpact,
   type ImplementationOpportunity,
   type InsertImplementationOpportunity,
+  type WorkflowConsolidation,
+  type InsertWorkflowConsolidation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -62,4 +64,11 @@ export interface IStorage {
   createImplementationOpportunity(opportunity: InsertImplementationOpportunity): Promise<ImplementationOpportunity>;
   updateImplementationOpportunity(id: string, data: Partial<InsertImplementationOpportunity>): Promise<ImplementationOpportunity | undefined>;
   deleteImplementationOpportunity(id: string): Promise<boolean>;
+  
+  // Workflow Consolidations
+  getWorkflowConsolidation(id: string): Promise<WorkflowConsolidation | undefined>;
+  getConsolidationsByWorkflow(workflowId: string): Promise<WorkflowConsolidation[]>;
+  createWorkflowConsolidation(consolidation: InsertWorkflowConsolidation): Promise<WorkflowConsolidation>;
+  updateWorkflowConsolidation(id: string, data: Partial<InsertWorkflowConsolidation>): Promise<WorkflowConsolidation | undefined>;
+  deleteWorkflowConsolidation(id: string): Promise<boolean>;
 }
