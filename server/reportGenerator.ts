@@ -1275,6 +1275,88 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createHeading(TRANSLATIONS.appendices.d, HeadingLevel.HEADING_1));
   sections.push(createBodyParagraph(APPENDIX_D_INTRO));
   
+  // D.0 Consolidated Opportunities Overview (conditional - only if consolidations exist)
+  const allConsolidations = data.workflows.flatMap(w => w.consolidations || []);
+  if (allConsolidations.length > 0) {
+    sections.push(
+      new Paragraph({
+        text: "D.0 Consolidated Opportunities",
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+      })
+    );
+    
+    sections.push(createBodyParagraph(
+      "When multiple automation opportunities exist across related process steps within a workflow, they may be " +
+      "consolidated into strategic implementation packages. Consolidations enable coordinated deployment that " +
+      "leverages shared resources, minimizes integration overhead, and achieves greater business impact through " +
+      "platform-level synergy. The tables below present consolidated opportunity summaries with aggregated " +
+      "financial metrics and constituent mappings for traceability."
+    ));
+    
+    // D.0a - Consolidated Opportunity Summary Table
+    const consolidationHeaders = [
+      TRANSLATIONS.headers.workflow,
+      "Consolidation Name",
+      "Opportunities",
+      TRANSLATIONS.headers.annualBenefit,
+      TRANSLATIONS.headers.fteSaved,
+      TRANSLATIONS.headers.payback,
+      "Quadrant"
+    ];
+    
+    const consolidationRows: string[][] = [];
+    allConsolidations
+      .sort((a, b) => b.matrixPosition.businessImpact - a.matrixPosition.businessImpact)
+      .forEach(cons => {
+        consolidationRows.push([
+          cons.workflow.name,
+          cons.consolidation.name,
+          cons.constituentOpportunities.length.toString(),
+          formatCurrency(cons.aggregatedMetrics.totalAnnualRoi),
+          formatNumber(cons.aggregatedMetrics.totalFteSavings, 2),
+          Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " mo",
+          cons.matrixPosition.quadrant,
+        ]);
+      });
+    
+    sections.push(createTableCaption("D.0a", (TRANSLATIONS.tableCaptions as any)["D.0a"], TRANSLATIONS.labels.table));
+    sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
+    
+    // D.0b - Consolidation Constituent Mapping Table
+    const constituentHeaders = [
+      TRANSLATIONS.headers.workflow,
+      "Consolidation",
+      "Constituent Opportunity",
+      "Step #",
+      "Step Name"
+    ];
+    
+    const constituentRows: string[][] = [];
+    allConsolidations.forEach(cons => {
+      // Sort constituents by step order
+      const sortedConstituents = [...cons.constituentOpportunities].sort((a, b) => a.stepOrder - b.stepOrder);
+      sortedConstituents.forEach(opp => {
+        constituentRows.push([
+          cons.workflow.name,
+          cons.consolidation.name,
+          opp.name,
+          opp.stepOrder.toString(),
+          opp.stepName,
+        ]);
+      });
+    });
+    
+    sections.push(createTableCaption("D.0b", (TRANSLATIONS.tableCaptions as any)["D.0b"], TRANSLATIONS.labels.table));
+    sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
+    
+    sections.push(createBodyParagraph(
+      "Consolidations represent strategic groupings recommended for coordinated implementation. " +
+      "Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections."
+    ));
+    sections.push(createHorizontalSeparator());
+  }
+  
   // D.1 Portfolio Summary Table (add Weekly Hours Saved column)
   const portfolioHeaders = [TRANSLATIONS.headers.workflow, TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.estCost, TRANSLATIONS.headers.fteSaved, TRANSLATIONS.headers.payback, "Weekly Hours Saved"];
   const portfolioRows: string[][] = [];
@@ -1296,7 +1378,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     sections.push(createTableCaption("D.1", TRANSLATIONS.tableCaptions["D.1"], TRANSLATIONS.labels.table));
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
-  sections.push(createBodyParagraph("Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. Detailed per-opportunity pages follow."));
+  sections.push(createBodyParagraph(
+    "Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. " +
+    (allConsolidations.length > 0 ? "Consolidated opportunities are shown aggregated above; individual constituents are included here for detailed review. " : "") +
+    "Detailed per-opportunity pages follow."
+  ));
   sections.push(createHorizontalSeparator());
   
   // D.2.X sections - ONE PER OPPORTUNITY

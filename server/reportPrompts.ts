@@ -1067,6 +1067,8 @@ export const TRANSLATIONS = {
     "6.3": "Phase 3 — Strategic",
     "6.4": "18-Month Implementation Timeline",
     "B.1": "Readiness Score Component Weighting",
+    "D.0a": "Consolidated Opportunity Summary",
+    "D.0b": "Consolidation Constituent Mapping",
     "D.1": "Portfolio Overview — All Opportunities",
     "E.2": "Net Benefit Formulas",
     "E.4": "Annual Benefit Breakdown",

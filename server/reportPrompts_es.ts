@@ -1093,6 +1093,8 @@ export const TRANSLATIONS = {
     "6.3": "Fase 3 — Estratégica",
     "6.4": "Cronograma de Implementación de 18 Meses",
     "B.1": "Ponderación de Componentes de Puntuación de Preparación",
+    "D.0a": "Resumen de Oportunidades Consolidadas",
+    "D.0b": "Mapeo de Constituyentes de Consolidación",
     "D.1": "Resumen de Cartera — Todas las Oportunidades",
     "E.2": "Fórmulas de Beneficio Neto",
     "E.4": "Desglose de Beneficio Anual",
