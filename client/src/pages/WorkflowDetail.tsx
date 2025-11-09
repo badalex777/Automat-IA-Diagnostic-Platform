@@ -187,17 +187,19 @@ export default function WorkflowDetail() {
   const calculateSectionScores = () => {
     if (!tfaAssessment?.responses) return [];
     
+    const responses = tfaAssessment.responses as Record<string, string | number>;
+    
     return allSections.map(section => {
       const sectionQuestions = section.questions;
       const sectionResponses = sectionQuestions.filter(q => 
-        tfaAssessment.responses[q.id.toString()]
+        responses[q.id.toString()]
       );
       
       const totalWeight = sectionQuestions.reduce((acc, q) => acc + q.weight, 0);
       const weightedScore = sectionQuestions.reduce((acc, q) => {
-        const response = tfaAssessment.responses[q.id.toString()];
+        const response = responses[q.id.toString()];
         if (!response) return acc;
-        return acc + (parseInt(response) * q.weight);
+        return acc + (parseInt(response.toString()) * q.weight);
       }, 0);
       
       const score = totalWeight > 0 ? (weightedScore / totalWeight) : 0;
@@ -1570,7 +1572,23 @@ export default function WorkflowDetail() {
             {editOpportunity && (
               <OpportunityForm
                 workflowId={workflowId}
-                initialData={editOpportunity}
+                initialData={{
+                  ...editOpportunity,
+                  annualRoi: editOpportunity.annualRoi ? parseFloat(editOpportunity.annualRoi.toString()) : undefined,
+                  implementationCost: editOpportunity.implementationCost ? parseFloat(editOpportunity.implementationCost.toString()) : undefined,
+                  annualRunRateRoi: editOpportunity.annualRunRateRoi ? parseFloat(editOpportunity.annualRunRateRoi.toString()) : undefined,
+                  cumulativeNetBenefit3Year: editOpportunity.cumulativeNetBenefit3Year ? parseFloat(editOpportunity.cumulativeNetBenefit3Year.toString()) : undefined,
+                  cumulativeNetBenefit5Year: editOpportunity.cumulativeNetBenefit5Year ? parseFloat(editOpportunity.cumulativeNetBenefit5Year.toString()) : undefined,
+                  hoursSavedPerWeek: editOpportunity.hoursSavedPerWeek ? parseFloat(editOpportunity.hoursSavedPerWeek.toString()) : undefined,
+                  annualHoursSaved: editOpportunity.annualHoursSaved ? parseFloat(editOpportunity.annualHoursSaved.toString()) : undefined,
+                  fteSavings: editOpportunity.fteSavings ? parseFloat(editOpportunity.fteSavings.toString()) : undefined,
+                  errorReductionPct: editOpportunity.errorReductionPct ? parseFloat(editOpportunity.errorReductionPct.toString()) : undefined,
+                  hoursReallocatedToRevenue: editOpportunity.hoursReallocatedToRevenue ? parseFloat(editOpportunity.hoursReallocatedToRevenue.toString()) : undefined,
+                  revenueUpliftAnnual: editOpportunity.revenueUpliftAnnual ? parseFloat(editOpportunity.revenueUpliftAnnual.toString()) : undefined,
+                  rampupPeriodMonths: editOpportunity.rampupPeriodMonths ? parseFloat(editOpportunity.rampupPeriodMonths.toString()) : undefined,
+                  paybackPeriodMonths: editOpportunity.paybackPeriodMonths ? parseFloat(editOpportunity.paybackPeriodMonths.toString()) : undefined,
+                  trainingHoursPerEmployee: editOpportunity.trainingHoursPerEmployee ? parseFloat(editOpportunity.trainingHoursPerEmployee.toString()) : undefined,
+                }}
                 onSubmit={(data) => {
                   updateOpportunityMutation.mutate({
                     opportunityId: editOpportunity.id,
