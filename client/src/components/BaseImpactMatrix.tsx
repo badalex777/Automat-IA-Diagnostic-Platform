@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, LabelList } from "recharts";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LabelList } from "recharts";
 import type { ImplementationOpportunity, Workflow, WorkflowConsolidation } from "@shared/schema";
 import { 
   calculateBaseImpact,
@@ -52,6 +52,7 @@ interface DataPoint {
   y: number; // Implementation Effort
   quadrant: string;
   color: string;
+  isConsolidation?: boolean; // Flag for visual differentiation
 }
 
 export default function BaseImpactMatrix({ 
@@ -162,6 +163,7 @@ export default function BaseImpactMatrix({
           y: implementationEffort,
           quadrant,
           color: colorMap[cons.workflowId],
+          isConsolidation: true,
         });
       });
     }
@@ -191,6 +193,9 @@ export default function BaseImpactMatrix({
       return (
         <div className="bg-popover border rounded-lg p-3 shadow-lg">
           <p className="font-semibold text-sm">{data.name}</p>
+          {data.isConsolidation && (
+            <p className="text-xs text-primary font-medium">Strategic Consolidation</p>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Quadrant: {data.quadrant}</p>
           <div className="mt-2 space-y-1">
             <p className="text-xs">
@@ -368,10 +373,29 @@ export default function BaseImpactMatrix({
                   data={displayData}
                   onClick={handleClick}
                   style={{ cursor: 'pointer' }}
+                  shape={(props: any) => {
+                    const { cx, cy, payload } = props;
+                    if (!payload) return <></>;
+                    
+                    // Larger size and border for consolidations
+                    const radius = payload.isConsolidation ? 9 : 5;
+                    const strokeWidth = payload.isConsolidation ? 2 : 0;
+                    
+                    return (
+                      <g>
+                        <circle 
+                          cx={cx} 
+                          cy={cy} 
+                          r={radius} 
+                          fill={payload.color}
+                          stroke={payload.isConsolidation ? "hsl(var(--foreground))" : "none"}
+                          strokeWidth={strokeWidth}
+                          className="hover:opacity-80 transition-opacity"
+                        />
+                      </g>
+                    );
+                  }}
                 >
-                  {displayData.map((entry, index) => (
-                    <Cell key={`cell-${entry.id}`} fill={entry.color} />
-                  ))}
                   <LabelList
                     dataKey="name"
                     position="top"

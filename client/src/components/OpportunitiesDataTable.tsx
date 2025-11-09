@@ -396,7 +396,7 @@ export function OpportunitiesDataTable({
                         className={`${colors?.bg || 'bg-muted/30'} border-l-4 ${colors?.border || 'border-l-transparent'} opacity-80`}
                         data-testid={`table-row-constituent-${opp.id}`}
                       >
-                        <TableCell className="text-sm text-muted-foreground pl-6">—</TableCell>
+                        <TableCell className="text-sm text-muted-foreground pl-6">Individual Opportunity</TableCell>
                         <TableCell className="pl-6">{opp.name}</TableCell>
                         <TableCell>{row.workflow?.name || 'N/A'}</TableCell>
                         <TableCell className="text-muted-foreground">

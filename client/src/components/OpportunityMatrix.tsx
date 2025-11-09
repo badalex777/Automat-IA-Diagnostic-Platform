@@ -521,20 +521,6 @@ export default function OpportunityMatrix({
 
                     return (
                       <g>
-                        {/* Connector line from original point to adjusted label when repositioned */}
-                        {wasAdjusted && (
-                          <line
-                            x1={originalPointX}
-                            y1={originalPointY}
-                            x2={cx}
-                            y2={cy - 12}
-                            stroke="hsl(var(--muted-foreground))"
-                            strokeWidth={1}
-                            strokeDasharray="2,2"
-                            opacity={0.4}
-                            style={{ pointerEvents: 'none' }}
-                          />
-                        )}
                         {/* Label text at adjusted position */}
                         <text
                           x={cx}
