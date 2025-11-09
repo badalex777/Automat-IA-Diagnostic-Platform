@@ -17,6 +17,8 @@ import {
   updateBusinessImpactSchema,
   insertImplementationOpportunitySchema,
   updateImplementationOpportunitySchema,
+  insertWorkflowConsolidationSchema,
+  updateWorkflowConsolidationSchema,
 } from "@shared/schema";
 import { TFA_QUESTIONS, calculateTFAScore, calculateSectionScores } from "@shared/tfaQuestions";
 import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualitativeResponses } from "@shared/pifQuestions";
@@ -1416,6 +1418,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const success = await storage.deleteImplementationOpportunity(req.params.id);
       if (!success) {
         return res.status(404).json({ error: "Opportunity not found" });
+      }
+      res.status(204).send();
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Workflow Consolidations
+  app.post("/api/workflows/:workflowId/consolidations", async (req, res) => {
+    try {
+      const validatedData = insertWorkflowConsolidationSchema.parse({
+        ...req.body,
+        workflowId: req.params.workflowId,
+      });
+
+      const consolidation = await storage.createWorkflowConsolidation(validatedData);
+      res.status(201).json(consolidation);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/workflows/:workflowId/consolidations", async (req, res) => {
+    try {
+      const consolidations = await storage.getConsolidationsByWorkflow(req.params.workflowId);
+      res.json(consolidations);
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/consolidations/:id", async (req, res) => {
+    try {
+      const consolidation = await storage.getWorkflowConsolidation(req.params.id);
+      if (!consolidation) {
+        return res.status(404).json({ error: "Consolidation not found" });
+      }
+      res.json(consolidation);
+    } catch (error: any) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/consolidations/:id", async (req, res) => {
+    try {
+      const validatedData = updateWorkflowConsolidationSchema.parse(req.body);
+
+      if (Object.keys(validatedData).length === 0) {
+        return res.status(400).json({ error: "At least one field to update is required" });
+      }
+
+      const consolidation = await storage.updateWorkflowConsolidation(req.params.id, validatedData);
+      if (!consolidation) {
+        return res.status(404).json({ error: "Consolidation not found" });
+      }
+      res.json(consolidation);
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/consolidations/:id", async (req, res) => {
+    try {
+      const success = await storage.deleteWorkflowConsolidation(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Consolidation not found" });
       }
       res.status(204).send();
     } catch (error: any) {
