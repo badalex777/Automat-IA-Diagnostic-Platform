@@ -1,0 +1,70 @@
+3. Hybrid Workflow-Level Opportunities (Recommended Approach)
+Concept: You keep all opportunities linked to specific steps (current architecture stays intact), BUT you can create Workflow Consolidation Views that aggregate multiple step-level opportunities into a virtual workflow-level opportunity.
+How it works:
+Creating a Workflow Consolidation
+Scenario: You've identified 3 step-level opportunities within "Accounts Payable" workflow:
+* Step 3: "Automate Invoice Data Entry" (5.0 FTE, $100K ROI, 6mo rampup)
+* Step 5: "Automate Approval Routing" (2.0 FTE, $40K ROI, 4mo rampup)
+* Step 7: "Automate Payment Processing" (3.0 FTE, $60K ROI, 8mo rampup)
+Action: Create a "Workflow Consolidation" that groups these three:
+UI Flow:
+1. On Workflow Detail page, new button: "Create Workflow Consolidation"
+2. Dialog shows all step-level opportunities in that workflow with checkboxes
+3. Select the 3 opportunities above
+4. Enter consolidation name: "Full AP Automation Platform"
+5. System calculates aggregated metrics automatically
+Aggregated Metrics:
+* Total Annual ROI: $100K + $40K + $60K = $200K
+* Total FTE Saved: 5.0 + 2.0 + 3.0 = 10.0 FTE
+* Weighted Avg Rampup: (5.0×6 + 2.0×4 + 3.0×8) / 10.0 = 6.4 months + 20% buffer = 7.7 months
+* Weighted Avg Payback: Similar calculation
+* Total Training Hours: Sum of all training hours
+* Implementation Cost: Sum of all costs + 15% integration overhead
+Buffer Logic (Hidden Complexities):
+* Single-step opportunity: Use raw estimates
+* Multi-step consolidation: Add 20% to rampup (coordination overhead)
+* Cross-workflow consolidation: Add 30% to rampup (integration complexity)
+Where Consolidations Appear
+1. Opportunity Matrix:
+* Consolidations appear as distinct data points
+* Positioned using aggregated metrics
+* Visual indicator (badge/icon) shows it's a consolidation
+* Hover tooltip: "Consolidates 3 opportunities from Accounts Payable"
+* Color-coded by source workflow (same as constituent opportunities)
+2. Executive Diagnostic Report:
+* Appendix D includes consolidated opportunities
+* Section D.2.X shows breakdown: "This consolidated opportunity comprises 3 step-level initiatives: [list]"
+* Financial table shows both aggregated totals and per-step breakdown
+3. Company Detail Dashboard:
+* New "Workflow Consolidations" card alongside individual opportunities
+* Click to expand and see constituent step-level opportunities
+Database Design (Lightweight)
+New Table: workflowConsolidations
+{
+id: serial
+name: string
+workflowId: number (FK)
+opportunityIds: integer[] // Array of step-level opp IDs
+aggregatedMetrics: json // Calculated on-the-fly or cached
+createdAt: timestamp
+}
+
+Key Points:
+* No changes to existing implementationOpportunities table
+* Consolidations reference existing opportunities (not duplicate data)
+* Metrics calculated dynamically from constituent opportunities
+* If you update a step-level opportunity, consolidation auto-updates
+Benefits of Hybrid Approach
+✅ Backward compatible: Existing step-level opportunities unchanged ✅ Flexible: Can create workflow-level, multi-step, or even cross-workflow consolidations ✅ Accurate: Metrics reflect actual scope (with coordination buffers) ✅ Transparent: Reports show both aggregate and constituent breakdown ✅ No data duplication: Single source of truth for each opportunity
+Example Usage Patterns
+Pattern 1: Full Workflow Platform
+* Consolidate ALL opportunities in "Accounts Payable" workflow
+* Gives client option: "implement piecemeal OR go all-in"
+Pattern 2: Strategic Theme
+* Consolidate opportunities across multiple workflows that share a theme
+* E.g., "Data Entry Automation" consolidation includes Step 2 from AP, Step 4 from AR, Step 1 from Inventory
+* Shows cross-functional platform value
+Pattern 3: Phased Rollout
+* Consolidate Phase 1 Quick Wins into "Q1 Implementation Package"
+* Consolidate Phase 2 Foundational into "Q2-Q3 Implementation Package"
+* Gives clients pre-packaged bundles
