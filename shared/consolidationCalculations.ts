@@ -222,3 +222,86 @@ export function calculateConsolidationBusinessImpact(
   // Cap at 150 (max scale for Enhanced Impact Matrix)
   return Math.min(businessImpact, 150);
 }
+
+/**
+ * Calculate BASE impact score for a consolidation (no enhanced bonuses)
+ * Uses ROI 60% + FTE 40% weighting on 0-100 scale
+ * 
+ * @param metrics - Consolidated metrics from calculateConsolidatedMetrics
+ * @param companyContext - Optional company financial data for normalization
+ * @returns Base impact score (0-100 scale)
+ */
+export function calculateConsolidatedBaseImpact(
+  metrics: ConsolidatedMetrics,
+  companyContext?: { annualRevenue?: string | number | null; totalEmployees?: string | number | null }
+): number {
+  // ROI contribution with 10x multiplier (60% weighting)
+  const roiContribution = (metrics.totalAnnualRoi * 10) * 0.6;
+  
+  // FTE contribution with context-aware scaling (40% weighting)
+  const totalEmployees = typeof companyContext?.totalEmployees === 'number' 
+    ? companyContext.totalEmployees 
+    : (typeof companyContext?.totalEmployees === 'string' 
+        ? parseFloat(companyContext.totalEmployees) 
+        : null);
+  const rawFteSavings = totalEmployees && !isNaN(totalEmployees)
+    ? (metrics.totalFteSavings / totalEmployees) * 100
+    : metrics.totalFteSavings * 20; // fallback: 20 points per FTE
+  const fteContribution = rawFteSavings * 0.4;
+  
+  const baseImpact = roiContribution + fteContribution;
+  
+  // Cap at 100 (base scale)
+  return Math.min(baseImpact, 100);
+}
+
+/**
+ * Compute FTE-weighted average readiness score for constituent opportunities
+ * 
+ * @param opportunities - Array of constituent opportunities
+ * @param readinessScores - Map of stepId to readiness score (0-100)
+ * @returns Weighted average readiness score (defaults to 50 if no readiness data)
+ */
+export function computeConsolidatedReadiness(
+  opportunities: ImplementationOpportunity[],
+  readinessScores: Record<string, number>
+): number {
+  let weightedSum = 0;
+  let totalWeight = 0;
+  
+  opportunities.forEach(opp => {
+    const weight = parseFloat(opp.fteSavings?.toString() || '0');
+    if (weight > 0 && opp.stepId) {
+      const readiness = readinessScores[opp.stepId] ?? 50; // Default to 50 if missing
+      weightedSum += readiness * weight;
+      totalWeight += weight;
+    }
+  });
+  
+  return totalWeight > 0 ? weightedSum / totalWeight : 0;
+}
+
+/**
+ * Get implementation effort inputs for a consolidation
+ * Returns buffered weighted averages from ConsolidatedMetrics
+ * 
+ * @param metrics - Consolidated metrics from calculateConsolidatedMetrics
+ * @param readinessScore - Consolidated readiness score from computeConsolidatedReadiness
+ * @returns Object with inputs for calculateImplementationEffort
+ */
+export function getConsolidatedImplementationInputs(
+  metrics: ConsolidatedMetrics,
+  readinessScore: number
+): {
+  readinessScore: number;
+  rampupMonths: number;
+  paybackMonths: number;
+  trainingHours: number;
+} {
+  return {
+    readinessScore,
+    rampupMonths: metrics.weightedAvgRampupPeriodMonths,
+    paybackMonths: metrics.weightedAvgPaybackPeriodMonths,
+    trainingHours: metrics.weightedAvgTrainingHoursPerEmployee,
+  };
+}

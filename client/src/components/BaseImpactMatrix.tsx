@@ -1,18 +1,32 @@
 import { useMemo, useState, useEffect } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell, LabelList } from "recharts";
-import type { ImplementationOpportunity, Workflow } from "@shared/schema";
+import type { ImplementationOpportunity, Workflow, WorkflowConsolidation } from "@shared/schema";
 import { 
   calculateBaseImpact,
   calculateImplementationEffort,
   type CompanyContext,
   getQuadrant
 } from "@shared/opportunityCalculations";
+import { 
+  calculateConsolidatedMetrics,
+  calculateConsolidatedBaseImpact,
+  computeConsolidatedReadiness,
+  getConsolidatedImplementationInputs
+} from "@shared/consolidationCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import type { MatrixViewMode } from "@/lib/opportunityViewMode";
+import { MATRIX_VIEW_OPTIONS } from "@/lib/opportunityViewMode";
 
 interface BaseImpactMatrixProps {
   opportunities: ImplementationOpportunity[];
   workflows: Workflow[];
   readinessScores: Record<string, number>;
+  consolidations?: WorkflowConsolidation[];
+  viewMode: MatrixViewMode;
+  onViewModeChange: (mode: MatrixViewMode) => void;
   workflowColors?: Record<string, string>;
   companyContext?: CompanyContext;
   onOpportunityClick?: (opportunity: ImplementationOpportunity) => void;
@@ -44,6 +58,9 @@ export default function BaseImpactMatrix({
   opportunities, 
   workflows,
   readinessScores,
+  consolidations = [],
+  viewMode,
+  onViewModeChange,
   workflowColors,
   companyContext,
   onOpportunityClick 
@@ -69,46 +86,99 @@ export default function BaseImpactMatrix({
       return acc;
     }, {} as Record<string, string>);
 
-    // Calculate base impact for ALL opportunities (no filtering)
-    const points: DataPoint[] = opportunities.map(opp => {
-      // Use step-level readiness score for positioning (opportunities are always linked to steps)
-      const readinessScore = opp.stepId ? readinessScores[opp.stepId] : 0;
-      
-      const implementationEffort = calculateImplementationEffort(
-        readinessScore || 0,
-        parseFloat(opp.rampupPeriodMonths || "0"),
-        parseFloat(opp.paybackPeriodMonths || "0"),
-        parseFloat(opp.trainingHoursPerEmployee || "0")
-      );
+    const points: DataPoint[] = [];
+    
+    // Add opportunity points based on viewMode
+    if (viewMode !== 'consolidations-only') {
+      opportunities.forEach(opp => {
+        // Use step-level readiness score for positioning (opportunities are always linked to steps)
+        const readinessScore = opp.stepId ? readinessScores[opp.stepId] : 0;
+        
+        const implementationEffort = calculateImplementationEffort(
+          readinessScore || 0,
+          parseFloat(opp.rampupPeriodMonths || "0"),
+          parseFloat(opp.paybackPeriodMonths || "0"),
+          parseFloat(opp.trainingHoursPerEmployee || "0")
+        );
 
-      // Calculate BASE impact (always 0-100, no toggles)
-      const baseImpact = calculateBaseImpact(opp, companyContext);
-      
-      // Determine quadrant (base scale is always 100)
-      const quadrant = getQuadrant(implementationEffort, baseImpact, 100);
-      
-      return {
-        id: opp.id,
-        name: opp.name,
-        workflowId: opp.workflowId,
-        workflowName: workflowMap[opp.workflowId] || "Unknown",
-        x: baseImpact,
-        y: implementationEffort,
-        quadrant,
-        color: colorMap[opp.workflowId],
-      };
-    });
+        // Calculate BASE impact (always 0-100, no toggles)
+        const baseImpact = calculateBaseImpact(opp, companyContext);
+        
+        // Determine quadrant (base scale is always 100)
+        const quadrant = getQuadrant(implementationEffort, baseImpact, 100);
+        
+        points.push({
+          id: opp.id,
+          name: opp.name,
+          workflowId: opp.workflowId,
+          workflowName: workflowMap[opp.workflowId] || "Unknown",
+          x: baseImpact,
+          y: implementationEffort,
+          quadrant,
+          color: colorMap[opp.workflowId],
+        });
+      });
+    }
+    
+    // Add consolidation points based on viewMode (using BASE calculations)
+    if (viewMode !== 'opportunities-only') {
+      consolidations.forEach(cons => {
+        // Get constituent opportunities
+        const constituentOpps = opportunities.filter(o => 
+          cons.opportunityIds.includes(o.id)
+        );
+        
+        if (constituentOpps.length === 0) return;
+        
+        // Calculate consolidated metrics
+        const metrics = calculateConsolidatedMetrics(constituentOpps);
+        
+        // Calculate base impact (ROI 60% + FTE 40%, no enhanced bonuses)
+        const baseImpact = calculateConsolidatedBaseImpact(metrics, companyContext);
+        
+        // Calculate consolidated readiness score (FTE-weighted average)
+        const consolidatedReadiness = computeConsolidatedReadiness(constituentOpps, readinessScores);
+        
+        // Get implementation effort inputs (already has coordination buffers)
+        const effortInputs = getConsolidatedImplementationInputs(metrics, consolidatedReadiness);
+        
+        // Calculate implementation effort with additional integration overhead
+        const implementationEffort = calculateImplementationEffort(
+          effortInputs.readinessScore,
+          effortInputs.rampupMonths * 1.15, // 15% integration overhead
+          effortInputs.paybackMonths, // Already has 20% coordination buffer
+          effortInputs.trainingHours * 1.15 // 15% integration overhead
+        );
+        
+        // Determine quadrant (base scale is always 100)
+        const quadrant = getQuadrant(implementationEffort, baseImpact, 100);
+        
+        points.push({
+          id: cons.id,
+          name: cons.name,
+          workflowId: cons.workflowId,
+          workflowName: workflowMap[cons.workflowId] || "Unknown",
+          x: baseImpact,
+          y: implementationEffort,
+          quadrant,
+          color: colorMap[cons.workflowId],
+        });
+      });
+    }
 
-    // Create legend
-    const allUniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
-    const legend = allUniqueWorkflows.map(wId => ({
+    // Create legend from all unique workflows
+    const allWorkflowIds = Array.from(new Set([
+      ...opportunities.map(o => o.workflowId),
+      ...consolidations.map(c => c.workflowId)
+    ]));
+    const legend = allWorkflowIds.map(wId => ({
       workflowId: wId,
       workflowName: workflowMap[wId] || "Unknown",
       color: colorMap[wId],
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, workflows, readinessScores, colorMap, companyContext]);
+  }, [opportunities, consolidations, workflows, readinessScores, colorMap, companyContext, viewMode]);
 
   // Update display data immediately
   useEffect(() => {
@@ -170,6 +240,24 @@ export default function BaseImpactMatrix({
               Fair comparison using ROI 60% + Time Savings 40% (0-100 scale)
             </p>
           </div>
+          
+          {consolidations.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">View:</span>
+              <Select value={viewMode} onValueChange={onViewModeChange}>
+                <SelectTrigger className="w-[220px]" data-testid="select-base-matrix-view">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {MATRIX_VIEW_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent>
