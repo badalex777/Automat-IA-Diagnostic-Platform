@@ -11,11 +11,15 @@ import {
   type ToggleState,
   getFilterMaxScore
 } from "@shared/opportunityCalculations";
-import { calculateConsolidatedMetrics, calculateConsolidationBusinessImpact } from "@shared/consolidationCalculations";
+import { 
+  calculateConsolidatedMetrics,
+  calculateConsolidationBusinessImpact,
+  computeConsolidatedReadiness,
+  getConsolidatedImplementationInputs
+} from "@shared/consolidationCalculations";
+import { type MatrixViewMode, MATRIX_VIEW_OPTIONS } from "@/lib/opportunityViewMode";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
@@ -24,6 +28,8 @@ interface OpportunityMatrixProps {
   consolidations?: WorkflowConsolidation[]; // Workflow consolidations to display
   workflowColors?: Record<string, string>; // workflowId -> color
   companyContext?: CompanyContext; // Company financial context for normalized scoring
+  viewMode: MatrixViewMode; // External view mode control
+  onViewModeChange: (mode: MatrixViewMode) => void; // View mode change callback
   onOpportunityClick?: (opportunity: ImplementationOpportunity) => void;
   onConsolidationClick?: (consolidation: WorkflowConsolidation) => void;
 }
@@ -67,11 +73,12 @@ export default function OpportunityMatrix({
   consolidations = [],
   workflowColors,
   companyContext,
+  viewMode,
+  onViewModeChange,
   onOpportunityClick,
   onConsolidationClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
-  const [showConsolidations, setShowConsolidations] = useState(true);
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
   const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
   const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 450 });
@@ -97,10 +104,13 @@ export default function OpportunityMatrix({
     return () => window.removeEventListener('resize', measureChart);
   }, []);
 
-  // Build stable color map based on ALL workflows (not just filtered)
-  // Sort workflow IDs to ensure stable color assignment even when opportunities change
+  // Build stable color map based on ALL workflows (opportunities AND consolidations)
+  // Sort workflow IDs to ensure stable color assignment even when data changes
   const colorMap = useMemo(() => {
-    const allWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
+    const allWorkflows = Array.from(new Set([
+      ...opportunities.map(o => o.workflowId),
+      ...consolidations.map(c => c.workflowId)
+    ]));
     // Sort by ID to ensure consistent ordering and stable colors
     allWorkflows.sort();
     const colors: Record<string, string> = {};
@@ -110,7 +120,7 @@ export default function OpportunityMatrix({
     });
     
     return colors;
-  }, [opportunities, workflowColors]);
+  }, [opportunities, consolidations, workflowColors]);
 
   // Enhanced Impact Matrix always uses 0-150 scale (supports all 3 metrics)
   // Individual opportunities may score lower if their bonuses are toggled off
@@ -122,42 +132,47 @@ export default function OpportunityMatrix({
       return acc;
     }, {} as Record<string, string>);
 
-    // Filter opportunities based on selected filter
-    const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
+    const points: DataPoint[] = [];
 
-    // Calculate scores for filtered opportunities
-    const points: DataPoint[] = filteredOpps.map(opp => {
-      // Use step-level readiness score for positioning (opportunities are always linked to steps)
-      const readinessScore = opp.stepId ? readinessScores[opp.stepId] : 0;
-      
-      const implementationEffort = calculateImplementationEffort(
-        readinessScore || 0,
-        parseFloat(opp.rampupPeriodMonths || "0"),
-        parseFloat(opp.paybackPeriodMonths || "0"),
-        parseFloat(opp.trainingHoursPerEmployee || "0")
-      );
+    // Add individual opportunities based on viewMode
+    if (viewMode !== 'consolidations-only') {
+      // Filter opportunities based on selected filter
+      const filteredOpps = filterOpportunitiesByMetrics(opportunities, filterType);
 
-      // Calculate ENHANCED impact (respects per-opportunity toggles, uses reweighting)
-      const enhancedImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
-      
-      // Determine quadrant using fixed 150 scale (Enhanced Impact Matrix uses full capability scale)
-      const quadrant = getQuadrant(implementationEffort, enhancedImpact, 150);
-      
-      return {
-        id: opp.id,
-        name: opp.name,
-        workflowId: opp.workflowId,
-        workflowName: workflowMap[opp.workflowId] || "Unknown",
-        x: enhancedImpact,
-        y: implementationEffort,
-        quadrant,
-        color: colorMap[opp.workflowId],
-        isConsolidation: false,
-      };
-    });
+      // Calculate scores for filtered opportunities
+      filteredOpps.forEach(opp => {
+        // Use step-level readiness score for positioning (opportunities are always linked to steps)
+        const readinessScore = opp.stepId ? readinessScores[opp.stepId] : 0;
+        
+        const implementationEffort = calculateImplementationEffort(
+          readinessScore || 0,
+          parseFloat(opp.rampupPeriodMonths || "0"),
+          parseFloat(opp.paybackPeriodMonths || "0"),
+          parseFloat(opp.trainingHoursPerEmployee || "0")
+        );
 
-    // Add consolidation data points if enabled
-    if (showConsolidations && consolidations.length > 0) {
+        // Calculate ENHANCED impact (respects per-opportunity toggles, uses reweighting)
+        const enhancedImpact = calculateBusinessImpactForFilter(opp, filterType, companyContext);
+        
+        // Determine quadrant using fixed 150 scale (Enhanced Impact Matrix uses full capability scale)
+        const quadrant = getQuadrant(implementationEffort, enhancedImpact, 150);
+        
+        points.push({
+          id: opp.id,
+          name: opp.name,
+          workflowId: opp.workflowId,
+          workflowName: workflowMap[opp.workflowId] || "Unknown",
+          x: enhancedImpact,
+          y: implementationEffort,
+          quadrant,
+          color: colorMap[opp.workflowId],
+          isConsolidation: false,
+        });
+      });
+    }
+
+    // Add consolidation data points based on viewMode
+    if (viewMode !== 'opportunities-only') {
       consolidations.forEach(consolidation => {
         // Get constituent opportunities
         const constituentOpps = opportunities.filter(opp => 
@@ -169,28 +184,27 @@ export default function OpportunityMatrix({
         // Calculate aggregated metrics with buffers
         const metrics = calculateConsolidatedMetrics(constituentOpps);
         
-        // Calculate average readiness from constituent opportunities' steps
-        const stepReadinessValues = constituentOpps
-          .map(opp => opp.stepId ? readinessScores[opp.stepId] || 0 : 0);
-        const readinessScores_avg = stepReadinessValues.length > 0
-          ? stepReadinessValues.reduce((sum, score) => sum + score, 0) / stepReadinessValues.length
-          : 0;
+        // Calculate FTE-weighted readiness (same as base matrix)
+        const consolidatedReadiness = computeConsolidatedReadiness(constituentOpps, readinessScores);
+        
+        // Get implementation effort inputs with coordination buffers
+        const effortInputs = getConsolidatedImplementationInputs(metrics, consolidatedReadiness);
         
         // Calculate implementation effort using consolidated weighted metrics
         const implementationEffort = calculateImplementationEffort(
-          readinessScores_avg,
-          metrics.weightedAvgRampupPeriodMonths,
-          metrics.weightedAvgPaybackPeriodMonths,
-          metrics.weightedAvgTrainingHoursPerEmployee
+          effortInputs.readinessScore,
+          effortInputs.rampupMonths,
+          effortInputs.paybackMonths,
+          effortInputs.trainingHours
         );
 
-        // Calculate business impact using centralized logic for consistency
+        // Calculate ENHANCED business impact (includes error/revenue bonuses)
         const businessImpact = calculateConsolidationBusinessImpact(metrics, companyContext);
         
         const quadrant = getQuadrant(implementationEffort, businessImpact, 150);
         
-        // Use workflow color from first constituent opportunity
-        const workflowId = constituentOpps[0].workflowId;
+        // Use workflow color from consolidation's workflowId
+        const workflowId = consolidation.workflowId;
         
         points.push({
           id: consolidation.id,
@@ -206,16 +220,19 @@ export default function OpportunityMatrix({
       });
     }
 
-    // Create legend
-    const allUniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
-    const legend = allUniqueWorkflows.map(wId => ({
+    // Create legend from all unique workflows (both opportunities and consolidations)
+    const allWorkflowIds = Array.from(new Set([
+      ...opportunities.map(o => o.workflowId),
+      ...consolidations.map(c => c.workflowId)
+    ]));
+    const legend = allWorkflowIds.map(wId => ({
       workflowId: wId,
       workflowName: workflowMap[wId] || "Unknown",
       color: colorMap[wId],
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType, showConsolidations, consolidations]);
+  }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType, viewMode, consolidations]);
 
   // Collision detection function - works in data space with proper scaling
   const detectCollision = useCallback((pos1: { x: number; y: number; text: string }, pos2: { x: number; y: number; text: string }) => {
@@ -337,18 +354,19 @@ export default function OpportunityMatrix({
           <div className="flex items-center gap-4">
             {consolidations.length > 0 && (
               <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="show-consolidations" 
-                  checked={showConsolidations}
-                  onCheckedChange={(checked) => setShowConsolidations(!!checked)}
-                  data-testid="checkbox-show-consolidations"
-                />
-                <Label 
-                  htmlFor="show-consolidations" 
-                  className="text-sm cursor-pointer"
-                >
-                  Show Consolidations
-                </Label>
+                <span className="text-sm text-muted-foreground">View:</span>
+                <Select value={viewMode} onValueChange={(value) => onViewModeChange(value as MatrixViewMode)}>
+                  <SelectTrigger className="w-[220px]" data-testid="select-enhanced-matrix-view">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MATRIX_VIEW_OPTIONS.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
             <Select value={filterType} onValueChange={handleFilterChange}>

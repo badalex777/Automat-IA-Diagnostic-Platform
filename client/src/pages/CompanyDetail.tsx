@@ -36,6 +36,11 @@ export default function CompanyDetail() {
   // View mode state for opportunity filtering
   const [matrixViewMode, setMatrixViewMode] = useState<MatrixViewMode>('combined');
   const [tableViewMode, setTableViewMode] = useState<TableViewMode>('opportunities-only');
+  
+  // Handler for matrix view mode changes
+  const handleMatrixViewModeChange = (mode: MatrixViewMode) => {
+    setMatrixViewMode(mode);
+  };
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -723,6 +728,9 @@ export default function CompanyDetail() {
                         opportunities={filteredOpportunities}
                         workflows={workflows}
                         readinessScores={readinessScores}
+                        consolidations={consolidations}
+                        viewMode={matrixViewMode}
+                        onViewModeChange={handleMatrixViewModeChange}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,
@@ -748,6 +756,8 @@ export default function CompanyDetail() {
                         workflows={workflows}
                         readinessScores={readinessScores}
                         consolidations={consolidations}
+                        viewMode={matrixViewMode}
+                        onViewModeChange={handleMatrixViewModeChange}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,

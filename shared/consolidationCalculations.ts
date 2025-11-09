@@ -278,7 +278,8 @@ export function computeConsolidatedReadiness(
     }
   });
   
-  return totalWeight > 0 ? weightedSum / totalWeight : 0;
+  // Return neutral 50 when no FTE-weighted readiness data is available
+  return totalWeight > 0 ? weightedSum / totalWeight : 50;
 }
 
 /**
