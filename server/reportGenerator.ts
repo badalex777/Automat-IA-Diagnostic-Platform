@@ -603,7 +603,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         .slice(0, 5) // Limit to top 5
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
-    : TRANSLATIONS.fallbackMessages.noStrategicBets;
+    : ctx.t.fallbackMessages.noStrategicBets;
   
   // Generate Nice-to-Have list
   const allRoadmapOpps = [
@@ -616,7 +616,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ? niceToHaveOpportunities
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
         .join('\n')
-    : TRANSLATIONS.fallbackMessages.noNiceToHave;
+    : ctx.t.fallbackMessages.noNiceToHave;
   
   // Generate cultural readiness summary from PIF insights (broader filter)
   const allQuestionInsights = data.appendixB.flatMap(wb => {
@@ -701,7 +701,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== COVER PAGE =====
   sections.push(
     new Paragraph({
-      text: TRANSLATIONS.coverPage.executiveDiagnosticReport.toUpperCase(),
+      text: ctx.t.coverPage.executiveDiagnosticReport.toUpperCase(),
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { before: 1000, after: 200 },
@@ -721,7 +721,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     new Paragraph({
       children: [
         new TextRun({
-          text: TRANSLATIONS.coverTitle,
+          text: ctx.t.coverTitle,
           size: 24,
           font: "Roboto",
         }),
@@ -763,13 +763,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   );
 
   // ===== EXECUTIVE SUMMARY =====
-  sections.push(createHeading(TRANSLATIONS.sections.executiveSummary, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.executiveSummary, HeadingLevel.HEADING_1));
   const execSummaryText = replaceVariables(EXECUTIVE_SUMMARY, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(execSummaryText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== CONFIDENTIALITY & DISCLAIMER =====
-  sections.push(createHeading(TRANSLATIONS.sections.confidentialityDisclaimer, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.confidentialityDisclaimer, HeadingLevel.HEADING_1));
   const confidentialityText = replaceVariables(CONFIDENTIALITY_DISCLAIMER, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(confidentialityText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
@@ -785,13 +785,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   );
 
   // ===== METHODOLOGY OVERVIEW =====
-  sections.push(createHeading(TRANSLATIONS.sections.methodologyOverview, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.methodologyOverview, HeadingLevel.HEADING_1));
   const methodologyText = replaceVariables(METHODOLOGY_OVERVIEW, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(methodologyText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== DIAGNOSTIC OVERVIEW =====
-  sections.push(createHeading(TRANSLATIONS.sections.diagnosticOverview, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.diagnosticOverview, HeadingLevel.HEADING_1));
   
   // Part 1: Sections 4.1 and 4.2
   const diagnosticOverviewPart1 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART1, templateVars, commentaryKeys);
@@ -809,7 +809,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       })
     );
 
-    const top3Headers = [TRANSLATIONS.headers.workflow, TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.roi, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
+    const top3Headers = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.roi, ctx.t.headers.payback, ctx.t.headers.fteSaved];
     const top3Rows = data.top3Opportunities.map(opp => [
       opp.workflowName,
       opp.opportunityName,
@@ -818,7 +818,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       Math.round(opp.paybackMonths).toString(),
       ctx.fmt.number(opp.fteSavings, 2),
     ]);
-    sections.push(createTableCaption("4.3", TRANSLATIONS.tableCaptions["4.3"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("4.3", ctx.t.tableCaptions["4.3"], ctx.t.labels.table));
     sections.push(createTable(top3Headers, top3Rows));
   }
   
@@ -838,7 +838,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       })
     );
 
-    const financialSummaryHeaders = [TRANSLATIONS.headers.metric, TRANSLATIONS.headers.value, TRANSLATIONS.headers.description];
+    const financialSummaryHeaders = [ctx.t.headers.metric, ctx.t.headers.value, ctx.t.headers.description];
     const totalTopBenefit = data.top3Opportunities.reduce((sum, opp) => sum + opp.annualBenefit, 0);
     const totalTopCost = data.top3Opportunities.reduce((sum, opp) => sum + parseFloat(opp.implementationCost || "0"), 0);
     const avgTopROI = data.top3Opportunities.reduce((sum, opp) => sum + opp.roi, 0) / data.top3Opportunities.length;
@@ -853,7 +853,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       ["Total FTE Capacity Saved", ctx.fmt.number(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
     ];
 
-    sections.push(createTableCaption("4.4", TRANSLATIONS.tableCaptions["4.4"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("4.4", ctx.t.tableCaptions["4.4"], ctx.t.labels.table));
     sections.push(createTable(financialSummaryHeaders, financialSummaryRows));
     sections.push(createBodyParagraph("All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the nearest hundred."));
   }
@@ -866,14 +866,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== FINDINGS & ANALYSIS =====
-  sections.push(createHeading(TRANSLATIONS.sections.findingsAnalysis, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.findingsAnalysis, HeadingLevel.HEADING_1));
   
   // Part 1: 5.1 Introduction text
   const findingsPart1 = replaceVariables(FINDINGS_ANALYSIS_PART1, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(findingsPart1));
   
   // Table 5.1: Readiness Summary - ONE ROW PER WORKFLOW (not per opportunity)
-  const readinessHeaders = [TRANSLATIONS.headers.workflow, TRANSLATIONS.headers.tfaScore, TRANSLATIONS.headers.pifScore, TRANSLATIONS.headers.readiness, TRANSLATIONS.headers.band];
+  const readinessHeaders = [ctx.t.headers.workflow, ctx.t.headers.tfaScore, ctx.t.headers.pifScore, ctx.t.headers.readiness, ctx.t.headers.band];
   const readinessRows: string[][] = [];
 
   // Group by workflow to avoid duplication
@@ -908,7 +908,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   });
 
   if (readinessRows.length > 0) {
-    sections.push(createTableCaption("5.1", TRANSLATIONS.tableCaptions["5.1"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("5.1", ctx.t.tableCaptions["5.1"], ctx.t.labels.table));
     sections.push(createTable(readinessHeaders, readinessRows));
   }
   
@@ -922,7 +922,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(...createTextParagraphs(findingsPart3));
   
   // Table 5.2: ROI Insights Table
-  const roiHeaders = [TRANSLATIONS.headers.workflow, TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.estCost, TRANSLATIONS.headers.fteSaved, TRANSLATIONS.headers.payback];
+  const roiHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback];
   const roiRows: string[][] = [];
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
@@ -938,7 +938,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   });
 
   if (roiRows.length > 0) {
-    sections.push(createTableCaption("5.2", TRANSLATIONS.tableCaptions["5.2"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("5.2", ctx.t.tableCaptions["5.2"], ctx.t.labels.table));
     sections.push(createTable(roiHeaders, roiRows));
   }
   
@@ -952,14 +952,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(...createTextParagraphs(findingsPart5));
   
   // Table 5.3: Matrix Distribution
-  const matrixHeaders = [TRANSLATIONS.headers.quadrant, TRANSLATIONS.headers.opportunities, TRANSLATIONS.headers.count];
+  const matrixHeaders = [ctx.t.headers.quadrant, ctx.t.headers.opportunities, ctx.t.headers.count];
   const matrixRows = [
-    [TRANSLATIONS.matrix.quickWins, data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
-    [TRANSLATIONS.matrix.strategicGoals, data.matrixDistribution.strategicGoals.opportunities.join(", "), data.matrixDistribution.strategicGoals.count.toString()],
-    [TRANSLATIONS.matrix.niceToHave, data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
-    [TRANSLATIONS.matrix.deprioritize, data.matrixDistribution.deprioritize.opportunities.join(", "), data.matrixDistribution.deprioritize.count.toString()],
+    [ctx.t.matrix.quickWins, data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
+    [ctx.t.matrix.strategicGoals, data.matrixDistribution.strategicGoals.opportunities.join(", "), data.matrixDistribution.strategicGoals.count.toString()],
+    [ctx.t.matrix.niceToHave, data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
+    [ctx.t.matrix.deprioritize, data.matrixDistribution.deprioritize.opportunities.join(", "), data.matrixDistribution.deprioritize.count.toString()],
   ];
-  sections.push(createTableCaption("5.3", TRANSLATIONS.tableCaptions["5.3"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("5.3", ctx.t.tableCaptions["5.3"], ctx.t.labels.table));
   sections.push(createTable(matrixHeaders, matrixRows));
   
   // Part 6: Commentary and matrix image placeholders
@@ -968,12 +968,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   sections.push(
     new Paragraph({
-      children: [new TextRun({ text: TRANSLATIONS.sections.matrixVisualizations, bold: true })],
+      children: [new TextRun({ text: ctx.t.sections.matrixVisualizations, bold: true })],
       spacing: { before: 240, after: 120 },
     })
   );
   
-  sections.push(createBodyParagraph(TRANSLATIONS.sections.baseOpportunityMatrix));
+  sections.push(createBodyParagraph(ctx.t.sections.baseOpportunityMatrix));
   sections.push(
     new Paragraph({
       text: "[base_matrix_image]",
@@ -982,7 +982,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     })
   );
 
-  sections.push(createBodyParagraph(TRANSLATIONS.sections.enhancedOpportunityMatrix));
+  sections.push(createBodyParagraph(ctx.t.sections.enhancedOpportunityMatrix));
   sections.push(
     new Paragraph({
       text: "[enhanced_matrix_image]",
@@ -991,7 +991,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     })
   );
   
-  sections.push(createBodyParagraph(TRANSLATIONS.matrixDescriptions.baseMatrix));
+  sections.push(createBodyParagraph(ctx.t.matrixDescriptions.baseMatrix));
 
   // 5.4 Executive Interpretation
   sections.push(
@@ -1009,7 +1009,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== AUTOMATION ROADMAP =====
-  sections.push(createHeading(TRANSLATIONS.sections.automationRoadmap, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.sections.automationRoadmap, HeadingLevel.HEADING_1));
   
   // Introduction
   const roadmapIntro = replaceVariables(AUTOMATION_ROADMAP_INTRO, templateVars, commentaryKeys);
@@ -1022,14 +1022,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Phase 1 Table
   if (data.roadmapPhases.phase1QuickWins.length > 0) {
-    const phase1Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
+    const phase1Headers = [ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.payback, ctx.t.headers.fteSaved];
     const phase1Rows = data.roadmapPhases.phase1QuickWins.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
-    sections.push(createTableCaption("6.1", TRANSLATIONS.tableCaptions["6.1"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("6.1", ctx.t.tableCaptions["6.1"], ctx.t.labels.table));
     sections.push(createTable(phase1Headers, phase1Rows));
   }
   
@@ -1046,14 +1046,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Phase 2 Table
   if (data.roadmapPhases.phase2Foundational.length > 0) {
-    const phase2Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
+    const phase2Headers = [ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.payback, ctx.t.headers.fteSaved];
     const phase2Rows = data.roadmapPhases.phase2Foundational.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
-    sections.push(createTableCaption("6.2", TRANSLATIONS.tableCaptions["6.2"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("6.2", ctx.t.tableCaptions["6.2"], ctx.t.labels.table));
     sections.push(createTable(phase2Headers, phase2Rows));
   }
   
@@ -1070,14 +1070,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Phase 3 Table
   if (data.roadmapPhases.phase3Strategic.length > 0) {
-    const phase3Headers = [TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.payback, TRANSLATIONS.headers.fteSaved];
+    const phase3Headers = [ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.payback, ctx.t.headers.fteSaved];
     const phase3Rows = data.roadmapPhases.phase3Strategic.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
       Math.round(opp.roiMetrics.paybackMonths) + " mo",
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
-    sections.push(createTableCaption("6.3", TRANSLATIONS.tableCaptions["6.3"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("6.3", ctx.t.tableCaptions["6.3"], ctx.t.labels.table));
     sections.push(createTable(phase3Headers, phase3Rows));
   }
   
@@ -1100,11 +1100,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   const ganttHeaders = ["Phase", "0-3 mo", "3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo", "15-18 mo"];
   const ganttRows = [
-    [TRANSLATIONS.phaseHeaders.phase1, "█████", "█████", "", "", "", ""],
-    [TRANSLATIONS.phaseHeaders.phase2, "", "", "█████", "█████", "", ""],
-    [TRANSLATIONS.phaseHeaders.phase3, "", "", "", "", "█████", "█████"],
+    [ctx.t.phaseHeaders.phase1, "█████", "█████", "", "", "", ""],
+    [ctx.t.phaseHeaders.phase2, "", "", "█████", "█████", "", ""],
+    [ctx.t.phaseHeaders.phase3, "", "", "", "", "█████", "█████"],
   ];
-  sections.push(createTableCaption("6.4", TRANSLATIONS.tableCaptions["6.4"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("6.4", ctx.t.tableCaptions["6.4"], ctx.t.labels.table));
   sections.push(createTable(ganttHeaders, ganttRows));
   
   // Narrative Summary
@@ -1114,9 +1114,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
   // ===== CONCLUSIONS & NEXT STEPS =====
-  sections.push(createHeading(TRANSLATIONS.conclusions.title, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.conclusions.title, HeadingLevel.HEADING_1));
 
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.keyConclusions));
+  sections.push(createBodyParagraph(ctx.t.conclusions.keyConclusions));
   sections.push(createBulletParagraph("Use of data and structured process readiness for automation with 4 identified opportunities representing $148,000 in annual benefits."));
   sections.push(createBulletParagraph("Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum."));
   sections.push(createBulletParagraph("Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first."));
@@ -1125,23 +1125,23 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   sections.push(createBodyParagraph("[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]"));
 
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.recommendedNextSteps));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step1Title));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step1Content));
+  sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step1Title));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step1Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step2Title));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step2Content));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step2Title));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step2Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step3Title));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step3Content));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step3Title));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step3Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step4Title));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.step4Content));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step4Title));
+  sections.push(createBodyParagraph(ctx.t.conclusions.step4Content));
   sections.push(createBodyParagraph(""));
   sections.push(createBodyParagraph("5. 6-Month Roadmap Review Cadence"));
   sections.push(createBodyParagraph("Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities."));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(TRANSLATIONS.conclusions.closingStatement));
+  sections.push(createBodyParagraph(ctx.t.conclusions.closingStatement));
 
   sections.push(createHorizontalSeparator());
 
@@ -1150,13 +1150,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== APPENDICES =====
 
   // Appendix A
-  sections.push(createHeading(TRANSLATIONS.appendices.a, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.appendices.a, HeadingLevel.HEADING_1));
   const appendixAText = replaceVariables(APPENDIX_A, templateVars, commentaryKeys);
   sections.push(...createTextParagraphs(appendixAText));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix B: Readiness Score Metric Weighting
-  sections.push(createHeading(TRANSLATIONS.appendices.b, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.appendices.b, HeadingLevel.HEADING_1));
   
   sections.push(createBodyParagraph(
     "The Readiness Score is calculated as a weighted combination of the Technical Feasibility Assessment (TFA) " +
@@ -1165,7 +1165,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   ));
   
   // Component Weighting Table - 7-row breakdown matching template
-  const metricWeightHeaders = [TRANSLATIONS.headers.component, TRANSLATIONS.headers.weight, TRANSLATIONS.headers.description];
+  const metricWeightHeaders = [ctx.t.headers.component, ctx.t.headers.weight, ctx.t.headers.description];
   const metricWeightRows = [
     ["System Environment", "15%", "API accessibility, structured data formats, and automation-friendly system architecture"],
     ["Data Quality", "18%", "Completeness, consistency, standardization, and reliability of data used in the workflow"],
@@ -1175,7 +1175,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ["Change Magnitude", "15%", "Frequency of process changes, adaptability requirements, and rules stability"],
     ["Workflow Brittleness", "10%", "Error frequency, exception handling needs, and input consistency challenges"],
   ];
-  sections.push(createTableCaption("B.1", TRANSLATIONS.tableCaptions["B.1"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("B.1", ctx.t.tableCaptions["B.1"], ctx.t.labels.table));
   sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
   sections.push(createBodyParagraph("Why These Weights Matter:"));
@@ -1187,7 +1187,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
   // Appendix C: Readiness SWOT Analysis - Step-Level Text Format
-  sections.push(createHeading(TRANSLATIONS.appendices.c, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.appendices.c, HeadingLevel.HEADING_1));
   sections.push(createBodyParagraph(
     "This appendix consolidates step-level SWOT analyses across all workflows, providing a " +
     "comprehensive view of automation readiness at the process step level. Each workflow is presented " +
@@ -1224,7 +1224,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           // Strengths
           if (stepSWOT.swotAnalysis.strengths && stepSWOT.swotAnalysis.strengths.length > 0) {
             sections.push(new Paragraph({
-              children: [new TextRun({ text: TRANSLATIONS.swot.strengths, bold: true })],
+              children: [new TextRun({ text: ctx.t.swot.strengths, bold: true })],
               spacing: { before: 60, after: 30 },
             }));
             stepSWOT.swotAnalysis.strengths.forEach(strength => {
@@ -1235,7 +1235,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           // Weaknesses
           if (stepSWOT.swotAnalysis.weaknesses && stepSWOT.swotAnalysis.weaknesses.length > 0) {
             sections.push(new Paragraph({
-              children: [new TextRun({ text: TRANSLATIONS.swot.weaknesses, bold: true })],
+              children: [new TextRun({ text: ctx.t.swot.weaknesses, bold: true })],
               spacing: { before: 60, after: 30 },
             }));
             stepSWOT.swotAnalysis.weaknesses.forEach(weakness => {
@@ -1246,7 +1246,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           // Opportunities
           if (stepSWOT.swotAnalysis.opportunities && stepSWOT.swotAnalysis.opportunities.length > 0) {
             sections.push(new Paragraph({
-              children: [new TextRun({ text: TRANSLATIONS.swot.opportunities, bold: true })],
+              children: [new TextRun({ text: ctx.t.swot.opportunities, bold: true })],
               spacing: { before: 60, after: 30 },
             }));
             stepSWOT.swotAnalysis.opportunities.forEach(opportunity => {
@@ -1257,7 +1257,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           // Threats
           if (stepSWOT.swotAnalysis.threats && stepSWOT.swotAnalysis.threats.length > 0) {
             sections.push(new Paragraph({
-              children: [new TextRun({ text: TRANSLATIONS.swot.threats, bold: true })],
+              children: [new TextRun({ text: ctx.t.swot.threats, bold: true })],
               spacing: { before: 60, after: 30 },
             }));
             stepSWOT.swotAnalysis.threats.forEach(threat => {
@@ -1268,13 +1268,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       }
     });
   } else {
-    sections.push(createBodyParagraph("No step-level SWOT analyses available."));
+    sections.push(createBodyParagraph(ctx.t.fallback.noStepSwot));
   }
   
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix D
-  sections.push(createHeading(TRANSLATIONS.appendices.d, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.appendices.d, HeadingLevel.HEADING_1));
   sections.push(createBodyParagraph(APPENDIX_D_INTRO));
   
   // D.0 Consolidated Opportunities Overview (conditional - only if consolidations exist)
@@ -1298,12 +1298,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     
     // D.0a - Consolidated Opportunity Summary Table
     const consolidationHeaders = [
-      TRANSLATIONS.headers.workflow,
+      ctx.t.headers.workflow,
       "Consolidation Name",
       "Opportunities",
-      TRANSLATIONS.headers.annualBenefit,
-      TRANSLATIONS.headers.fteSaved,
-      TRANSLATIONS.headers.payback,
+      ctx.t.headers.annualBenefit,
+      ctx.t.headers.fteSaved,
+      ctx.t.headers.payback,
       "Quadrant"
     ];
     
@@ -1322,12 +1322,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         ]);
       });
     
-    sections.push(createTableCaption("D.0a", (TRANSLATIONS.tableCaptions as any)["D.0a"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("D.0a", (ctx.t.tableCaptions as any)["D.0a"], ctx.t.labels.table));
     sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
     
     // D.0b - Consolidation Constituent Mapping Table
     const constituentHeaders = [
-      TRANSLATIONS.headers.workflow,
+      ctx.t.headers.workflow,
       "Consolidation",
       "Constituent Opportunity",
       "Step #",
@@ -1349,7 +1349,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       });
     });
     
-    sections.push(createTableCaption("D.0b", (TRANSLATIONS.tableCaptions as any)["D.0b"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("D.0b", (ctx.t.tableCaptions as any)["D.0b"], ctx.t.labels.table));
     sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
     
     sections.push(createBodyParagraph(
@@ -1360,7 +1360,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   }
   
   // D.1 Portfolio Summary Table (add Weekly Hours Saved column)
-  const portfolioHeaders = [TRANSLATIONS.headers.workflow, TRANSLATIONS.headers.opportunity, TRANSLATIONS.headers.annualBenefit, TRANSLATIONS.headers.estCost, TRANSLATIONS.headers.fteSaved, TRANSLATIONS.headers.payback, "Weekly Hours Saved"];
+  const portfolioHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback, "Weekly Hours Saved"];
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
@@ -1377,7 +1377,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     });
   });
   if (portfolioRows.length > 0) {
-    sections.push(createTableCaption("D.1", TRANSLATIONS.tableCaptions["D.1"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("D.1", ctx.t.tableCaptions["D.1"], ctx.t.labels.table));
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
   sections.push(createBodyParagraph(
@@ -1426,7 +1426,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         ["Annual Hours Saved", ctx.fmt.number(annualHours, 0)],
         ["Weekly Hours Saved", ctx.fmt.number(weeklyHours, 1)],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics", TRANSLATIONS.labels.table));
+      sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics", ctx.t.labels.table));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
       sections.push(createBodyParagraph("All values modeled under Automat-IA Conservative Scenario."));
       
@@ -1438,7 +1438,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         ["Revenue Uplift", "To be validated", "Capacity reallocation potential subject to business validation"],
         ["Ramp-Up Period", "3 months", "Time to reach steady-state performance after implementation"],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}b`, "Business Impact Components", TRANSLATIONS.labels.table));
+      sections.push(createTableCaption(`D.2.${oppCounter}b`, "Business Impact Components", ctx.t.labels.table));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
       // Dominant component paragraph
@@ -1458,7 +1458,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix E
-  sections.push(createHeading(TRANSLATIONS.appendices.e, HeadingLevel.HEADING_1));
+  sections.push(createHeading(ctx.t.appendices.e, HeadingLevel.HEADING_1));
 
   // E.1 Core Financial Formulas (text only)
   sections.push(...createTextParagraphs(APPENDIX_E_PART1));
@@ -1470,7 +1470,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ["3-Year", "(Annual Benefit × 3) − Implementation Cost", "Cumulative value over initial contract period"],
     ["5-Year", "(Annual Benefit × 5) − Implementation Cost", "Long-term strategic value assessment"],
   ];
-  sections.push(createTableCaption("E.2", TRANSLATIONS.tableCaptions["E.2"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("E.2", ctx.t.tableCaptions["E.2"], ctx.t.labels.table));
   sections.push(createTable(netBenefitHeaders, netBenefitRows, [25, 40, 35]));
 
   // E.3 FTE Conversions (text)
@@ -1483,7 +1483,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ["Error Reduction Benefits", "Error Rate × Rework Cost × Volume × Improvement %", "Value of quality improvements and rework avoided"],
     ["Revenue Uplift Benefits", "Capacity Reallocation × Revenue per Hour × Realization %", "Value from redirecting capacity to revenue-generating activities"],
   ];
-  sections.push(createTableCaption("E.4", TRANSLATIONS.tableCaptions["E.4"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("E.4", ctx.t.tableCaptions["E.4"], ctx.t.labels.table));
   sections.push(createTable(benefitHeaders, benefitRows, [25, 40, 35]));
   sections.push(createBodyParagraph("All benefit calculations apply downward multipliers in conservative modeling to avoid overstatement."));
 
@@ -1497,7 +1497,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ["Cost Overrun Adjustment", "Add 20% contingency to implementation costs to reflect typical project overruns"],
     ["Ramp-Up Efficiency Adjustment", "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization"],
   ];
-  sections.push(createTableCaption("E.5", TRANSLATIONS.tableCaptions["E.5"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("E.5", ctx.t.tableCaptions["E.5"], ctx.t.labels.table));
   sections.push(createTable(scenarioHeaders, scenarioRows, [35, 65]));
   sections.push(createBodyParagraph("Together these controls form the Conservative Scenario Framework, ensuring projections remain achievable, evidence-based, and comparable across diagnostics."));
 
@@ -1512,7 +1512,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ["Recurring Costs", "10-15% of implementation", "Annual software licenses, maintenance, and support"],
     ["One-Time Costs", "Implementation + Training", "Includes build, configuration, testing, and change management"],
   ];
-  sections.push(createTableCaption("E.6", TRANSLATIONS.tableCaptions["E.6"], TRANSLATIONS.labels.table));
+  sections.push(createTableCaption("E.6", ctx.t.tableCaptions["E.6"], ctx.t.labels.table));
   sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
 
   // E.7 Formula Integrity (text)
@@ -1520,12 +1520,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix F - Data Provenance and Audit Trail
-  sections.push(createHeading(TRANSLATIONS.appendices.f, HeadingLevel.HEADING_1));
-  const provenanceHeaders = [TRANSLATIONS.headers.workflowName, "Department", "Step", "Type", "Method", TRANSLATIONS.headers.respondentName, TRANSLATIONS.headers.respondentRole, TRANSLATIONS.headers.collectionDate, TRANSLATIONS.headers.verificationStatus, "Gaps"];
+  sections.push(createHeading(ctx.t.appendices.f, HeadingLevel.HEADING_1));
+  const provenanceHeaders = [ctx.t.headers.workflowName, "Department", "Step", "Type", "Method", ctx.t.headers.respondentName, ctx.t.headers.respondentRole, ctx.t.headers.collectionDate, ctx.t.headers.verificationStatus, "Gaps"];
   const provenanceRows = data.appendixF.map(prov => {
     // Merge Step # and Step Name into single column
-    const stepIdentifier = prov.stepNumber === "N/A" 
-      ? "N/A" 
+    const stepIdentifier = prov.stepNumber === ctx.t.fallback.na 
+      ? ctx.t.fallback.na 
       : `Step ${prov.stepNumber} — ${prov.stepName}`;
     
     return [
@@ -1538,11 +1538,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       prov.respondentRole,
       prov.submissionDate,
       prov.validationStatus,
-      prov.knowledgeGaps || "None",
+      prov.knowledgeGaps || ctx.t.fallback.none,
     ];
   });
   if (provenanceRows.length > 0) {
-    sections.push(createTableCaption("F.1", TRANSLATIONS.tableCaptions["F.1"], TRANSLATIONS.labels.table));
+    sections.push(createTableCaption("F.1", ctx.t.tableCaptions["F.1"], ctx.t.labels.table));
     sections.push(createTable(provenanceHeaders, provenanceRows, [14, 12, 14, 7, 10, 12, 10, 8, 7, 6]));
   }
   
@@ -1565,10 +1565,10 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         detail.resolvedBy,
         detail.resolverRole,
         detail.resolutionMethod,
-        detail.isKnowledgeGap ? "Yes" : "No",
+        detail.isKnowledgeGap ? ctx.t.fallback.yes : ctx.t.fallback.no,
         detail.resolvedAt,
       ]);
-      sections.push(createTableCaption(`F.${gapTableCounter}`, `Knowledge Gap Resolution — ${prov.workflowName}`, TRANSLATIONS.labels.table));
+      sections.push(createTableCaption(`F.${gapTableCounter}`, `Knowledge Gap Resolution — ${prov.workflowName}`, ctx.t.labels.table));
       sections.push(createTable(gapHeaders, gapRows, [5, 30, 15, 12, 15, 8, 15]));
       gapTableCounter++;
     }
@@ -1637,7 +1637,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `${TRANSLATIONS.coverPage.preparedFor} ${data.company.name} ${TRANSLATIONS.coverPage.by} Automat-IA | ${TRANSLATIONS.coverPage.confidential}`,
+                    text: `${ctx.t.coverPage.preparedFor} ${data.company.name} ${ctx.t.coverPage.by} Automat-IA | ${ctx.t.coverPage.confidential}`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
                     font: "Roboto",
@@ -1662,7 +1662,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `${TRANSLATIONS.coverPage.executiveDiagnosticReport} – ${diagnosticPeriod}`,
+                    text: `${ctx.t.coverPage.executiveDiagnosticReport} – ${diagnosticPeriod}`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
                     font: "Roboto",

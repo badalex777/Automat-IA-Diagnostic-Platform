@@ -28,6 +28,15 @@ export interface ReportTranslations {
     systemEnvironmentLimitations: string;
   };
   
+  // Fallback values (for empty/missing data)
+  fallback: {
+    na: string;
+    none: string;
+    yes: string;
+    no: string;
+    noStepSwot: string;
+  };
+  
   // Matrix descriptions
   matrixDescriptions: {
     baseMatrix: string;
@@ -343,6 +352,14 @@ export const en: ReportTranslations = {
     systemEnvironmentLimitations: "System environment limitations",
   },
   
+  fallback: {
+    na: "N/A",
+    none: "None",
+    yes: "Yes",
+    no: "No",
+    noStepSwot: "No step-level SWOT analyses available.",
+  },
+  
   matrixDescriptions: {
     baseMatrix: "The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a balanced view of short-term gains and long-term automation potential.",
   },
@@ -640,6 +657,14 @@ export const es: ReportTranslations = {
     noStrategicBets: "No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.",
     noNiceToHave: "No se identificaron oportunidades Deseables. Todas las oportunidades son Logros Rápidos, Apuestas Estratégicas o requieren mejoras fundacionales.",
     systemEnvironmentLimitations: "Limitaciones del entorno del sistema",
+  },
+  
+  fallback: {
+    na: "N/A",
+    none: "Ninguno",
+    yes: "Sí",
+    no: "No",
+    noStepSwot: "No hay análisis FODA a nivel de pasos disponibles.",
   },
   
   matrixDescriptions: {
