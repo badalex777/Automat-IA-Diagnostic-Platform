@@ -34,6 +34,16 @@ The Automat-IA Diagnostic Platform is a professional web application for consult
 - **Data Backfill**: Existing PIF responses backfilled with calculated scores to ensure historical data displays correctly in all views
 - **End-to-End Verification**: Automated Playwright tests confirm PIF scores calculate correctly, persist to database, and display in both PIF Data and Readiness Analysis tabs
 
+**Workflow-Level Consolidation System (Nov 9, 2024):** Implemented hybrid tactical/strategic opportunity packaging with workflow-level consolidations:
+- **Architecture**: Workflow-level consolidations bundle multiple step-level opportunities into coordinated implementation packages, showing both tactical (individual step opportunities) and strategic (consolidated platform) investment scenarios
+- **Calculation Logic**: Centralized in shared/consolidationCalculations.ts with 20% coordination buffer for workflow-level projects and 15% integration overhead, preventing calculation divergence between UI components
+- **Business Impact**: Consolidations use aggregated constituent metrics (sum ROI, sum FTE, weighted average payback) with coordination buffers applied; positioned on matrix using average constituent readiness scores with effort penalties
+- **UI Integration**: OpportunityMatrix displays consolidations as larger data points (radius 8-10 vs 5) with distinct stroke styling and show/hide toggle; OpportunitiesTable shows Type column with expandable constituent breakdown
+- **Workflow Detail UI**: Dedicated Consolidations section in Opportunities tab with create/edit/delete functionality, aggregated metrics cards, and constituent opportunity listings
+- **EDR Report Enhancement**: Appendix D.0 added with two tables: (D.0a) Consolidated Opportunity Summary showing workflow, name, constituent count, ROI, FTE, payback, and quadrant; (D.0b) Consolidation Constituent Mapping with sorted step-by-step breakdown
+- **Localization**: Full bilingual support with Spanish translations for D.0 table captions and report sections
+- **Data Model**: opportunityConsolidations table links to workflows with many-to-many relationship to constituent opportunities, storing name and aggregated metrics
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
