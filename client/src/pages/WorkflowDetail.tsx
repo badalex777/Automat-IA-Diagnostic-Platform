@@ -299,6 +299,9 @@ export default function WorkflowDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      if (workflow?.companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${workflow.companyId}/consolidations`] });
+      }
       toast({
         title: "Consolidation created",
         description: "Workflow consolidation has been created successfully.",
@@ -322,6 +325,9 @@ export default function WorkflowDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      if (workflow?.companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${workflow.companyId}/consolidations`] });
+      }
       toast({
         title: "Consolidation updated",
         description: "Workflow consolidation has been updated successfully.",
@@ -344,6 +350,9 @@ export default function WorkflowDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/consolidations`] });
+      if (workflow?.companyId) {
+        queryClient.invalidateQueries({ queryKey: [`/api/companies/${workflow.companyId}/consolidations`] });
+      }
       toast({
         title: "Consolidation deleted",
         description: "Workflow consolidation has been deleted successfully.",
@@ -919,13 +928,13 @@ export default function WorkflowDetail() {
               
               return (
                 <>
-                  {/* Opportunity Matrix */}
+                  {/* All Opportunities Cards */}
                   <Card className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold">Opportunity Matrix</h3>
+                        <h2 className="text-xl font-semibold">All Opportunities</h2>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Visual positioning by business impact and implementation effort
+                          Detailed view of each implementation opportunity with raw input metrics
                         </p>
                       </div>
                       <Button
@@ -936,46 +945,6 @@ export default function WorkflowDetail() {
                         <Plus className="h-4 w-4 mr-1" />
                         Create Consolidation
                       </Button>
-                    </div>
-                    <OpportunityMatrix
-                      opportunities={opportunitiesWithScores}
-                      workflows={workflow ? [workflow] : []}
-                      consolidations={consolidations}
-                      readinessScores={stepReadinessScores}
-                      companyContext={companyContext}
-                      onOpportunityClick={(opp) => setEditOpportunity(opp)}
-                      onConsolidationClick={(cons) => setEditConsolidation(cons)}
-                    />
-                  </Card>
-
-                  {/* Opportunities and Consolidations Table */}
-                  <Card className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-semibold">Opportunities & Consolidations</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Detailed breakdown with metrics and constituent analysis
-                        </p>
-                      </div>
-                    </div>
-                    <OpportunitiesTable
-                      opportunities={opportunitiesWithScores}
-                      consolidations={consolidations}
-                      workflowName={workflow?.name || ''}
-                      readinessScores={stepReadinessScores}
-                      companyContext={companyContext}
-                      onOpportunityClick={(opp) => setEditOpportunity(opp)}
-                      onConsolidationClick={(cons) => setEditConsolidation(cons)}
-                    />
-                  </Card>
-
-                  {/* All Opportunities Cards */}
-                  <Card className="p-6">
-                    <div className="mb-4">
-                      <h2 className="text-xl font-semibold">All Opportunities</h2>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Detailed view of each implementation opportunity with raw input metrics
-                      </p>
                     </div>
                     <div className="space-y-3">
                       {opportunitiesWithScores.map((opportunity) => (

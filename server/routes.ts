@@ -1364,6 +1364,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/companies/:companyId/consolidations", async (req, res) => {
+    try {
+      const consolidations = await storage.getConsolidationsByCompany(req.params.companyId);
+      res.json(consolidations);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/opportunities/:id", async (req, res) => {
     try {
       const opportunity = await storage.getImplementationOpportunity(req.params.id);

@@ -68,6 +68,7 @@ export interface IStorage {
   // Workflow Consolidations
   getWorkflowConsolidation(id: string): Promise<WorkflowConsolidation | undefined>;
   getConsolidationsByWorkflow(workflowId: string): Promise<WorkflowConsolidation[]>;
+  getConsolidationsByCompany(companyId: string): Promise<WorkflowConsolidation[]>;
   createWorkflowConsolidation(consolidation: InsertWorkflowConsolidation): Promise<WorkflowConsolidation>;
   updateWorkflowConsolidation(id: string, data: Partial<InsertWorkflowConsolidation>): Promise<WorkflowConsolidation | undefined>;
   deleteWorkflowConsolidation(id: string): Promise<boolean>;

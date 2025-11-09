@@ -13,7 +13,7 @@ import { OpportunitiesDataTable } from "@/components/OpportunitiesDataTable";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Company, Workflow, WorkflowStep, ImplementationOpportunity, TFAAssessment, PIFResponse } from "@shared/schema";
+import type { Company, Workflow, WorkflowStep, ImplementationOpportunity, TFAAssessment, PIFResponse, WorkflowConsolidation } from "@shared/schema";
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections } from "@shared/tfaQuestions";
@@ -44,6 +44,11 @@ export default function CompanyDetail() {
 
   const { data: opportunities = [], isLoading: opportunitiesLoading, error: opportunitiesError } = useQuery<ImplementationOpportunity[]>({
     queryKey: [`/api/companies/${companyId}/opportunities`],
+    enabled: !!companyId,
+  });
+
+  const { data: consolidations = [], isLoading: consolidationsLoading, error: consolidationsError } = useQuery<WorkflowConsolidation[]>({
+    queryKey: [`/api/companies/${companyId}/consolidations`],
     enabled: !!companyId,
   });
 
@@ -726,6 +731,7 @@ export default function CompanyDetail() {
                         opportunities={filteredOpportunities}
                         workflows={workflows}
                         readinessScores={readinessScores}
+                        consolidations={consolidations}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,

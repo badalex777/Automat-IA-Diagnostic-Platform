@@ -481,6 +481,21 @@ export class DbStorage implements IStorage {
     const result = await db.delete(workflowConsolidations).where(eq(workflowConsolidations.id, id));
     return result.rowCount ? result.rowCount > 0 : false;
   }
+
+  async getConsolidationsByCompany(companyId: string): Promise<WorkflowConsolidation[]> {
+    return db.select({
+      id: workflowConsolidations.id,
+      workflowId: workflowConsolidations.workflowId,
+      name: workflowConsolidations.name,
+      description: workflowConsolidations.description,
+      opportunityIds: workflowConsolidations.opportunityIds,
+      createdAt: workflowConsolidations.createdAt,
+    })
+      .from(workflowConsolidations)
+      .innerJoin(workflows, eq(workflowConsolidations.workflowId, workflows.id))
+      .where(eq(workflows.companyId, companyId))
+      .orderBy(desc(workflowConsolidations.createdAt));
+  }
 }
 
 export const storage = new DbStorage();
