@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
-import type { ImplementationOpportunity, Workflow } from "@shared/schema";
+import type { ImplementationOpportunity, Workflow, WorkflowConsolidation } from "@shared/schema";
 import { 
   type CompanyContext,
   type MatrixFilterType,
@@ -11,16 +11,21 @@ import {
   type ToggleState,
   getFilterMaxScore
 } from "@shared/opportunityCalculations";
+import { calculateConsolidatedMetrics, calculateConsolidationBusinessImpact } from "@shared/consolidationCalculations";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface OpportunityMatrixProps {
   opportunities: ImplementationOpportunity[];
   workflows: Workflow[]; // Workflow data for name mapping
-  readinessScores: Record<string, number>; // workflowId -> readiness score
+  readinessScores: Record<string, number>; // stepId -> readiness score
+  consolidations?: WorkflowConsolidation[]; // Workflow consolidations to display
   workflowColors?: Record<string, string>; // workflowId -> color
   companyContext?: CompanyContext; // Company financial context for normalized scoring
   onOpportunityClick?: (opportunity: ImplementationOpportunity) => void;
+  onConsolidationClick?: (consolidation: WorkflowConsolidation) => void;
 }
 
 // Color palette for workflows
@@ -44,6 +49,7 @@ interface DataPoint {
   y: number; // Implementation Effort (inverted for display)
   quadrant: string;
   color: string;
+  isConsolidation?: boolean; // Flag for visual differentiation
 }
 
 interface LabelPosition {
@@ -58,11 +64,14 @@ export default function OpportunityMatrix({
   opportunities, 
   workflows,
   readinessScores,
+  consolidations = [],
   workflowColors,
   companyContext,
-  onOpportunityClick 
+  onOpportunityClick,
+  onConsolidationClick 
 }: OpportunityMatrixProps) {
   const [filterType, setFilterType] = useState<MatrixFilterType>("all-opportunities");
+  const [showConsolidations, setShowConsolidations] = useState(true);
   const [displayData, setDisplayData] = useState<DataPoint[]>([]);
   const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
   const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 450 });
@@ -143,8 +152,59 @@ export default function OpportunityMatrix({
         y: implementationEffort,
         quadrant,
         color: colorMap[opp.workflowId],
+        isConsolidation: false,
       };
     });
+
+    // Add consolidation data points if enabled
+    if (showConsolidations && consolidations.length > 0) {
+      consolidations.forEach(consolidation => {
+        // Get constituent opportunities
+        const constituentOpps = opportunities.filter(opp => 
+          consolidation.opportunityIds.includes(opp.id)
+        );
+        
+        if (constituentOpps.length === 0) return;
+
+        // Calculate aggregated metrics with buffers
+        const metrics = calculateConsolidatedMetrics(constituentOpps);
+        
+        // Calculate average readiness from constituent opportunities' steps
+        const stepReadinessValues = constituentOpps
+          .map(opp => opp.stepId ? readinessScores[opp.stepId] || 0 : 0);
+        const readinessScores_avg = stepReadinessValues.length > 0
+          ? stepReadinessValues.reduce((sum, score) => sum + score, 0) / stepReadinessValues.length
+          : 0;
+        
+        // Calculate implementation effort using consolidated weighted metrics
+        const implementationEffort = calculateImplementationEffort(
+          readinessScores_avg,
+          metrics.weightedAvgRampupPeriodMonths,
+          metrics.weightedAvgPaybackPeriodMonths,
+          metrics.weightedAvgTrainingHoursPerEmployee
+        );
+
+        // Calculate business impact using centralized logic for consistency
+        const businessImpact = calculateConsolidationBusinessImpact(metrics, companyContext);
+        
+        const quadrant = getQuadrant(implementationEffort, businessImpact, 150);
+        
+        // Use workflow color from first constituent opportunity
+        const workflowId = constituentOpps[0].workflowId;
+        
+        points.push({
+          id: consolidation.id,
+          name: consolidation.name,
+          workflowId: workflowId,
+          workflowName: workflowMap[workflowId] || "Unknown",
+          x: businessImpact,
+          y: implementationEffort,
+          quadrant,
+          color: colorMap[workflowId],
+          isConsolidation: true,
+        });
+      });
+    }
 
     // Create legend
     const allUniqueWorkflows = Array.from(new Set(opportunities.map(o => o.workflowId)));
@@ -155,7 +215,7 @@ export default function OpportunityMatrix({
     }));
 
     return { dataPoints: points, workflowLegend: legend };
-  }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType]);
+  }, [opportunities, workflows, readinessScores, colorMap, companyContext, filterType, showConsolidations, consolidations]);
 
   // Collision detection function - works in data space with proper scaling
   const detectCollision = useCallback((pos1: { x: number; y: number; text: string }, pos2: { x: number; y: number; text: string }) => {
@@ -226,6 +286,9 @@ export default function OpportunityMatrix({
       return (
         <div className="bg-popover border rounded-lg p-3 shadow-lg">
           <p className="font-semibold text-sm">{data.name}</p>
+          {data.isConsolidation && (
+            <p className="text-xs text-primary font-medium">Strategic Consolidation</p>
+          )}
           <p className="text-xs text-muted-foreground mt-1">Quadrant: {data.quadrant}</p>
           <div className="mt-2 space-y-1">
             <p className="text-xs">
@@ -242,10 +305,17 @@ export default function OpportunityMatrix({
   };
 
   const handleClick = (data: any) => {
-    if (onOpportunityClick && data) {
-      const opportunity = opportunities.find(o => o.id === data.id);
-      if (opportunity) {
-        onOpportunityClick(opportunity);
+    if (data) {
+      if (data.isConsolidation && onConsolidationClick) {
+        const consolidation = consolidations.find(c => c.id === data.id);
+        if (consolidation) {
+          onConsolidationClick(consolidation);
+        }
+      } else if (onOpportunityClick) {
+        const opportunity = opportunities.find(o => o.id === data.id);
+        if (opportunity) {
+          onOpportunityClick(opportunity);
+        }
       }
     }
   };
@@ -264,28 +334,46 @@ export default function OpportunityMatrix({
               Additive bonus model with full capability scale (0-150)
             </p>
           </div>
-          <Select value={filterType} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
-              <SelectValue placeholder="Filter by metrics" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all-opportunities" data-testid="filter-all-opportunities">
-                All Opportunities
-              </SelectItem>
-              <SelectItem value="time-only" data-testid="filter-time-only">
-                Time Savings Only
-              </SelectItem>
-              <SelectItem value="time-error" data-testid="filter-time-error">
-                Time + Error Reduction
-              </SelectItem>
-              <SelectItem value="time-revenue" data-testid="filter-time-revenue">
-                Time + Revenue Uplift
-              </SelectItem>
-              <SelectItem value="all-three" data-testid="filter-all-three">
-                All 3 Metrics
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-4">
+            {consolidations.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="show-consolidations" 
+                  checked={showConsolidations}
+                  onCheckedChange={(checked) => setShowConsolidations(!!checked)}
+                  data-testid="checkbox-show-consolidations"
+                />
+                <Label 
+                  htmlFor="show-consolidations" 
+                  className="text-sm cursor-pointer"
+                >
+                  Show Consolidations
+                </Label>
+              </div>
+            )}
+            <Select value={filterType} onValueChange={handleFilterChange}>
+              <SelectTrigger className="w-[240px]" data-testid="select-matrix-filter">
+                <SelectValue placeholder="Filter by metrics" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all-opportunities" data-testid="filter-all-opportunities">
+                  All Opportunities
+                </SelectItem>
+                <SelectItem value="time-only" data-testid="filter-time-only">
+                  Time Savings Only
+                </SelectItem>
+                <SelectItem value="time-error" data-testid="filter-time-error">
+                  Time + Error Reduction
+                </SelectItem>
+                <SelectItem value="time-revenue" data-testid="filter-time-revenue">
+                  Time + Revenue Uplift
+                </SelectItem>
+                <SelectItem value="all-three" data-testid="filter-all-three">
+                  All 3 Metrics
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -364,15 +452,29 @@ export default function OpportunityMatrix({
                   data={displayData} 
                   onClick={handleClick}
                   className="cursor-pointer"
-                >
-                  {displayData.map((entry) => (
-                    <Cell 
-                      key={entry.id} 
-                      fill={entry.color}
-                      className="hover:opacity-80 transition-opacity"
-                    />
-                  ))}
-                </Scatter>
+                  shape={(props: any) => {
+                    const { cx, cy, payload } = props;
+                    if (!payload) return <></>;
+                    
+                    // Larger size for consolidations
+                    const radius = payload.isConsolidation ? 9 : 5;
+                    const strokeWidth = payload.isConsolidation ? 2 : 0;
+                    
+                    return (
+                      <g>
+                        <circle 
+                          cx={cx} 
+                          cy={cy} 
+                          r={radius} 
+                          fill={payload.color}
+                          stroke={payload.isConsolidation ? "hsl(var(--foreground))" : "none"}
+                          strokeWidth={strokeWidth}
+                          className="hover:opacity-80 transition-opacity"
+                        />
+                      </g>
+                    );
+                  }}
+                />
 
                 {/* Custom labels with collision avoidance - invisible scatter for coordinate mapping */}
                 <Scatter 

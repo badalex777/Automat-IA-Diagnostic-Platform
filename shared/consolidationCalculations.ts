@@ -180,3 +180,45 @@ export function getConsolidationSummary(opportunities: ImplementationOpportunity
   
   return `${opportunities.length} opportunities across ${stepCount} step${stepCount > 1 ? 's' : ''}`;
 }
+
+/**
+ * Calculate business impact score for a consolidation
+ * Matches opportunity scoring logic for consistency
+ * 
+ * @param metrics - Consolidated metrics from calculateConsolidatedMetrics
+ * @param companyContext - Optional company financial data for normalization
+ * @returns Business impact score (0-150 scale)
+ */
+export function calculateConsolidationBusinessImpact(
+  metrics: ConsolidatedMetrics,
+  companyContext?: { annualRevenue?: string | number | null; totalEmployees?: string | number | null }
+): number {
+  // ROI contribution with 10x multiplier
+  const roiContribution = metrics.totalAnnualRoi * 10;
+  
+  // FTE contribution with context-aware scaling
+  const totalEmployees = typeof companyContext?.totalEmployees === 'number' 
+    ? companyContext.totalEmployees 
+    : (typeof companyContext?.totalEmployees === 'string' 
+        ? parseFloat(companyContext.totalEmployees) 
+        : null);
+  const fteContribution = totalEmployees && !isNaN(totalEmployees)
+    ? (metrics.totalFteSavings / totalEmployees) * 100
+    : metrics.totalFteSavings * 20; // fallback: 20 points per FTE
+  
+  // Start with base impact
+  let businessImpact = roiContribution + fteContribution;
+  
+  // Add error reduction bonus if applicable (25 points)
+  if (metrics.hasErrorMetrics && metrics.totalErrorsAvoidedAnnually > 0) {
+    businessImpact += 25;
+  }
+  
+  // Add revenue uplift bonus if applicable (25 points)
+  if (metrics.hasRevenueMetrics && metrics.totalRevenueUpliftAnnual > 0) {
+    businessImpact += 25;
+  }
+  
+  // Cap at 150 (max scale for Enhanced Impact Matrix)
+  return Math.min(businessImpact, 150);
+}
