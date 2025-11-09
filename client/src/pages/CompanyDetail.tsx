@@ -41,6 +41,11 @@ export default function CompanyDetail() {
   const handleMatrixViewModeChange = (mode: MatrixViewMode) => {
     setMatrixViewMode(mode);
   };
+  
+  // Handler for table view mode changes
+  const handleTableViewModeChange = (mode: TableViewMode) => {
+    setTableViewMode(mode);
+  };
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -742,6 +747,8 @@ export default function CompanyDetail() {
                         workflowSteps={allSteps}
                         readinessScores={readinessScores}
                         consolidations={consolidations}
+                        viewMode={tableViewMode}
+                        onViewModeChange={handleTableViewModeChange}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,
@@ -769,6 +776,8 @@ export default function CompanyDetail() {
                         workflowSteps={allSteps}
                         readinessScores={readinessScores}
                         consolidations={consolidations}
+                        viewMode={tableViewMode}
+                        onViewModeChange={handleTableViewModeChange}
                         companyContext={{
                           annualRevenue: company?.annualRevenue,
                           totalEmployees: company?.totalEmployees,

@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import {
   Select,
@@ -24,8 +22,10 @@ import type { CompanyContext } from "@shared/opportunityCalculations";
 import {
   calculateConsolidatedMetrics,
   calculateConsolidationBusinessImpact,
+  calculateConsolidatedBaseImpact,
   type ConsolidatedMetrics,
 } from "@shared/consolidationCalculations";
+import { type TableViewMode, TABLE_VIEW_OPTIONS } from "@/lib/opportunityViewMode";
 
 interface OpportunitiesDataTableProps {
   opportunities: ImplementationOpportunity[];
@@ -35,15 +35,9 @@ interface OpportunitiesDataTableProps {
   companyContext: CompanyContext;
   matrixType: 'base' | 'enhanced';
   consolidations?: WorkflowConsolidation[];
+  viewMode: TableViewMode;
+  onViewModeChange: (mode: TableViewMode) => void;
 }
-
-type SortOption = 
-  | 'impact-high'
-  | 'impact-low'
-  | 'effort-high'
-  | 'effort-low'
-  | 'workflow'
-  | 'roadmap';
 
 // Discriminated union for unified table rows
 type TableRow =
@@ -93,9 +87,9 @@ export function OpportunitiesDataTable({
   companyContext,
   matrixType,
   consolidations = [],
+  viewMode,
+  onViewModeChange,
 }: OpportunitiesDataTableProps) {
-  const [sortBy, setSortBy] = useState<SortOption>('roadmap');
-  const [showConsolidations, setShowConsolidations] = useState(true);
   const [expandedConsolidations, setExpandedConsolidations] = useState<Set<string>>(new Set());
 
   // Workflow colors for visual coding - professional palette
@@ -117,45 +111,47 @@ export function OpportunitiesDataTable({
     return workflowColorMap;
   }, [workflows]);
 
-  // Build unified row array with both opportunities and consolidations
+  // Build unified row array based on viewMode
   const unifiedRows = useMemo((): TableRow[] => {
     const rows: TableRow[] = [];
     
-    // Add opportunity rows
-    opportunities.forEach(opp => {
-      const readinessScore = opp.stepId ? (readinessScores[opp.stepId] || 0) : 0;
-      const baseImpact = calculateBaseImpact(opp, companyContext);
-      const enhancedImpact = calculateEnhancedImpact(
-        opp, 
-        { errorMetrics: true, revenueMetrics: true }, 
-        companyContext
-      );
-      const effortScore = calculateImplementationEffort(
-        readinessScore,
-        parseFloat(opp.rampupPeriodMonths || "0"),
-        parseFloat(opp.paybackPeriodMonths || "0"),
-        parseFloat(opp.trainingHoursPerEmployee || "0")
-      );
-      const workflow = workflows.find(w => w.id === opp.workflowId);
-      const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
-      const displayImpact = matrixType === 'enhanced' ? enhancedImpact : baseImpact;
-      
-      rows.push({
-        kind: 'opportunity',
-        id: opp.id,
-        name: opp.name,
-        workflowId: opp.workflowId,
-        workflow,
-        linkedStep,
-        displayImpact,
-        effortScore,
-        readinessScore,
-        opportunity: opp,
+    // Add opportunity rows if viewMode is 'opportunities-only'
+    if (viewMode === 'opportunities-only') {
+      opportunities.forEach(opp => {
+        const readinessScore = opp.stepId ? (readinessScores[opp.stepId] || 0) : 0;
+        const baseImpact = calculateBaseImpact(opp, companyContext);
+        const enhancedImpact = calculateEnhancedImpact(
+          opp, 
+          { errorMetrics: true, revenueMetrics: true }, 
+          companyContext
+        );
+        const effortScore = calculateImplementationEffort(
+          readinessScore,
+          parseFloat(opp.rampupPeriodMonths || "0"),
+          parseFloat(opp.paybackPeriodMonths || "0"),
+          parseFloat(opp.trainingHoursPerEmployee || "0")
+        );
+        const workflow = workflows.find(w => w.id === opp.workflowId);
+        const linkedStep = workflowSteps.find(s => s.id === opp.stepId);
+        const displayImpact = matrixType === 'enhanced' ? enhancedImpact : baseImpact;
+        
+        rows.push({
+          kind: 'opportunity',
+          id: opp.id,
+          name: opp.name,
+          workflowId: opp.workflowId,
+          workflow,
+          linkedStep,
+          displayImpact,
+          effortScore,
+          readinessScore,
+          opportunity: opp,
+        });
       });
-    });
+    }
     
-    // Add consolidation rows if showConsolidations is enabled
-    if (showConsolidations) {
+    // Add consolidation rows if viewMode is 'consolidations-only'
+    if (viewMode === 'consolidations-only') {
       consolidations.forEach(consolidation => {
         // Get constituent opportunities
         const constituentOpps = opportunities.filter(opp => 
@@ -186,11 +182,10 @@ export function OpportunitiesDataTable({
           ? weightedReadinessSum / totalReadinessWeight 
           : 0;
         
-        // Calculate business impact from consolidated metrics
-        const consolidationImpact = calculateConsolidationBusinessImpact(
-          metrics,
-          companyContext
-        );
+        // Calculate business impact from consolidated metrics (both base and enhanced)
+        const baseImpact = calculateConsolidatedBaseImpact(metrics, companyContext);
+        const enhancedImpact = calculateConsolidationBusinessImpact(metrics, companyContext);
+        const displayImpact = matrixType === 'enhanced' ? enhancedImpact : baseImpact;
         
         // Calculate implementation effort using weighted periods from metrics
         const consolidationEffort = calculateImplementationEffort(
@@ -206,7 +201,7 @@ export function OpportunitiesDataTable({
           name: consolidation.name,
           workflowId: consolidation.workflowId,
           workflow,
-          displayImpact: consolidationImpact,
+          displayImpact,
           effortScore: consolidationEffort,
           readinessScore: consolidationReadiness,
           constituentCount: constituentOpps.length,
@@ -217,9 +212,9 @@ export function OpportunitiesDataTable({
     }
     
     return rows;
-  }, [opportunities, consolidations, readinessScores, workflows, workflowSteps, companyContext, matrixType, showConsolidations]);
+  }, [opportunities, consolidations, readinessScores, workflows, workflowSteps, companyContext, matrixType, viewMode]);
 
-  // Sort unified rows
+  // Sort unified rows using roadmap priority (always)
   const sortedRows = useMemo(() => {
     const sorted = [...unifiedRows];
     
@@ -231,35 +226,15 @@ export function OpportunitiesDataTable({
       ? Math.max(...sorted.map(r => r.effortScore), 0.001) // Guard against zero
       : 1;
     
-    switch (sortBy) {
-      case 'impact-high':
-        return sorted.sort((a, b) => b.displayImpact - a.displayImpact);
-      case 'impact-low':
-        return sorted.sort((a, b) => a.displayImpact - b.displayImpact);
-      case 'effort-high':
-        return sorted.sort((a, b) => b.effortScore - a.effortScore);
-      case 'effort-low':
-        return sorted.sort((a, b) => a.effortScore - b.effortScore);
-      case 'workflow':
-        // Sort by workflow name, then by row name
-        return sorted.sort((a, b) => {
-          const workflowComparison = (a.workflow?.name || '').localeCompare(b.workflow?.name || '');
-          return workflowComparison !== 0 ? workflowComparison : a.name.localeCompare(b.name);
-        });
-      case 'roadmap':
-        // Roadmap prioritization: high impact + low effort = quick wins (higher priority)
-        // Priority score = (normalized impact) - (normalized effort)
-        // Higher score = better opportunity (quick win)
-        return sorted.sort((a, b) => {
-          const aPriority = (a.displayImpact / maxImpact) - (a.effortScore / maxEffort);
-          const bPriority = (b.displayImpact / maxImpact) - (b.effortScore / maxEffort);
-          
-          return bPriority - aPriority;
-        });
-      default:
-        return sorted;
-    }
-  }, [unifiedRows, sortBy]);
+    // Roadmap prioritization: high impact + low effort = quick wins (higher priority)
+    // Priority score = (normalized impact) - (normalized effort)
+    // Higher score = better opportunity (quick win)
+    return sorted.sort((a, b) => {
+      const aPriority = (a.displayImpact / maxImpact) - (a.effortScore / maxEffort);
+      const bPriority = (b.displayImpact / maxImpact) - (b.effortScore / maxEffort);
+      return bPriority - aPriority;
+    });
+  }, [unifiedRows]);
 
   // Get color for business impact score (green = good, red = bad)
   const getImpactColor = (score: number) => {
@@ -308,41 +283,23 @@ export function OpportunitiesDataTable({
           </p>
         </div>
         
-        <div className="flex items-center gap-4">
-          {consolidations.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Checkbox 
-                id="show-table-consolidations" 
-                checked={showConsolidations}
-                onCheckedChange={(checked) => setShowConsolidations(!!checked)}
-                data-testid="checkbox-show-table-consolidations"
-              />
-              <Label 
-                htmlFor="show-table-consolidations" 
-                className="text-sm cursor-pointer"
-              >
-                Show Consolidations ({consolidations.length})
-              </Label>
-            </div>
-          )}
-          
+        {consolidations.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Sort by:</span>
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-              <SelectTrigger className="w-[220px]" data-testid="select-sort-opportunities">
+            <span className="text-sm text-muted-foreground">View:</span>
+            <Select value={viewMode} onValueChange={(value) => onViewModeChange(value as TableViewMode)}>
+              <SelectTrigger className="w-[200px]" data-testid="select-table-view">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="roadmap">Roadmap Priority</SelectItem>
-                <SelectItem value="impact-high">Highest Business Impact</SelectItem>
-                <SelectItem value="impact-low">Lowest Business Impact</SelectItem>
-                <SelectItem value="effort-low">Lowest Implementation Effort</SelectItem>
-                <SelectItem value="effort-high">Highest Implementation Effort</SelectItem>
-                <SelectItem value="workflow">Sort by Workflow</SelectItem>
+                {TABLE_VIEW_OPTIONS.map(option => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="border rounded-lg overflow-hidden">
@@ -463,14 +420,12 @@ export function OpportunitiesDataTable({
         </Table>
       </div>
       
-      {sortBy === 'roadmap' && (
-        <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold">18-Month Roadmap:</span> Opportunities prioritized by quick wins (high impact, low effort) first, followed by strategic implementations. 
-            Top items are recommended for immediate action.
-          </p>
-        </div>
-      )}
+      <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold">18-Month Roadmap:</span> Opportunities prioritized by quick wins (high impact, low effort) first, followed by strategic implementations. 
+          Top items are recommended for immediate action.
+        </p>
+      </div>
     </Card>
   );
 }
