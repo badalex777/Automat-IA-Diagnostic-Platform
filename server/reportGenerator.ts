@@ -195,7 +195,7 @@ function createTextParagraphs(text: string): Paragraph[] {
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
         alignment: AlignmentType.BOTH,
-        spacing: { before: 120, after: 120 },
+        spacing: { before: 120, after: 60 },
       }));
       continue;
     }
@@ -207,7 +207,7 @@ function createTextParagraphs(text: string): Paragraph[] {
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
         alignment: AlignmentType.BOTH,
-        spacing: { before: 120, after: 120 },
+        spacing: { before: 120, after: 60 },
       }));
       continue;
     }
@@ -219,7 +219,7 @@ function createTextParagraphs(text: string): Paragraph[] {
       paragraphs.push(new Paragraph({
         text: trimmed,
         heading: HeadingLevel.HEADING_3,
-        spacing: { before: 120, after: 120 },
+        spacing: { before: 120, after: 60 },
       }));
       continue;
     }
@@ -647,6 +647,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ? culturalInsights.map((qi, idx) => `${idx + 1}. ${qi.insight}`).join('\n')
     : "• Varying levels of automation awareness across departments\n• Strong stakeholder engagement in high-readiness workflows\n• Need for change management support in cross-functional processes\n• Opportunity for automation literacy training";
 
+  // Calculate total consolidations across all workflows
+  const totalConsolidations = data.workflows.reduce((sum: number, wd: any) => sum + wd.consolidations.length, 0);
+  const consolidationCountLine = totalConsolidations > 0 
+    ? `\n• Workflow Consolidations Identified: ${totalConsolidations}` 
+    : '';
+
   const templateVars = {
     company_name: data.company.name,
     Lead_Analyst_Name: data.company.leadAnalystName || "[Lead Analyst Name]",
@@ -656,6 +662,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     workflow_count: data.portfolioMetrics.totalWorkflows.toString(),
     total_opportunities: data.portfolioMetrics.totalOpportunities.toString(),
     opportunity_count: data.portfolioMetrics.totalOpportunities.toString(),
+    consolidation_count_line: consolidationCountLine,
     annual_benefit: formatCurrency(data.portfolioMetrics.totalAnnualBenefit),
     payback_period: Math.round(data.portfolioMetrics.averagePaybackMonths).toString(),
     avg_payback: Math.round(data.portfolioMetrics.averagePaybackMonths).toString(),

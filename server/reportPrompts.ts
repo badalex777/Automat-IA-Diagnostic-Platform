@@ -298,9 +298,9 @@ Phase 8: Validation Session and Stakeholder Alignment
 
 After the Opportunity Matrix is generated, a validation session is conducted with key
 stakeholders to confirm prioritization, address hidden risks, and align automation opportunities
-with organizational strategy and culture. This collaborative review ensures that the roadmap
-reflects both analytical rigor and practical business considerations. Stakeholders provide input
-on implementation feasibility, resource availability, and strategic fit, allowing the team to adjust
+with organizational strategy. This collaborative review ensures that the roadmap reflects both
+analytical rigor and practical business considerations. Stakeholders provide input on
+implementation feasibility, resource availability, and strategic fit, allowing the team to adjust
 rankings and sequencing as needed. The validated Opportunity Matrix then feeds directly into
 the final automation roadmap and becomes the foundation for the Executive Diagnostic Report.
 
@@ -363,7 +363,7 @@ that are both technically feasible and financially justified.
 4.2 Key Diagnostic Findings
 
 • Total Workflows Analyzed: {{workflow_count}}
-• Validated Automation Opportunities: {{opportunity_count}}
+• Validated Automation Opportunities: {{opportunity_count}}{{consolidation_count_line}}
 • Total Annual Benefit Potential: {{annual_benefit}}
 • Average Payback Period: {{avg_payback}} months
 • FTE Saved: {{fte_savings}}
