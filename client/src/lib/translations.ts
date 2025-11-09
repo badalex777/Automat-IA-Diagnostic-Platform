@@ -459,6 +459,8 @@ export interface Translations {
       step5Content: string;
       step6Title: string;
       step6Content: string;
+      step7Title: string;
+      step7Content: string;
     };
     
     // TFA Methodology
@@ -573,10 +575,30 @@ export interface Translations {
       quadrant4: string;
       opportunitiesTable: string;
       opportunitiesTableContent: string;
-      sortingFunctionality: string;
-      sortingFunctionalityContent: string;
       roadmapPriorityAlgorithm: string;
       roadmapPriorityAlgorithmContent: string;
+    };
+    
+    // Workflow Consolidations
+    consolidations: {
+      title: string;
+      intro: string;
+      whatAreConsolidations: string;
+      whatAreConsolidationsContent: string;
+      whyConsolidate: string;
+      whyConsolidateContent: string;
+      whenToConsolidate: string;
+      whenToConsolidateContent: string;
+      whenNotToConsolidate: string;
+      whenNotToConsolidateContent: string;
+      calculationLogic: string;
+      calculationLogicContent: string;
+      visualDistinction: string;
+      visualDistinctionContent: string;
+      filteringSystem: string;
+      filteringSystemContent: string;
+      tableDisplay: string;
+      tableDisplayContent: string;
     };
     
     // ROI Calculator Integration
@@ -1152,7 +1174,9 @@ const en: Translations = {
       step5Title: "Step 5: Step-Level Readiness Analysis",
       step5Content: "View each step's individual readiness score calculated as 60% shared TFA + 40% step-specific PIF. Each step displays its own Readiness tab with component breakdowns, radar chart visualization, feasibility band classification, and comprehensive step-specific SWOT analysis. The Workflow Readiness tab aggregates all step analyses, showing combined executive summary, aggregated SWOT, radar chart, and component weight pie chart for workflow-wide insights.",
       step6Title: "Step 6: Step-Level Opportunity Creation & Matrix Positioning",
-      step6Content: "Create implementation opportunities linked exclusively to specific workflow steps. Each opportunity specifies ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. The Opportunity Matrix scatter plot positions opportunities using Business Impact (X-axis) vs Implementation Effort (Y-axis), where Implementation Effort is calculated from the opportunity's specific step readiness score. Compare opportunities using both Base Impact Matrix (pure time savings) and Enhanced Impact Matrix (with quality and growth bonuses). The opportunities table below the matrix provides color-coded workflow grouping and sortable roadmap prioritization.",
+      step6Content: "Create implementation opportunities linked exclusively to specific workflow steps. Each opportunity specifies ROI data, time savings, optional error reduction metrics, and optional revenue uplift metrics. The Opportunity Matrix scatter plot positions opportunities using Business Impact (X-axis) vs Implementation Effort (Y-axis), where Implementation Effort is calculated from the opportunity's specific step readiness score. Compare opportunities using both Base Impact Matrix (pure time savings) and Enhanced Impact Matrix (with quality and growth bonuses). The opportunities table below the matrix provides color-coded workflow grouping and roadmap prioritization.",
+      step7Title: "Optional Step 7: Create Workflow Consolidations",
+      step7Content: "When multiple opportunities exist within the same workflow, consider creating a consolidation package to bundle them into a unified strategic platform. Consolidations provide coordinated implementation, shared infrastructure, and economies of scale. Navigate to the workflow's Opportunities tab, select 2+ individual opportunities, and use the 'Create Consolidation' feature to define the strategic package with a name and description. Consolidations appear on the Opportunity Matrix as larger dots with distinct borders and can be filtered using the matrix and table view controls.",
     },
     
     tfaMethodology: {
@@ -1166,7 +1190,7 @@ const en: Translations = {
       integrationFeasibility: "Integration Feasibility (30%): Technical integration capabilities, vendor cooperation, data exchange formats, latency tolerance, and monitoring infrastructure",
       securityCompliance: "Security & Compliance (15%): Security requirements, data privacy standards, compliance frameworks, audit trails, and regulatory constraints",
       scoringAlgorithm: "Scoring Algorithm",
-      scoringAlgorithmContent: "**Formula**: • TFA Score = Weighted average across all sections, normalized to 0-100 scale • TFA = [(System Environment × 0.25) + (Data Quality × 0.30) + (Integration Feasibility × 0.30) + (Security/Compliance × 0.15)] **Section Calculation**: • Each section score = Average of its question scores, weighted by question importance **Knowledge Gaps**: • 'Don't Know' responses are excluded from calculations • Tracked separately for risk assessment",
+      scoringAlgorithmContent: "**Formula** • TFA Score = Weighted average across all sections, normalized to 0-100 scale • TFA = [(System Environment × 0.25) + (Data Quality × 0.30) + (Integration Feasibility × 0.30) + (Security/Compliance × 0.15)] **Section Calculation** • Each section score = Average of its question scores, weighted by question importance **Knowledge Gaps** • 'Don't Know' responses are excluded from calculations • Tracked separately for risk assessment",
       feasibilityBands: "Feasibility Bands",
       veryHigh: "Very High Feasibility (80-100): Optimal technical foundation. Systems are modern, well-integrated, and AI-ready. Minimal technical barriers to implementation.",
       high: "High Feasibility (65-79): Strong technical foundation with minor gaps. Implementation is viable with manageable technical adjustments.",
@@ -1262,11 +1286,30 @@ const en: Translations = {
       quadrant3: "Nice-to-Haves: Low business impact, low implementation effort. Easy wins but limited strategic value. Pursue after higher priorities.",
       quadrant4: "Deprioritize: Low business impact, high implementation effort. Avoid unless non-financial strategic drivers exist.",
       opportunitiesTable: "Opportunities Table",
-      opportunitiesTableContent: "**Table Location**: • Below each scatter plot matrix **Visual Features**: • Professional tabular view of all opportunities • Workflow color coding • Performance gradients **Workflow Color Coding**: • Each table row features a subtle background tint matching its source workflow color • Prominent left border accent in the same hue • Enables instant recognition of which opportunities belong to which workflow **Performance Gradients**: • Business Impact and Implementation Effort columns use color gradients for at-a-glance prioritization • Green shading: High impact/low effort (favorable) • Red shading: Low impact/high effort (unfavorable) **Dynamic Scaling**: • Table dynamically switches between Base Impact (0-100 scale) and Enhanced Impact (0-150 scale) when toggling matrix views • Automatically recalculates all scores and updates color gradients accordingly",
-      sortingFunctionality: "Sorting & Prioritization",
-      sortingFunctionalityContent: "**Dropdown Menu**: • Context-aware sorting options **Available Sorts (6 options for all views)**: • Roadmap Priority (default) • Highest Business Impact • Lowest Business Impact • Lowest Implementation Effort • Highest Implementation Effort • Sort by Workflow **Notes**: • All views (company-wide and single-workflow) include all 6 sorting options • Sorting adapts to current matrix view (Base vs Enhanced Impact)",
+      opportunitiesTableContent: "**Table Location** • Below each scatter plot matrix **Visual Features** • Professional tabular view of opportunities and consolidations • Workflow color coding • Performance gradients • Expandable consolidations **Workflow Color Coding** • Each table row features a subtle background tint matching its source workflow color • Prominent left border accent in the same hue • Enables instant recognition of which opportunities belong to which workflow **Consolidation Display** • Consolidations appear in the table with expandable rows • Click to expand and view constituent opportunities • Shows aggregated metrics (combined ROI, FTE savings) and calculated readiness **Filtering Controls** • Matrix Filter: Combined (both), Opportunities Only, or Consolidations Only • Table Filter: Opportunities Only or Consolidations Only • Filters synchronize: Matrix filter to Opportunities/Consolidations Only auto-syncs table • Combined matrix mode keeps table filter independent **Performance Gradients** • Business Impact and Implementation Effort columns use color gradients for at-a-glance prioritization • Green shading: High impact/low effort (favorable) • Red shading: Low impact/high effort (unfavorable) **Dynamic Scaling** • Table switches between Base Impact (0-100 scale) and Enhanced Impact (0-150 scale) when toggling matrix views • Automatically recalculates all scores and updates color gradients **Default Sorting** • All tables use roadmap priority sorting by default • Formula: (Business Impact / Max Impact) - (Implementation Effort / Max Effort) • Identifies quick wins (high impact, low effort) automatically",
       roadmapPriorityAlgorithm: "Roadmap Priority Algorithm",
       roadmapPriorityAlgorithmContent: "**Purpose**: • Creates an 18-month implementation roadmap • Identifies quick wins—opportunities with high business impact and low implementation effort **Algorithm**: • Priority Score = (Normalized Impact) - (Normalized Effort) **Normalization Process**: • Normalized values are scaled 0-1 by dividing each opportunity's score by the maximum score in its category • Zero-division protection using Math.max with 0.001 fallback **Score Interpretation**: • High priority scores = High-value, low-effort opportunities that should be tackled first • Quick wins rise to the top • Followed by strategic bets (high impact but higher effort) • Low-impact or high-effort opportunities are deprioritized **Output**: • Clear, defensible implementation sequence to present to clients",
+    },
+    
+    consolidations: {
+      title: "Workflow Consolidations",
+      intro: "Workflow consolidations bundle multiple step-level opportunities into unified strategic platforms. This feature enables consultants to present both tactical (individual opportunities) and strategic (consolidated platform) investment scenarios to clients.",
+      whatAreConsolidations: "What Are Consolidations?",
+      whatAreConsolidationsContent: "**Definition** • Consolidations are strategic packages that combine 2+ individual opportunities from the same workflow into a coordinated implementation platform **Purpose** • Present platform-based approaches as an alternative to piecemeal implementations • Show economies of scale and integration benefits • Enable apples-to-apples comparison of tactical vs strategic approaches **Creation** • Navigate to workflow's Opportunities tab • Select 2+ opportunities using checkboxes • Click 'Create Consolidation' button • Define name, description, and constituent opportunities",
+      whyConsolidate: "Why Bundle Opportunities?",
+      whyConsolidateContent: "**Integration Challenges** • Disconnected tools that don't communicate • Multiple interfaces and training requirements • Higher long-term maintenance costs **Strategic Benefits** • Coordinated Implementation: Single integrated solution across multiple process steps • Enhanced User Experience: One cohesive interface instead of multiple point solutions • Economies of Scale: Shared infrastructure, training, and maintenance • Strategic Value: Comprehensive workflow transformation vs piecemeal improvements • Reduced Risk: Coordinated change management and governance",
+      whenToConsolidate: "When to Create Consolidations",
+      whenToConsolidateContent: "**Workflow Cohesion** • Multiple opportunities belong to the same workflow or tightly coupled process • Example: Lead qualification + proposal generation + contract review in a sales process **Shared Technology Stack** • Opportunities would benefit from the same underlying platform • Example: Multiple document processing steps could use a single AI document platform **User Overlap** • The same team or roles interact with multiple opportunity areas • Example: Support agents handling ticket triage, response drafting, and escalation **Sequential Dependencies** • Process steps flow directly into one another • Example: Data extraction → validation → entry → reconciliation in invoice processing **Scale Threshold** • Combined impact justifies platform investment • Guideline: 3+ opportunities with combined Business Impact >80 (Enhanced) or >60 (Base) **Strategic Bet** • Executive commitment to comprehensive workflow transformation • Example: Complete automation of a mission-critical business process",
+      whenNotToConsolidate: "When NOT to Consolidate",
+      whenNotToConsolidateContent: "**Unrelated Workflows** • Opportunities span unrelated workflows with different ownership • Technologies or vendors are fundamentally incompatible **Readiness Variance** • Organizational readiness varies significantly across opportunities • Some areas ready, others need foundational work first **Quick Wins Needed** • Individual opportunities can be delivered faster • Client needs immediate ROI demonstration **Organizational Barriers** • Political or organizational barriers prevent coordinated implementation • Different budget owners or competing priorities",
+      calculationLogic: "Consolidation Calculation Logic",
+      calculationLogicContent: "**Business Impact** • Aggregates constituent ROI and FTE benefits • May include coordination efficiency gains in Enhanced Impact mode **Payback Period** • Weighted average of constituent payback periods • Plus 20% coordination buffer to account for integration complexity **Readiness Score** • FTE-weighted average of constituent readiness scores • Defaults to simple average if no FTE data available • Formula: Σ(Readiness × FTE) / Σ(FTE) **Implementation Effort** • Includes 15% integration overhead on rampup and training hours • Plus 20% coordination buffer on payback period • Reflects additional complexity of coordinated implementations **Why Buffers?** • Coordination requires additional planning, integration testing, and change management • Buffers provide realistic estimates vs artificially optimistic projections • Helps set appropriate client expectations",
+      visualDistinction: "Visual Distinction on Matrix",
+      visualDistinctionContent: "**Consolidations vs Opportunities** • Individual Opportunities: Standard dots (5px radius) in workflow color • Consolidations: Larger dots (9px radius) with foreground-colored border **Why Different?** • Instant visual recognition of strategic platform investments • Emphasizes strategic nature vs tactical point solutions • Clear differentiation in both Base and Enhanced Impact matrices **Color Coding** • Consolidations use the same workflow color as their constituents • Border treatment adds visual weight and prominence",
+      filteringSystem: "Unified Filtering System",
+      filteringSystemContent: "**Matrix Filter (3 options)** • Combined: Display both opportunities AND consolidations on scatter plot • Opportunities Only: Show only individual opportunities (hide consolidations) • Consolidations Only: Show only consolidation packages (hide opportunities) **Table Filter (2 options)** • Opportunities Only: List individual opportunities in data table • Consolidations Only: List consolidations with expand/collapse to view constituents **Sync Behavior** • Matrix → Table Sync: Matrix filter to Opportunities/Consolidations Only auto-updates table • Combined Mode: Table filter remains independent when matrix shows both • Manual Override: User can always manually change table filter **Use Cases** • Focused Analysis: Filter both to one type for concentrated review • Comprehensive View: Matrix shows Combined, table filters to specific type for detailed analysis",
+      tableDisplay: "Consolidation Table Display",
+      tableDisplayContent: "**Expandable Rows** • Consolidations appear as expandable rows in opportunities table • Click to expand and view constituent opportunities list • Each constituent shows: opportunity name, step name, individual metrics **Aggregated Metrics** • Header row shows consolidated totals: combined annual ROI, total FTE savings • Calculated readiness score (FTE-weighted average) • Implementation effort with coordination buffers **Visual Indicators** • Same workflow color coding as individual opportunities • Expandable arrow icon indicates consolidation vs individual opportunity • Constituent list indented for clear hierarchy",
     },
     
     roiCalculatorIntegration: {
@@ -1831,6 +1874,8 @@ const es: Translations = {
       step5Content: "Vea la puntuación de preparación combinada calculada como 60% TFA + 40% PIF. La rúbrica desglosa los 7 componentes con sus pesos individuales, proporciona clasificación de banda de viabilidad y genera un análisis FODA integral que identifica fortalezas, debilidades, oportunidades y amenazas.",
       step6Title: "Paso 6: Identificación y Priorización de Oportunidades",
       step6Content: "Cree oportunidades de implementación especificando datos de ROI, ahorro de tiempo, métricas opcionales de reducción de errores y métricas opcionales de aumento de ingresos. Vea el gráfico de dispersión de la Matriz de Oportunidades mostrando Impacto Empresarial (eje X) vs Esfuerzo de Implementación (eje Y). Compare oportunidades usando tanto la Matriz de Impacto Base (ahorro de tiempo puro) como la Matriz de Impacto Mejorada (con bonificaciones de calidad y crecimiento).",
+      step7Title: "Paso 7 Opcional: Crear Consolidaciones de Flujo de Trabajo",
+      step7Content: "Cuando existen múltiples oportunidades dentro del mismo flujo de trabajo, considere crear un paquete de consolidación para agruparlas en una plataforma estratégica unificada. Las consolidaciones proporcionan implementación coordinada, infraestructura compartida y economías de escala.",
     },
     
     tfaMethodology: {
@@ -1940,11 +1985,30 @@ const es: Translations = {
       quadrant3: "Agradables de Tener: Bajo impacto empresarial, bajo esfuerzo de implementación. Victorias fáciles pero valor estratégico limitado. Perseguir después de prioridades más altas.",
       quadrant4: "Despriorizar: Bajo impacto empresarial, alto esfuerzo de implementación. Evite a menos que existan impulsores estratégicos no financieros.",
       opportunitiesTable: "Tabla de Oportunidades",
-      opportunitiesTableContent: "Debajo de cada matriz de gráfico de dispersión, una tabla profesional de oportunidades proporciona una vista tabular detallada de todas las oportunidades con codificación de colores por flujo de trabajo y gradientes de rendimiento. Codificación de Colores por Flujo de Trabajo: Cada fila de tabla presenta un tinte de fondo sutil que coincide con el color de su flujo de trabajo de origen, con un acento de borde izquierdo prominente en el mismo tono. Esta agrupación visual permite el reconocimiento instantáneo de qué oportunidades pertenecen a qué flujo de trabajo. Gradientes de Rendimiento: Las columnas de Impacto Empresarial y Esfuerzo de Implementación usan gradientes de color para priorización de un vistazo: sombreado verde indica alto impacto/bajo esfuerzo (favorable), sombreado rojo indica bajo impacto/alto esfuerzo (desfavorable). La tabla cambia dinámicamente entre Impacto Base (escala 0-100) e Impacto Mejorado (escala 0-150) al alternar vistas de matriz, recalculando automáticamente todas las puntuaciones y actualizando los gradientes de color en consecuencia.",
-      sortingFunctionality: "Funcionalidad de Ordenación y Priorización",
-      sortingFunctionalityContent: "La tabla de oportunidades incluye un menú desplegable con opciones de ordenación conscientes del contexto. Las ordenaciones disponibles incluyen: Prioridad de Hoja de Ruta (predeterminado), Mayor Impacto Empresarial, Menor Impacto Empresarial, Menor Esfuerzo de Implementación, Mayor Esfuerzo de Implementación y Ordenar por Flujo de Trabajo (solo vistas a nivel de empresa). Las opciones de ordenación se adaptan según el contexto: las vistas a nivel de empresa muestran 6 opciones incluyendo agrupación de flujo de trabajo, mientras que las vistas de flujo de trabajo único muestran 5 opciones enfocadas en ordenación basada en métricas.",
+      opportunitiesTableContent: "Tabla profesional de oportunidades con codificación de colores por flujo de trabajo, gradientes de rendimiento y consolidaciones expandibles. Muestra métricas agregadas y permite filtrar entre oportunidades individuales y paquetes de consolidación. Ordenación predeterminada por prioridad de hoja de ruta.",
       roadmapPriorityAlgorithm: "Algoritmo de Prioridad de Hoja de Ruta",
       roadmapPriorityAlgorithmContent: "La ordenación de Prioridad de Hoja de Ruta crea una hoja de ruta de implementación de 18 meses identificando victorias rápidas: oportunidades con alto impacto empresarial y bajo esfuerzo de implementación. El algoritmo usa puntuación compuesta: Puntuación de Prioridad = (Impacto Normalizado) - (Esfuerzo Normalizado), donde los valores normalizados se escalan 0-1 dividiendo la puntuación de cada oportunidad por la puntuación máxima en su categoría (con protección de división por cero usando Math.max con reserva 0.001). Las puntuaciones de alta prioridad indican oportunidades de alto valor y bajo esfuerzo que deben abordarse primero. Las victorias rápidas suben a la parte superior, seguidas de apuestas estratégicas (alto impacto pero mayor esfuerzo), con oportunidades de bajo impacto o alto esfuerzo despriorizadas. Esta clasificación proporciona a los consultores una secuencia de implementación clara y defendible para presentar a los clientes.",
+    },
+    
+    consolidations: {
+      title: "Consolidaciones de Flujo de Trabajo",
+      intro: "Las consolidaciones de flujo de trabajo agrupan múltiples oportunidades en plataformas estratégicas unificadas.",
+      whatAreConsolidations: "¿Qué son las Consolidaciones?",
+      whatAreConsolidationsContent: "Paquetes estratégicos que combinan 2+ oportunidades del mismo flujo de trabajo en una plataforma de implementación coordinada.",
+      whyConsolidate: "¿Por qué Consolidar?",
+      whyConsolidateContent: "Beneficios: Implementación coordinada, experiencia de usuario mejorada, economías de escala, valor estratégico y riesgo reducido.",
+      whenToConsolidate: "Cuándo Crear Consolidaciones",
+      whenToConsolidateContent: "Considere consolidar cuando: múltiples oportunidades pertenecen al mismo flujo de trabajo, se beneficiarían de la misma plataforma tecnológica, el mismo equipo interactúa con múltiples áreas, o el impacto combinado justifica la inversión en plataforma.",
+      whenNotToConsolidate: "Cuándo NO Consolidar",
+      whenNotToConsolidateContent: "Evite consolidar cuando: las oportunidades abarcan flujos de trabajo no relacionados, las tecnologías son incompatibles, la preparación organizacional varía significativamente, o se necesitan victorias rápidas.",
+      calculationLogic: "Lógica de Cálculo de Consolidación",
+      calculationLogicContent: "Las consolidaciones agregan el impacto empresarial, usan promedios ponderados para la preparación, e incluyen buffers de coordinación (20% recuperación, 15% rampa/capacitación) para reflejar la complejidad de la implementación coordinada.",
+      visualDistinction: "Distinción Visual en Matriz",
+      visualDistinctionContent: "Las consolidaciones aparecen como puntos más grandes (radio 9px) con borde de color de primer plano. Las oportunidades individuales son puntos estándar (radio 5px) en color de flujo de trabajo.",
+      filteringSystem: "Sistema de Filtrado Unificado",
+      filteringSystemContent: "Filtro de Matriz (3 opciones): Combinado, Solo Oportunidades, Solo Consolidaciones. Filtro de Tabla (2 opciones): Solo Oportunidades, Solo Consolidaciones. Los filtros se sincronizan automáticamente.",
+      tableDisplay: "Visualización de Tabla de Consolidación",
+      tableDisplayContent: "Las consolidaciones aparecen como filas expandibles en la tabla. Haga clic para expandir y ver las oportunidades constituyentes. Muestra métricas agregadas con indicadores visuales.",
     },
     
     roiCalculatorIntegration: {

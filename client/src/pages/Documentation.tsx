@@ -181,6 +181,7 @@ export default function Documentation() {
       <li><a href="#pif-methodology">${doc.pifMethodology.title}</a></li>
       <li><a href="#readiness-rubric">${doc.readinessRubric.title}</a></li>
       <li><a href="#opportunity-matrix">${doc.opportunityMatrix.title}</a></li>
+      <li><a href="#consolidations">${doc.consolidations.title}</a></li>
       <li><a href="#roi-calculator-integration">${doc.roiCalculatorIntegration.title}</a></li>
       <li><a href="#data-flow">${doc.dataFlow.title}</a></li>
       <li><a href="#roi-calculations">${doc.roiCalculations.title}</a></li>
@@ -210,6 +211,7 @@ export default function Documentation() {
       <li><strong>${doc.userJourney.step4Title}:</strong> ${doc.userJourney.step4Content}</li>
       <li><strong>${doc.userJourney.step5Title}:</strong> ${doc.userJourney.step5Content}</li>
       <li><strong>${doc.userJourney.step6Title}:</strong> ${doc.userJourney.step6Content}</li>
+      <li><strong>${doc.userJourney.step7Title}:</strong> ${doc.userJourney.step7Content}</li>
     </ol>
   </div>
 
@@ -326,8 +328,6 @@ export default function Documentation() {
     </ul>
     <h3>${doc.opportunityMatrix.opportunitiesTable}</h3>
     ${parseStructuredContentToHTML(doc.opportunityMatrix.opportunitiesTableContent)}
-    <h3>${doc.opportunityMatrix.sortingFunctionality}</h3>
-    ${parseStructuredContentToHTML(doc.opportunityMatrix.sortingFunctionalityContent)}
     <h3>${doc.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
     ${parseStructuredContentToHTML(doc.opportunityMatrix.roadmapPriorityAlgorithmContent)}
     <h3>${doc.opportunityMatrix.implementationEffortScoring}</h3>
@@ -336,6 +336,27 @@ export default function Documentation() {
     ${parseStructuredContentToHTML(doc.opportunityMatrix.effortWeightingRationaleContent)}
     <h3>${doc.opportunityMatrix.effortNormalizationScales}</h3>
     ${parseStructuredContentToHTML(doc.opportunityMatrix.effortNormalizationScalesContent)}
+  </div>
+
+  <div class="section" id="consolidations">
+    <h2>${doc.consolidations.title}</h2>
+    <p>${doc.consolidations.intro}</p>
+    <h3>${doc.consolidations.whatAreConsolidations}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.whatAreConsolidationsContent)}
+    <h3>${doc.consolidations.whyConsolidate}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.whyConsolidateContent)}
+    <h3>${doc.consolidations.whenToConsolidate}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.whenToConsolidateContent)}
+    <h3>${doc.consolidations.whenNotToConsolidate}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.whenNotToConsolidateContent)}
+    <h3>${doc.consolidations.calculationLogic}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.calculationLogicContent)}
+    <h3>${doc.consolidations.visualDistinction}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.visualDistinctionContent)}
+    <h3>${doc.consolidations.filteringSystem}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.filteringSystemContent)}
+    <h3>${doc.consolidations.tableDisplay}</h3>
+    ${parseStructuredContentToHTML(doc.consolidations.tableDisplayContent)}
   </div>
 
   <div class="section" id="roi-calculator-integration">
@@ -427,6 +448,7 @@ export default function Documentation() {
     { id: "pif-methodology", label: t.documentation.pifMethodology.title },
     { id: "readiness-rubric", label: t.documentation.readinessRubric.title },
     { id: "opportunity-matrix", label: t.documentation.opportunityMatrix.title },
+    { id: "consolidations", label: t.documentation.consolidations.title },
     { id: "roi-calculator-integration", label: t.documentation.roiCalculatorIntegration.title },
     { id: "data-flow", label: t.documentation.dataFlow.title },
     { id: "roi-calculations", label: t.documentation.roiCalculations.title },
@@ -622,6 +644,15 @@ export default function Documentation() {
                         <h3 className="text-lg font-semibold mb-2 text-primary">{t.documentation.userJourney.step6Title}</h3>
                         <p className="text-muted-foreground leading-relaxed">
                           {t.documentation.userJourney.step6Content}
+                        </p>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-2 text-primary">{t.documentation.userJourney.step7Title}</h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {t.documentation.userJourney.step7Content}
                         </p>
                       </div>
                     </CardContent>
@@ -1039,15 +1070,6 @@ export default function Documentation() {
                       <Separator />
                       
                       <div>
-                        <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.sortingFunctionality}</h3>
-                        <div className="bg-blue-500/5 border border-blue-500/20 p-4 rounded-md">
-                          {parseStructuredContent(t.documentation.opportunityMatrix.sortingFunctionalityContent)}
-                        </div>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <div>
                         <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.roadmapPriorityAlgorithm}</h3>
                         <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.roadmapPriorityAlgorithmContent)}
@@ -1100,6 +1122,87 @@ export default function Documentation() {
                         <h3 className="text-lg font-semibold mb-3">{t.documentation.opportunityMatrix.effortNormalizationScales}</h3>
                         <div className="bg-amber-500/5 border-l-4 border-amber-500 p-4 rounded-r-md">
                           {parseStructuredContent(t.documentation.opportunityMatrix.effortNormalizationScalesContent)}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </section>
+
+                {/* Workflow Consolidations */}
+                <section id="consolidations" className="scroll-mt-24">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-2xl">{t.documentation.consolidations.title}</CardTitle>
+                      <CardDescription>{t.documentation.consolidations.intro}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.whatAreConsolidations}</h3>
+                        <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.whatAreConsolidationsContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.whyConsolidate}</h3>
+                        <div className="bg-blue-500/5 border-l-4 border-blue-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.whyConsolidateContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.whenToConsolidate}</h3>
+                        <div className="bg-green-500/5 border-l-4 border-green-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.whenToConsolidateContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.whenNotToConsolidate}</h3>
+                        <div className="bg-red-500/5 border-l-4 border-red-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.whenNotToConsolidateContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.calculationLogic}</h3>
+                        <div className="bg-amber-500/5 border-l-4 border-amber-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.calculationLogicContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.visualDistinction}</h3>
+                        <div className="bg-purple-500/5 border-l-4 border-purple-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.visualDistinctionContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.filteringSystem}</h3>
+                        <div className="bg-indigo-500/5 border-l-4 border-indigo-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.filteringSystemContent)}
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">{t.documentation.consolidations.tableDisplay}</h3>
+                        <div className="bg-cyan-500/5 border-l-4 border-cyan-500 p-4 rounded-r-md">
+                          {parseStructuredContent(t.documentation.consolidations.tableDisplayContent)}
                         </div>
                       </div>
                     </CardContent>
