@@ -117,7 +117,7 @@ export default function OpportunityMatrix({
   const maxImpactScale = 150;
 
   const { dataPoints, workflowLegend } = useMemo(() => {
-    const workflowMap = workflows.reduce((acc, w) => {
+    const workflowMap = (workflows ?? []).reduce((acc, w) => {
       acc[w.id] = w.name;
       return acc;
     }, {} as Record<string, string>);

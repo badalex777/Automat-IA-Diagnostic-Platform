@@ -939,8 +939,8 @@ export default function WorkflowDetail() {
                     </div>
                     <OpportunityMatrix
                       opportunities={opportunitiesWithScores}
+                      workflows={workflow ? [workflow] : []}
                       consolidations={consolidations}
-                      workflowId={workflowId}
                       readinessScores={stepReadinessScores}
                       companyContext={companyContext}
                       onOpportunityClick={(opp) => setEditOpportunity(opp)}
