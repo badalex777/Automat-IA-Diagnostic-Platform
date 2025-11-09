@@ -134,6 +134,17 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   workflowIdIdx: index("implementation_opportunities_workflow_id_idx").on(table.workflowId),
 }));
 
+export const workflowConsolidations = pgTable("workflow_consolidations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workflowId: varchar("workflow_id").notNull().references(() => workflows.id, { onDelete: 'cascade' }),
+  name: text("name").notNull(),
+  description: text("description"),
+  opportunityIds: text("opportunity_ids").array().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  workflowIdIdx: index("workflow_consolidations_workflow_id_idx").on(table.workflowId),
+}));
+
 // Insert schemas
 export const insertCompanySchema = createInsertSchema(companies).omit({
   id: true,
@@ -261,6 +272,16 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
 
 export const updateImplementationOpportunitySchema = insertImplementationOpportunitySchema.omit({ workflowId: true }).partial();
 
+export const insertWorkflowConsolidationSchema = createInsertSchema(workflowConsolidations).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  name: z.string().min(1, "Consolidation name is required"),
+  opportunityIds: z.array(z.string()).min(1, "At least one opportunity must be selected"),
+});
+
+export const updateWorkflowConsolidationSchema = insertWorkflowConsolidationSchema.omit({ workflowId: true }).partial();
+
 // Select types
 export type Company = typeof companies.$inferSelect;
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
@@ -283,3 +304,6 @@ export type InsertBusinessImpact = z.infer<typeof insertBusinessImpactSchema>;
 
 export type ImplementationOpportunity = typeof implementationOpportunities.$inferSelect;
 export type InsertImplementationOpportunity = z.infer<typeof insertImplementationOpportunitySchema>;
+
+export type WorkflowConsolidation = typeof workflowConsolidations.$inferSelect;
+export type InsertWorkflowConsolidation = z.infer<typeof insertWorkflowConsolidationSchema>;
