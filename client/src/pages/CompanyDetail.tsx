@@ -21,6 +21,7 @@ import CreateWorkflowDialog from "@/components/CreateWorkflowDialog";
 import EditCompanyContextDialog from "@/components/EditCompanyContextDialog";
 import ScoringGuideDialog from "@/components/ScoringGuideDialog";
 import LanguageSelectionDialog from "@/components/LanguageSelectionDialog";
+import type { MatrixViewMode, TableViewMode } from "@/lib/opportunityViewMode";
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/company/:id");
@@ -31,6 +32,10 @@ export default function CompanyDetail() {
   const [editedName, setEditedName] = useState("");
   const [scoringGuideOpen, setScoringGuideOpen] = useState(false);
   const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
+  
+  // View mode state for opportunity filtering
+  const [matrixViewMode, setMatrixViewMode] = useState<MatrixViewMode>('combined');
+  const [tableViewMode, setTableViewMode] = useState<TableViewMode>('opportunities-only');
 
   const { data: company, isLoading: companyLoading, error: companyError } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -140,6 +145,16 @@ export default function CompanyDetail() {
       });
     }
   }, [workflowsError, toast]);
+
+  // Sync table view mode with matrix view mode when they overlap
+  useEffect(() => {
+    if (matrixViewMode === 'opportunities-only') {
+      setTableViewMode('opportunities-only');
+    } else if (matrixViewMode === 'consolidations-only') {
+      setTableViewMode('consolidations-only');
+    }
+    // When matrix is 'combined', leave table unchanged (no sync needed)
+  }, [matrixViewMode]);
 
   const createWorkflowMutation = useMutation({
     mutationFn: async (data: { name: string; description: string }) => {
