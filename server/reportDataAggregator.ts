@@ -6,9 +6,11 @@ import {
   tfaAssessments, 
   pifResponses, 
   implementationOpportunities,
+  workflowConsolidations,
   type TFAAssessment,
   type PIFResponse,
   type ImplementationOpportunity,
+  type WorkflowConsolidation,
   type Company,
   type Workflow,
   type WorkflowStep
@@ -19,6 +21,7 @@ import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/
 import { calculateOpportunityScore } from "@shared/opportunityCalculations";
 import { calculateSectionScores, TFA_QUESTIONS } from "@shared/tfaQuestions";
 import { ALL_PIF_QUESTIONS } from "@shared/pifQuestions";
+import { calculateConsolidatedMetrics, calculateConsolidationBusinessImpact } from "@shared/consolidationCalculations";
 
 /**
  * Remediation recommendations based on section and score level
@@ -406,6 +409,7 @@ export interface WorkflowData {
   tfa: TFAData | null;
   pifs: PIFData[];
   opportunities: OpportunityData[];
+  consolidations: ConsolidationData[];
   readiness: ReadinessData | null;
 }
 
@@ -479,6 +483,31 @@ export interface OpportunityData {
     implementationEffort: number;
     baseImpact: number;
     businessImpact: number; // Enhanced impact
+    quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
+  };
+}
+
+export interface ConsolidationData {
+  consolidation: WorkflowConsolidation;
+  workflow: { name: string };
+  constituentOpportunities: Array<{
+    id: string;
+    name: string;
+    stepName: string;
+    stepOrder: number;
+  }>;
+  aggregatedMetrics: {
+    totalAnnualRoi: number;
+    totalFteSavings: number;
+    totalErrorsAvoidedAnnually: number;
+    totalRevenueUpliftAnnual: number;
+    weightedAvgRampupPeriodMonths: number;
+    weightedAvgPaybackPeriodMonths: number;
+    weightedAvgTrainingHoursPerEmployee: number;
+  };
+  matrixPosition: {
+    implementationEffort: number;
+    businessImpact: number;
     quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
   };
 }
@@ -712,11 +741,113 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       };
     });
 
+    // Fetch and process consolidations
+    const consolidationRecords = await db
+      .select()
+      .from(workflowConsolidations)
+      .where(eq(workflowConsolidations.workflowId, workflow.id));
+
+    const consolidationsData: ConsolidationData[] = consolidationRecords.map(cons => {
+      // Parse opportunity IDs array
+      const opportunityIds = (cons.opportunityIds as string[]) || [];
+      
+      // Find constituent opportunities
+      const constituentOpps = opportunityIds.map(oppId => {
+        const opp = opps.find(o => o.id === oppId);
+        if (!opp) return null;
+        const step = opp.stepId ? workflowStepRecords.find((s: any) => s.id === opp.stepId) : null;
+        return {
+          id: opp.id,
+          name: opp.name,
+          stepName: step?.stepName || "Unknown Step",
+          stepOrder: step?.stepOrder || 0,
+        };
+      }).filter((opp): opp is NonNullable<typeof opp> => opp !== null);
+      
+      // Find full opportunity objects for metric calculation
+      const constituentOppRecords = opportunityIds
+        .map(oppId => opps.find(o => o.id === oppId))
+        .filter((opp): opp is NonNullable<typeof opp> => opp !== null);
+      
+      // Calculate aggregated metrics using centralized logic
+      const metrics = calculateConsolidatedMetrics(constituentOppRecords);
+      
+      // Calculate step readiness scores for implementation effort
+      const stepReadinessScores: Record<string, number> = {};
+      workflowStepRecords.forEach((step: any) => {
+        const stepPIFs = pifs.filter(pif => pif.stepId === step.id);
+        if (stepPIFs.length > 0 && tfaData) {
+          const aggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
+          const rubric = calculateReadinessRubric(
+            tfaData.score,
+            tfaData.sectionScores,
+            aggregatedPIF
+          );
+          stepReadinessScores[step.id] = rubric.totalScore;
+        }
+      });
+      
+      // Calculate average readiness across constituent opportunity steps
+      const readinessValues = constituentOppRecords
+        .map(opp => opp.stepId ? stepReadinessScores[opp.stepId] : null)
+        .filter((score): score is number => score !== null);
+      const avgReadiness = readinessValues.length > 0
+        ? readinessValues.reduce((sum, score) => sum + score, 0) / readinessValues.length
+        : 50; // Default to moderate
+      
+      // Calculate implementation effort
+      const implementationEffort = 
+        (100 - avgReadiness) * 0.40 +
+        metrics.weightedAvgRampupPeriodMonths * 3.0 +
+        metrics.weightedAvgPaybackPeriodMonths * 2.0 +
+        (metrics.weightedAvgTrainingHoursPerEmployee / 40) * 10;
+      
+      // Calculate business impact using centralized logic
+      const companyContext = {
+        annualRevenue: company.annualRevenue ? parseFloat(company.annualRevenue.toString()) : undefined,
+        totalEmployees: company.totalEmployees || undefined,
+      };
+      const businessImpact = calculateConsolidationBusinessImpact(metrics, companyContext);
+      
+      // Determine quadrant
+      let quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
+      if (businessImpact >= 75 && implementationEffort <= 50) {
+        quadrant = 'Quick Wins';
+      } else if (businessImpact >= 75 && implementationEffort > 50) {
+        quadrant = 'Strategic Goals';
+      } else if (businessImpact < 75 && implementationEffort <= 50) {
+        quadrant = 'Nice-To-Haves';
+      } else {
+        quadrant = 'Deprioritize';
+      }
+      
+      return {
+        consolidation: cons,
+        workflow: { name: workflow.name },
+        constituentOpportunities: constituentOpps,
+        aggregatedMetrics: {
+          totalAnnualRoi: metrics.totalAnnualRoi,
+          totalFteSavings: metrics.totalFteSavings,
+          totalErrorsAvoidedAnnually: metrics.totalErrorsAvoidedAnnually,
+          totalRevenueUpliftAnnual: metrics.totalRevenueUpliftAnnual,
+          weightedAvgRampupPeriodMonths: metrics.weightedAvgRampupPeriodMonths,
+          weightedAvgPaybackPeriodMonths: metrics.weightedAvgPaybackPeriodMonths,
+          weightedAvgTrainingHoursPerEmployee: metrics.weightedAvgTrainingHoursPerEmployee,
+        },
+        matrixPosition: {
+          implementationEffort,
+          businessImpact,
+          quadrant,
+        },
+      };
+    });
+
     workflowsData.push({
       workflow,
       tfa: tfaData,
       pifs: pifsData,
       opportunities: opportunitiesData,
+      consolidations: consolidationsData,
       readiness: readinessData,
     });
   }
