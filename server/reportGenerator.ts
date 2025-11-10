@@ -647,7 +647,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   });
   
   const culturalInsights = allQuestionInsights
-    .filter((qi: any) => qi.section === 'Cultural Fit' || qi.section === 'Change Management' || qi.section.includes('Cultural') || qi.section.includes('Change'))
+    .filter((qi: any) => {
+      const section = qi?.section || '';
+      return section === 'Cultural Fit' || section === 'Change Management' || section.includes('Cultural') || section.includes('Change');
+    })
+    .filter((qi: any) => qi?.insight && qi.insight.trim().length > 0) // Ensure insight exists and is not empty
     .slice(0, 4);
   
   const culturalReadinessSummary = culturalInsights.length > 0
