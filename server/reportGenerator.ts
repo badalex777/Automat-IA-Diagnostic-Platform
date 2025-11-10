@@ -51,6 +51,24 @@ const COLORS = {
 // The context is created in generateExecutiveReport() and passed through helper functions
 
 /**
+ * Numbering registry to manage independent numbered list instances
+ */
+class NumberingRegistry {
+  private instanceCounter = 0;
+  private listKeyToInstance = new Map<string, number>();
+
+  /**
+   * Get or create a numbering instance for a given list key
+   */
+  getInstance(listKey: string): number {
+    if (!this.listKeyToInstance.has(listKey)) {
+      this.listKeyToInstance.set(listKey, this.instanceCounter++);
+    }
+    return this.listKeyToInstance.get(listKey)!;
+  }
+}
+
+/**
  * Create a body paragraph with justified alignment (for content after cover page)
  */
 function createBodyParagraph(text: string, options: {spacing?: any} = {}): Paragraph {
@@ -75,14 +93,24 @@ function createBulletParagraph(text: string): Paragraph {
 
 /**
  * Create a numbered paragraph with proper DOCX numbering
+ * @param text - The paragraph text
+ * @param registry - The numbering registry to get instance IDs
+ * @param listKey - Unique key for this list (e.g., 'next-steps', 'methodology')
+ * @param level - Indentation level (default 0)
  */
-function createNumberedParagraph(text: string, level: number = 0): Paragraph {
+function createNumberedParagraph(
+  text: string, 
+  registry: NumberingRegistry, 
+  listKey: string, 
+  level: number = 0
+): Paragraph {
   return new Paragraph({
     text,
     alignment: AlignmentType.BOTH,
     numbering: {
       reference: "decimal-numbering",
       level: level,
+      instance: registry.getInstance(listKey),
     },
     spacing: { after: 120 },
   });
@@ -137,11 +165,17 @@ function createHorizontalSeparator(): Paragraph {
  * - Detects subsection titles and makes them headings
  * - Detects framework names and makes them bold with colons
  * - Groups consecutive lines into paragraphs
+ * - Automatically isolates numbered lists with unique instance IDs
+ * @param text - The text to parse
+ * @param registry - The numbering registry for list isolation
+ * @param listKeyPrefix - Prefix for auto-generated list keys (default: 'auto')
  */
-function createTextParagraphs(text: string): Paragraph[] {
+function createTextParagraphs(text: string, registry: NumberingRegistry, listKeyPrefix: string = 'auto'): Paragraph[] {
   const lines = text.split('\n');
   const paragraphs: Paragraph[] = [];
   let currentParagraph: string[] = [];
+  let currentListKey: string | null = null;
+  let listCounter = 0;
 
   const isPhaseTitle = (line: string): boolean => {
     // Match both English "Phase X:" and Spanish "Fase X:"
@@ -204,6 +238,10 @@ function createTextParagraphs(text: string): Paragraph[] {
     return /^\d+[.)]\s+/.test(line.trim());
   };
 
+  const resetListContext = () => {
+    currentListKey = null;
+  };
+
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
       const text = currentParagraph.join(' ').trim();
@@ -222,14 +260,16 @@ function createTextParagraphs(text: string): Paragraph[] {
     const trimmed = line.trim();
 
     if (trimmed === '') {
-      // Blank line - flush current paragraph
+      // Blank line - flush current paragraph and reset list context
       flushParagraph();
+      resetListContext();
       continue;
     }
 
     if (isPhaseTitle(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      resetListContext();
       // Add phase title as bold paragraph
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
@@ -242,6 +282,7 @@ function createTextParagraphs(text: string): Paragraph[] {
     if (isMethodologySubsection(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      resetListContext();
       // Methodology subsections are rendered as bold paragraphs (not headings) to exclude from ToC
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
@@ -254,6 +295,7 @@ function createTextParagraphs(text: string): Paragraph[] {
     if (isSubsectionTitle(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      resetListContext();
       // Add subsection as heading (will appear in ToC)
       paragraphs.push(new Paragraph({
         text: trimmed,
@@ -266,6 +308,7 @@ function createTextParagraphs(text: string): Paragraph[] {
     if (isFrameworkName(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      resetListContext();
       // Framework name paragraphs: bold the framework name up to the period or colon
       const match = trimmed.match(/^([^.]+(?:\([^)]+\))?[.:])(.*)$/);
       if (match) {
@@ -292,6 +335,7 @@ function createTextParagraphs(text: string): Paragraph[] {
     if (isBulletPoint(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      resetListContext();
       // Remove bullet symbol and create proper DOCX bullet paragraph
       const textWithoutBullet = trimmed.replace(/^[•\-\*●]\s+/, '');
       paragraphs.push(new Paragraph({
@@ -306,13 +350,18 @@ function createTextParagraphs(text: string): Paragraph[] {
     if (isNumberedItem(trimmed)) {
       // Flush any current paragraph first
       flushParagraph();
+      // Start a new list if we're not in one
+      if (currentListKey === null) {
+        currentListKey = `${listKeyPrefix}-list-${listCounter++}`;
+      }
       // Remove numbered prefix and create proper DOCX numbered paragraph
       const textWithoutNumber = trimmed.replace(/^\d+[.)]\s+/, '');
-      paragraphs.push(createNumberedParagraph(textWithoutNumber));
+      paragraphs.push(createNumberedParagraph(textWithoutNumber, registry, currentListKey));
       continue;
     }
 
-    // Regular line - add to current paragraph
+    // Regular line - add to current paragraph and reset list context
+    resetListContext();
     currentParagraph.push(trimmed);
   }
 
@@ -647,6 +696,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Create report context with translations and formatters
   const ctx = createReportContext(language);
   
+  // Create numbering registry for list isolation
+  const numberingRegistry = new NumberingRegistry();
+  
   // Destructure all needed constants from the selected language module
   const {
     EXECUTIVE_SUMMARY,
@@ -896,13 +948,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== EXECUTIVE SUMMARY =====
   sections.push(createHeading(ctx.t.sections.executiveSummary, HeadingLevel.HEADING_1));
   const execSummaryText = replaceVariables(EXECUTIVE_SUMMARY, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(execSummaryText));
+  sections.push(...createTextParagraphs(execSummaryText, numberingRegistry, 'executive-summary'));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== CONFIDENTIALITY & DISCLAIMER =====
   sections.push(createHeading(ctx.t.sections.confidentialityDisclaimer, HeadingLevel.HEADING_1));
   const confidentialityText = replaceVariables(CONFIDENTIALITY_DISCLAIMER, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(confidentialityText));
+  sections.push(...createTextParagraphs(confidentialityText, numberingRegistry, 'confidentiality'));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== TABLE OF CONTENTS =====
@@ -918,7 +970,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== METHODOLOGY OVERVIEW =====
   sections.push(createHeading(ctx.t.sections.methodologyOverview, HeadingLevel.HEADING_1));
   const methodologyText = replaceVariables(METHODOLOGY_OVERVIEW, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(methodologyText));
+  sections.push(...createTextParagraphs(methodologyText, numberingRegistry, 'methodology'));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // ===== DIAGNOSTIC OVERVIEW =====
@@ -926,7 +978,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 1: Sections 4.1 and 4.2
   const diagnosticOverviewPart1 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART1, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(diagnosticOverviewPart1));
+  sections.push(...createTextParagraphs(diagnosticOverviewPart1, numberingRegistry, 'diagnostic-overview-1'));
   sections.push(createHorizontalSeparator());
   
   // Table 4.3: Top Three Opportunities
@@ -955,7 +1007,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 2: Commentary after Table 4.3
   const diagnosticOverviewPart2 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART2, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(diagnosticOverviewPart2));
+  sections.push(...createTextParagraphs(diagnosticOverviewPart2, numberingRegistry, 'diagnostic-overview-2'));
   sections.push(createHorizontalSeparator());
   
   // Table 4.4: Financial Summary of Top Opportunities
@@ -992,7 +1044,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 3: Sections 4.5-4.9
   const diagnosticOverviewPart3 = replaceVariables(DIAGNOSTIC_OVERVIEW_PART3, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(diagnosticOverviewPart3));
+  sections.push(...createTextParagraphs(diagnosticOverviewPart3, numberingRegistry, 'diagnostic-overview-3'));
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
@@ -1001,7 +1053,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 1: 5.1 Introduction text
   const findingsPart1 = replaceVariables(FINDINGS_ANALYSIS_PART1, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart1));
+  sections.push(...createTextParagraphs(findingsPart1, numberingRegistry, 'findings-1'));
   
   // Table 5.1: Readiness Summary - ONE ROW PER WORKFLOW (not per opportunity)
   const readinessHeaders = [ctx.t.headers.workflow, ctx.t.headers.tfaScore, ctx.t.headers.pifScore, ctx.t.headers.readiness, ctx.t.headers.band];
@@ -1045,12 +1097,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 2: Commentary after Table 5.1
   const findingsPart2 = replaceVariables(FINDINGS_ANALYSIS_PART2, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart2));
+  sections.push(...createTextParagraphs(findingsPart2, numberingRegistry, 'findings-2'));
   sections.push(createHorizontalSeparator());
   
   // Part 3: 5.2 ROI Insights introduction text
   const findingsPart3 = replaceVariables(FINDINGS_ANALYSIS_PART3, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart3));
+  sections.push(...createTextParagraphs(findingsPart3, numberingRegistry, 'findings-3'));
   
   // Table 5.2: ROI Insights Table
   const roiHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback];
@@ -1075,12 +1127,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 4: Commentary after Table 5.2
   const findingsPart4 = replaceVariables(FINDINGS_ANALYSIS_PART4, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart4));
+  sections.push(...createTextParagraphs(findingsPart4, numberingRegistry, 'findings-4'));
   sections.push(createHorizontalSeparator());
   
   // Part 5: 5.3 Opportunity Matrix Analysis introduction text
   const findingsPart5 = replaceVariables(FINDINGS_ANALYSIS_PART5, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart5));
+  sections.push(...createTextParagraphs(findingsPart5, numberingRegistry, 'findings-5'));
   
   // Table 5.3: Matrix Distribution
   const matrixHeaders = [ctx.t.headers.quadrant, ctx.t.headers.opportunities, ctx.t.headers.count];
@@ -1095,7 +1147,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Part 6: Commentary and matrix image placeholders
   const findingsPart6 = replaceVariables(FINDINGS_ANALYSIS_PART6, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(findingsPart6));
+  sections.push(...createTextParagraphs(findingsPart6, numberingRegistry, 'findings-6'));
   
   sections.push(
     new Paragraph({
@@ -1144,12 +1196,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Introduction
   const roadmapIntro = replaceVariables(AUTOMATION_ROADMAP_INTRO, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapIntro));
+  sections.push(...createTextParagraphs(roadmapIntro, numberingRegistry, 'roadmap-intro'));
   sections.push(createHorizontalSeparator());
   
   // Phase 1
   const roadmapPhase1 = replaceVariables(AUTOMATION_ROADMAP_PHASE1, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase1));
+  sections.push(...createTextParagraphs(roadmapPhase1, numberingRegistry, 'roadmap-phase1'));
   
   // Phase 1 Table
   if (data.roadmapPhases.phase1QuickWins.length > 0) {
@@ -1168,12 +1220,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(""));
   
   const roadmapPhase1Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE1_OUTCOMES, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase1Outcomes));
+  sections.push(...createTextParagraphs(roadmapPhase1Outcomes, numberingRegistry, 'roadmap-phase1-outcomes'));
   sections.push(createHorizontalSeparator());
 
   // Phase 2
   const roadmapPhase2 = replaceVariables(AUTOMATION_ROADMAP_PHASE2, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase2));
+  sections.push(...createTextParagraphs(roadmapPhase2, numberingRegistry, 'roadmap-phase2'));
   
   // Phase 2 Table
   if (data.roadmapPhases.phase2Foundational.length > 0) {
@@ -1192,12 +1244,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(""));
   
   const roadmapPhase2Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE2_OUTCOMES, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase2Outcomes));
+  sections.push(...createTextParagraphs(roadmapPhase2Outcomes, numberingRegistry, 'roadmap-phase2-outcomes'));
   sections.push(createHorizontalSeparator());
 
   // Phase 3
   const roadmapPhase3 = replaceVariables(AUTOMATION_ROADMAP_PHASE3, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase3));
+  sections.push(...createTextParagraphs(roadmapPhase3, numberingRegistry, 'roadmap-phase3'));
   
   // Phase 3 Table
   if (data.roadmapPhases.phase3Strategic.length > 0) {
@@ -1216,7 +1268,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(""));
   
   const roadmapPhase3Outcomes = replaceVariables(AUTOMATION_ROADMAP_PHASE3_OUTCOMES, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapPhase3Outcomes));
+  sections.push(...createTextParagraphs(roadmapPhase3Outcomes, numberingRegistry, 'roadmap-phase3-outcomes'));
   sections.push(createHorizontalSeparator());
   
   // Gantt Table (18-month roadmap)
@@ -1240,7 +1292,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // Narrative Summary
   const roadmapSummary = replaceVariables(AUTOMATION_ROADMAP_SUMMARY, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(roadmapSummary));
+  sections.push(...createTextParagraphs(roadmapSummary, numberingRegistry, 'roadmap-summary'));
 
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
@@ -1257,16 +1309,16 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.strategicInterpretationPrompt));
 
   sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step1Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step1Title, numberingRegistry, 'next-steps'));
   sections.push(createBodyParagraph(ctx.t.conclusions.step1Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step2Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step2Title, numberingRegistry, 'next-steps'));
   sections.push(createBodyParagraph(ctx.t.conclusions.step2Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step3Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step3Title, numberingRegistry, 'next-steps'));
   sections.push(createBodyParagraph(ctx.t.conclusions.step3Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step4Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step4Title, numberingRegistry, 'next-steps'));
   sections.push(createBodyParagraph(ctx.t.conclusions.step4Content));
   sections.push(createBodyParagraph(""));
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Title));
@@ -1283,7 +1335,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Appendix A
   sections.push(createHeading(ctx.t.appendices.a, HeadingLevel.HEADING_1));
   const appendixAText = replaceVariables(APPENDIX_A, templateVars, commentaryKeys);
-  sections.push(...createTextParagraphs(appendixAText));
+  sections.push(...createTextParagraphs(appendixAText, numberingRegistry, 'appendix-a'));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix B: Readiness Score Metric Weighting
@@ -1494,7 +1546,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   });
   
   // D.3 Modeling Notes
-  sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES));
+  sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES, numberingRegistry, 'appendix-d-modeling'));
   
   // D.4 and D.5 - Consolidated Opportunities (conditional, moved to end after modeling notes)
   if (allConsolidations.length > 0) {
@@ -1524,7 +1576,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createHeading(ctx.t.appendices.e, HeadingLevel.HEADING_1));
 
   // E.1 Core Financial Formulas (text only)
-  sections.push(...createTextParagraphs(APPENDIX_E_PART1));
+  sections.push(...createTextParagraphs(APPENDIX_E_PART1, numberingRegistry, 'appendix-e-1'));
 
   // E.2 Net Benefit Formulas Table
   const netBenefitHeaders = [ctx.t.appendixETables.projectionHorizonHeader, ctx.t.appendixETables.formulaHeader, ctx.t.appendixETables.purposeHeader];
@@ -1537,7 +1589,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createTable(netBenefitHeaders, netBenefitRows, [25, 40, 35]));
 
   // E.3 FTE Conversions (text)
-  sections.push(...createTextParagraphs(APPENDIX_E_PART2));
+  sections.push(...createTextParagraphs(APPENDIX_E_PART2, numberingRegistry, 'appendix-e-2'));
 
   // E.4 Annual Benefit Breakdown Table
   const benefitHeaders = [ctx.t.appendixETables.componentHeader, ctx.t.appendixETables.formulaHeader, ctx.t.appendixETables.descriptionHeader];
@@ -1551,7 +1603,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.appendixETables.benefitCalculationsFooter));
 
   // E.5 Scenario Adjustment Framework Table
-  sections.push(...createTextParagraphs(APPENDIX_E_PART3));
+  sections.push(...createTextParagraphs(APPENDIX_E_PART3, numberingRegistry, 'appendix-e-3'));
   const scenarioHeaders = [ctx.t.appendixETables.adjustmentCategoryHeader, ctx.t.appendixETables.conservativeRationaleHeader];
   const scenarioRows = [
     [ctx.t.appendixETables.timeSavingsAdjustment, ctx.t.appendixETables.timeSavingsRationale],
@@ -1565,7 +1617,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.appendixETables.conservativeFrameworkFooter));
 
   // E.6 Key Modeling Assumptions Table
-  sections.push(...createTextParagraphs(APPENDIX_E_PART4));
+  sections.push(...createTextParagraphs(APPENDIX_E_PART4, numberingRegistry, 'appendix-e-4'));
   const assumptionsHeaders = [ctx.t.appendixETables.variableHeader, ctx.t.appendixETables.standardAssumptionHeader, ctx.t.appendixETables.rationaleHeader];
   const assumptionsRows = [
     [ctx.t.appendixETables.effectiveHourlyRate, ctx.t.appendixETables.effectiveHourlyRateValue, ctx.t.appendixETables.effectiveHourlyRateRationale],
@@ -1579,7 +1631,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
 
   // E.7 Formula Integrity (text)
-  sections.push(...createTextParagraphs(APPENDIX_E_PART5));
+  sections.push(...createTextParagraphs(APPENDIX_E_PART5, numberingRegistry, 'appendix-e-5'));
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix F - Data Provenance and Audit Trail
