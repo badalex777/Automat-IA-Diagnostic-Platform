@@ -201,7 +201,7 @@ export const METHODOLOGY_OVERVIEW = `
 Nuestro enfoque de diagnóstico integra el análisis de factibilidad técnica con la evaluación de impacto 
 empresarial para producir una visión completa y basada en datos del potencial de automatización. La 
 metodología se desarrolla a través de diez fases clave, asegurando profundidad analítica, validación de 
-partes interesadas y trazabilidad de insights.
+partes interesadas y trazabilidad de hallazgos.
 
 Fase 1: Descubrimiento de Partes Interesadas y Definición de Contexto
 
@@ -315,7 +315,7 @@ en la base del Reporte Ejecutivo de Diagnóstico.
 Fase 9: Desarrollo de Hoja de Ruta de Automatización
 
 Las oportunidades seleccionadas de las matrices validadas se secuencian en una hoja de ruta de tres fases 
-que convierte los insights de diagnóstico en pasos de implementación accionables:
+que convierte los hallazgos de diagnóstico en pasos de implementación accionables:
 
 Fase 1: Logros Rápidos (0 a 6 meses) se enfoca en automatizaciones de baja complejidad que entregan 
 ROI temprano y demuestran resultados medibles.
@@ -496,12 +496,12 @@ Automatización.
 export const FINDINGS_ANALYSIS_PART2 = `
 [readiness_commentary]
 
-Para insights cualitativos detallados por paso incluyendo fortalezas identificadas, debilidades y 
-dependencias, consulte el Apéndice B: Análisis FODA de Preparación.
+Para hallazgos cualitativos detallados por paso incluyendo fortalezas identificadas, debilidades y 
+dependencias, consulte el Apéndice C: Análisis FODA a Nivel de Paso por Flujo de Trabajo.
 `;
 
 export const FINDINGS_ANALYSIS_PART3 = `
-5.2 Insights de ROI
+5.2 Hallazgos de ROI
 
 Esta sección resume los resultados cuantitativos del modelado de ROI realizado para las oportunidades de 
 automatización validadas. Todos los resultados financieros se derivan utilizando el Marco de Calculadora 
@@ -540,7 +540,7 @@ export const FINDINGS_ANALYSIS_PART6 = `
 
 export const AUTOMATION_ROADMAP_INTRO = `
 La Hoja de Ruta de Automatización traduce los hallazgos del diagnóstico en una secuencia estructurada de 
-iniciativas que guían a {{company_name}} desde el análisis hasta la ejecución. Consolida insights de la 
+iniciativas que guían a {{company_name}} desde el análisis hasta la ejecución. Consolida hallazgos de la 
 Rúbrica de Preparación, Análisis de ROI y Matriz de Oportunidades en un plan de implementación práctico 
 y por fases.
 

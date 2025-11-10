@@ -831,7 +831,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   if (data.top3Opportunities.length > 0) {
     sections.push(
       new Paragraph({
-        text: "4.3 Top Three Automation Opportunities",
+        text: ctx.t.sectionTitles.topThreeOpportunities,
         heading: HeadingLevel.HEADING_3,
         alignment: AlignmentType.BOTH,
         spacing: { before: 240, after: 120 },
@@ -860,7 +860,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   if (data.top3Opportunities.length > 0) {
     sections.push(
       new Paragraph({
-        text: "4.4 Financial Summary of Top Opportunities",
+        text: ctx.t.sectionTitles.financialSummary,
         heading: HeadingLevel.HEADING_3,
         alignment: AlignmentType.BOTH,
         spacing: { before: 360, after: 120 },
@@ -1192,18 +1192,18 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Component Weighting Table - 7-row breakdown matching template
   const metricWeightHeaders = [ctx.t.headers.component, ctx.t.headers.weight, ctx.t.headers.description];
   const metricWeightRows = [
-    [ctx.t.tfaComponents.systemEnvironment, "15%", ctx.t.appendices.systemEnvironmentDesc],
-    [ctx.t.tfaComponents.dataQuality, "18%", ctx.t.appendices.dataQualityDesc],
-    [ctx.t.tfaComponents.integrationFeasibility, "18%", ctx.t.appendices.integrationFeasibilityDesc],
-    [ctx.t.tfaComponents.securityCompliance, "9%", ctx.t.appendices.securityComplianceDesc],
-    [ctx.t.tfaComponents.processClarity, "15%", ctx.t.appendices.processClarityDesc],
-    [ctx.t.tfaComponents.changeMagnitude, "15%", ctx.t.appendices.changeMagnitudeDesc],
-    [ctx.t.tfaComponents.workflowBrittleness, "10%", ctx.t.appendices.workflowBrittlenessDesc],
+    [ctx.t.tfaComponents.systemEnvironment, "15%", ctx.t.tableDescriptions.systemEnvironmentDesc],
+    [ctx.t.tfaComponents.dataQuality, "18%", ctx.t.tableDescriptions.dataQualityDesc],
+    [ctx.t.tfaComponents.integrationFeasibility, "18%", ctx.t.tableDescriptions.integrationFeasibilityDesc],
+    [ctx.t.tfaComponents.securityCompliance, "9%", ctx.t.tableDescriptions.securityComplianceDesc],
+    [ctx.t.tfaComponents.processClarity, "15%", ctx.t.tableDescriptions.processClarityDesc],
+    [ctx.t.tfaComponents.changeMagnitude, "15%", ctx.t.tableDescriptions.changeMagnitudeDesc],
+    [ctx.t.tfaComponents.workflowBrittleness, "10%", ctx.t.tableDescriptions.workflowBrittlenessDesc],
   ];
   sections.push(createTableCaption("B.1", ctx.t.tableCaptions["B.1"], ctx.t.labels.table));
   sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
-  sections.push(createBodyParagraph(ctx.t.appendices.whyTheseWeights));
+  sections.push(createBodyParagraph(ctx.t.tableDescriptions.whyTheseWeights));
   sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet1));
   sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet2));
   sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet3));
@@ -1438,7 +1438,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         [ctx.t.metricLabels.annualHoursSaved, ctx.fmt.number(annualHours, 0)],
         [ctx.t.metricLabels.weeklyHoursSaved, ctx.fmt.number(weeklyHours, 1)],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics", ctx.t.labels.table));
+      sections.push(createTableCaption(`D.2.${oppCounter}a`, ctx.t.tableDescriptions.keyFinancialMetrics, ctx.t.labels.table));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
       sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
       
@@ -1450,7 +1450,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         [ctx.t.metricLabels.revenueUplift, ctx.t.metricLabels.toBeValidated, ctx.t.metricLabels.capacityReallocation],
         [ctx.t.metricLabels.rampUpPeriod, ctx.t.metricLabels.threeMonths, ctx.t.metricLabels.timeToSteadyState],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}b`, "Business Impact Components", ctx.t.labels.table));
+      sections.push(createTableCaption(`D.2.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
       // Dominant component paragraph
