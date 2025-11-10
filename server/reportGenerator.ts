@@ -563,6 +563,77 @@ function validateTemplateVars(vars: Record<string, string>): { valid: boolean; e
 }
 
 /**
+ * Build consolidated opportunity summary table (Appendix D.4, was D.0a)
+ */
+function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
+  const sections: Paragraph[] = [];
+  
+  const consolidationHeaders = [
+    ctx.t.headers.workflow,
+    ctx.t.headers.consolidationName,
+    ctx.t.headers.opportunities,
+    ctx.t.headers.annualBenefit,
+    ctx.t.headers.fteSaved,
+    ctx.t.headers.payback,
+    ctx.t.headers.quadrant
+  ];
+  
+  const consolidationRows: string[][] = [];
+  allConsolidations
+    .sort((a, b) => b.matrixPosition.businessImpact - a.matrixPosition.businessImpact)
+    .forEach(cons => {
+      consolidationRows.push([
+        cons.workflow.name,
+        cons.consolidation.name,
+        cons.constituentOpportunities.length.toString(),
+        ctx.fmt.currency(cons.aggregatedMetrics.totalAnnualRoi),
+        ctx.fmt.number(cons.aggregatedMetrics.totalFteSavings, 2),
+        Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
+        cons.matrixPosition.quadrant,
+      ]);
+    });
+  
+  sections.push(createTableCaption("D.4", (ctx.t.tableCaptions as any)["D.4"], ctx.t.labels.table));
+  sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
+  
+  return sections;
+}
+
+/**
+ * Build consolidation constituent mapping table (Appendix D.5, was D.0b)
+ */
+function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
+  const sections: Paragraph[] = [];
+  
+  const constituentHeaders = [
+    ctx.t.headers.workflow,
+    ctx.t.headers.consolidation,
+    ctx.t.headers.constituentOpportunity,
+    ctx.t.headers.stepNumber,
+    ctx.t.headers.stepName
+  ];
+  
+  const constituentRows: string[][] = [];
+  allConsolidations.forEach(cons => {
+    const sortedConstituents = [...cons.constituentOpportunities].sort((a, b) => a.stepOrder - b.stepOrder);
+    sortedConstituents.forEach(opp => {
+      constituentRows.push([
+        cons.workflow.name,
+        cons.consolidation.name,
+        opp.name,
+        opp.stepOrder.toString(),
+        opp.stepName,
+      ]);
+    });
+  });
+  
+  sections.push(createTableCaption("D.5", (ctx.t.tableCaptions as any)["D.5"], ctx.t.labels.table));
+  sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
+  
+  return sections;
+}
+
+/**
  * Main function to generate Executive Diagnostic Report
  * @param data - Aggregated diagnostic data
  * @param language - Report language ('en' or 'es'), defaults to 'en'
@@ -1328,80 +1399,10 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createHeading(ctx.t.appendices.d, HeadingLevel.HEADING_1));
   sections.push(createBodyParagraph(ctx.t.appendixIntros.appendixD));
   
-  // D.0 Consolidated Opportunities Overview (conditional - only if consolidations exist)
+  // Store consolidations for rendering at end
   const allConsolidations = data.workflows.flatMap(w => w.consolidations || []);
-  if (allConsolidations.length > 0) {
-    sections.push(
-      new Paragraph({
-        text: ctx.t.formatStrings.consolidatedOpportunitiesHeading,
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-      })
-    );
-    
-    sections.push(createBodyParagraph(ctx.t.appendixIntros.consolidatedOpportunities));
-    
-    // D.0a - Consolidated Opportunity Summary Table
-    const consolidationHeaders = [
-      ctx.t.headers.workflow,
-      ctx.t.headers.consolidationName,
-      ctx.t.headers.opportunities,
-      ctx.t.headers.annualBenefit,
-      ctx.t.headers.fteSaved,
-      ctx.t.headers.payback,
-      ctx.t.headers.quadrant
-    ];
-    
-    const consolidationRows: string[][] = [];
-    allConsolidations
-      .sort((a, b) => b.matrixPosition.businessImpact - a.matrixPosition.businessImpact)
-      .forEach(cons => {
-        consolidationRows.push([
-          cons.workflow.name,
-          cons.consolidation.name,
-          cons.constituentOpportunities.length.toString(),
-          ctx.fmt.currency(cons.aggregatedMetrics.totalAnnualRoi),
-          ctx.fmt.number(cons.aggregatedMetrics.totalFteSavings, 2),
-          Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
-          cons.matrixPosition.quadrant,
-        ]);
-      });
-    
-    sections.push(createTableCaption("D.0a", (ctx.t.tableCaptions as any)["D.0a"], ctx.t.labels.table));
-    sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
-    
-    // D.0b - Consolidation Constituent Mapping Table
-    const constituentHeaders = [
-      ctx.t.headers.workflow,
-      ctx.t.headers.consolidation,
-      ctx.t.headers.constituentOpportunity,
-      ctx.t.headers.stepNumber,
-      ctx.t.headers.stepName
-    ];
-    
-    const constituentRows: string[][] = [];
-    allConsolidations.forEach(cons => {
-      // Sort constituents by step order
-      const sortedConstituents = [...cons.constituentOpportunities].sort((a, b) => a.stepOrder - b.stepOrder);
-      sortedConstituents.forEach(opp => {
-        constituentRows.push([
-          cons.workflow.name,
-          cons.consolidation.name,
-          opp.name,
-          opp.stepOrder.toString(),
-          opp.stepName,
-        ]);
-      });
-    });
-    
-    sections.push(createTableCaption("D.0b", (ctx.t.tableCaptions as any)["D.0b"], ctx.t.labels.table));
-    sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
-    
-    sections.push(createBodyParagraph(ctx.t.appendixNarratives.consolidationRepresentsParagraph));
-    sections.push(createHorizontalSeparator());
-  }
   
-  // D.1 Portfolio Summary Table (add Weekly Hours Saved column)
+  // D.1 Portfolio Summary Table (moved to top)
   const portfolioHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback, ctx.t.metricLabels.weeklyHoursSaved];
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
@@ -1494,6 +1495,29 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   // D.3 Modeling Notes
   sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES));
+  
+  // D.4 and D.5 - Consolidated Opportunities (conditional, moved to end after modeling notes)
+  if (allConsolidations.length > 0) {
+    sections.push(
+      new Paragraph({
+        text: ctx.t.formatStrings.consolidatedOpportunitiesHeading,
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+      })
+    );
+    
+    sections.push(createBodyParagraph(ctx.t.appendixIntros.consolidatedOpportunities));
+    
+    // D.4 - Consolidated Opportunity Summary (was D.0a)
+    sections.push(...buildConsolidatedSummaryTable(ctx, allConsolidations));
+    
+    // D.5 - Consolidation Constituent Mapping (was D.0b)
+    sections.push(...buildConsolidationMappingTable(ctx, allConsolidations));
+    
+    sections.push(createBodyParagraph(ctx.t.appendixNarratives.consolidationRepresentsParagraph));
+    sections.push(createHorizontalSeparator());
+  }
+  
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 
   // Appendix E

@@ -101,9 +101,9 @@ export interface ReportTranslations {
     "6.3": string;
     "6.4": string;
     "B.1": string;
-    "D.0a": string;
-    "D.0b": string;
     "D.1": string;
+    "D.4": string;
+    "D.5": string;
     "E.2": string;
     "E.4": string;
     "E.5": string;
@@ -584,9 +584,9 @@ export const en: ReportTranslations = {
     "6.3": "Phase 3 — Strategic",
     "6.4": "18-Month Implementation Timeline",
     "B.1": "Readiness Score Component Weighting",
-    "D.0a": "Consolidated Opportunity Summary",
-    "D.0b": "Consolidation Constituent Mapping",
     "D.1": "Portfolio Overview — All Opportunities",
+    "D.4": "Consolidated Opportunity Summary",
+    "D.5": "Consolidation Constituent Mapping",
     "E.2": "Net Benefit Formulas",
     "E.4": "Annual Benefit Breakdown",
     "E.5": "Scenario Adjustment Framework",
@@ -1050,9 +1050,9 @@ export const es: ReportTranslations = {
     "6.3": "Fase 3 — Estratégica",
     "6.4": "Cronograma de Implementación de 18 Meses",
     "B.1": "Ponderación de Componentes de Puntuación de Preparación",
-    "D.0a": "Resumen de Oportunidades Consolidadas",
-    "D.0b": "Mapeo de Constituyentes de Consolidación",
     "D.1": "Resumen de Cartera — Todas las Oportunidades",
+    "D.4": "Resumen de Oportunidades Consolidadas",
+    "D.5": "Mapeo de Constituyentes de Consolidación",
     "E.2": "Fórmulas de Beneficio Neto",
     "E.4": "Desglose de Beneficio Anual",
     "E.5": "Marco de Ajuste de Escenarios",
