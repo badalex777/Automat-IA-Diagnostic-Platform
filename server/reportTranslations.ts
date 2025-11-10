@@ -332,6 +332,72 @@ export interface ReportTranslations {
     month12to15: string;
     month15to18: string;
   };
+  
+  // Appendix introduction paragraphs
+  appendixIntros: {
+    appendixB: string;
+    appendixC: string;
+    appendixD: string;
+    consolidatedOpportunities: string;
+  };
+  
+  // Appendix narrative content (longer explanatory paragraphs)
+  appendixNarratives: {
+    whyTheseWeightsBullet1: string;
+    whyTheseWeightsBullet2: string;
+    whyTheseWeightsBullet3: string;
+    whyTheseWeightsBullet4: string;
+    performanceSummaryTemplate: string;
+    allValuesModeledConservative: string;
+    impactMajorityParagraph: string;
+    portfolioSummaryParagraph: string;
+    consolidationRepresentsParagraph: string;
+  };
+  
+  // Metric labels for financial tables
+  metricLabels: {
+    annualBenefit: string;
+    estimatedImplementationCost: string;
+    paybackPeriod: string;
+    yearOneNetBenefit: string;
+    yearThreeNetBenefit: string;
+    yearFiveNetBenefit: string;
+    fteSaved: string;
+    annualHoursSaved: string;
+    weeklyHoursSaved: string;
+    timeSavings: string;
+    qualityImpact: string;
+    revenueUplift: string;
+    rampUpPeriod: string;
+    conservativeEstimate: string;
+    toBeValidated: string;
+    threeMonths: string;
+    primaryEfficiencyGain: string;
+    errorReductionBenefits: string;
+    capacityReallocation: string;
+    timeToSteadyState: string;
+  };
+  
+  // Format strings and templates
+  formatStrings: {
+    stepFormat: string; // "Step {0} — {1}"
+    roiInsightsHeading: string; // "D.{0} ROI Insights — {1} / {2}"
+    monthsAbbrev: string; // "mo"
+    hoursPerYear: string; // "hours/year"
+    consolidatedOpportunitiesHeading: string; // "D.0 Consolidated Opportunities"
+  };
+  
+  // Key conclusions bullets and content
+  keyConclusionsBullets: {
+    bullet1: string;
+    bullet2: string;
+    bullet3: string;
+    bullet4: string;
+    bullet5: string;
+    strategicInterpretationPrompt: string;
+    step5Title: string;
+    step5Content: string;
+  };
 }
 
 /**
@@ -639,6 +705,67 @@ export const en: ReportTranslations = {
     month12to15: "12-15 mo",
     month15to18: "15-18 mo",
   },
+  
+  appendixIntros: {
+    appendixB: "The Readiness Score is calculated as a weighted combination of the Technical Feasibility Assessment (TFA) and Process Insights Form (PIF). These weights reflect the relative importance of technical and operational factors in determining automation feasibility.",
+    appendixC: "This appendix consolidates step-level SWOT analyses across all workflows, providing a comprehensive view of automation readiness at the process step level. Each workflow is presented with its constituent steps, followed by the Strengths, Weaknesses, Opportunities, and Threats identified through step-level readiness assessment.",
+    appendixD: "This appendix provides a validated financial view of each validated automation opportunity. Results are modeled using the Automat-IA Conservative Scenario Framework unless indicated otherwise. Financial figures are rounded to the nearest centenar.",
+    consolidatedOpportunities: "When multiple automation opportunities exist across related process steps within a workflow, they may be consolidated into strategic implementation packages. Consolidations enable coordinated deployment that leverages shared resources, minimizes integration overhead, and achieves greater business impact through platform-level synergy. The tables below present consolidated opportunity summaries with aggregated financial metrics and constituent mappings for traceability.",
+  },
+  
+  appendixNarratives: {
+    whyTheseWeightsBullet1: "Technical components (System Environment, Data Quality, Integration, Security/Compliance) total 60%, reflecting the reality that technical barriers are harder and costlier to remediate.",
+    whyTheseWeightsBullet2: "Operational components (Process Clarity, Change Magnitude, Workflow Brittleness) total 40%, capturing process maturity and organizational readiness factors critical to adoption success.",
+    whyTheseWeightsBullet3: "Data Quality and Integration Feasibility receive the highest individual weights (18% each) as they are the primary determinants of automation viability.",
+    whyTheseWeightsBullet4: "Combined, these seven components produce a holistic readiness score that balances technical feasibility with operational reality.",
+    performanceSummaryTemplate: "Performance Summary. Under the conservative scenario, estimated annual benefit is {0}, equivalent to {1} FTEs or approximately {2} hours per year, with an expected payback of {3} months.",
+    allValuesModeledConservative: "All values modeled under Automat-IA Conservative Scenario.",
+    impactMajorityParagraph: "For this opportunity, the majority of measurable benefit is driven by time savings. Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance.",
+    portfolioSummaryParagraph: "Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. {0}Detailed per-opportunity pages follow.",
+    consolidationRepresentsParagraph: "Consolidations represent strategic groupings recommended for coordinated implementation. Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections.",
+  },
+  
+  metricLabels: {
+    annualBenefit: "Annual Benefit",
+    estimatedImplementationCost: "Estimated Implementation Cost",
+    paybackPeriod: "Payback Period",
+    yearOneNetBenefit: "1-Year Net Benefit",
+    yearThreeNetBenefit: "3-Year Net Benefit",
+    yearFiveNetBenefit: "5-Year Net Benefit",
+    fteSaved: "FTE Saved",
+    annualHoursSaved: "Annual Hours Saved",
+    weeklyHoursSaved: "Weekly Hours Saved",
+    timeSavings: "Time Savings",
+    qualityImpact: "Quality Impact",
+    revenueUplift: "Revenue Uplift",
+    rampUpPeriod: "Ramp-Up Period",
+    conservativeEstimate: "Conservative estimate",
+    toBeValidated: "To be validated",
+    threeMonths: "3 months",
+    primaryEfficiencyGain: "Primary efficiency gain from process automation",
+    errorReductionBenefits: "Error reduction benefits modeled conservatively where data available",
+    capacityReallocation: "Capacity reallocation potential subject to business validation",
+    timeToSteadyState: "Time to reach steady-state performance after implementation",
+  },
+  
+  formatStrings: {
+    stepFormat: "Step {0} — {1}",
+    roiInsightsHeading: "D.{0} ROI Insights — {1} / {2}",
+    monthsAbbrev: "mo",
+    hoursPerYear: "hours/year",
+    consolidatedOpportunitiesHeading: "D.0 Consolidated Opportunities",
+  },
+  
+  keyConclusionsBullets: {
+    bullet1: "Use of data and structured process readiness for automation with {0} identified opportunities representing {1} in annual benefits.",
+    bullet2: "Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum.",
+    bullet3: "Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first.",
+    bullet4: "Average payback period of {0} months indicates relatively rapid return on automation investments.",
+    bullet5: "Technical feasibility assessments reveal varying levels of readiness across workflows, informing implementation sequencing.",
+    strategicInterpretationPrompt: "[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]",
+    step5Title: "5. 6-Month Roadmap Review Cadence",
+    step5Content: "Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities.",
+  },
 };
 
 /**
@@ -945,6 +1072,67 @@ export const es: ReportTranslations = {
     month9to12: "9-12 meses",
     month12to15: "12-15 meses",
     month15to18: "15-18 meses",
+  },
+  
+  appendixIntros: {
+    appendixB: "La Puntuación de Preparación se calcula como una combinación ponderada de la Evaluación de Factibilidad Técnica (TFA) y el Formulario de Perspectivas de Proceso (PIF). Estos pesos reflejan la importancia relativa de factores técnicos y operacionales en determinar la viabilidad de automatización.",
+    appendixC: "Este apéndice consolida análisis FODA a nivel de paso en todos los flujos de trabajo, proporcionando una vista completa de preparación de automatización a nivel de paso de proceso. Cada flujo de trabajo se presenta con sus pasos constituyentes, seguido de las Fortalezas, Debilidades, Oportunidades y Amenazas identificadas a través de la evaluación de preparación a nivel de paso.",
+    appendixD: "Este apéndice proporciona una vista financiera validada de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Automat-IA a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.",
+    consolidatedOpportunities: "Cuando existen múltiples oportunidades de automatización en pasos de proceso relacionados dentro de un flujo de trabajo, pueden consolidarse en paquetes de implementación estratégica. Las consolidaciones permiten un despliegue coordinado que aprovecha recursos compartidos, minimiza sobrecarga de integración y logra mayor impacto empresarial a través de sinergia a nivel de plataforma. Las tablas a continuación presentan resúmenes de oportunidades consolidadas con métricas financieras agregadas y mapeos de constituyentes para trazabilidad.",
+  },
+  
+  appendixNarratives: {
+    whyTheseWeightsBullet1: "Los componentes técnicos (Entorno del Sistema, Calidad de Datos, Integración, Seguridad/Cumplimiento) totalizan 60%, reflejando la realidad de que las barreras técnicas son más difíciles y costosas de remediar.",
+    whyTheseWeightsBullet2: "Los componentes operacionales (Claridad del Proceso, Magnitud del Cambio, Fragilidad del Flujo de Trabajo) totalizan 40%, capturando factores de madurez del proceso y preparación organizacional críticos para el éxito de la adopción.",
+    whyTheseWeightsBullet3: "Calidad de Datos y Viabilidad de Integración reciben los pesos individuales más altos (18% cada uno) ya que son los determinantes primarios de viabilidad de automatización.",
+    whyTheseWeightsBullet4: "Combinados, estos siete componentes producen una puntuación de preparación holística que equilibra viabilidad técnica con realidad operacional.",
+    performanceSummaryTemplate: "Resumen de Rendimiento. Bajo el escenario conservador, el beneficio anual estimado es {0}, equivalente a {1} FTEs o aproximadamente {2} horas por año, con un período de recuperación esperado de {3} meses.",
+    allValuesModeledConservative: "Todos los valores modelados bajo el Escenario Conservador de Automat-IA.",
+    impactMajorityParagraph: "Para esta oportunidad, la mayoría del beneficio medible proviene del ahorro de tiempo. Los impactos de calidad e ingresos se modelan de manera conservadora o se omiten cuando los datos de respaldo son insuficientes. El período de aceleración considera la adopción y estabilización para que los resultados del Año 1 reflejen un rendimiento alcanzable.",
+    portfolioSummaryParagraph: "Utilice el resumen del portafolio para comparar la escala de oportunidad, costo y ritmo de realización de un vistazo. {0}Las páginas detalladas por oportunidad siguen a continuación.",
+    consolidationRepresentsParagraph: "Las consolidaciones representan agrupaciones estratégicas recomendadas para implementación coordinada. Las oportunidades constituyentes individuales y sus análisis financieros detallados se presentan en secciones subsiguientes.",
+  },
+  
+  metricLabels: {
+    annualBenefit: "Beneficio Anual",
+    estimatedImplementationCost: "Costo de Implementación Estimado",
+    paybackPeriod: "Período de Recuperación",
+    yearOneNetBenefit: "Beneficio Neto Año 1",
+    yearThreeNetBenefit: "Beneficio Neto Año 3",
+    yearFiveNetBenefit: "Beneficio Neto Año 5",
+    fteSaved: "FTE Ahorrado",
+    annualHoursSaved: "Horas Anuales Ahorradas",
+    weeklyHoursSaved: "Horas Semanales Ahorradas",
+    timeSavings: "Ahorro de Tiempo",
+    qualityImpact: "Impacto en Calidad",
+    revenueUplift: "Incremento de Ingresos",
+    rampUpPeriod: "Período de Aceleración",
+    conservativeEstimate: "Estimación conservadora",
+    toBeValidated: "Por validar",
+    threeMonths: "3 meses",
+    primaryEfficiencyGain: "Ganancia primaria de eficiencia de automatización de proceso",
+    errorReductionBenefits: "Beneficios de reducción de errores modelados conservadoramente donde hay datos disponibles",
+    capacityReallocation: "Potencial de reasignación de capacidad sujeto a validación empresarial",
+    timeToSteadyState: "Tiempo para alcanzar rendimiento de estado estable después de la implementación",
+  },
+  
+  formatStrings: {
+    stepFormat: "Paso {0} — {1}",
+    roiInsightsHeading: "D.{0} Hallazgos de ROI — {1} / {2}",
+    monthsAbbrev: "meses",
+    hoursPerYear: "horas/año",
+    consolidatedOpportunitiesHeading: "D.0 Oportunidades Consolidadas",
+  },
+  
+  keyConclusionsBullets: {
+    bullet1: "Uso de datos y preparación de procesos estructurados para automatización con {0} oportunidades identificadas que representan {1} en beneficios anuales.",
+    bullet2: "Las oportunidades de Logros Rápidos en Fase 1 representan un excelente punto de partida para demostrar valor y generar impulso.",
+    bullet3: "Las oportunidades estratégicas en Fase 3 representan el ROI individual más alto pero requieren mejoras fundacionales primero.",
+    bullet4: "El período de recuperación promedio de {0} meses indica un retorno relativamente rápido de las inversiones en automatización.",
+    bullet5: "Las evaluaciones de factibilidad técnica revelan niveles variables de preparación entre flujos de trabajo, informando la secuencia de implementación.",
+    strategicInterpretationPrompt: "[Interpretación Estratégica: Sintetiza los hallazgos del diagnóstico en orientación estratégica. ¿Cuál es el nivel general de madurez de automatización? ¿Qué capacidades organizacionales necesitan fortalecimiento? ¿Cómo se alinea esta hoja de ruta de automatización con objetivos de transformación digital más amplios? ¿Qué patrocinio ejecutivo y gestión del cambio serán críticos?]",
+    step5Title: "5. Cadencia de Revisión de Hoja de Ruta de 6 Meses",
+    step5Content: "Establecer puntos de control regulares para evaluar el progreso, repriorizar según cambios empresariales e identificar nuevas oportunidades.",
   },
 };
 
