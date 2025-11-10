@@ -73,6 +73,18 @@ function createBulletParagraph(text: string): Paragraph {
 }
 
 /**
+ * Format a template string by replacing {0}, {1}, {2}, etc. with provided values
+ * @param template - Template string with {0}, {1}, {2}, etc. placeholders
+ * @param values - Values to replace placeholders with
+ * @returns Formatted string
+ */
+function formatTemplate(template: string, ...values: (string | number)[]): string {
+  return values.reduce((str, value, index) => {
+    return str.replace(new RegExp(`\\{${index}\\}`, 'g'), String(value));
+  }, template);
+}
+
+/**
  * Create a table caption with bold formatting
  * @param tableNumber - The table number (e.g., "4.3")
  * @param description - The table description
@@ -569,9 +581,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Generate Quick Win list with workflow and step details
   const quickwinList = data.roadmapPhases.phase1QuickWins.length > 0
     ? data.roadmapPhases.phase1QuickWins
-        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
         .join('\n')
-    : "No Quick Win opportunities identified at this time. Focus on addressing foundational gaps to improve readiness scores.";
+    : ctx.t.fallbackMessages.noQuickWins;
   
   // Generate foundational gaps list from common SWOT weaknesses
   const allWeaknesses = data.appendixB
@@ -595,13 +607,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   const foundationalGapsList = allWeaknesses.length > 0
     ? allWeaknesses.map((gap, idx) => `${idx + 1}. ${gap}`).join('\n')
-    : "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies";
+    : ctx.t.fallbackMessages.noFoundationalGaps;
   
   // Generate Strategic Bets list
   const strategicBetsList = [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic].length > 0
     ? [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic]
         .slice(0, 5) // Limit to top 5
-        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
         .join('\n')
     : ctx.t.fallbackMessages.noStrategicBets;
   
@@ -614,7 +626,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   const niceToHaveOpportunities = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Nice-To-Haves');
   const niceToHaveList = niceToHaveOpportunities.length > 0
     ? niceToHaveOpportunities
-        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - Step ${opp.step.stepOrder}: ${opp.step.name})`)
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
         .join('\n')
     : ctx.t.fallbackMessages.noNiceToHave;
   
@@ -640,7 +652,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   
   const culturalReadinessSummary = culturalInsights.length > 0
     ? culturalInsights.map((qi, idx) => `${idx + 1}. ${qi.insight}`).join('\n')
-    : "• Varying levels of automation awareness across departments\n• Strong stakeholder engagement in high-readiness workflows\n• Need for change management support in cross-functional processes\n• Opportunity for automation literacy training";
+    : ctx.t.fallbackMessages.noCulturalInsights;
 
   // Calculate total consolidations across all workflows
   const totalConsolidations = data.workflows.reduce((sum: number, wd: any) => sum + wd.consolidations.length, 0);
@@ -846,16 +858,16 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const totalTopFTE = data.top3Opportunities.reduce((sum, opp) => sum + opp.fteSavings, 0);
 
     const financialSummaryRows = [
-      ["Total Annual Benefit", ctx.fmt.currency(totalTopBenefit), "Combined quantifiable value across identified opportunities"],
-      ["Total Estimated Implementation Cost", ctx.fmt.currency(totalTopCost), "Includes implementation, training, and change management"],
-      ["Average ROI", ctx.fmt.number(avgTopROI, 1) + "%", "Modeled under the Conservative Scenario Framework"],
-      ["Average Payback Period", ctx.fmt.number(avgTopPayback, 1) + " months", "Time to recover implementation cost"],
-      ["Total FTE Capacity Saved", ctx.fmt.number(totalTopFTE, 2), "Full-time equivalent hours freed for higher-value work"],
+      [`Total ${ctx.t.metricLabels.annualBenefit}`, ctx.fmt.currency(totalTopBenefit), ctx.t.metricLabels.combinedQuantifiableValue],
+      [`Total ${ctx.t.metricLabels.estimatedImplementationCost}`, ctx.fmt.currency(totalTopCost), ctx.t.metricLabels.includesImplementationTraining],
+      ["Average ROI", ctx.fmt.number(avgTopROI, 1) + "%", ctx.t.metricLabels.modeledConservativeFramework],
+      [`Average ${ctx.t.metricLabels.paybackPeriod}`, ctx.fmt.number(avgTopPayback, 1) + " " + ctx.t.formatStrings.monthsAbbrev, ctx.t.metricLabels.timeToRecoverCost],
+      [`Total ${ctx.t.metricLabels.fteSaved}`, ctx.fmt.number(totalTopFTE, 2), ctx.t.metricLabels.fteHoursFreed],
     ];
 
     sections.push(createTableCaption("4.4", ctx.t.tableCaptions["4.4"], ctx.t.labels.table));
     sections.push(createTable(financialSummaryHeaders, financialSummaryRows));
-    sections.push(createBodyParagraph("All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the nearest hundred."));
+    sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
   }
   sections.push(createHorizontalSeparator());
   
@@ -932,7 +944,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         ctx.fmt.currency(opp.roiMetrics.annualRoi),
         ctx.fmt.currency(parseFloat(opp.opportunity.implementationCost || "0")),
         ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
-        Math.round(opp.roiMetrics.paybackMonths) + " mo",
+        Math.round(opp.roiMetrics.paybackMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
       ]);
     });
   });
@@ -1026,7 +1038,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase1Rows = data.roadmapPhases.phase1QuickWins.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
-      Math.round(opp.roiMetrics.paybackMonths) + " mo",
+      Math.round(opp.roiMetrics.paybackMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.1", ctx.t.tableCaptions["6.1"], ctx.t.labels.table));
@@ -1050,7 +1062,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase2Rows = data.roadmapPhases.phase2Foundational.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
-      Math.round(opp.roiMetrics.paybackMonths) + " mo",
+      Math.round(opp.roiMetrics.paybackMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.2", ctx.t.tableCaptions["6.2"], ctx.t.labels.table));
@@ -1074,7 +1086,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const phase3Rows = data.roadmapPhases.phase3Strategic.map(opp => [
       opp.opportunity.name,
       ctx.fmt.currency(opp.roiMetrics.annualRoi),
-      Math.round(opp.roiMetrics.paybackMonths) + " mo",
+      Math.round(opp.roiMetrics.paybackMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.3", ctx.t.tableCaptions["6.3"], ctx.t.labels.table));
@@ -1117,13 +1129,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createHeading(ctx.t.conclusions.title, HeadingLevel.HEADING_1));
 
   sections.push(createBodyParagraph(ctx.t.conclusions.keyConclusions));
-  sections.push(createBulletParagraph("Use of data and structured process readiness for automation with 4 identified opportunities representing $148,000 in annual benefits."));
-  sections.push(createBulletParagraph("Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum."));
-  sections.push(createBulletParagraph("Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first."));
-  sections.push(createBulletParagraph("Average payback period of 12 months indicates relatively rapid return on automation investments."));
-  sections.push(createBulletParagraph("Technical feasibility assessments reveal varying levels of readiness across workflows, informing implementation sequencing."));
+  sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet1, data.roadmapPhases.phase1QuickWins.length, ctx.fmt.currency(data.portfolioMetrics.totalAnnualBenefit))));
+  sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet2));
+  sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet3));
+  sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet4, Math.round(data.portfolioMetrics.averagePaybackMonths))));
+  sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet5));
   
-  sections.push(createBodyParagraph("[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]"));
+  sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.strategicInterpretationPrompt));
 
   sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
   sections.push(createBodyParagraph(ctx.t.conclusions.step1Title));
@@ -1138,8 +1150,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.conclusions.step4Title));
   sections.push(createBodyParagraph(ctx.t.conclusions.step4Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph("5. 6-Month Roadmap Review Cadence"));
-  sections.push(createBodyParagraph("Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities."));
+  sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Title));
+  sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Content));
   sections.push(createBodyParagraph(""));
   sections.push(createBodyParagraph(ctx.t.conclusions.closingStatement));
 
@@ -1158,42 +1170,33 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Appendix B: Readiness Score Metric Weighting
   sections.push(createHeading(ctx.t.appendices.b, HeadingLevel.HEADING_1));
   
-  sections.push(createBodyParagraph(
-    "The Readiness Score is calculated as a weighted combination of the Technical Feasibility Assessment (TFA) " +
-    "and Process Insights Form (PIF). These weights reflect the relative importance of technical and operational " +
-    "factors in determining automation feasibility."
-  ));
+  sections.push(createBodyParagraph(ctx.t.appendixIntros.appendixB));
   
   // Component Weighting Table - 7-row breakdown matching template
   const metricWeightHeaders = [ctx.t.headers.component, ctx.t.headers.weight, ctx.t.headers.description];
   const metricWeightRows = [
-    ["System Environment", "15%", "API accessibility, structured data formats, and automation-friendly system architecture"],
-    ["Data Quality", "18%", "Completeness, consistency, standardization, and reliability of data used in the workflow"],
-    ["Integration Feasibility", "18%", "Ease of system integration, availability of connectors, and cross-platform data flow"],
-    ["Security/Compliance", "9%", "Regulatory requirements, data sensitivity, and access control considerations"],
-    ["Process Clarity", "15%", "Documentation quality, rule consistency, and decision logic transparency"],
-    ["Change Magnitude", "15%", "Frequency of process changes, adaptability requirements, and rules stability"],
-    ["Workflow Brittleness", "10%", "Error frequency, exception handling needs, and input consistency challenges"],
+    [ctx.t.tfaComponents.systemEnvironment, "15%", ctx.t.appendices.systemEnvironmentDesc],
+    [ctx.t.tfaComponents.dataQuality, "18%", ctx.t.appendices.dataQualityDesc],
+    [ctx.t.tfaComponents.integrationFeasibility, "18%", ctx.t.appendices.integrationFeasibilityDesc],
+    [ctx.t.tfaComponents.securityCompliance, "9%", ctx.t.appendices.securityComplianceDesc],
+    [ctx.t.tfaComponents.processClarity, "15%", ctx.t.appendices.processClarityDesc],
+    [ctx.t.tfaComponents.changeMagnitude, "15%", ctx.t.appendices.changeMagnitudeDesc],
+    [ctx.t.tfaComponents.workflowBrittleness, "10%", ctx.t.appendices.workflowBrittlenessDesc],
   ];
   sections.push(createTableCaption("B.1", ctx.t.tableCaptions["B.1"], ctx.t.labels.table));
   sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
-  sections.push(createBodyParagraph("Why These Weights Matter:"));
-  sections.push(createBulletParagraph("Technical components (System Environment, Data Quality, Integration, Security/Compliance) total 60%, reflecting the reality that technical barriers are harder and costlier to remediate."));
-  sections.push(createBulletParagraph("Operational components (Process Clarity, Change Magnitude, Workflow Brittleness) total 40%, capturing process maturity and organizational readiness factors critical to adoption success."));
-  sections.push(createBulletParagraph("Data Quality and Integration Feasibility receive the highest individual weights (18% each) as they are the primary determinants of automation viability."));
-  sections.push(createBulletParagraph("Combined, these seven components produce a holistic readiness score that balances technical feasibility with operational reality."));
+  sections.push(createBodyParagraph(ctx.t.appendices.whyTheseWeights));
+  sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet1));
+  sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet2));
+  sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet3));
+  sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet4));
   
   sections.push(new Paragraph({ children: [new PageBreak()] }));
   
   // Appendix C: Readiness SWOT Analysis - Step-Level Text Format
   sections.push(createHeading(ctx.t.appendices.c, HeadingLevel.HEADING_1));
-  sections.push(createBodyParagraph(
-    "This appendix consolidates step-level SWOT analyses across all workflows, providing a " +
-    "comprehensive view of automation readiness at the process step level. Each workflow is presented " +
-    "with its constituent steps, followed by the Strengths, Weaknesses, Opportunities, and Threats " +
-    "identified through step-level readiness assessment."
-  ));
+  sections.push(createBodyParagraph(ctx.t.appendixIntros.appendixC));
 
   // Generate text-based SWOT format
   if (data.appendixB && data.appendixB.length > 0) {
@@ -1215,7 +1218,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           // Step identifier as subheading
           sections.push(
             new Paragraph({
-              text: `Step ${stepNumber} — ${stepSWOT.stepName}`,
+              text: formatTemplate(ctx.t.formatStrings.stepFormat, stepNumber, stepSWOT.stepName),
               heading: HeadingLevel.HEADING_4,
               spacing: { before: 180, after: 90 },
             })
@@ -1275,36 +1278,30 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   // Appendix D
   sections.push(createHeading(ctx.t.appendices.d, HeadingLevel.HEADING_1));
-  sections.push(createBodyParagraph(APPENDIX_D_INTRO));
+  sections.push(createBodyParagraph(ctx.t.appendixIntros.appendixD));
   
   // D.0 Consolidated Opportunities Overview (conditional - only if consolidations exist)
   const allConsolidations = data.workflows.flatMap(w => w.consolidations || []);
   if (allConsolidations.length > 0) {
     sections.push(
       new Paragraph({
-        text: "D.0 Consolidated Opportunities",
+        text: ctx.t.formatStrings.consolidatedOpportunitiesHeading,
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 240, after: 120 },
       })
     );
     
-    sections.push(createBodyParagraph(
-      "When multiple automation opportunities exist across related process steps within a workflow, they may be " +
-      "consolidated into strategic implementation packages. Consolidations enable coordinated deployment that " +
-      "leverages shared resources, minimizes integration overhead, and achieves greater business impact through " +
-      "platform-level synergy. The tables below present consolidated opportunity summaries with aggregated " +
-      "financial metrics and constituent mappings for traceability."
-    ));
+    sections.push(createBodyParagraph(ctx.t.appendixIntros.consolidatedOpportunities));
     
     // D.0a - Consolidated Opportunity Summary Table
     const consolidationHeaders = [
       ctx.t.headers.workflow,
-      "Consolidation Name",
-      "Opportunities",
+      ctx.t.headers.consolidationName,
+      ctx.t.headers.opportunities,
       ctx.t.headers.annualBenefit,
       ctx.t.headers.fteSaved,
       ctx.t.headers.payback,
-      "Quadrant"
+      ctx.t.headers.quadrant
     ];
     
     const consolidationRows: string[][] = [];
@@ -1317,7 +1314,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           cons.constituentOpportunities.length.toString(),
           ctx.fmt.currency(cons.aggregatedMetrics.totalAnnualRoi),
           ctx.fmt.number(cons.aggregatedMetrics.totalFteSavings, 2),
-          Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " mo",
+          Math.round(cons.aggregatedMetrics.weightedAvgPaybackPeriodMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
           cons.matrixPosition.quadrant,
         ]);
       });
@@ -1328,10 +1325,10 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     // D.0b - Consolidation Constituent Mapping Table
     const constituentHeaders = [
       ctx.t.headers.workflow,
-      "Consolidation",
-      "Constituent Opportunity",
-      "Step #",
-      "Step Name"
+      ctx.t.headers.consolidation,
+      ctx.t.headers.constituentOpportunity,
+      ctx.t.headers.stepNumber,
+      ctx.t.headers.stepName
     ];
     
     const constituentRows: string[][] = [];
@@ -1352,15 +1349,12 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     sections.push(createTableCaption("D.0b", (ctx.t.tableCaptions as any)["D.0b"], ctx.t.labels.table));
     sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
     
-    sections.push(createBodyParagraph(
-      "Consolidations represent strategic groupings recommended for coordinated implementation. " +
-      "Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections."
-    ));
+    sections.push(createBodyParagraph(ctx.t.appendixNarratives.consolidationRepresentsParagraph));
     sections.push(createHorizontalSeparator());
   }
   
   // D.1 Portfolio Summary Table (add Weekly Hours Saved column)
-  const portfolioHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback, "Weekly Hours Saved"];
+  const portfolioHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback, ctx.t.metricLabels.weeklyHoursSaved];
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
@@ -1371,7 +1365,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         ctx.fmt.currency(opp.roiMetrics.annualRoi),
         ctx.fmt.currency(parseFloat(opp.opportunity.implementationCost || "0")),
         ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
-        Math.round(opp.roiMetrics.paybackMonths) + " mo",
+        Math.round(opp.roiMetrics.paybackMonths) + " " + ctx.t.formatStrings.monthsAbbrev,
         ctx.fmt.number(weeklyHours, 1),
       ]);
     });
@@ -1381,9 +1375,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     sections.push(createTable(portfolioHeaders, portfolioRows));
   }
   sections.push(createBodyParagraph(
-    "Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. " +
-    (allConsolidations.length > 0 ? "Consolidated opportunities are shown aggregated above; individual constituents are included here for detailed review. " : "") +
-    "Detailed per-opportunity pages follow."
+    formatTemplate(ctx.t.appendixNarratives.portfolioSummaryParagraph, 
+      allConsolidations.length > 0 ? "Consolidated opportunities are shown aggregated above; individual constituents are included here for detailed review. " : "")
   ));
   sections.push(createHorizontalSeparator());
   
@@ -1393,7 +1386,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     w.opportunities.forEach(opp => {
       sections.push(
         new Paragraph({
-          text: `D.2.${oppCounter} ROI Insights – ${w.workflow.name} / ${opp.opportunity.name}`,
+          text: formatTemplate(ctx.t.formatStrings.roiInsightsHeading, oppCounter, w.workflow.name, opp.opportunity.name),
           heading: HeadingLevel.HEADING_3,
           spacing: { before: 360, after: 120 },
         })
@@ -1402,9 +1395,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       // Performance Summary paragraph
       const annualHours = opp.roiMetrics.fteSavings * 2080;
       sections.push(createBodyParagraph(
-        `Performance Summary. Under the conservative scenario, estimated annual benefit is ` +
-        `${ctx.fmt.currency(opp.roiMetrics.annualRoi)}, equivalent to ${ctx.fmt.number(opp.roiMetrics.fteSavings, 2)} FTEs or approximately ` +
-        `${ctx.fmt.number(annualHours, 0)} hours per year, with an expected payback of ${Math.round(opp.roiMetrics.paybackMonths)} months.`
+        formatTemplate(ctx.t.appendixNarratives.performanceSummaryTemplate,
+          ctx.fmt.currency(opp.roiMetrics.annualRoi),
+          ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
+          ctx.fmt.number(annualHours, 0),
+          Math.round(opp.roiMetrics.paybackMonths))
       ));
       
       // Key Metrics Table (9 rows)
@@ -1414,39 +1409,35 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       const year5Net = (opp.roiMetrics.annualRoi * 5) - implCost;
       const weeklyHours = annualHours / 52;
       
-      const keyMetricsHeaders = ["Metric", "Value"];
+      const keyMetricsHeaders = [ctx.t.headers.metric, ctx.t.headers.value];
       const keyMetricsRows = [
-        ["Annual Benefit", ctx.fmt.currency(opp.roiMetrics.annualRoi)],
-        ["Estimated Implementation Cost", ctx.fmt.currency(implCost)],
-        ["Payback Period", `${Math.round(opp.roiMetrics.paybackMonths)} months`],
-        ["1-Year Net Benefit", ctx.fmt.currency(year1Net)],
-        ["3-Year Net Benefit", ctx.fmt.currency(year3Net)],
-        ["5-Year Net Benefit", ctx.fmt.currency(year5Net)],
-        ["FTE Saved", ctx.fmt.number(opp.roiMetrics.fteSavings, 2)],
-        ["Annual Hours Saved", ctx.fmt.number(annualHours, 0)],
-        ["Weekly Hours Saved", ctx.fmt.number(weeklyHours, 1)],
+        [ctx.t.metricLabels.annualBenefit, ctx.fmt.currency(opp.roiMetrics.annualRoi)],
+        [ctx.t.metricLabels.estimatedImplementationCost, ctx.fmt.currency(implCost)],
+        [ctx.t.metricLabels.paybackPeriod, `${Math.round(opp.roiMetrics.paybackMonths)} ${ctx.t.formatStrings.monthsAbbrev}`],
+        [ctx.t.metricLabels.yearOneNetBenefit, ctx.fmt.currency(year1Net)],
+        [ctx.t.metricLabels.yearThreeNetBenefit, ctx.fmt.currency(year3Net)],
+        [ctx.t.metricLabels.yearFiveNetBenefit, ctx.fmt.currency(year5Net)],
+        [ctx.t.metricLabels.fteSaved, ctx.fmt.number(opp.roiMetrics.fteSavings, 2)],
+        [ctx.t.metricLabels.annualHoursSaved, ctx.fmt.number(annualHours, 0)],
+        [ctx.t.metricLabels.weeklyHoursSaved, ctx.fmt.number(weeklyHours, 1)],
       ];
       sections.push(createTableCaption(`D.2.${oppCounter}a`, "Key Financial Metrics", ctx.t.labels.table));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
-      sections.push(createBodyParagraph("All values modeled under Automat-IA Conservative Scenario."));
+      sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
       
       // Business Impact Components Table
-      const impactHeaders = ["Impact Area", "Key Metrics", "Description"];
+      const impactHeaders = [ctx.t.headers.impactArea, ctx.t.headers.keyMetrics, ctx.t.headers.description];
       const impactRows = [
-        ["Time Savings", `${ctx.fmt.number(annualHours, 0)} hours/year`, "Primary efficiency gain from process automation"],
-        ["Quality Impact", "Conservative estimate", "Error reduction benefits modeled conservatively where data available"],
-        ["Revenue Uplift", "To be validated", "Capacity reallocation potential subject to business validation"],
-        ["Ramp-Up Period", "3 months", "Time to reach steady-state performance after implementation"],
+        [ctx.t.metricLabels.timeSavings, `${ctx.fmt.number(annualHours, 0)} ${ctx.t.formatStrings.hoursPerYear}`, ctx.t.metricLabels.primaryEfficiencyGain],
+        [ctx.t.metricLabels.qualityImpact, ctx.t.metricLabels.conservativeEstimate, ctx.t.metricLabels.errorReductionBenefits],
+        [ctx.t.metricLabels.revenueUplift, ctx.t.metricLabels.toBeValidated, ctx.t.metricLabels.capacityReallocation],
+        [ctx.t.metricLabels.rampUpPeriod, ctx.t.metricLabels.threeMonths, ctx.t.metricLabels.timeToSteadyState],
       ];
       sections.push(createTableCaption(`D.2.${oppCounter}b`, "Business Impact Components", ctx.t.labels.table));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
       // Dominant component paragraph
-      sections.push(createBodyParagraph(
-        "For this opportunity, the majority of measurable benefit is driven by time savings. " +
-        "Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. " +
-        "Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance."
-      ));
+      sections.push(createBodyParagraph(ctx.t.appendixNarratives.impactMajorityParagraph));
       
       sections.push(createHorizontalSeparator());
       oppCounter++;
@@ -1464,11 +1455,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(...createTextParagraphs(APPENDIX_E_PART1));
 
   // E.2 Net Benefit Formulas Table
-  const netBenefitHeaders = ["Projection Horizon", "Formula", "Purpose"];
+  const netBenefitHeaders = [ctx.t.appendixETables.projectionHorizonHeader, ctx.t.appendixETables.formulaHeader, ctx.t.appendixETables.purposeHeader];
   const netBenefitRows = [
-    ["Year 1", "Annual Benefit × Ramp-Up Factor − Implementation Cost", "Accounts for partial realization during adoption phase"],
-    ["3-Year", "(Annual Benefit × 3) − Implementation Cost", "Cumulative value over initial contract period"],
-    ["5-Year", "(Annual Benefit × 5) − Implementation Cost", "Long-term strategic value assessment"],
+    [ctx.t.appendixETables.netBenefitYear1, ctx.t.appendixETables.netBenefitYear1Formula, ctx.t.appendixETables.netBenefitYear1Purpose],
+    [ctx.t.appendixETables.netBenefitYear3, ctx.t.appendixETables.netBenefitYear3Formula, ctx.t.appendixETables.netBenefitYear3Purpose],
+    [ctx.t.appendixETables.netBenefitYear5, ctx.t.appendixETables.netBenefitYear5Formula, ctx.t.appendixETables.netBenefitYear5Purpose],
   ];
   sections.push(createTableCaption("E.2", ctx.t.tableCaptions["E.2"], ctx.t.labels.table));
   sections.push(createTable(netBenefitHeaders, netBenefitRows, [25, 40, 35]));
@@ -1477,40 +1468,40 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(...createTextParagraphs(APPENDIX_E_PART2));
 
   // E.4 Annual Benefit Breakdown Table
-  const benefitHeaders = ["Component", "Formula", "Description"];
+  const benefitHeaders = [ctx.t.appendixETables.componentHeader, ctx.t.appendixETables.formulaHeader, ctx.t.appendixETables.descriptionHeader];
   const benefitRows = [
-    ["Time Savings Benefits", "Hours Saved × Effective Hourly Rate × Adoption %", "Value of time freed for higher-priority work"],
-    ["Error Reduction Benefits", "Error Rate × Rework Cost × Volume × Improvement %", "Value of quality improvements and rework avoided"],
-    ["Revenue Uplift Benefits", "Capacity Reallocation × Revenue per Hour × Realization %", "Value from redirecting capacity to revenue-generating activities"],
+    [ctx.t.appendixETables.timeSavingsBenefits, ctx.t.appendixETables.timeSavingsFormula, ctx.t.appendixETables.timeSavingsPurpose],
+    [ctx.t.appendixETables.errorReductionBenefitsLabel, ctx.t.appendixETables.errorReductionFormula, ctx.t.appendixETables.errorReductionPurpose],
+    [ctx.t.appendixETables.revenueUpliftBenefits, ctx.t.appendixETables.revenueUpliftFormula, ctx.t.appendixETables.revenueUpliftPurpose],
   ];
   sections.push(createTableCaption("E.4", ctx.t.tableCaptions["E.4"], ctx.t.labels.table));
   sections.push(createTable(benefitHeaders, benefitRows, [25, 40, 35]));
-  sections.push(createBodyParagraph("All benefit calculations apply downward multipliers in conservative modeling to avoid overstatement."));
+  sections.push(createBodyParagraph(ctx.t.appendixETables.benefitCalculationsFooter));
 
   // E.5 Scenario Adjustment Framework Table
   sections.push(...createTextParagraphs(APPENDIX_E_PART3));
-  const scenarioHeaders = ["Adjustment Category", "Conservative Modeling Rationale"];
+  const scenarioHeaders = [ctx.t.appendixETables.adjustmentCategoryHeader, ctx.t.appendixETables.conservativeRationaleHeader];
   const scenarioRows = [
-    ["Time Savings Adjustment", "Apply 60-75% realization factor to account for exceptions, learning curves, and process variations"],
-    ["Error Reduction Adjustment", "Only include when error data is documented; apply 50% discount to projected improvements"],
-    ["Revenue Reallocation Adjustment", "Exclude unless business validates capacity can be redirected; apply 40% discount when included"],
-    ["Cost Overrun Adjustment", "Add 20% contingency to implementation costs to reflect typical project overruns"],
-    ["Ramp-Up Efficiency Adjustment", "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization"],
+    [ctx.t.appendixETables.timeSavingsAdjustment, ctx.t.appendixETables.timeSavingsRationale],
+    [ctx.t.appendixETables.errorReductionAdjustment, ctx.t.appendixETables.errorReductionRationale],
+    [ctx.t.appendixETables.revenueReallocationAdjustment, ctx.t.appendixETables.revenueReallocationRationale],
+    [ctx.t.appendixETables.costOverrunAdjustment, ctx.t.appendixETables.costOverrunRationale],
+    [ctx.t.appendixETables.rampUpEfficiencyAdjustment, ctx.t.appendixETables.rampUpEfficiencyRationale],
   ];
   sections.push(createTableCaption("E.5", ctx.t.tableCaptions["E.5"], ctx.t.labels.table));
   sections.push(createTable(scenarioHeaders, scenarioRows, [35, 65]));
-  sections.push(createBodyParagraph("Together these controls form the Conservative Scenario Framework, ensuring projections remain achievable, evidence-based, and comparable across diagnostics."));
+  sections.push(createBodyParagraph(ctx.t.appendixETables.conservativeFrameworkFooter));
 
   // E.6 Key Modeling Assumptions Table
   sections.push(...createTextParagraphs(APPENDIX_E_PART4));
-  const assumptionsHeaders = ["Variable", "Standard Assumption", "Rationale"];
+  const assumptionsHeaders = [ctx.t.appendixETables.variableHeader, ctx.t.appendixETables.standardAssumptionHeader, ctx.t.appendixETables.rationaleHeader];
   const assumptionsRows = [
-    ["Effective Hourly Rate", "$50-$75 per hour", "Blended rate reflecting salary, benefits, and overhead across roles"],
-    ["Standard Work Year", "2,080 hours", "52 weeks × 40 hours, industry standard for FTE calculations"],
-    ["Process Baseline", "Current state as reported", "PIF data establishes pre-automation performance baseline"],
-    ["Automation Capability", "60-80% task coverage", "Realistic automation scope accounting for exceptions and edge cases"],
-    ["Recurring Costs", "10-15% of implementation", "Annual software licenses, maintenance, and support"],
-    ["One-Time Costs", "Implementation + Training", "Includes build, configuration, testing, and change management"],
+    [ctx.t.appendixETables.effectiveHourlyRate, ctx.t.appendixETables.effectiveHourlyRateValue, ctx.t.appendixETables.effectiveHourlyRateRationale],
+    [ctx.t.appendixETables.standardWorkYear, ctx.t.appendixETables.standardWorkYearValue, ctx.t.appendixETables.standardWorkYearRationale],
+    [ctx.t.appendixETables.processBaseline, ctx.t.appendixETables.processBaselineValue, ctx.t.appendixETables.processBaselineRationale],
+    [ctx.t.appendixETables.automationCapability, ctx.t.appendixETables.automationCapabilityValue, ctx.t.appendixETables.automationCapabilityRationale],
+    [ctx.t.appendixETables.recurringCostsLabel, ctx.t.appendixETables.recurringCostsValue, ctx.t.appendixETables.recurringCostsRationale],
+    [ctx.t.appendixETables.oneTimeCostsLabel, ctx.t.appendixETables.oneTimeCostsValue, ctx.t.appendixETables.oneTimeCostsRationale],
   ];
   sections.push(createTableCaption("E.6", ctx.t.tableCaptions["E.6"], ctx.t.labels.table));
   sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));

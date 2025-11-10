@@ -23,8 +23,11 @@ export interface ReportTranslations {
   
   // Fallback messages (when no data exists)
   fallbackMessages: {
+    noQuickWins: string;
+    noFoundationalGaps: string;
     noStrategicBets: string;
     noNiceToHave: string;
+    noCulturalInsights: string;
     systemEnvironmentLimitations: string;
   };
   
@@ -124,6 +127,9 @@ export interface ReportTranslations {
     workflowName: string;
     dataField: string;
     source: string;
+    consolidationName: string;
+    consolidation: string;
+    constituentOpportunity: string;
     respondentName: string;
     respondentRole: string;
     collectionDate: string;
@@ -145,6 +151,17 @@ export interface ReportTranslations {
     role: string;
     gapQuestion: string;
     date: string;
+  };
+  
+  // TFA Component Names
+  tfaComponents: {
+    systemEnvironment: string;
+    dataQuality: string;
+    integrationFeasibility: string;
+    securityCompliance: string;
+    processClarity: string;
+    changeMagnitude: string;
+    workflowBrittleness: string;
   };
   
   // SWOT labels
@@ -376,6 +393,11 @@ export interface ReportTranslations {
     errorReductionBenefits: string;
     capacityReallocation: string;
     timeToSteadyState: string;
+    combinedQuantifiableValue: string;
+    includesImplementationTraining: string;
+    modeledConservativeFramework: string;
+    timeToRecoverCost: string;
+    fteHoursFreed: string;
   };
   
   // Format strings and templates
@@ -398,6 +420,67 @@ export interface ReportTranslations {
     step5Title: string;
     step5Content: string;
   };
+  
+  appendixETables: {
+    netBenefitYear1: string;
+    netBenefitYear3: string;
+    netBenefitYear5: string;
+    netBenefitYear1Formula: string;
+    netBenefitYear3Formula: string;
+    netBenefitYear5Formula: string;
+    netBenefitYear1Purpose: string;
+    netBenefitYear3Purpose: string;
+    netBenefitYear5Purpose: string;
+    timeSavingsBenefits: string;
+    errorReductionBenefitsLabel: string;
+    revenueUpliftBenefits: string;
+    timeSavingsFormula: string;
+    errorReductionFormula: string;
+    revenueUpliftFormula: string;
+    timeSavingsPurpose: string;
+    errorReductionPurpose: string;
+    revenueUpliftPurpose: string;
+    timeSavingsAdjustment: string;
+    errorReductionAdjustment: string;
+    revenueReallocationAdjustment: string;
+    costOverrunAdjustment: string;
+    timeSavingsRationale: string;
+    errorReductionRationale: string;
+    revenueReallocationRationale: string;
+    costOverrunRationale: string;
+    effectiveHourlyRate: string;
+    standardWorkYear: string;
+    processBaseline: string;
+    automationCapability: string;
+    effectiveHourlyRateValue: string;
+    standardWorkYearValue: string;
+    processBaselineValue: string;
+    automationCapabilityValue: string;
+    effectiveHourlyRateRationale: string;
+    standardWorkYearRationale: string;
+    processBaselineRationale: string;
+    automationCapabilityRationale: string;
+    rampUpEfficiencyAdjustment: string;
+    rampUpEfficiencyRationale: string;
+    recurringCostsLabel: string;
+    recurringCostsValue: string;
+    recurringCostsRationale: string;
+    oneTimeCostsLabel: string;
+    oneTimeCostsValue: string;
+    oneTimeCostsRationale: string;
+    benefitCalculationsFooter: string;
+    conservativeFrameworkFooter: string;
+    projectionHorizonHeader: string;
+    formulaHeader: string;
+    purposeHeader: string;
+    componentHeader: string;
+    descriptionHeader: string;
+    adjustmentCategoryHeader: string;
+    conservativeRationaleHeader: string;
+    variableHeader: string;
+    standardAssumptionHeader: string;
+    rationaleHeader: string;
+  };
 }
 
 /**
@@ -413,8 +496,11 @@ export const en: ReportTranslations = {
   },
   
   fallbackMessages: {
+    noQuickWins: "No Quick Win opportunities identified at this time. Focus on addressing foundational gaps to improve readiness scores.",
+    noFoundationalGaps: "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies",
     noStrategicBets: "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.",
     noNiceToHave: "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.",
+    noCulturalInsights: "• Varying levels of automation awareness across departments\n• Strong stakeholder engagement in high-readiness workflows\n• Need for change management support in cross-functional processes\n• Opportunity for automation literacy training",
     systemEnvironmentLimitations: "System environment limitations",
   },
   
@@ -528,6 +614,19 @@ export const en: ReportTranslations = {
     role: "Role",
     gapQuestion: "Gap?",
     date: "Date",
+    consolidationName: "Consolidation Name",
+    consolidation: "Consolidation",
+    constituentOpportunity: "Constituent Opportunity",
+  },
+  
+  tfaComponents: {
+    systemEnvironment: "System Environment",
+    dataQuality: "Data Quality",
+    integrationFeasibility: "Integration Feasibility",
+    securityCompliance: "Security/Compliance",
+    processClarity: "Process Clarity",
+    changeMagnitude: "Change Magnitude",
+    workflowBrittleness: "Workflow Brittleness",
   },
   
   swot: {
@@ -746,6 +845,11 @@ export const en: ReportTranslations = {
     errorReductionBenefits: "Error reduction benefits modeled conservatively where data available",
     capacityReallocation: "Capacity reallocation potential subject to business validation",
     timeToSteadyState: "Time to reach steady-state performance after implementation",
+    combinedQuantifiableValue: "Combined quantifiable value across identified opportunities",
+    includesImplementationTraining: "Includes implementation, training, and change management",
+    modeledConservativeFramework: "Modeled under the Conservative Scenario Framework",
+    timeToRecoverCost: "Time to recover implementation cost",
+    fteHoursFreed: "Full-time equivalent hours freed for higher-value work",
   },
   
   formatStrings: {
@@ -766,6 +870,67 @@ export const en: ReportTranslations = {
     step5Title: "5. 6-Month Roadmap Review Cadence",
     step5Content: "Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities.",
   },
+  
+  appendixETables: {
+    netBenefitYear1: "Year 1",
+    netBenefitYear3: "3-Year",
+    netBenefitYear5: "5-Year",
+    netBenefitYear1Formula: "Annual Benefit × Ramp-Up Factor − Implementation Cost",
+    netBenefitYear3Formula: "(Annual Benefit × 3) − Implementation Cost",
+    netBenefitYear5Formula: "(Annual Benefit × 5) − Implementation Cost",
+    netBenefitYear1Purpose: "Accounts for partial realization during adoption phase",
+    netBenefitYear3Purpose: "Cumulative value over initial contract period",
+    netBenefitYear5Purpose: "Long-term value realization",
+    timeSavingsBenefits: "Time Savings Benefits",
+    errorReductionBenefitsLabel: "Error Reduction Benefits",
+    revenueUpliftBenefits: "Revenue Uplift Benefits",
+    timeSavingsFormula: "Hours Saved × Effective Hourly Rate × Adoption %",
+    errorReductionFormula: "Error Rate × Rework Cost × Volume × Improvement %",
+    revenueUpliftFormula: "Capacity Reallocation × Revenue per Hour × Realization %",
+    timeSavingsPurpose: "Value of time freed for higher-priority work",
+    errorReductionPurpose: "Value of quality improvements and rework avoided",
+    revenueUpliftPurpose: "Value from redirecting capacity to revenue-generating activities",
+    timeSavingsAdjustment: "Time Savings Adjustment",
+    errorReductionAdjustment: "Error Reduction Adjustment",
+    revenueReallocationAdjustment: "Revenue Reallocation Adjustment",
+    costOverrunAdjustment: "Cost Overrun Adjustment",
+    timeSavingsRationale: "Apply 60-75% realization factor to account for exceptions, learning curves, and process variations",
+    errorReductionRationale: "Only include when error data is documented; apply 50% discount to projected improvements",
+    revenueReallocationRationale: "Exclude unless business validates capacity can be redirected; apply 40% discount when included",
+    costOverrunRationale: "Add 20% contingency to implementation costs to reflect typical project overruns",
+    effectiveHourlyRate: "Effective Hourly Rate",
+    standardWorkYear: "Standard Work Year",
+    processBaseline: "Process Baseline",
+    automationCapability: "Automation Capability",
+    effectiveHourlyRateValue: "$50-$75 per hour",
+    standardWorkYearValue: "2,080 hours",
+    processBaselineValue: "Current state as reported",
+    automationCapabilityValue: "60-80% task coverage",
+    effectiveHourlyRateRationale: "Blended rate reflecting salary, benefits, and overhead across roles",
+    standardWorkYearRationale: "52 weeks × 40 hours, industry standard for FTE calculations",
+    processBaselineRationale: "PIF data establishes pre-automation performance baseline",
+    automationCapabilityRationale: "Realistic automation scope accounting for exceptions and edge cases",
+    rampUpEfficiencyAdjustment: "Ramp-Up Efficiency Adjustment",
+    rampUpEfficiencyRationale: "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization",
+    recurringCostsLabel: "Recurring Costs",
+    recurringCostsValue: "10-15% of implementation",
+    recurringCostsRationale: "Annual software licenses, maintenance, and support",
+    oneTimeCostsLabel: "One-Time Costs",
+    oneTimeCostsValue: "Implementation + Training",
+    oneTimeCostsRationale: "Includes build, configuration, testing, and change management",
+    benefitCalculationsFooter: "All benefit calculations apply downward multipliers in conservative modeling to avoid overstatement.",
+    conservativeFrameworkFooter: "Together these controls form the Conservative Scenario Framework, ensuring projections remain achievable, evidence-based, and comparable across diagnostics.",
+    projectionHorizonHeader: "Projection Horizon",
+    formulaHeader: "Formula",
+    purposeHeader: "Purpose",
+    componentHeader: "Component",
+    descriptionHeader: "Description",
+    adjustmentCategoryHeader: "Adjustment Category",
+    conservativeRationaleHeader: "Conservative Modeling Rationale",
+    variableHeader: "Variable",
+    standardAssumptionHeader: "Standard Assumption",
+    rationaleHeader: "Rationale",
+  },
 };
 
 /**
@@ -781,8 +946,11 @@ export const es: ReportTranslations = {
   },
   
   fallbackMessages: {
+    noQuickWins: "No se identificaron oportunidades de Logros Rápidos en este momento. Enfóquese en abordar las brechas fundacionales para mejorar los puntajes de preparación.",
+    noFoundationalGaps: "• Brechas en la documentación de procesos\n• Limitaciones de integración de sistemas\n• Inconsistencias en la calidad de datos",
     noStrategicBets: "No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.",
     noNiceToHave: "No se identificaron oportunidades Deseables. Todas las oportunidades son Logros Rápidos, Apuestas Estratégicas o requieren mejoras fundacionales.",
+    noCulturalInsights: "• Niveles variables de conciencia sobre automatización en los departamentos\n• Fuerte compromiso de las partes interesadas en flujos de trabajo de alta preparación\n• Necesidad de apoyo en gestión del cambio en procesos interfuncionales\n• Oportunidad para capacitación en alfabetización de automatización",
     systemEnvironmentLimitations: "Limitaciones del entorno del sistema",
   },
   
@@ -896,6 +1064,19 @@ export const es: ReportTranslations = {
     role: "Rol",
     gapQuestion: "¿Brecha?",
     date: "Fecha",
+    consolidationName: "Nombre de Consolidación",
+    consolidation: "Consolidación",
+    constituentOpportunity: "Oportunidad Constituyente",
+  },
+  
+  tfaComponents: {
+    systemEnvironment: "Entorno del Sistema",
+    dataQuality: "Calidad de Datos",
+    integrationFeasibility: "Viabilidad de Integración",
+    securityCompliance: "Seguridad/Cumplimiento",
+    processClarity: "Claridad del Proceso",
+    changeMagnitude: "Magnitud del Cambio",
+    workflowBrittleness: "Fragilidad del Flujo de Trabajo",
   },
   
   swot: {
@@ -1114,6 +1295,11 @@ export const es: ReportTranslations = {
     errorReductionBenefits: "Beneficios de reducción de errores modelados conservadoramente donde hay datos disponibles",
     capacityReallocation: "Potencial de reasignación de capacidad sujeto a validación empresarial",
     timeToSteadyState: "Tiempo para alcanzar rendimiento de estado estable después de la implementación",
+    combinedQuantifiableValue: "Valor cuantificable combinado en oportunidades identificadas",
+    includesImplementationTraining: "Incluye implementación, capacitación y gestión del cambio",
+    modeledConservativeFramework: "Modelado bajo el Marco de Escenario Conservador",
+    timeToRecoverCost: "Tiempo para recuperar el costo de implementación",
+    fteHoursFreed: "Horas equivalentes a tiempo completo liberadas para trabajo de mayor valor",
   },
   
   formatStrings: {
@@ -1133,6 +1319,67 @@ export const es: ReportTranslations = {
     strategicInterpretationPrompt: "[Interpretación Estratégica: Sintetiza los hallazgos del diagnóstico en orientación estratégica. ¿Cuál es el nivel general de madurez de automatización? ¿Qué capacidades organizacionales necesitan fortalecimiento? ¿Cómo se alinea esta hoja de ruta de automatización con objetivos de transformación digital más amplios? ¿Qué patrocinio ejecutivo y gestión del cambio serán críticos?]",
     step5Title: "5. Cadencia de Revisión de Hoja de Ruta de 6 Meses",
     step5Content: "Establecer puntos de control regulares para evaluar el progreso, repriorizar según cambios empresariales e identificar nuevas oportunidades.",
+  },
+  
+  appendixETables: {
+    netBenefitYear1: "Año 1",
+    netBenefitYear3: "3 Años",
+    netBenefitYear5: "5 Años",
+    netBenefitYear1Formula: "Beneficio Anual × Factor de Aceleración − Costo de Implementación",
+    netBenefitYear3Formula: "(Beneficio Anual × 3) − Costo de Implementación",
+    netBenefitYear5Formula: "(Beneficio Anual × 5) − Costo de Implementación",
+    netBenefitYear1Purpose: "Considera la realización parcial durante la fase de adopción",
+    netBenefitYear3Purpose: "Valor acumulado durante el período de contrato inicial",
+    netBenefitYear5Purpose: "Realización de valor a largo plazo",
+    timeSavingsBenefits: "Beneficios de Ahorro de Tiempo",
+    errorReductionBenefitsLabel: "Beneficios de Reducción de Errores",
+    revenueUpliftBenefits: "Beneficios de Incremento de Ingresos",
+    timeSavingsFormula: "Horas Ahorradas × Tarifa por Hora Efectiva × % de Adopción",
+    errorReductionFormula: "Tasa de Error × Costo de Retrabajo × Volumen × % de Mejora",
+    revenueUpliftFormula: "Reasignación de Capacidad × Ingresos por Hora × % de Realización",
+    timeSavingsPurpose: "Valor del tiempo liberado para trabajo de mayor prioridad",
+    errorReductionPurpose: "Valor de mejoras de calidad y retrabajo evitado",
+    revenueUpliftPurpose: "Valor de redirigir capacidad a actividades generadoras de ingresos",
+    timeSavingsAdjustment: "Ajuste de Ahorro de Tiempo",
+    errorReductionAdjustment: "Ajuste de Reducción de Errores",
+    revenueReallocationAdjustment: "Ajuste de Reasignación de Ingresos",
+    costOverrunAdjustment: "Ajuste de Sobrecosto",
+    timeSavingsRationale: "Aplicar factor de realización del 60-75% para considerar excepciones, curvas de aprendizaje y variaciones de proceso",
+    errorReductionRationale: "Incluir solo cuando los datos de error estén documentados; aplicar descuento del 50% a las mejoras proyectadas",
+    revenueReallocationRationale: "Excluir a menos que el negocio valide que la capacidad puede redirigirse; aplicar descuento del 40% cuando se incluya",
+    costOverrunRationale: "Agregar contingencia del 20% a los costos de implementación para reflejar sobrecostos típicos del proyecto",
+    effectiveHourlyRate: "Tarifa por Hora Efectiva",
+    standardWorkYear: "Año Laboral Estándar",
+    processBaseline: "Línea Base del Proceso",
+    automationCapability: "Capacidad de Automatización",
+    effectiveHourlyRateValue: "$50-$75 por hora",
+    standardWorkYearValue: "2.080 horas",
+    processBaselineValue: "Estado actual según informado",
+    automationCapabilityValue: "60-80% de cobertura de tareas",
+    effectiveHourlyRateRationale: "Tarifa combinada que refleja salario, beneficios y gastos generales en todos los roles",
+    standardWorkYearRationale: "52 semanas × 40 horas, estándar de la industria para cálculos de FTE",
+    processBaselineRationale: "Los datos del PIF establecen la línea base de rendimiento previa a la automatización",
+    automationCapabilityRationale: "Alcance de automatización realista considerando excepciones y casos extremos",
+    rampUpEfficiencyAdjustment: "Ajuste de Eficiencia de Aceleración",
+    rampUpEfficiencyRationale: "Beneficios de Año 1 con descuento del 50% para reflejar adopción gradual y estabilización",
+    recurringCostsLabel: "Costos Recurrentes",
+    recurringCostsValue: "10-15% de implementación",
+    recurringCostsRationale: "Licencias de software anuales, mantenimiento y soporte",
+    oneTimeCostsLabel: "Costos Únicos",
+    oneTimeCostsValue: "Implementación + Capacitación",
+    oneTimeCostsRationale: "Incluye construcción, configuración, pruebas y gestión del cambio",
+    benefitCalculationsFooter: "Todos los cálculos de beneficios aplican multiplicadores a la baja en modelado conservador para evitar sobreestimación.",
+    conservativeFrameworkFooter: "Juntos, estos controles forman el Marco de Escenario Conservador, asegurando que las proyecciones sean alcanzables, basadas en evidencia y comparables entre diagnósticos.",
+    projectionHorizonHeader: "Horizonte de Proyección",
+    formulaHeader: "Fórmula",
+    purposeHeader: "Propósito",
+    componentHeader: "Componente",
+    descriptionHeader: "Descripción",
+    adjustmentCategoryHeader: "Categoría de Ajuste",
+    conservativeRationaleHeader: "Justificación del Modelado Conservador",
+    variableHeader: "Variable",
+    standardAssumptionHeader: "Supuesto Estándar",
+    rationaleHeader: "Justificación",
   },
 };
 
