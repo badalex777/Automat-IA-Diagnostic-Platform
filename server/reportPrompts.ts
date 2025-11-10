@@ -655,24 +655,24 @@ The diagnostic integrates quantitative and qualitative inputs from multiple orga
 to ensure analytical depth, data integrity, and traceability. Each stream captures a distinct
 dimension of the analyzed workflows.
 
-Technical Feasibility Assessments (TFA). Completed by IT and system owners to document
+Technical Feasibility Assessments (TFA): Completed by IT and system owners to document
 system environment, data quality, integration feasibility, and security posture. TFAs establish the
 technical conditions that determine whether automation is feasible within each workflow.
 
-Process Insights Forms (PIF). Completed by process owners and end users to capture
+Process Insights Forms (PIF): Completed by process owners and end users to capture
 operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness,
 and collect metrics such as process volume, frequency, average duration, and observed error
 rates. PIF inputs feed readiness scoring and ROI modeling.
 
-Stakeholder Interviews. Sessions with department leads and subject-matter experts validate
+Stakeholder Interviews: Sessions with department leads and subject-matter experts validate
 automation candidates, contextualize TFA and PIF responses, and provide data not found in
 system documentation, including salary ranges, role counts per workflow, and high-level
 process maps.
 
-End-User Interviews. Discussions with those performing the work verify PIF inputs, enable
+End-User Interviews: Discussions with those performing the work verify PIF inputs, enable
 detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
 
-Documentation Review. Review of workflow diagrams, SOPs, and system documentation to
+Documentation Review: Review of workflow diagrams, SOPs, and system documentation to
 cross-check form data and confirm process conditions. Where available, policy documents,
 screen captures, or task logs are incorporated as supporting evidence.
 
@@ -685,28 +685,28 @@ A.2 Diagnostic Frameworks
 Automat-IA applies a structured, multi-layered framework that translates technical and
 operational inputs into measurable readiness and financial performance indicators.
 
-Technical Feasibility Assessment (TFA).
+Technical Feasibility Assessment (TFA):
 21 weighted questions scored 1 to 5, with a "Don't know" option to flag gaps. Section weights:
 System Environment 25 percent, Data Quality 30 percent, Integration Feasibility 30 percent,
 Security and Compliance 15 percent. TFA outputs a 0 to 100 technical readiness score.
 
-Process Insights Form (PIF).
+Process Insights Form (PIF):
 40 questions capturing operational readiness across process clarity, change magnitude, and
 workflow brittleness, plus quantitative metrics for volumes, times, participants, and quality. When
 multiple respondents exist, responses are aggregated with variance tracking.
 
-Readiness Rubric.
+Readiness Rubric:
 Combined readiness score per step using TFA (shared workflow-level, 60%) and step-specific
 PIF (40%), normalized 0 to 100. This step-level readiness score is the primary input for
 Implementation Effort calculation in the Opportunity Matrix, as detailed in Section A.5.
 
-Automat-IA ROI Calculator.
+Automat-IA ROI Calculator:
 Quantifies financial impact using PIF operational data and cost assumptions from the
 diagnostic. The calculator applies a double-layer conservatism model, producing annual benefit,
 payback period, and related business metrics. All calculations are version-controlled and
 auditable.
 
-Opportunity Matrix.
+Opportunity Matrix:
 Final analytical layer that unifies readiness and ROI into a single prioritization framework.
 
 ● X axis: Business Impact, a normalized score derived from efficiency and value.

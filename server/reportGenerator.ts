@@ -147,8 +147,10 @@ function createTextParagraphs(text: string): Paragraph[] {
   };
   
   const isFrameworkName = (line: string): boolean => {
-    // Matches framework names like "Technical Feasibility Assessment (TFA)." or "Process Insights Form (PIF)."
+    // Matches framework names like "Technical Feasibility Assessment (TFA):" or "Process Insights Form (PIF):"
+    // Supports both English and Spanish versions
     const frameworks = [
+      // English
       'Technical Feasibility Assessment',
       'Technical Feasibility Assessments',
       'Process Insights Form',
@@ -158,7 +160,18 @@ function createTextParagraphs(text: string): Paragraph[] {
       'Documentation Review',
       'Readiness Rubric',
       'Automat-IA ROI Calculator',
-      'Opportunity Matrix'
+      'Opportunity Matrix',
+      // Spanish
+      'Evaluaciones de Factibilidad Técnica',
+      'Evaluación de Factibilidad Técnica',
+      'Formularios de Perspectivas de Proceso',
+      'Formulario de Perspectivas de Proceso',
+      'Entrevistas con Partes Interesadas',
+      'Entrevistas con Usuarios Finales',
+      'Revisión de Documentación',
+      'Rúbrica de Preparación',
+      'Calculadora de ROI de Automat-IA',
+      'Matriz de Oportunidades'
     ];
     const trimmed = line.trim();
     return frameworks.some(fw => trimmed.startsWith(fw));

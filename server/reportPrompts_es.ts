@@ -673,26 +673,26 @@ El diagnóstico integra entradas cuantitativas y cualitativas de múltiples capa
 asegurar profundidad analítica, integridad de datos y trazabilidad. Cada flujo captura una dimensión 
 distinta de los flujos de trabajo analizados.
 
-Evaluaciones de Factibilidad Técnica (TFA). Completadas por propietarios de TI y sistemas para documentar 
+Evaluaciones de Factibilidad Técnica (TFA): Completadas por propietarios de TI y sistemas para documentar 
 el entorno del sistema, calidad de datos, factibilidad de integración y postura de seguridad. Los TFA 
 establecen las condiciones técnicas que determinan si la automatización es factible dentro de cada flujo 
 de trabajo.
 
-Formularios de Perspectivas de Proceso (PIF). Completados por propietarios de procesos y usuarios finales 
+Formularios de Perspectivas de Proceso (PIF): Completados por propietarios de procesos y usuarios finales 
 para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad 
 de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas 
 de error observadas. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
 
-Entrevistas con Partes Interesadas. Sesiones con líderes departamentales y expertos en la materia validan 
+Entrevistas con Partes Interesadas: Sesiones con líderes departamentales y expertos en la materia validan 
 candidatos de automatización, contextualizan respuestas TFA y PIF y proporcionan datos no encontrados en 
 la documentación del sistema, incluyendo rangos salariales, conteos de roles por flujo de trabajo y mapas 
 de procesos de alto nivel.
 
-Entrevistas con Usuarios Finales. Discusiones con quienes realizan el trabajo verifican entradas PIF, 
+Entrevistas con Usuarios Finales: Discusiones con quienes realizan el trabajo verifican entradas PIF, 
 permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción 
 o propensas a errores.
 
-Revisión de Documentación. Revisión de diagramas de flujos de trabajo, SOPs y documentación de sistemas 
+Revisión de Documentación: Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas 
 para verificar datos de formularios y confirmar condiciones de proceso. Cuando estén disponibles, se 
 incorporan documentos de política, capturas de pantalla o registros de tareas como evidencia de respaldo.
 
@@ -705,29 +705,29 @@ A.2 Marcos de Diagnóstico
 Automat-IA aplica un marco estructurado de múltiples capas que traduce entradas técnicas y operacionales 
 en indicadores medibles de preparación y rendimiento financiero.
 
-Evaluación de Factibilidad Técnica (TFA).
+Evaluación de Factibilidad Técnica (TFA):
 21 preguntas ponderadas puntuadas de 1 a 5, con opción "No sé" para marcar brechas. Pesos de sección: 
 Entorno del Sistema 25 por ciento, Calidad de Datos 30 por ciento, Factibilidad de Integración 30 por 
 ciento, Seguridad y Cumplimiento 15 por ciento. TFA produce una puntuación de preparación técnica de 0 
 a 100.
 
-Formulario de Perspectivas de Proceso (PIF).
+Formulario de Perspectivas de Proceso (PIF):
 40 preguntas capturando preparación operacional en claridad de proceso, magnitud de cambio y fragilidad 
 de flujo de trabajo, más métricas cuantitativas para volúmenes, tiempos, participantes y calidad. Cuando 
 existen múltiples encuestados, las respuestas se agregan con seguimiento de varianza.
 
-Rúbrica de Preparación.
+Rúbrica de Preparación:
 Puntuación de preparación combinada por paso usando TFA (compartido a nivel de flujo de trabajo, 60%) y 
 PIF específico de paso (40%), normalizado de 0 a 100. Esta puntuación de preparación a nivel de paso es 
 la entrada principal para el cálculo de Esfuerzo de Implementación en la Matriz de Oportunidades, como 
 se detalla en la Sección A.5.
 
-Calculadora de ROI de Automat-IA.
+Calculadora de ROI de Automat-IA:
 Cuantifica el impacto financiero usando datos operacionales PIF y supuestos de costos del diagnóstico. La 
 calculadora aplica un modelo de conservadurismo de doble capa, produciendo beneficio anual, período de 
 retorno y métricas empresariales relacionadas. Todos los cálculos son versionados y auditables.
 
-Matriz de Oportunidades.
+Matriz de Oportunidades:
 Capa analítica final que unifica preparación y ROI en un marco único de priorización.
 
 ● Eje X: Impacto Empresarial, una puntuación normalizada derivada de eficiencia y valor.
