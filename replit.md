@@ -6,15 +6,19 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ## Recent Changes
 
-### November 10, 2025 - Bilingual EDR Project Completion
-- **COMPLETE**: Achieved 100% translation coverage for Executive Diagnostic Reports in English and Spanish
-- Expanded `reportTranslations.ts` with 101 additional translation keys covering all Appendices (B, C, D, E), Section 6, Table 4.4, and edge case fallbacks
+### November 10, 2025 - Complete Bilingual EDR Translation System
+- **COMPLETE**: Achieved 100% translation coverage for Executive Diagnostic Reports in English and Spanish across all components
+- **Phase Title Enhancement**: Updated `isPhaseTitle` regex to support bilingual bold formatting for both "Phase X:" (English) and "Fase X:" (Spanish) in Appendix A methodology descriptions
+- **Appendix F Full Translation**: Migrated all hardcoded headers (Question ID, Question Text, Resolved By, Role, Method, Gap?, Date) and section labels to use centralized `ctx.t` translation keys
+- **Section Headings Translation**: Added `sectionSubtitles` with bilingual support for "5.4 Executive Interpretation" / "5.4 Interpretación Ejecutiva" and "6.4 18-Month Automation Roadmap" / "6.4 Hoja de Ruta de Automatización de 18 Meses"
+- **Gantt Chart Localization**: Added `timeRangeHeaders` translation structure for all timeline columns ("0-3 mo" / "0-3 m", "3-6 mo" / "3-6 m", etc.) and phase header
+- Expanded `reportTranslations.ts` with 115+ additional translation keys covering all Appendices (B, C, D, E, F), Section 6, Table 4.4, gantt headers, and edge case fallbacks
 - Refactored all remaining hardcoded English strings in `reportGenerator.ts` to use centralized translation system
 - Enhanced Appendix A formatting: changed period separators to colons, added bilingual framework name detection for bold formatting in both `reportPrompts.ts` and `reportPrompts_es.ts`
 - Fixed cultural readiness null-safety with defensive optional chaining and empty payload guards
 - Verified Spanish terminology for professional executive audience (corrected "SOPs" to "procedimientos operativos estándar (SOP)")
 - **DOCX XML verification**: Confirmed bold colon formatting renders correctly in both languages via XML inspection of generated reports
-- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (32KB) reports generated successfully
+- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (33KB) reports generated successfully
 - Zero hardcoded English strings remaining - full type-safety enforced via TypeScript interfaces
 
 ### November 9, 2025 - Complete Spanish Translation Implementation for EDR
