@@ -8,14 +8,16 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### November 10, 2025 - Professional DOCX Formatting and Appendix D Reorganization
 - **DOCX NumberingConfig Implementation**: Added proper Word document numbering system with reusable bullet and numbered list definitions, replacing manual text prefixes with native DOCX formatting
+- **Numbering Instance Isolation Fix**: Implemented `NumberingRegistry` class to ensure each numbered list (methodology, next steps, appendix sections) restarts at 1 independently instead of continuing sequentially across the entire document
 - **Section 7 Enhancement**: Replaced fake "1.", "2.", "3.", "4." text prefixes in "Recommended Next Steps" with proper auto-incrementing DOCX numbered paragraphs using `createNumberedParagraph()` helper
-- **Auto-Detection System**: Enhanced `createTextParagraphs()` with regex-based detection to automatically convert manual numbered prefixes (`/^\d+[.)]\s+/`) and bulleted prefixes (`/^[•\-\*●]\s+/`) into proper DOCX list formatting
+- **Auto-Detection System**: Enhanced `createTextParagraphs()` with regex-based detection to automatically convert manual numbered prefixes (`/^\d+[.)]\s+/`) and bulleted prefixes (`/^[•\-\*●]\s+/`) into proper DOCX list formatting with automatic list context reset on headers/bullets/blank lines
 - **Appendix D Reorganization**: Restructured logical flow to D.1 (Portfolio Summary - moved to top), D.2.X (Individual Opportunities), D.3 (Modeling Notes - unchanged), D.4/D.5 (Consolidated Opportunities - conditional, moved to end)
 - **Helper Function Extraction**: Created `buildConsolidatedSummaryTable()` and `buildConsolidationMappingTable()` for cleaner code organization and maintainability
 - **Translation Key Migration**: Updated all table caption references from D.0a/D.0b to D.4/D.5 in both English and Spanish translation dictionaries
 - **Translation Cleanup**: Removed hardcoded numbered prefixes from step titles in translations (EN/ES), allowing DOCX to handle numbering natively
-- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (33KB) reports generated successfully with correct Appendix D structure
-- Architect-approved with "Pass" rating - verified proper numbering definitions and logical appendix organization
+- **Threading Registry Pattern**: Single `NumberingRegistry` instance created at start of `generateExecutiveReport()` and threaded through all section builders with semantic list key prefixes ("methodology", "next-steps", "roadmap-phase1", "appendix-a", etc.)
+- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (33KB) reports generated successfully with correct Appendix D structure and independent numbered lists (10 distinct numId instances)
+- Architect-approved with "Pass" rating - verified proper numbering instance isolation, list context reset logic, and registry threading pattern
 
 ### November 10, 2025 - Complete Bilingual EDR Translation System
 - **COMPLETE**: Achieved 100% translation coverage for Executive Diagnostic Reports in English and Spanish across all components
