@@ -128,7 +128,8 @@ function createTextParagraphs(text: string): Paragraph[] {
   let currentParagraph: string[] = [];
 
   const isPhaseTitle = (line: string): boolean => {
-    return /^Phase\s+\d+[:\s]/.test(line.trim());
+    // Match both English "Phase X:" and Spanish "Fase X:"
+    return /^(Phase|Fase)\s+\d+[:\s]/.test(line.trim());
   };
 
   const isSubsectionTitle = (line: string): boolean => {
@@ -1529,7 +1530,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   // Appendix F - Data Provenance and Audit Trail
   sections.push(createHeading(ctx.t.appendices.f, HeadingLevel.HEADING_1));
-  const provenanceHeaders = [ctx.t.headers.workflowName, "Department", "Step", "Type", "Method", ctx.t.headers.respondentName, ctx.t.headers.respondentRole, ctx.t.headers.collectionDate, ctx.t.headers.verificationStatus, "Gaps"];
+  const provenanceHeaders = [ctx.t.headers.workflowName, ctx.t.labels.department, ctx.t.labels.step, ctx.t.labels.type, ctx.t.labels.method, ctx.t.headers.respondentName, ctx.t.headers.respondentRole, ctx.t.headers.collectionDate, ctx.t.headers.verificationStatus, ctx.t.labels.gaps];
   const provenanceRows = data.appendixF.map(prov => {
     // Merge Step # and Step Name into single column
     const stepIdentifier = prov.stepNumber === ctx.t.fallback.na 
@@ -1538,7 +1539,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     
     return [
       prov.workflowName,
-      prov.department || "General Operations",
+      prov.department || ctx.t.labels.generalOperations,
       stepIdentifier,
       prov.dataType,
       prov.collectionMethod,
@@ -1560,13 +1561,13 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     if (prov.knowledgeGapDetails && prov.knowledgeGapDetails.length > 0) {
       sections.push(
         new Paragraph({
-          text: `Knowledge Gap Resolution Details: ${prov.workflowName} (${prov.dataType})`,
+          text: `${ctx.t.labels.knowledgeGapResolutionDetails} ${prov.workflowName} (${prov.dataType})`,
           heading: HeadingLevel.HEADING_3,
           spacing: { before: 240, after: 120 },
         })
       );
       
-      const gapHeaders = ["Q#", "Question", "Resolved By", "Role", "Method", "Gap?", "Date"];
+      const gapHeaders = [ctx.t.headers.questionId, ctx.t.headers.questionText, ctx.t.headers.resolvedBy, ctx.t.headers.role, ctx.t.labels.method, ctx.t.headers.gapQuestion, ctx.t.headers.date];
       const gapRows = prov.knowledgeGapDetails.map(detail => [
         detail.questionId.toString(),
         detail.questionText,
@@ -1576,7 +1577,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         detail.isKnowledgeGap ? ctx.t.fallback.yes : ctx.t.fallback.no,
         detail.resolvedAt,
       ]);
-      sections.push(createTableCaption(`F.${gapTableCounter}`, `Knowledge Gap Resolution — ${prov.workflowName}`, ctx.t.labels.table));
+      sections.push(createTableCaption(`F.${gapTableCounter}`, `${ctx.t.labels.knowledgeGapResolutionPrefix} ${prov.workflowName}`, ctx.t.labels.table));
       sections.push(createTable(gapHeaders, gapRows, [5, 30, 15, 12, 15, 8, 15]));
       gapTableCounter++;
     }

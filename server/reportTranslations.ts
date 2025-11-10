@@ -151,6 +151,8 @@ export interface ReportTranslations {
     role: string;
     gapQuestion: string;
     date: string;
+    questionId: string;
+    phase: string;
   };
   
   // TFA Component Names
@@ -614,6 +616,8 @@ export const en: ReportTranslations = {
     role: "Role",
     gapQuestion: "Gap?",
     date: "Date",
+    questionId: "Q#",
+    phase: "Phase",
     consolidationName: "Consolidation Name",
     consolidation: "Consolidation",
     constituentOpportunity: "Constituent Opportunity",
@@ -1064,6 +1068,8 @@ export const es: ReportTranslations = {
     role: "Rol",
     gapQuestion: "¿Brecha?",
     date: "Fecha",
+    questionId: "P#",
+    phase: "Fase",
     consolidationName: "Nombre de Consolidación",
     consolidation: "Consolidación",
     constituentOpportunity: "Oportunidad Constituyente",
