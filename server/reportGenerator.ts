@@ -199,6 +199,11 @@ function createTextParagraphs(text: string): Paragraph[] {
     return /^[•\-\*●]\s+/.test(line.trim());
   };
 
+  const isNumberedItem = (line: string): boolean => {
+    // Matches lines starting with numbered prefixes like "1.", "2.", "3." etc.
+    return /^\d+[.)]\s+/.test(line.trim());
+  };
+
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
       const text = currentParagraph.join(' ').trim();
@@ -295,6 +300,15 @@ function createTextParagraphs(text: string): Paragraph[] {
         bullet: { level: 0 },
         spacing: { after: 60 },
       }));
+      continue;
+    }
+
+    if (isNumberedItem(trimmed)) {
+      // Flush any current paragraph first
+      flushParagraph();
+      // Remove numbered prefix and create proper DOCX numbered paragraph
+      const textWithoutNumber = trimmed.replace(/^\d+[.)]\s+/, '');
+      paragraphs.push(createNumberedParagraph(textWithoutNumber));
       continue;
     }
 
