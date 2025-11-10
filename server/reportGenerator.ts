@@ -1026,7 +1026,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // 5.4 Executive Interpretation
   sections.push(
     new Paragraph({
-      text: "5.4 Executive Interpretation",
+      text: ctx.t.sectionSubtitles.executiveInterpretation,
       heading: HeadingLevel.HEADING_3,
       spacing: { before: 240, after: 120 },
     })
@@ -1121,14 +1121,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Gantt Table (18-month roadmap)
   sections.push(
     new Paragraph({
-      text: "6.4 18-Month Automation Roadmap",
+      text: ctx.t.sectionSubtitles.roadmapTimeline,
       heading: HeadingLevel.HEADING_3,
       alignment: AlignmentType.BOTH,
       spacing: { before: 360, after: 120 },
     })
   );
 
-  const ganttHeaders = ["Phase", "0-3 mo", "3-6 mo", "6-9 mo", "9-12 mo", "12-15 mo", "15-18 mo"];
+  const ganttHeaders = [ctx.t.headers.phase, ctx.t.timeRangeHeaders.zeroToThree, ctx.t.timeRangeHeaders.threeToSix, ctx.t.timeRangeHeaders.sixToNine, ctx.t.timeRangeHeaders.nineToTwelve, ctx.t.timeRangeHeaders.twelveToFifteen, ctx.t.timeRangeHeaders.fifteenToEighteen];
   const ganttRows = [
     [ctx.t.phaseHeaders.phase1, "█████", "█████", "", "", "", ""],
     [ctx.t.phaseHeaders.phase2, "", "", "█████", "█████", "", ""],

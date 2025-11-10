@@ -68,6 +68,22 @@ export interface ReportTranslations {
     closingStatement: string;
   };
   
+  // Section subtitles  
+  sectionSubtitles: {
+    executiveInterpretation: string;
+    roadmapTimeline: string;
+  };
+  
+  // Time range headers for gantt chart
+  timeRangeHeaders: {
+    zeroToThree: string;
+    threeToSix: string;
+    sixToNine: string;
+    nineToTwelve: string;
+    twelveToFifteen: string;
+    fifteenToEighteen: string;
+  };
+  
   // Appendix subsections
   appendixSubsections: {
     a7: string;
@@ -524,6 +540,20 @@ export const en: ReportTranslations = {
     phase3: "Phase 3: Strategic",
   },
   
+  sectionSubtitles: {
+    executiveInterpretation: "5.4 Executive Interpretation",
+    roadmapTimeline: "6.4 18-Month Automation Roadmap",
+  },
+  
+  timeRangeHeaders: {
+    zeroToThree: "0-3 mo",
+    threeToSix: "3-6 mo",
+    sixToNine: "6-9 mo",
+    nineToTwelve: "9-12 mo",
+    twelveToFifteen: "12-15 mo",
+    fifteenToEighteen: "15-18 mo",
+  },
+  
   conclusions: {
     title: "Conclusions and Next Steps",
     keyConclusions: "Key Conclusions",
@@ -974,6 +1004,20 @@ export const es: ReportTranslations = {
     phase1: "Fase 1: Logros Rápidos",
     phase2: "Fase 2: Fundacional",
     phase3: "Fase 3: Estratégica",
+  },
+  
+  sectionSubtitles: {
+    executiveInterpretation: "5.4 Interpretación Ejecutiva",
+    roadmapTimeline: "6.4 Hoja de Ruta de Automatización de 18 Meses",
+  },
+  
+  timeRangeHeaders: {
+    zeroToThree: "0-3 m",
+    threeToSix: "3-6 m",
+    sixToNine: "6-9 m",
+    nineToTwelve: "9-12 m",
+    twelveToFifteen: "12-15 m",
+    fifteenToEighteen: "15-18 m",
   },
   
   conclusions: {
