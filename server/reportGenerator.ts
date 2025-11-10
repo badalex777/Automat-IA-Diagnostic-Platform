@@ -17,6 +17,7 @@ import {
   VerticalAlign,
   convertInchesToTwip,
   Packer,
+  LevelFormat,
   type IRunOptions,
 } from "docx";
 import { DiagnosticData } from "./reportDataAggregator";
@@ -69,6 +70,21 @@ function createBulletParagraph(text: string): Paragraph {
     alignment: AlignmentType.BOTH,
     bullet: { level: 0 },
     spacing: { after: 60 },
+  });
+}
+
+/**
+ * Create a numbered paragraph with proper DOCX numbering
+ */
+function createNumberedParagraph(text: string, level: number = 0): Paragraph {
+  return new Paragraph({
+    text,
+    alignment: AlignmentType.BOTH,
+    numbering: {
+      reference: "decimal-numbering",
+      level: level,
+    },
+    spacing: { after: 120 },
   });
 }
 
@@ -1156,16 +1172,16 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.strategicInterpretationPrompt));
 
   sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step1Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step1Title));
   sections.push(createBodyParagraph(ctx.t.conclusions.step1Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step2Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step2Title));
   sections.push(createBodyParagraph(ctx.t.conclusions.step2Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step3Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step3Title));
   sections.push(createBodyParagraph(ctx.t.conclusions.step3Content));
   sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step4Title));
+  sections.push(createNumberedParagraph(ctx.t.conclusions.step4Title));
   sections.push(createBodyParagraph(ctx.t.conclusions.step4Content));
   sections.push(createBodyParagraph(""));
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Title));
@@ -1585,6 +1601,26 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
 
   // Create document
   const doc = new Document({
+    numbering: {
+      config: [
+        {
+          reference: "decimal-numbering",
+          levels: [
+            {
+              level: 0,
+              format: LevelFormat.DECIMAL,
+              text: "%1.",
+              alignment: AlignmentType.START,
+              style: {
+                paragraph: {
+                  indent: { left: convertInchesToTwip(0.5), hanging: convertInchesToTwip(0.25) },
+                },
+              },
+            },
+          ],
+        },
+      ],
+    },
     styles: {
       default: {
         document: {
