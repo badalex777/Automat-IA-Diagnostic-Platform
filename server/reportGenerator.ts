@@ -69,12 +69,12 @@ class NumberingRegistry {
 }
 
 /**
- * Create a body paragraph with left alignment (for content after cover page)
+ * Create a body paragraph with justified alignment (for content after cover page)
  */
 function createBodyParagraph(text: string, options: {spacing?: any} = {}): Paragraph {
   return new Paragraph({
     text,
-    alignment: AlignmentType.LEFT,
+    alignment: AlignmentType.BOTH,
     spacing: options.spacing || { after: 120 },
   });
 }
@@ -85,7 +85,7 @@ function createBodyParagraph(text: string, options: {spacing?: any} = {}): Parag
 function createBulletParagraph(text: string): Paragraph {
   return new Paragraph({
     text,
-    alignment: AlignmentType.LEFT,
+    alignment: AlignmentType.BOTH,
     bullet: { level: 0 },
     spacing: { after: 60 },
   });
@@ -106,7 +106,7 @@ function createNumberedParagraph(
 ): Paragraph {
   return new Paragraph({
     text,
-    alignment: AlignmentType.LEFT,
+    alignment: AlignmentType.BOTH,
     numbering: {
       reference: "decimal-numbering",
       level: level,
@@ -248,7 +248,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       if (text) {
         paragraphs.push(new Paragraph({
           text,
-          alignment: AlignmentType.LEFT,
+          alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
       }
@@ -273,7 +273,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       // Add phase title as bold paragraph
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
-        alignment: AlignmentType.LEFT,
+        alignment: AlignmentType.BOTH,
         spacing: { before: 120, after: 60 },
       }));
       continue;
@@ -286,7 +286,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       // Methodology subsections are rendered as bold paragraphs (not headings) to exclude from ToC
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
-        alignment: AlignmentType.LEFT,
+        alignment: AlignmentType.BOTH,
         spacing: { before: 120, after: 60 },
       }));
       continue;
@@ -318,14 +318,14 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
             new TextRun({ text: boldPart, bold: true }),
             new TextRun({ text: rest }),
           ],
-          alignment: AlignmentType.LEFT,
+          alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
       } else {
         // Fallback if pattern doesn't match
         paragraphs.push(new Paragraph({
           children: [new TextRun({ text: trimmed, bold: true })],
-          alignment: AlignmentType.LEFT,
+          alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
       }
@@ -340,7 +340,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       const textWithoutBullet = trimmed.replace(/^[•\-\*●]\s+/, '');
       paragraphs.push(new Paragraph({
         text: textWithoutBullet,
-        alignment: AlignmentType.LEFT,
+        alignment: AlignmentType.BOTH,
         bullet: { level: 0 },
         spacing: { after: 60 },
       }));
@@ -1011,7 +1011,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       new Paragraph({
         text: ctx.t.sectionTitles.topThreeOpportunities,
         heading: HeadingLevel.HEADING_3,
-        alignment: AlignmentType.LEFT,
+        alignment: AlignmentType.BOTH,
         spacing: { before: 240, after: 120 },
       })
     );
@@ -1040,7 +1040,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       new Paragraph({
         text: ctx.t.sectionTitles.financialSummary,
         heading: HeadingLevel.HEADING_3,
-        alignment: AlignmentType.LEFT,
+        alignment: AlignmentType.BOTH,
         spacing: { before: 360, after: 120 },
       })
     );
@@ -1300,7 +1300,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     new Paragraph({
       text: ctx.t.sectionSubtitles.roadmapTimeline,
       heading: HeadingLevel.HEADING_3,
-      alignment: AlignmentType.LEFT,
+      alignment: AlignmentType.BOTH,
       spacing: { before: 360, after: 120 },
     })
   );
