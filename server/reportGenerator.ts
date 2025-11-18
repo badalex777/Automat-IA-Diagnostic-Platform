@@ -266,8 +266,8 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
 
-    if (isPhaseTitle(trimmed)) {
-      // Flush any current paragraph first
+    if (currentParagraph.length === 0 && isPhaseTitle(trimmed)) {
+      // Only trigger if we're at a paragraph boundary
       flushParagraph();
       resetListContext();
       // Add phase title as bold paragraph
@@ -279,8 +279,8 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
 
-    if (isMethodologySubsection(trimmed)) {
-      // Flush any current paragraph first
+    if (currentParagraph.length === 0 && isMethodologySubsection(trimmed)) {
+      // Only trigger if we're at a paragraph boundary
       flushParagraph();
       resetListContext();
       // Methodology subsections are rendered as bold paragraphs (not headings) to exclude from ToC
@@ -292,8 +292,8 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
     
-    if (isSubsectionTitle(trimmed)) {
-      // Flush any current paragraph first
+    if (currentParagraph.length === 0 && isSubsectionTitle(trimmed)) {
+      // Only trigger if we're at a paragraph boundary
       flushParagraph();
       resetListContext();
       // Add subsection as heading (will appear in ToC)
@@ -305,8 +305,8 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
     
-    if (isFrameworkName(trimmed)) {
-      // Flush any current paragraph first
+    if (currentParagraph.length === 0 && isFrameworkName(trimmed)) {
+      // Only trigger if we're at a paragraph boundary
       flushParagraph();
       resetListContext();
       // Framework name paragraphs: bold the framework name up to the period or colon
