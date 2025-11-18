@@ -2,6 +2,15 @@
 
 The Automat-IA Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level, using Technical Feasibility Assessments (TFA) and Process Insight Forms (PIF). The platform generates step-specific readiness scores, SWOT analyses, and identifies implementation opportunities, culminating in comprehensive Executive Diagnostic Reports. Its vision is to provide consultants with detailed insights for AI adoption, enabling precise project scoping and impact measurement.
 
+### Recent Changes
+
+**November 18, 2025 - EDR Mid-Sentence Line Break Fix**
+- **Root Cause Identified**: Special-case text detectors (`isFrameworkName`, `isPhaseTitle`, `isMethodologySubsection`) were triggering mid-sentence when template text wrapped phrases like "Technical Feasibility Assessment (TFA)" across multiple lines
+- **Fix Applied**: Added `currentParagraph.length === 0` guard to all special-case detectors to ensure they only trigger at true paragraph boundaries, not mid-sentence
+- **Alignment Restored**: Reverted all paragraph alignment back to `AlignmentType.BOTH` (justified) for professional document cleanliness
+- **Impact**: Eliminates awkward mid-sentence breaks throughout the EDR in both paragraphs and bullet points
+- **Files Modified**: `server/reportGenerator.ts` - `createTextParagraphs()` function
+
 ### User Preferences
 
 Preferred communication style: Simple, everyday language.
