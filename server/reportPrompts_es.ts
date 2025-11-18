@@ -221,18 +221,24 @@ proporciona una base para comprender el entorno técnico que afecta todos los pa
 Fase 3: Formulario de Perspectivas de Proceso (PIF)
 
 Los PIF se recopilan a nivel de paso: cada paso de proceso individual dentro de un flujo de trabajo recibe 
-su propia evaluación PIF. Los participantes operacionales completan el PIF para proporcionar datos 
-cuantitativos como frecuencia, duración y conteo de participantes, así como observaciones cualitativas 
-incluyendo excepciones, pasos manuales y dependencias. Esta granularidad a nivel de paso captura las 
-realidades operacionales en cada punto específico del flujo de trabajo, permitiendo la identificación precisa 
-de oportunidades de automatización y evaluación de preparación para pasos de proceso individuales en lugar 
-de depender de promedios agregados de flujo de trabajo.
+su propia evaluación PIF optimizada. El formulario consiste en hasta 29 preguntas (dependiendo de la lógica 
+condicional), principalmente de opción múltiple con solo 3 entradas numéricas requeridas de los encuestados. 
+Los participantes operacionales proporcionan datos cuantitativos incluyendo puntuaciones de claridad de 
+proceso, indicadores de preparación al cambio, métricas de fragilidad de flujo de trabajo, datos de 
+tiempo/volumen y mediciones de impacto de calidad. Este enfoque cuantitativo y enfocado minimiza la fatiga 
+de encuesta mientras captura puntuaciones de preparación operacional estandarizadas y entradas precisas de 
+modelado de ROI a nivel de paso, permitiendo la identificación precisa de oportunidades de automatización sin 
+depender de promedios agregados de flujo de trabajo.
 
 Fase 4: Validación de Usuario Final y Mapeo de Flujo de Trabajo
 
 Las sesiones de validación con usuarios finales confirman entradas PIF y mapean cada flujo de trabajo en 
-detalle, identificando ineficiencias, cuellos de botella, bucles de reelaboración y actividades propensas a 
-errores. Esto asegura que los supuestos técnicos se alineen con las condiciones reales de ejecución.
+detalle, identificando ineficiencias específicas, tareas repetitivas, cuellos de botella, bucles de 
+reelaboración, actividades propensas a errores, casos extremos y excepciones a través de entrevistas 
+estructuradas. Estas entrevistas recopilan las perspectivas cualitativas necesarias para comprender los 
+matices del flujo de trabajo, requisitos de conocimiento crítico, limitaciones de herramientas y puntos de 
+dolor del proceso. Esto asegura que los supuestos técnicos se alineen con las condiciones reales de 
+ejecución y que las estrategias de automatización aborden las oportunidades de mejora más impactantes.
 
 Fase 5: Identificación de Oportunidades
 

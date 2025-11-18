@@ -6,6 +6,19 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ## Recent Changes
 
+### November 18, 2025 - PIF Survey Streamlined to 29 Questions
+- **Removed Qualitative Questions**: Deleted "Your Experience & Insights" section (old Q17-Q27) consisting of 11 textarea/text questions to reduce survey fatigue
+- **Renumbered Questions**: Old Q28-40 renumbered to Q17-29, maintaining sequential numbering
+- **Updated Conditional Logic**: Quality Impact screening moved from Q32 to Q21; conditional questions Q33-40 renumbered to Q22-29
+- **Streamlined Format**: Survey now consists of up to 29 questions (depending on conditional logic), primarily multiple-choice with only 3 numeric inputs required
+- **Qualitative Data Collection**: Shifted to separate end-user interviews for gathering insights about workflow inefficiencies, edge cases, tool limitations, and process pain points
+- **Report Prompts Updated**: English and Spanish report methodology descriptions updated to reflect streamlined PIF (29 questions, quantitative focus, qualitative insights from interviews)
+- **Client Translation Updates**: Updated all documentation references from "40 questions across 8 sections" to "up to 29 questions" with corrected question ranges
+- **Verification Code Validation**: Made verification code mandatory on PIF page 1 (disclaimer section) before allowing navigation to page 2
+- **Helper Function Updates**: Updated `extractROIInputs()` to use new question IDs (Q17-20 for time/volume, Q21 for quality screening, Q27-29 for error metrics); simplified `extractQualitativeResponses()` to only extract role (Q11)
+- All PIF form logic updated: conditional rendering (Q21-based), validation (Q22-29), progress tracking, and question label rendering
+- Reduced survey completion time from 40 minutes to estimated 20 minutes maximum
+
 ### November 10, 2025 - Professional DOCX Formatting and Appendix D Reorganization
 - **DOCX NumberingConfig Implementation**: Added proper Word document numbering system with reusable bullet and numbered list definitions, replacing manual text prefixes with native DOCX formatting
 - **Numbering Instance Isolation Fix**: Implemented `NumberingRegistry` class to ensure each numbered list (methodology, next steps, appendix sections) restarts at 1 independently instead of continuing sequentially across the entire document

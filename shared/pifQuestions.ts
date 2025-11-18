@@ -1,5 +1,7 @@
 // Process Insight Form (PIF) Questions
-// Collects operational readiness data and ROI inputs from end users
+// Streamlined quantitative survey (29 questions max, multiple choice with 3 numeric inputs)
+// Collects operational readiness scores and ROI modeling data
+// Qualitative insights gathered separately through end-user interviews
 
 export interface PIFOption {
   value: string;
@@ -295,103 +297,19 @@ export const PIF_SECTIONS: PIFSection[] = [
     ]
   },
   {
-    section: "Your Experience & Insights",
-    weight: 0, // Used for qualitative analysis, not Readiness Rubric
-    description: "Share your hands-on knowledge about this process - you're the expert, and your insights are critical for identifying the best automation opportunities",
-    questions: [
-      {
-        id: 17,
-        question: "What specific steps do you personally perform in this workflow?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
-      },
-      {
-        id: 18,
-        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
-      },
-      {
-        id: 19,
-        question: "Are there exceptions or special cases you need to watch out for during this process?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
-      },
-      {
-        id: 20,
-        question: "What tools or systems do you use most in your daily work?",
-        section: "Your Experience & Insights",
-        type: "text",
-        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
-      },
-      {
-        id: 21,
-        question: "What do you find most frustrating or limiting about these tools?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Describe the main pain points or limitations you experience"
-      },
-      {
-        id: 22,
-        question: "What are the biggest time-wasters in your current workflow?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Describe tasks that take longer than they should"
-      },
-      {
-        id: 23,
-        question: "If you could automate one part of this process, what would it be and why?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Describe what you'd automate and the impact it would have"
-      },
-      {
-        id: 24,
-        question: "What do you usually produce or complete at the end of your step?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Example: Approved file, completed report, data entry in system, email sent to customer, invoice processed"
-      },
-      {
-        id: 25,
-        question: "What makes this process slow, repetitive, or error-prone in your experience?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Describe key difficulties or pain points you encounter"
-      },
-      {
-        id: 26,
-        question: "What happens if this process is delayed or done incorrectly?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Describe the business impact of delays or errors"
-      },
-      {
-        id: 27,
-        question: "Is there anything else about this workflow that we should know?",
-        section: "Your Experience & Insights",
-        type: "textarea",
-        placeholder: "Any additional context, edge cases, or important details"
-      }
-    ]
-  },
-  {
     section: "Time & Volume Data",
     weight: 0, // Used for ROI calculations, not Readiness Rubric
     description: "Provide details about how often you perform this work so we can calculate the total time savings and ROI potential",
     questions: [
       {
-        id: 28,
+        id: 17,
         question: "How many employees perform this task?",
         section: "Time & Volume Data",
         type: "number",
         placeholder: "Enter number of employees"
       },
       {
-        id: 29,
+        id: 18,
         question: "How often is this task performed?",
         section: "Time & Volume Data",
         type: "radio",
@@ -402,14 +320,14 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 30,
+        id: 19,
         question: "How many times is this process completed in the selected period?",
         section: "Time & Volume Data",
         type: "number",
         placeholder: "e.g., 5 times per day"
       },
       {
-        id: 31,
+        id: 20,
         question: "How many minutes does each process take?",
         section: "Time & Volume Data",
         type: "number",
@@ -423,7 +341,7 @@ export const PIF_SECTIONS: PIFSection[] = [
     description: "Tell us about errors or quality issues so we can show how AI could help you produce more accurate, consistent work",
     questions: [
       {
-        id: 32,
+        id: 21,
         question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
         section: "Quality Impact Module",
         type: "radio",
@@ -433,12 +351,12 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 33,
+        id: 22,
         question: "How often do errors or quality issues currently occur in this process?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         },
         options: [
@@ -449,12 +367,12 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 34,
+        id: 23,
         question: "What is the primary cause of errors or quality issues?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         },
         options: [
@@ -466,12 +384,12 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 35,
+        id: 24,
         question: "When are errors or quality issues typically discovered?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         },
         options: [
@@ -482,12 +400,12 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 36,
+        id: 25,
         question: "How standardized is the current process?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         },
         options: [
@@ -498,12 +416,12 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 37,
+        id: 26,
         question: "What type of work best describes this process?",
         section: "Quality Impact Module",
         type: "radio",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         },
         options: [
@@ -514,35 +432,35 @@ export const PIF_SECTIONS: PIFSection[] = [
         ]
       },
       {
-        id: 38,
+        id: 27,
         question: "What is the current error rate?",
         section: "Quality Impact Module",
         type: "number",
         placeholder: "Enter percentage (e.g., 15 for 15%)",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         }
       },
       {
-        id: 39,
+        id: 28,
         question: "How many minutes of rework does each error require?",
         section: "Quality Impact Module",
         type: "number",
         placeholder: "Enter minutes per error",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         }
       },
       {
-        id: 40,
+        id: 29,
         question: "What is the estimated cost per error (in USD)?",
         section: "Quality Impact Module",
         type: "number",
         placeholder: "Enter cost in USD (e.g., 50)",
         conditional: {
-          dependsOn: 32,
+          dependsOn: 21,
           showWhen: "yes"
         }
       }
@@ -614,19 +532,19 @@ export function extractROIInputs(responses: Record<string, string>): {
   reworkMinutesPerError: number | null;
   costPerError: number | null;
 } {
-  // Q28-Q31: Always captured
-  const employeeCount = responses['28'] ? parseInt(responses['28']) : null;
-  const frequency = responses['29'] as 'daily' | 'weekly' | 'monthly' | null || null;
-  const processesPerPeriod = responses['30'] ? parseInt(responses['30']) : null;
-  const minutesPerProcess = responses['31'] ? parseInt(responses['31']) : null;
+  // Q17-Q20: Time & Volume Data - Always captured
+  const employeeCount = responses['17'] ? parseInt(responses['17']) : null;
+  const frequency = responses['18'] as 'daily' | 'weekly' | 'monthly' | null || null;
+  const processesPerPeriod = responses['19'] ? parseInt(responses['19']) : null;
+  const minutesPerProcess = responses['20'] ? parseInt(responses['20']) : null;
 
-  // Q32: Changed from Likert scale to yes/no
-  const hasQualityImpact = responses['32'] === 'yes';
+  // Q21: Quality Impact yes/no
+  const hasQualityImpact = responses['21'] === 'yes';
 
-  // Q38-Q40: Only captured when Q32 is 'yes'
-  const errorRate = hasQualityImpact && responses['38'] ? parseFloat(responses['38']) : null;
-  const reworkMinutesPerError = hasQualityImpact && responses['39'] ? parseInt(responses['39']) : null;
-  const costPerError = hasQualityImpact && responses['40'] ? parseFloat(responses['40']) : null;
+  // Q27-Q29: Only captured when Q21 is 'yes'
+  const errorRate = hasQualityImpact && responses['27'] ? parseFloat(responses['27']) : null;
+  const reworkMinutesPerError = hasQualityImpact && responses['28'] ? parseInt(responses['28']) : null;
+  const costPerError = hasQualityImpact && responses['29'] ? parseFloat(responses['29']) : null;
 
   return {
     employeeCount,
@@ -640,33 +558,12 @@ export function extractROIInputs(responses: Record<string, string>): {
   };
 }
 
-// Extract qualitative responses
+// Extract qualitative responses (REMOVED - qualitative questions 17-27 have been deleted)
+// Qualitative insights are now gathered through End-User interviews
 export function extractQualitativeResponses(responses: Record<string, string>): {
   role?: string; // Q11: Role selection for revenue uplift calculations
-  toolsUsed?: string;
-  toolLimitations?: string;
-  timeWasters?: string;
-  automationWish?: string;
-  typicalOutcome?: string;
-  keyDifficulties?: string;
-  personalSteps?: string;
-  criticalKnowledge?: string;
-  impactOfDelays?: string;
-  exceptions?: string;
-  additionalContext?: string;
 } {
   return {
-    role: responses['11'] || undefined, // Q11: Role selection (merged from old Q14)
-    toolsUsed: responses['20'] || undefined,
-    toolLimitations: responses['21'] || undefined,
-    timeWasters: responses['22'] || undefined,
-    automationWish: responses['23'] || undefined,
-    typicalOutcome: responses['24'] || undefined,
-    keyDifficulties: responses['25'] || undefined,
-    personalSteps: responses['17'] || undefined,
-    criticalKnowledge: responses['18'] || undefined,
-    impactOfDelays: responses['26'] || undefined,
-    exceptions: responses['19'] || undefined,
-    additionalContext: responses['27'] || undefined,
+    role: responses['11'] || undefined, // Q11: Role selection (for revenue uplift modeling)
   };
 }

@@ -143,16 +143,14 @@ export default function PIFForm() {
     }
 
     // Check all required questions are answered
-    const q32Answer = answers['32'];
-    const isErrorProne = q32Answer === 'yes';
+    const q21Answer = answers['21']; // Q21 is now the Quality Impact yes/no question
+    const isErrorProne = q21Answer === 'yes';
     
     const requiredQuestions = ALL_PIF_QUESTIONS.filter(q => {
-      // Only Q17, Q18, Q19 are mandatory in Experience & Insights
-      if (q.id === 17 || q.id === 18 || q.id === 19) return true;
-      // Other text/textarea are optional
+      // All text/textarea are optional (no qualitative questions anymore)
       if (q.type === 'text' || q.type === 'textarea') return false;
-      // Quality Impact questions only required if error-prone
-      if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
+      // Quality Impact questions (Q22-Q29) only required if Q21 = yes
+      if (q.id >= 22 && q.id <= 29 && !isErrorProne) return false;
       return true;
     });
     
@@ -204,39 +202,45 @@ export default function PIFForm() {
   const isRespondentInfoSection = currentSection === 1;
   const currentPIFSection = (isDisclaimerSection || isRespondentInfoSection) ? null : sections[currentSection - 2];
 
-  // Check if Q32 indicates quality impact (yes means show Quality Impact module)
-  const isErrorProne = answers['32'] === 'yes';
+  // Check if Q21 indicates quality impact (yes means show Quality Impact module)
+  const isErrorProne = answers['21'] === 'yes';
 
   // Calculate progress - include required questions only
   const requiredQuestionsCount = ALL_PIF_QUESTIONS.filter(q => {
-    // Only Q17, Q18, Q19 are mandatory in Experience & Insights
-    if (q.id === 17 || q.id === 18 || q.id === 19) return true;
-    // Other text/textarea are optional
+    // All text/textarea are optional (no qualitative questions)
     if (q.type === 'text' || q.type === 'textarea') return false;
-    // Quality Impact questions (33-40) only required if error-prone
-    if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
+    // Quality Impact questions (Q22-Q29) only required if Q21 = yes
+    if (q.id >= 22 && q.id <= 29 && !isErrorProne) return false;
     return true;
   }).length;
   const answeredCount = Object.keys(answers).filter(id => {
     const q = ALL_PIF_QUESTIONS.find(q => q.id.toString() === id);
     if (!q) return false;
-    // Only Q17, Q18, Q19 are mandatory in Experience & Insights
-    if (q.id === 17 || q.id === 18 || q.id === 19) return true;
-    // Other text/textarea are optional
+    // All text/textarea are optional (no qualitative questions)
     if (q.type === 'text' || q.type === 'textarea') return false;
-    // Quality Impact questions (33-40) only required if error-prone
-    if (q.id >= 33 && q.id <= 40 && !isErrorProne) return false;
+    // Quality Impact questions (Q22-Q29) only required if Q21 = yes
+    if (q.id >= 22 && q.id <= 29 && !isErrorProne) return false;
     return true;
   }).length;
   const progress = requiredQuestionsCount > 0 ? (answeredCount / requiredQuestionsCount) * 100 : 0;
 
   const handleNext = () => {
     if (currentSection === 0) {
-      // Disclaimer section
+      // Disclaimer section - require both disclaimer acceptance AND verification code
       if (!disclaimerAccepted) {
         toast({
           title: t.ui.acceptanceRequired,
           description: t.ui.acceptanceRequiredDescription,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!verificationCode.trim()) {
+        toast({
+          title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
+          description: language === 'en' 
+            ? 'Please enter the verification code provided by your consultant before proceeding.' 
+            : 'Por favor ingrese el código de verificación proporcionado por su consultor antes de continuar.',
           variant: "destructive",
         });
         return;
@@ -256,14 +260,12 @@ export default function PIFForm() {
       const currentPIFSection = sections[currentSection - 2]; // -2 because section 0 is disclaimer, section 1 is respondent info
       if (currentPIFSection) {
         const sectionRequiredQuestions = currentPIFSection.questions.filter(q => {
-          // Only Q17, Q18, Q19 are mandatory in Experience & Insights
-          if (q.id === 17 || q.id === 18 || q.id === 19) return true;
-          // Other text/textarea are optional
+          // All text/textarea are optional (no qualitative questions)
           if (q.type === 'text' || q.type === 'textarea') return false;
-          // Quality Impact questions only required if quality impact exists
-          if (q.id >= 33 && q.id <= 40) {
-            const q32Answer = answers['32'];
-            const isErrorProne = q32Answer === 'yes';
+          // Quality Impact questions (Q22-Q29) only required if Q21 = yes
+          if (q.id >= 22 && q.id <= 29) {
+            const q21Answer = answers['21'];
+            const isErrorProne = q21Answer === 'yes';
             return isErrorProne;
           }
           return true;
@@ -292,11 +294,11 @@ export default function PIFForm() {
 
   const isLastSection = currentSection === totalSections - 1;
   
-  // Filter questions based on Q32 (conditional Quality Impact)
+  // Filter questions based on Q21 (conditional Quality Impact)
   const getVisibleQuestions = (questions: typeof ALL_PIF_QUESTIONS) => {
     return questions.filter(q => {
-      // Quality Impact questions (33-41) only shown if quality impact exists (Q32 = yes)
-      if (q.id >= 33 && q.id <= 41) {
+      // Quality Impact questions (Q22-Q29) only shown if quality impact exists (Q21 = yes)
+      if (q.id >= 22 && q.id <= 29) {
         return isErrorProne;
       }
       return true;
@@ -491,9 +493,7 @@ export default function PIFForm() {
                   <div key={question.id} className="space-y-3">
                     <Label className="text-base">
                       Q{question.id}. {questionTranslation?.question || question.question}
-                      {(question.type === 'text' || question.type === 'textarea') && question.id < 17 && <span className="text-muted-foreground ml-1">(Optional)</span>}
-                      {(question.id === 17 || question.id === 18 || question.id === 19) && <span className="text-destructive ml-1">*</span>}
-                      {(question.type === 'text' || question.type === 'textarea') && question.id >= 17 && question.id <= 27 && question.id !== 17 && question.id !== 18 && question.id !== 19 && <span className="text-muted-foreground ml-1">(Optional)</span>}
+                      {(question.type === 'text' || question.type === 'textarea') && <span className="text-muted-foreground ml-1">(Optional)</span>}
                     </Label>
 
                     {question.type === 'radio' && question.options && (

@@ -218,18 +218,24 @@ steps within the process.
 Phase 3: Process Insights Form (PIF)
 
 PIFs are collected at the step level—each individual process step within a workflow receives its
-own PIF assessment. Operational participants complete the PIF to provide quantitative data
-such as frequency, duration, and participant count, as well as qualitative observations including
-exceptions, manual steps, and dependencies. This step-level granularity captures the operational
-realities at each specific point in the workflow, enabling precise identification of automation
-opportunities and readiness assessment for individual process steps rather than relying on
-aggregated workflow averages.
+own streamlined PIF assessment. The form consists of up to 29 questions (depending on
+conditional logic), primarily multiple-choice with only 3 numeric inputs required from respondents.
+Operational participants provide quantitative data including process clarity scores, change
+readiness indicators, workflow brittleness metrics, time/volume data, and quality impact
+measurements. This focused, quantitative approach minimizes survey fatigue while capturing
+standardized operational readiness scores and accurate ROI modeling inputs at the step level,
+enabling precise automation opportunity identification without relying on aggregated workflow
+averages.
 
 Phase 4: End-User Validation and Workflow Mapping
 
 Validation sessions with end users confirm PIF inputs and map each workflow in detail,
-identifying inefficiencies, bottlenecks, rework loops, and error-prone activities. This ensures that
-technical assumptions align with real execution conditions.
+identifying specific inefficiencies, repetitive tasks, bottlenecks, rework loops, error-prone
+activities, edge cases, and exceptions through structured interviews. These interviews gather the
+qualitative insights needed to understand workflow nuances, critical knowledge requirements, tool
+limitations, and process pain points. This ensures that technical assumptions align with real
+execution conditions and that automation strategies address the most impactful improvement
+opportunities.
 
 Phase 5: Opportunity Identification
 
