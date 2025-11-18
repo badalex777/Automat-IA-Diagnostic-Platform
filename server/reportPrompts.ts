@@ -432,7 +432,21 @@ valuable learning experiences for teams new to automation technologies.
 
 [Analyst Commentary: Describe each Nice-to-Have opportunity, what it automates, and optimization potential]
 
-4.8 Foundational Gaps Hindering Scale
+4.8 Consolidated Opportunities
+
+Some high-impact outcomes require coordinating multiple automation initiatives across related
+workflow steps. These Consolidated Opportunities bundle individual opportunities into strategic
+packages that deliver greater combined value than implementing them separately:
+
+{{consolidations_list}}
+
+Consolidations factor in integration overhead, coordination complexity, and phased rollout
+requirements. They represent strategic investment scenarios that may span multiple roadmap phases,
+enabling comprehensive workflow transformation rather than point-solution improvements.
+
+[Analyst Commentary: Describe each consolidation, its strategic rationale, and expected organizational impact]
+
+4.9 Foundational Gaps Hindering Scale
 
 Step-level readiness analysis revealed recurring weaknesses that limit scalability across multiple
 workflows. Common foundational gaps include:
@@ -446,7 +460,7 @@ and enable successful scaling of automation initiatives.
 
 [Analyst Commentary: Explain each foundational gap category, affected workflows, and recommended remediation timeline]
 
-4.9 Organizational and Cultural Readiness
+4.10 Organizational and Cultural Readiness
 
 Stakeholder interviews and step-level PIF responses revealed differing levels of automation
 awareness and change adaptability across departments. Cultural readiness factors include:
@@ -458,7 +472,7 @@ cross-departmental communication initiatives, automation literacy training, and 
 internal champions to build confidence and capability. Strong cultural readiness accelerates
 implementation timelines and improves adoption rates for all automation initiatives.
 
-4.10 Recommended Focus
+4.11 Recommended Focus
 
 ● Prioritize Quick Wins in Phase 1 to demonstrate ROI and build internal confidence.
 

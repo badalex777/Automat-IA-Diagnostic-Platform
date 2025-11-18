@@ -27,6 +27,7 @@ export interface ReportTranslations {
     noFoundationalGaps: string;
     noStrategicBets: string;
     noNiceToHave: string;
+    noConsolidations: string;
     noCulturalInsights: string;
     systemEnvironmentLimitations: string;
   };
@@ -146,6 +147,7 @@ export interface ReportTranslations {
     consolidationName: string;
     consolidation: string;
     constituentOpportunity: string;
+    constituents: string;
     respondentName: string;
     respondentRole: string;
     collectionDate: string;
@@ -518,6 +520,7 @@ export const en: ReportTranslations = {
     noFoundationalGaps: "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies",
     noStrategicBets: "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.",
     noNiceToHave: "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.",
+    noConsolidations: "No consolidated opportunities identified. All opportunities are currently assessed individually.",
     noCulturalInsights: "• Varying levels of automation awareness across departments\n• Strong stakeholder engagement in high-readiness workflows\n• Need for change management support in cross-functional processes\n• Opportunity for automation literacy training",
     systemEnvironmentLimitations: "System environment limitations",
   },
@@ -651,6 +654,7 @@ export const en: ReportTranslations = {
     consolidationName: "Consolidation Name",
     consolidation: "Consolidation",
     constituentOpportunity: "Constituent Opportunity",
+    constituents: "Constituents",
   },
   
   tfaComponents: {
@@ -984,6 +988,7 @@ export const es: ReportTranslations = {
     noFoundationalGaps: "• Brechas en la documentación de procesos\n• Limitaciones de integración de sistemas\n• Inconsistencias en la calidad de datos",
     noStrategicBets: "No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.",
     noNiceToHave: "No se identificaron oportunidades Deseables. Todas las oportunidades son Logros Rápidos, Apuestas Estratégicas o requieren mejoras fundacionales.",
+    noConsolidations: "No se identificaron oportunidades consolidadas. Todas las oportunidades se evalúan actualmente de forma individual.",
     noCulturalInsights: "• Niveles variables de conciencia sobre automatización en los departamentos\n• Fuerte compromiso de las partes interesadas en flujos de trabajo de alta preparación\n• Necesidad de apoyo en gestión del cambio en procesos interfuncionales\n• Oportunidad para capacitación en alfabetización de automatización",
     systemEnvironmentLimitations: "Limitaciones del entorno del sistema",
   },
@@ -1117,6 +1122,7 @@ export const es: ReportTranslations = {
     consolidationName: "Nombre de Consolidación",
     consolidation: "Consolidación",
     constituentOpportunity: "Oportunidad Constituyente",
+    constituents: "Componentes",
   },
   
   tfaComponents: {

@@ -776,20 +776,24 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ? allWeaknesses.map((gap, idx) => `${idx + 1}. ${gap}`).join('\n')
     : ctx.t.fallbackMessages.noFoundationalGaps;
   
-  // Generate Strategic Bets list
-  const strategicBetsList = [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic].length > 0
-    ? [...data.roadmapPhases.phase2Foundational, ...data.roadmapPhases.phase3Strategic]
+  // Combine all roadmap opportunities for filtering
+  const allRoadmapOpps = [
+    ...data.roadmapPhases.phase1QuickWins,
+    ...data.roadmapPhases.phase2Foundational,
+    ...data.roadmapPhases.phase3Strategic
+  ];
+  
+  // Generate Strategic Bets list - ONLY individual opportunities that are Strategic Goals (high impact + high effort)
+  // Exclude consolidations - those will appear in Section 4.8
+  const strategicBetOpps = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Strategic Goals');
+  const strategicBetsList = strategicBetOpps.length > 0
+    ? strategicBetOpps
         .slice(0, 5) // Limit to top 5
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
         .join('\n')
     : ctx.t.fallbackMessages.noStrategicBets;
   
   // Generate Nice-to-Have list
-  const allRoadmapOpps = [
-    ...data.roadmapPhases.phase1QuickWins,
-    ...data.roadmapPhases.phase2Foundational,
-    ...data.roadmapPhases.phase3Strategic
-  ];
   const niceToHaveOpportunities = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Nice-To-Haves');
   const niceToHaveList = niceToHaveOpportunities.length > 0
     ? niceToHaveOpportunities
@@ -830,6 +834,24 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   const consolidationCountLine = totalConsolidations > 0 
     ? `\n• Workflow Consolidations Identified: ${totalConsolidations}` 
     : '';
+  
+  // Generate Consolidations list for Section 4.8
+  const consolidationsForSection48 = data.workflows.flatMap(wd => 
+    wd.consolidations.map(cons => ({
+      ...cons,
+      workflowName: wd.workflow.name
+    }))
+  );
+  const consolidationsList = consolidationsForSection48.length > 0
+    ? consolidationsForSection48
+        .map((cons, idx) => {
+          const constituents = cons.constituentOpportunities
+            .map(c => `${c.name} (${formatTemplate(ctx.t.formatStrings.stepFormat, c.stepOrder, c.stepName)})`)
+            .join(', ');
+          return `${idx + 1}. ${cons.consolidation.name} (${cons.workflowName})\n   ${ctx.t.headers.description}: ${cons.consolidation.description || ctx.t.fallback.none}\n   ${ctx.t.headers.constituents}: ${constituents}`;
+        })
+        .join('\n\n')
+    : ctx.t.fallbackMessages.noConsolidations;
 
   const templateVars = {
     company_name: data.company.name,
@@ -854,6 +876,8 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     strategic_bets_list: strategicBetsList,
     nice_to_have_list: niceToHaveList,
     nice_to_have_count: data.matrixDistribution.niceToHaves.count.toString(),
+    consolidations_list: consolidationsList,
+    consolidations_count: totalConsolidations.toString(),
     cultural_readiness_summary: culturalReadinessSummary,
   };
 

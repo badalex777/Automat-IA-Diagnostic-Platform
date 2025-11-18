@@ -445,7 +445,23 @@ automatización.
 
 [Comentario del Analista: Describa cada oportunidad Deseable, qué automatiza y el potencial de optimización]
 
-4.8 Brechas Fundacionales que Dificultan la Escala
+4.8 Oportunidades Consolidadas
+
+Algunos resultados de alto impacto requieren coordinar múltiples iniciativas de automatización en
+pasos de flujo de trabajo relacionados. Estas Oportunidades Consolidadas agrupan oportunidades
+individuales en paquetes estratégicos que entregan mayor valor combinado que implementándolas
+por separado:
+
+{{consolidations_list}}
+
+Las consolidaciones consideran sobrecarga de integración, complejidad de coordinación y requisitos
+de despliegue por fases. Representan escenarios de inversión estratégica que pueden abarcar múltiples
+fases de la hoja de ruta, permitiendo transformación integral del flujo de trabajo en lugar de mejoras
+puntuales.
+
+[Comentario del Analista: Describa cada consolidación, su justificación estratégica y el impacto organizacional esperado]
+
+4.9 Brechas Fundacionales que Dificultan la Escala
 
 El análisis de preparación a nivel de paso reveló debilidades recurrentes que limitan la escalabilidad en 
 múltiples flujos de trabajo. Las brechas fundacionales comunes incluyen:
@@ -460,7 +476,7 @@ de esfuerzo medio y permitirá el escalamiento exitoso de iniciativas de automat
 [Comentario del Analista: Explique cada categoría de brecha fundacional, flujos de trabajo afectados y 
 cronograma de remediación recomendado]
 
-4.9 Preparación Organizacional y Cultural
+4.10 Preparación Organizacional y Cultural
 
 Las entrevistas con partes interesadas y las respuestas PIF a nivel de paso revelaron diferentes niveles 
 de conciencia de automatización y adaptabilidad al cambio entre departamentos. Los factores de preparación 
@@ -474,7 +490,7 @@ establecimiento de campeones internos para construir confianza y capacidad. Una 
 acelera los cronogramas de implementación y mejora las tasas de adopción para todas las iniciativas de 
 automatización.
 
-4.10 Enfoque Recomendado
+4.11 Enfoque Recomendado
 
 ● Priorizar Logros Rápidos en la Fase 1 para demostrar ROI y construir confianza interna.
 
