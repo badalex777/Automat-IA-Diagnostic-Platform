@@ -4,12 +4,14 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
-**November 18, 2025 - EDR Mid-Sentence Line Break Fix**
-- **Root Cause Identified**: Special-case text detectors (`isFrameworkName`, `isPhaseTitle`, `isMethodologySubsection`) were triggering mid-sentence when template text wrapped phrases like "Technical Feasibility Assessment (TFA)" across multiple lines
-- **Fix Applied**: Added `currentParagraph.length === 0` guard to all special-case detectors to ensure they only trigger at true paragraph boundaries, not mid-sentence
-- **Alignment Restored**: Reverted all paragraph alignment back to `AlignmentType.BOTH` (justified) for professional document cleanliness
-- **Impact**: Eliminates awkward mid-sentence breaks throughout the EDR in both paragraphs and bullet points
-- **Files Modified**: `server/reportGenerator.ts` - `createTextParagraphs()` function
+**November 18, 2025 - Comprehensive EDR Line Break and Formatting Fix**
+- **Framework Name Detector**: Tightened `isFrameworkName()` to only trigger on standalone headings (colon + ≤20 chars), preventing false matches on mid-sentence framework mentions like "TFA: Completed by IT and system owners..."
+- **List Processing**: Implemented multi-line accumulation for numbered lists and bullet points. List items now properly accumulate continuation lines until a blank line, new list marker, or special heading is encountered
+- **List Numbering**: Added proper `resetListContext()` calls after all special headings to prevent numbering carryover between distinct lists
+- **Next Steps Format**: Changed from numbered list format to inline bold format ("**Step Name:** Description") for cleaner presentation
+- **Alignment**: All paragraphs use `AlignmentType.BOTH` (justified) for professional document appearance
+- **Impact**: Eliminates all mid-sentence line breaks in Appendix A, Phase 10, bullet points, and throughout the EDR
+- **Files Modified**: `server/reportGenerator.ts` - `createTextParagraphs()` function and Conclusions section
 
 ### User Preferences
 

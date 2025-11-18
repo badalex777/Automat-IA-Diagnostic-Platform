@@ -174,6 +174,8 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
   const lines = text.split('\n');
   const paragraphs: Paragraph[] = [];
   let currentParagraph: string[] = [];
+  let currentListItem: string[] = []; // For accumulating multi-line list items
+  let currentListType: 'bullet' | 'numbered' | null = null; // Track what kind of list we're in
   let currentListKey: string | null = null;
   let listCounter = 0;
 
@@ -198,8 +200,9 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
   };
   
   const isFrameworkName = (line: string): boolean => {
-    // Matches framework names like "Technical Feasibility Assessment (TFA):" or "Process Insights Form (PIF):"
-    // Supports both English and Spanish versions
+    // Matches standalone framework headings that end with just a colon or colon + brief intro
+    // This prevents matching mid-sentence framework mentions like "TFA: Completed by IT and system owners..."
+    // Only matches patterns like "Technical Feasibility Assessment (TFA):" or "TFA: Brief intro."
     const frameworks = [
       // English
       'Technical Feasibility Assessment',
@@ -225,7 +228,39 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       'Matriz de Oportunidades'
     ];
     const trimmed = line.trim();
-    return frameworks.some(fw => trimmed.startsWith(fw));
+    
+    // Check if line starts with a framework name
+    const matchingFramework = frameworks.find(fw => trimmed.startsWith(fw));
+    if (!matchingFramework) return false;
+    
+    // Extract the text after the framework name
+    const afterFramework = trimmed.slice(matchingFramework.length).trim();
+    
+    // Only trigger if:
+    // 1. Line ends with just the framework name (no colon, nothing after)
+    // 2. Line has framework name followed by colon and nothing else
+    // 3. Line has framework name followed by (ACRONYM): with nothing or very short text after
+    //
+    // Do NOT trigger if there's substantial text after the colon (indicates mid-sentence)
+    if (afterFramework === '') return true; // Just the framework name
+    if (afterFramework === ':') return true; // Framework name with colon only
+    
+    // Match patterns like "(TFA):" or "(PIF):" followed by nothing or max 20 chars
+    const acronymPattern = /^\([A-Z]+\):?\s*(.*)$/;
+    const match = afterFramework.match(acronymPattern);
+    if (match) {
+      const textAfterColon = match[1];
+      // Only trigger if there's no text or very short text (<= 20 chars) after the colon
+      return textAfterColon.length <= 20;
+    }
+    
+    // If just a colon followed by short text (<= 20 chars)
+    if (afterFramework.startsWith(':')) {
+      const textAfterColon = afterFramework.slice(1).trim();
+      return textAfterColon.length <= 20;
+    }
+    
+    return false; // Don't trigger - this is likely mid-sentence
   };
 
   const isBulletPoint = (line: string): boolean => {
@@ -239,6 +274,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
   };
 
   const resetListContext = () => {
+    // Reset list context to start fresh numbering for the next list
     currentListKey = null;
   };
 
@@ -256,20 +292,42 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
     }
   };
 
+  const flushListItem = () => {
+    if (currentListItem.length > 0) {
+      const text = currentListItem.join(' ').trim();
+      if (text) {
+        if (currentListType === 'bullet') {
+          paragraphs.push(new Paragraph({
+            text,
+            alignment: AlignmentType.BOTH,
+            bullet: { level: 0 },
+            spacing: { after: 60 },
+          }));
+        } else if (currentListType === 'numbered') {
+          paragraphs.push(createNumberedParagraph(text, registry, currentListKey!));
+        }
+      }
+      currentListItem = [];
+      currentListType = null;
+    }
+  };
+
   for (const line of lines) {
     const trimmed = line.trim();
 
     if (trimmed === '') {
-      // Blank line - flush current paragraph and reset list context
+      // Blank line - flush both paragraph and list item, reset list context
       flushParagraph();
+      flushListItem();
       resetListContext();
       continue;
     }
 
-    if (currentParagraph.length === 0 && isPhaseTitle(trimmed)) {
-      // Only trigger if we're at a paragraph boundary
+    if (currentParagraph.length === 0 && currentListItem.length === 0 && isPhaseTitle(trimmed)) {
+      // Only trigger if we're at a boundary (no pending paragraph or list item)
       flushParagraph();
-      resetListContext();
+      flushListItem();
+      resetListContext(); // Reset numbering for any future lists
       // Add phase title as bold paragraph
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
@@ -279,10 +337,11 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
 
-    if (currentParagraph.length === 0 && isMethodologySubsection(trimmed)) {
-      // Only trigger if we're at a paragraph boundary
+    if (currentParagraph.length === 0 && currentListItem.length === 0 && isMethodologySubsection(trimmed)) {
+      // Only trigger if we're at a boundary
       flushParagraph();
-      resetListContext();
+      flushListItem();
+      resetListContext(); // Reset numbering for any future lists
       // Methodology subsections are rendered as bold paragraphs (not headings) to exclude from ToC
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: trimmed, bold: true })],
@@ -292,10 +351,11 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
     
-    if (currentParagraph.length === 0 && isSubsectionTitle(trimmed)) {
-      // Only trigger if we're at a paragraph boundary
+    if (currentParagraph.length === 0 && currentListItem.length === 0 && isSubsectionTitle(trimmed)) {
+      // Only trigger if we're at a boundary
       flushParagraph();
-      resetListContext();
+      flushListItem();
+      resetListContext(); // Reset numbering for any future lists
       // Add subsection as heading (will appear in ToC)
       paragraphs.push(new Paragraph({
         text: trimmed,
@@ -305,10 +365,11 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       continue;
     }
     
-    if (currentParagraph.length === 0 && isFrameworkName(trimmed)) {
-      // Only trigger if we're at a paragraph boundary
+    if (currentParagraph.length === 0 && currentListItem.length === 0 && isFrameworkName(trimmed)) {
+      // Only trigger if we're at a boundary
       flushParagraph();
-      resetListContext();
+      flushListItem();
+      resetListContext(); // Reset numbering for any future lists
       // Framework name paragraphs: bold the framework name up to the period or colon
       const match = trimmed.match(/^([^.]+(?:\([^)]+\))?[.:])(.*)$/);
       if (match) {
@@ -333,40 +394,46 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
     }
 
     if (isBulletPoint(trimmed)) {
-      // Flush any current paragraph first
+      // Flush any current paragraph and list item first, then reset list context
       flushParagraph();
-      resetListContext();
-      // Remove bullet symbol and create proper DOCX bullet paragraph
+      flushListItem();
+      resetListContext(); // Bullets don't use numbering, but reset for consistency
+      // Start a new bullet list item (remove the bullet symbol)
       const textWithoutBullet = trimmed.replace(/^[•\-\*●]\s+/, '');
-      paragraphs.push(new Paragraph({
-        text: textWithoutBullet,
-        alignment: AlignmentType.BOTH,
-        bullet: { level: 0 },
-        spacing: { after: 60 },
-      }));
+      currentListItem.push(textWithoutBullet);
+      currentListType = 'bullet';
       continue;
     }
 
     if (isNumberedItem(trimmed)) {
-      // Flush any current paragraph first
+      // Flush any current paragraph and previous list item first
       flushParagraph();
-      // Start a new list if we're not in one
+      flushListItem();
+      // Start a new list key only if we don't have one yet (first numbered item in this list)
       if (currentListKey === null) {
         currentListKey = `${listKeyPrefix}-list-${listCounter++}`;
       }
-      // Remove numbered prefix and create proper DOCX numbered paragraph
+      // Start a new numbered list item (remove the number prefix)
       const textWithoutNumber = trimmed.replace(/^\d+[.)]\s+/, '');
-      paragraphs.push(createNumberedParagraph(textWithoutNumber, registry, currentListKey));
+      currentListItem.push(textWithoutNumber);
+      currentListType = 'numbered';
       continue;
     }
 
-    // Regular line - add to current paragraph and reset list context
-    resetListContext();
-    currentParagraph.push(trimmed);
+    // Regular line - could be continuation of list item or regular paragraph
+    if (currentListItem.length > 0) {
+      // We're in a list item, so this is a continuation line
+      currentListItem.push(trimmed);
+    } else {
+      // We're in a regular paragraph
+      resetListContext();
+      currentParagraph.push(trimmed);
+    }
   }
 
-  // Flush any remaining paragraph
+  // Flush any remaining paragraph or list item
   flushParagraph();
+  flushListItem();
 
   return paragraphs;
 }
@@ -1333,21 +1400,52 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.strategicInterpretationPrompt));
 
   sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step1Title, numberingRegistry, 'next-steps'));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step1Content));
-  sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step2Title, numberingRegistry, 'next-steps'));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step2Content));
-  sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step3Title, numberingRegistry, 'next-steps'));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step3Content));
-  sections.push(createBodyParagraph(""));
-  sections.push(createNumberedParagraph(ctx.t.conclusions.step4Title, numberingRegistry, 'next-steps'));
-  sections.push(createBodyParagraph(ctx.t.conclusions.step4Content));
-  sections.push(createBodyParagraph(""));
-  sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Title));
-  sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.step5Content));
-  sections.push(createBodyParagraph(""));
+  
+  // Format each step as: **Step Title:** Description (inline, no separate lines)
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: ctx.t.conclusions.step1Title + ": ", bold: true }),
+      new TextRun({ text: ctx.t.conclusions.step1Content }),
+    ],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
+  
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: ctx.t.conclusions.step2Title + ": ", bold: true }),
+      new TextRun({ text: ctx.t.conclusions.step2Content }),
+    ],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
+  
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: ctx.t.conclusions.step3Title + ": ", bold: true }),
+      new TextRun({ text: ctx.t.conclusions.step3Content }),
+    ],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
+  
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: ctx.t.conclusions.step4Title + ": ", bold: true }),
+      new TextRun({ text: ctx.t.conclusions.step4Content }),
+    ],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
+  
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: ctx.t.keyConclusionsBullets.step5Title + ": ", bold: true }),
+      new TextRun({ text: ctx.t.keyConclusionsBullets.step5Content }),
+    ],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
   sections.push(createBodyParagraph(ctx.t.conclusions.closingStatement));
 
   sections.push(createHorizontalSeparator());
