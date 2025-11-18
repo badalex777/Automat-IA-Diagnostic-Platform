@@ -1,69 +1,8 @@
-# Automat-IA Diagnostic Platform
+### Overview
 
-## Overview
+The Automat-IA Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level, using Technical Feasibility Assessments (TFA) and Process Insight Forms (PIF). The platform generates step-specific readiness scores, SWOT analyses, and identifies implementation opportunities, culminating in comprehensive Executive Diagnostic Reports. Its vision is to provide consultants with detailed insights for AI adoption, enabling precise project scoping and impact measurement.
 
-The Automat-IA Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level. The platform uses Technical Feasibility Assessments (TFA, workflow-level) and Process Insight Forms (PIF, step-level) to evaluate each process step. It generates step-specific readiness scores, SWOT analyses, and identifies implementation opportunities, culminating in comprehensive Executive Diagnostic Reports. The platform's vision is to provide consultants with detailed insights for AI adoption, enabling precise project scoping and impact measurement.
-
-## Recent Changes
-
-### November 18, 2025 - PIF Survey Streamlined to 29 Questions
-- **Removed Qualitative Questions**: Deleted "Your Experience & Insights" section (old Q17-Q27) consisting of 11 textarea/text questions to reduce survey fatigue
-- **Renumbered Questions**: Old Q28-40 renumbered to Q17-29, maintaining sequential numbering
-- **Updated Conditional Logic**: Quality Impact screening moved from Q32 to Q21; conditional questions Q33-40 renumbered to Q22-29
-- **Streamlined Format**: Survey now consists of up to 29 questions (depending on conditional logic), primarily multiple-choice with only 3 numeric inputs required
-- **Qualitative Data Collection**: Shifted to separate end-user interviews for gathering insights about workflow inefficiencies, edge cases, tool limitations, and process pain points
-- **Report Prompts Updated**: English and Spanish report methodology descriptions updated to reflect streamlined PIF (29 questions, quantitative focus, qualitative insights from interviews)
-- **Client Translation Updates**: Updated all documentation references from "40 questions across 8 sections" to "up to 29 questions" with corrected question ranges
-- **Verification Code Validation**: Made verification code mandatory on PIF page 1 (disclaimer section) before allowing navigation to page 2
-- **Helper Function Updates**: Updated `extractROIInputs()` to use new question IDs (Q17-20 for time/volume, Q21 for quality screening, Q27-29 for error metrics); simplified `extractQualitativeResponses()` to only extract role (Q11)
-- All PIF form logic updated: conditional rendering (Q21-based), validation (Q22-29), progress tracking, and question label rendering
-- Reduced survey completion time from 40 minutes to estimated 20 minutes maximum
-
-### November 10, 2025 - Professional DOCX Formatting and Appendix D Reorganization
-- **DOCX NumberingConfig Implementation**: Added proper Word document numbering system with reusable bullet and numbered list definitions, replacing manual text prefixes with native DOCX formatting
-- **Numbering Instance Isolation Fix**: Implemented `NumberingRegistry` class to ensure each numbered list (methodology, next steps, appendix sections) restarts at 1 independently instead of continuing sequentially across the entire document
-- **Section 7 Enhancement**: Replaced fake "1.", "2.", "3.", "4." text prefixes in "Recommended Next Steps" with proper auto-incrementing DOCX numbered paragraphs using `createNumberedParagraph()` helper
-- **Auto-Detection System**: Enhanced `createTextParagraphs()` with regex-based detection to automatically convert manual numbered prefixes (`/^\d+[.)]\s+/`) and bulleted prefixes (`/^[•\-\*●]\s+/`) into proper DOCX list formatting with automatic list context reset on headers/bullets/blank lines
-- **Appendix D Reorganization**: Restructured logical flow to D.1 (Portfolio Summary - moved to top), D.2.X (Individual Opportunities), D.3 (Modeling Notes - unchanged), D.4/D.5 (Consolidated Opportunities - conditional, moved to end)
-- **Helper Function Extraction**: Created `buildConsolidatedSummaryTable()` and `buildConsolidationMappingTable()` for cleaner code organization and maintainability
-- **Translation Key Migration**: Updated all table caption references from D.0a/D.0b to D.4/D.5 in both English and Spanish translation dictionaries
-- **Translation Cleanup**: Removed hardcoded numbered prefixes from step titles in translations (EN/ES), allowing DOCX to handle numbering natively
-- **Threading Registry Pattern**: Single `NumberingRegistry` instance created at start of `generateExecutiveReport()` and threaded through all section builders with semantic list key prefixes ("methodology", "next-steps", "roadmap-phase1", "appendix-a", etc.)
-- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (33KB) reports generated successfully with correct Appendix D structure and independent numbered lists (10 distinct numId instances)
-- Architect-approved with "Pass" rating - verified proper numbering instance isolation, list context reset logic, and registry threading pattern
-
-### November 10, 2025 - Complete Bilingual EDR Translation System
-- **COMPLETE**: Achieved 100% translation coverage for Executive Diagnostic Reports in English and Spanish across all components
-- **Phase Title Enhancement**: Updated `isPhaseTitle` regex to support bilingual bold formatting for both "Phase X:" (English) and "Fase X:" (Spanish) in Appendix A methodology descriptions
-- **Appendix F Full Translation**: Migrated all hardcoded headers (Question ID, Question Text, Resolved By, Role, Method, Gap?, Date) and section labels to use centralized `ctx.t` translation keys
-- **Section Headings Translation**: Added `sectionSubtitles` with bilingual support for "5.4 Executive Interpretation" / "5.4 Interpretación Ejecutiva" and "6.4 18-Month Automation Roadmap" / "6.4 Hoja de Ruta de Automatización de 18 Meses"
-- **Gantt Chart Localization**: Added `timeRangeHeaders` translation structure for all timeline columns ("0-3 mo" / "0-3 m", "3-6 mo" / "3-6 m", etc.) and phase header
-- Expanded `reportTranslations.ts` with 115+ additional translation keys covering all Appendices (B, C, D, E, F), Section 6, Table 4.4, gantt headers, and edge case fallbacks
-- Refactored all remaining hardcoded English strings in `reportGenerator.ts` to use centralized translation system
-- Enhanced Appendix A formatting: changed period separators to colons, added bilingual framework name detection for bold formatting in both `reportPrompts.ts` and `reportPrompts_es.ts`
-- Fixed cultural readiness null-safety with defensive optional chaining and empty payload guards
-- Verified Spanish terminology for professional executive audience (corrected "SOPs" to "procedimientos operativos estándar (SOP)")
-- **DOCX XML verification**: Confirmed bold colon formatting renders correctly in both languages via XML inspection of generated reports
-- End-to-end tested with company "Nuevo sistema PIF" - both English (31KB) and Spanish (33KB) reports generated successfully
-- Zero hardcoded English strings remaining - full type-safety enforced via TypeScript interfaces
-
-### November 9, 2025 - Complete Spanish Translation Implementation for EDR
-- Implemented centralized translation system with 300+ type-safe translation keys in `server/reportTranslations.ts`
-- Created locale-aware formatting module `server/reportFormatters.ts` using Intl APIs for currency, numbers, dates, and month names
-- Introduced `createReportContext(lang)` helper providing unified `ctx.t` (translations) and `ctx.fmt` (formatters) API
-- Migrated entire `reportGenerator.ts` to use context-based translations and formatters (zero hardcoded strings)
-- Spanish formatting: currency uses "$1.234,56" format, dates show "Noviembre 2025", all UI elements fully localized
-- End-to-end tested: Both English and Spanish EDR generation confirmed working via API (`?lang=en` / `?lang=es`)
-- TypeScript interface enforces translation key parity between English/Spanish dictionaries
-- Resolved circular dependency between translation and formatter modules using Intl.DateTimeFormat
-
-### November 9, 2025 - EDR Formatting Refinements
-- Reduced spacing after Phase titles, methodology subsections, and subsection headings from 120pt to 60pt to eliminate excessive white space
-- Added conditional consolidation count to Section 4.2 Key Diagnostic Findings (displays only when consolidations exist)
-- Removed "culture" reference from Phase 8 methodology description
-- EDR generation endpoint validates that company has at least one workflow with both TFA and PIF completed before allowing report generation
-
-## User Preferences
+### User Preferences
 
 Preferred communication style: Simple, everyday language.
 
@@ -76,64 +15,53 @@ Language Requirements:
 - **TFA/PIF Surveys**: Bilingual (English/Spanish) with language toggle for client-facing assessment forms only
 - Translation functionality is isolated to survey routes via scoped LanguageProvider in App.tsx
 
-## System Architecture
+### System Architecture
 
-### Frontend
+**Frontend:**
+The frontend is a React 18+ SPA with TypeScript and Wouter for routing. It utilizes Radix UI and Shadcn/ui (New York variant) with Tailwind CSS for a consistent, accessible, and data-focused user interface. Key features include a custom HSL-based color system, Inter and JetBrains Mono typography, and dark mode support. TanStack Query manages server state.
 
-The frontend is a React 18+ SPA built with TypeScript and Wouter for routing. It leverages Radix UI and Shadcn/ui (New York variant) for a consistent and accessible user interface, styled using Tailwind CSS. TanStack Query manages server state. The design emphasizes a professional, data-focused aesthetic, featuring a custom HSL-based color system, Inter and JetBrains Mono typography, and dark mode support.
+**Backend:**
+The backend is built with Express.js and TypeScript (ESM modules). Data is stored in PostgreSQL (Neon serverless) and managed using Drizzle ORM, with Zod for schema validation. The API is RESTful, uses JSON, and incorporates middleware for logging, error handling, and CORS.
 
-### Backend
+**Data Model:**
+Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF Responses, Readiness Rubrics, Implementation Opportunities, and Business Impact calculations. Assessments, readiness scores, SWOT analyses, and opportunity creations are managed at the individual process step level.
 
-The backend is developed with Express.js and TypeScript (ESM modules). Data is persisted in PostgreSQL (Neon serverless) and managed using Drizzle ORM, with Zod providing schema validation. The API is RESTful, utilizing JSON formats, and includes middleware for logging, error handling, and CORS.
+**Key Features:**
+- **Workflow Management**: Create and manage workflows broken into assignable process steps.
+- **TFA Survey & Analysis**: Workflow-level technical feasibility assessment with gap detection and scores.
+- **Step-Level PIF Survey**: Granular, step-level Process Insight Forms for operational realities and ROI inputs.
+- **Step-Level Readiness Rubric**: Combines TFA and PIF scores (60% TFA + 40% PIF) per step, including SWOT analysis.
+- **Opportunity Matrix**: A 2D scatter plot visualizing implementation opportunities by Business Impact and Implementation Effort.
+- **Executive Diagnostic Report**: Generates comprehensive, branded .docx documents with executive summaries, methodology, findings, roadmaps, and technical appendices.
+- **Workflow-Level Consolidation System**: Bundles multiple step-level opportunities into strategic consolidation packages with distinct calculation logic for business impact, payback period, readiness score, and implementation effort. These are visually differentiated on the Opportunity Matrix and detailed in the EDR.
 
-### Data Model
+### External Dependencies
 
-Core entities include Companies, Workflows, Workflow Steps (with participant assignments), TFA Assessments (workflow-level, weighted scoring), PIF Responses (step-level, multi-respondent, operational scores, ROI inputs), Readiness Rubrics (calculated per step from TFA and PIF), Implementation Opportunities (ROI-based, linked to specific steps), and Business Impact calculations.
-
-### Key Features
-
-- **Workflow Management**: Create and manage workflows broken into individual, assignable process steps.
-- **TFA Survey & Analysis**: Workflow-level technical feasibility assessment with gap detection, scores, visual analytics, and an executive summary.
-- **Step-Level PIF Survey**: Granular, step-level Process Insight Forms collecting operational realities, operational scores, and ROI inputs from multiple respondents.
-- **Step-Level Readiness Rubric**: Primary assessment view displaying combined readiness scores (60% TFA + 40% PIF) per step, with component breakdowns, radar charts, and SWOT analysis.
-- **Opportunity Matrix**: A 2D scatter plot visualizing implementation opportunities by Business Impact (X-axis) and Implementation Effort (Y-axis), with opportunities linked to specific steps and color-coded by workflow. Includes both Base and Enhanced Impact Matrices.
-- **Executive Diagnostic Report**: Generates a comprehensive, branded .docx document including executive summary, methodology, findings, roadmap, and detailed technical appendices aggregating step-level SWOT analyses.
-- **Step-Level Assessment Architecture**: Ensures all assessments, readiness scores, SWOT analyses, and opportunity creations are primarily managed at the individual process step level.
-- **Workflow-Level Consolidation System**: Allows bundling multiple step-level opportunities into strategic consolidation packages, providing both tactical and strategic investment scenarios. Consolidations have distinct calculation logic for business impact, payback period, readiness score, and implementation effort, incorporating coordination buffers and integration overheads. They are visually differentiated on the Opportunity Matrix and detailed in the EDR.
-
-## External Dependencies
-
-### Database & Infrastructure
-
+**Database & Infrastructure:**
 - **Neon Serverless PostgreSQL**: Cloud database.
 - **Drizzle Kit**: Schema migrations.
 
-### UI Component Libraries
-
-- **@radix-ui/\***: Accessible component primitives.
+**UI Component Libraries:**
+- **@radix-ui/**: Accessible component primitives.
 - **recharts**: Charting library.
 - **embla-carousel**: Carousel component.
 - **cmdk**: Command palette.
 - **date-fns**: Date manipulation.
 - **lucide-react**: Icon library.
 
-### Form Handling & Validation
-
+**Form Handling & Validation:**
 - **React Hook Form**: Form state management.
 - **Zod**: Schema validation.
 
-### Document Generation
-
+**Document Generation:**
 - **docx**: Programmatic Word document creation.
 
-### Development Tools
-
+**Development Tools:**
 - **Vite**: Build tool and dev server.
 - **TypeScript**: Type checking.
 - **ESBuild**: Production server bundling.
 
-### Styling Infrastructure
-
+**Styling Infrastructure:**
 - **Tailwind CSS**: Utility-first CSS framework.
 - **PostCSS with Autoprefixer**: CSS processing.
 - **clsx & tailwind-merge**: Conditional class name utilities.
