@@ -139,7 +139,7 @@ integrated readiness score capturing both technical and operational viability.
 
 This analysis revealed meaningful variation across workflows:
 
-[Insert 1–2 sentences highlighting **Quick Wins** (high-feasibility, short-payback
+[Insert 1–2 sentences highlighting Quick Wins (high-feasibility, short-payback
 opportunities)]
 
 [Insert 1–2 sentences describing foundational gaps (e.g., data quality, system
@@ -297,7 +297,6 @@ scalability.
 Automat-IA applies a Two-Matrix Framework:
 
 1. The Base Impact Opportunity Matrix calculates Business Impact based on Annual ROI percentage and FTE savings, providing initial prioritization that supports executive visibility and quick sequencing of opportunities.
-
 2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
 
 Phase 8: Validation Session and Stakeholder Alignment
@@ -315,7 +314,7 @@ Phase 9: Automation Roadmap Development
 Opportunities selected from the validated matrices are sequenced into a three-phase roadmap
 that converts diagnostic insights into actionable implementation steps:
 
-Phase 1: **Quick Wins** (0 to 6 months) focus on low-complexity automations that deliver
+Phase 1: Quick Wins (0 to 6 months) focus on low-complexity automations that deliver
 early ROI and demonstrate measurable results.
 
 Phase 2: Foundational (6 to 12 months) builds the integration, data, and governance
@@ -339,7 +338,6 @@ comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Wei
 C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology,
 F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide
 strategic decision-making and implementation planning.
-
 2. **Executive Presentation:** A summarized presentation highlighting key findings, validated
 opportunities, and the recommended roadmap, tailored for board-level and senior leadership
 communication.
@@ -390,38 +388,38 @@ operations, and any interdependencies.]
 `;
 
 export const DIAGNOSTIC_OVERVIEW_PART3 = `
-4.5 Immediate Implementation Potential (Quick Wins)
+4.5 Immediate Implementation Potential (**Quick Wins**)
 
 {{quickwin_count}} opportunities demonstrated high readiness and low implementation effort,
-classifying them as **Quick Wins**. These opportunities span the following workflows and steps:
+classifying them as Quick Wins. These opportunities span the following workflows and steps:
 
 {{quickwin_list}}
 
-These can be executed in the short term to generate early ROI and internal momentum. **Quick
-Wins** are characterized by high step-level readiness scores (strong technical feasibility combined
+These can be executed in the short term to generate early ROI and internal momentum. Quick
+Wins are characterized by high step-level readiness scores (strong technical feasibility combined
 with clear operational data), minimal system integration requirements, and well-documented
 processes with engaged stakeholders.
 
-[Analyst Commentary: Describe each **Quick Win** opportunity, what it automates, and expected impact]
+[Analyst Commentary: Describe each Quick Win opportunity, what it automates, and expected impact]
 
-4.6 Strategic Bets for Long-Term Value
+4.6 **Strategic Bets** for Long-Term Value
 
 A subset of high-impact opportunities offers significant potential but requires higher
 implementation effort due to technical debt, legacy system dependencies, or cross-departmental
-coordination requirements. These **Strategic Bets** include:
+coordination requirements. These Strategic Bets include:
 
 {{strategic_bets_list}}
 
 These opportunities should be prioritized for later roadmap phases (Phase 2: Foundational or
 Phase 3: Strategic) once foundational enablers are strengthened, technical readiness improves,
-and early **Quick Wins** have built organizational capability and momentum.
+and early Quick Wins have built organizational capability and momentum.
 
-[Analyst Commentary: Describe each **Strategic Bet** opportunity, what it automates, and long-term value proposition]
+[Analyst Commentary: Describe each Strategic Bet opportunity, what it automates, and long-term value proposition]
 
-4.7 Nice-to-Have Opportunities
+4.7 **Nice-to-Have** Opportunities
 
 A set of moderate or low-impact opportunities offers optimization potential with relatively low
-implementation effort. These **Nice-to-Have** opportunities can serve as proof-of-concept initiatives,
+implementation effort. These Nice-to-Have opportunities can serve as proof-of-concept initiatives,
 training exercises, or incremental improvements:
 
 {{nice_to_have_list}}
@@ -430,7 +428,7 @@ While not prioritized for the immediate 18-month roadmap, these opportunities ma
 strategic as foundational capabilities mature or business priorities shift. They can also provide
 valuable learning experiences for teams new to automation technologies.
 
-[Analyst Commentary: Describe each **Nice-to-Have** opportunity, what it automates, and optimization potential]
+[Analyst Commentary: Describe each Nice-to-Have opportunity, what it automates, and optimization potential]
 
 4.8 Consolidated Opportunities
 
@@ -474,7 +472,7 @@ implementation timelines and improves adoption rates for all automation initiati
 
 4.11 Recommended Focus
 
-● Prioritize **Quick Wins** in Phase 1 to demonstrate ROI and build internal confidence.
+● Prioritize Quick Wins in Phase 1 to demonstrate ROI and build internal confidence.
 
 ● Address foundational readiness gaps before initiating high-effort initiatives.
 
@@ -548,7 +546,7 @@ implementation plan.
 
 The roadmap is designed to:
 
-● Deliver measurable value early through **Quick Wins** that validate the automation strategy.
+● Deliver measurable value early through Quick Wins that validate the automation strategy.
 
 ● Strengthen the data, process, and integration foundations required for scale.
 
@@ -559,11 +557,11 @@ pacing with organizational readiness.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE1 = `
-6.1 Phase 1 – **Quick Wins** (Short-Term, 0 to 6 months)
+6.1 Phase 1 – Quick Wins (Short-Term, 0 to 6 months)
 
 **Objective:** Achieve immediate operational improvements with minimal complexity and risk.
 
-**Quick Wins** typically involve repetitive, rules-based workflows with clean data and existing
+Quick Wins typically involve repetitive, rules-based workflows with clean data and existing
 system connectivity. Their implementation demonstrates the value of automation while
 establishing internal confidence and governance foundations.
 `;
@@ -622,7 +620,7 @@ export const AUTOMATION_ROADMAP_PHASE3 = `
 long-term business value.
 
 These initiatives, drawn from the High Impact / High Effort quadrant of the Opportunity Matrix,
-require stronger infrastructure and cross-departmental collaboration. By this stage, **Quick Wins**
+require stronger infrastructure and cross-departmental collaboration. By this stage, Quick Wins
 and Foundational phases will have validated the governance model, making these large-scale
 transformations viable.
 `;
@@ -656,9 +654,9 @@ export const AUTOMATION_ROADMAP_SUMMARY = `
 6.5 Narrative Summary
 
 This roadmap enables {{company_name}} to advance automation maturity in structured,
-measurable stages. **Quick Wins** create momentum and early financial returns, Foundational
-Enhancements strengthen the organization's digital infrastructure, and **Strategic
-Implementations** unlock transformative value and cross-functional scalability.
+measurable stages. Quick Wins create momentum and early financial returns, Foundational
+Enhancements strengthen the organization's digital infrastructure, and Strategic
+Implementations unlock transformative value and cross-functional scalability.
 
 Each phase is directly informed by the diagnostic evidence collected through Automat-IA's
 framework. This ensures that priorities are grounded in verified readiness, ROI, and effort data
@@ -865,19 +863,19 @@ always greater than or equal to Base.
 
 **Quadrants:**
 
-● Quick Wins: High impact and low effort.
+● **Quick Wins:** High impact and low effort.
 
-● Strategic Bets: High impact and high effort.
+● **Strategic Bets:** High impact and high effort.
 
-● Nice-to-Haves: Low impact and low effort.
+● **Nice-to-Haves:** Low impact and low effort.
 
-● Deprioritize: Low impact and high effort.
+● **Deprioritize:** Low impact and high effort.
 
 A.8 Roadmap Development Methodology
 
 Roadmap sequencing is derived directly from matrix positions and diagnostic evidence.
 
-Phase 1 **Quick Wins** 0 to 6 months. Low effort and high impact items executed first to deliver
+Phase 1 Quick Wins 0 to 6 months. Low effort and high impact items executed first to deliver
 ROI quickly and validate governance, data connections, and monitoring.
 
 Phase 2 Foundational Enhancements 6 to 12 months. Address data quality, integration, and

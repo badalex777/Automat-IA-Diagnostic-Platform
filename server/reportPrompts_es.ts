@@ -300,7 +300,6 @@ Automat-IA aplica un Marco de Dos Matrices:
 1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial basado en el porcentaje de 
 ROI anual y ahorro de FTE, proporcionando priorización inicial que respalda la visibilidad ejecutiva y 
 secuenciación rápida de oportunidades.
-
 2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto 
 Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a 
 través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones 
@@ -323,7 +322,7 @@ Fase 9: Desarrollo de Hoja de Ruta de Automatización
 Las oportunidades seleccionadas de las matrices validadas se secuencian en una hoja de ruta de tres fases 
 que convierte los hallazgos de diagnóstico en pasos de implementación accionables:
 
-Fase 1: **Logros Rápidos** (0 a 6 meses) se enfoca en automatizaciones de baja complejidad que entregan 
+Fase 1: Logros Rápidos (0 a 6 meses) se enfoca en automatizaciones de baja complejidad que entregan 
 ROI temprano y demuestran resultados medibles.
 
 Fase 2: Fundacional (6 a 12 meses) construye las estructuras de integración, datos y gobernanza 
@@ -347,7 +346,6 @@ Próximos Pasos, y seis apéndices completos (A: Metodología Detallada, B: Pond
 Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción Detallada de ROI, E: Metodología 
 de Cálculo de ROI, F: Procedencia de Datos y Pista de Auditoría). Diseñado para partes interesadas ejecutivas 
 y técnicas para guiar la toma de decisiones estratégicas y planificación de implementación.
-
 2. **Presentación Ejecutiva:** Una presentación resumida destacando hallazgos clave, oportunidades validadas 
 y la hoja de ruta recomendada, adaptada para comunicación a nivel de junta directiva y liderazgo senior.
 `;
@@ -401,39 +399,39 @@ en las operaciones y cualquier interdependencia.]
 `;
 
 export const DIAGNOSTIC_OVERVIEW_PART3 = `
-4.5 Potencial de Implementación Inmediata (Logros Rápidos)
+4.5 Potencial de Implementación Inmediata (**Logros Rápidos**)
 
 {{quickwin_count}} oportunidades demostraron alta preparación y bajo esfuerzo de implementación, 
-clasificándolas como **Logros Rápidos**. Estas oportunidades abarcan los siguientes flujos de trabajo y pasos:
+clasificándolas como Logros Rápidos. Estas oportunidades abarcan los siguientes flujos de trabajo y pasos:
 
 {{quickwin_list}}
 
-Estas pueden ejecutarse a corto plazo para generar ROI temprano e impulso interno. Los **Logros Rápidos** se 
+Estas pueden ejecutarse a corto plazo para generar ROI temprano e impulso interno. Los Logros Rápidos se 
 caracterizan por puntuaciones de preparación a nivel de paso altas (fuerte factibilidad técnica combinada 
 con datos operacionales claros), requisitos mínimos de integración de sistemas y procesos bien documentados 
 con partes interesadas comprometidas.
 
-[Comentario del Analista: Describa cada oportunidad de **Logro Rápido**, qué automatiza y el impacto esperado]
+[Comentario del Analista: Describa cada oportunidad de Logro Rápido, qué automatiza y el impacto esperado]
 
-4.6 Apuestas Estratégicas para Valor a Largo Plazo
+4.6 **Apuestas Estratégicas** para Valor a Largo Plazo
 
 Un subconjunto de oportunidades de alto impacto ofrece potencial significativo pero requiere mayor esfuerzo 
 de implementación debido a deuda técnica, dependencias de sistemas legados o requisitos de coordinación 
-transdepartamental. Estas **Apuestas Estratégicas** incluyen:
+transdepartamental. Estas Apuestas Estratégicas incluyen:
 
 {{strategic_bets_list}}
 
 Estas oportunidades deben priorizarse para fases posteriores de la hoja de ruta (Fase 2: Fundacional o 
 Fase 3: Estratégica) una vez que se fortalezcan los habilitadores fundacionales, mejore la preparación 
-técnica y los **Logros Rápidos** tempranos hayan construido capacidad y momentum organizacional.
+técnica y los Logros Rápidos tempranos hayan construido capacidad y momentum organizacional.
 
-[Comentario del Analista: Describa cada oportunidad de **Apuesta Estratégica**, qué automatiza y la propuesta 
+[Comentario del Analista: Describa cada oportunidad de Apuesta Estratégica, qué automatiza y la propuesta 
 de valor a largo plazo]
 
-4.7 Oportunidades Deseables
+4.7 Oportunidades **Deseables**
 
 Un conjunto de oportunidades de impacto moderado o bajo ofrece potencial de optimización con esfuerzo de 
-implementación relativamente bajo. Estas oportunidades **Deseables** pueden servir como iniciativas de prueba 
+implementación relativamente bajo. Estas oportunidades Deseables pueden servir como iniciativas de prueba 
 de concepto, ejercicios de capacitación o mejoras incrementales:
 
 {{nice_to_have_list}}
@@ -443,7 +441,7 @@ estratégicas a medida que maduran las capacidades fundacionales o cambian las p
 También pueden proporcionar experiencias valiosas de aprendizaje para equipos nuevos en tecnologías de 
 automatización.
 
-[Comentario del Analista: Describa cada oportunidad **Deseable**, qué automatiza y el potencial de optimización]
+[Comentario del Analista: Describa cada oportunidad Deseable, qué automatiza y el potencial de optimización]
 
 4.8 Oportunidades Consolidadas
 
@@ -492,7 +490,7 @@ automatización.
 
 4.11 Enfoque Recomendado
 
-● Priorizar **Logros Rápidos** en la Fase 1 para demostrar ROI y construir confianza interna.
+● Priorizar Logros Rápidos en la Fase 1 para demostrar ROI y construir confianza interna.
 
 ● Abordar brechas de preparación fundacional antes de iniciar iniciativas de alto esfuerzo.
 
@@ -568,7 +566,7 @@ y por fases.
 
 La hoja de ruta está diseñada para:
 
-● Entregar valor medible temprano a través de **Logros Rápidos** que validen la estrategia de automatización.
+● Entregar valor medible temprano a través de Logros Rápidos que validen la estrategia de automatización.
 
 ● Fortalecer las bases de datos, procesos e integración requeridas para escalar.
 
@@ -579,11 +577,11 @@ la preparación organizacional.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE1 = `
-6.1 Fase 1 – **Logros Rápidos** (Corto Plazo, 0 a 6 meses)
+6.1 Fase 1 – Logros Rápidos (Corto Plazo, 0 a 6 meses)
 
 **Objetivo:** Lograr mejoras operacionales inmediatas con complejidad y riesgo mínimos.
 
-Los **Logros Rápidos** típicamente involucran flujos de trabajo repetitivos basados en reglas con datos limpios 
+Los Logros Rápidos típicamente involucran flujos de trabajo repetitivos basados en reglas con datos limpios 
 y conectividad de sistemas existente. Su implementación demuestra el valor de la automatización mientras 
 establece confianza interna y bases de gobernanza.
 `;
@@ -641,7 +639,7 @@ export const AUTOMATION_ROADMAP_PHASE3 = `
 y valor empresarial a largo plazo.
 
 Estas iniciativas, extraídas del cuadrante de Alto Impacto / Alto Esfuerzo de la Matriz de Oportunidades, 
-requieren infraestructura más fuerte y colaboración transdepartamental. En esta etapa, los **Logros Rápidos** 
+requieren infraestructura más fuerte y colaboración transdepartamental. En esta etapa, los Logros Rápidos 
 y las fases Fundacionales habrán validado el modelo de gobernanza, haciendo viables estas transformaciones 
 a gran escala.
 `;
@@ -675,8 +673,8 @@ export const AUTOMATION_ROADMAP_SUMMARY = `
 6.5 Resumen Narrativo
 
 Esta hoja de ruta permite a {{company_name}} avanzar la madurez de automatización en etapas estructuradas 
-y medibles. Los **Logros Rápidos** crean momentum y retornos financieros tempranos, las Mejoras Fundacionales 
-fortalecen la infraestructura digital de la organización y las **Implementaciones Estratégicas** desbloquean 
+y medibles. Los Logros Rápidos crean momentum y retornos financieros tempranos, las Mejoras Fundacionales 
+fortalecen la infraestructura digital de la organización y las Implementaciones Estratégicas desbloquean 
 valor transformador y escalabilidad transfuncional.
 
 Cada fase está directamente informada por la evidencia de diagnóstico recopilada a través del marco de 
@@ -891,20 +889,20 @@ capacitación (10 por ciento). Vea la Sección A.5 para metodología detallada.
 
 **Cuadrantes:**
 
-● Logros Rápidos: Alto impacto y bajo esfuerzo.
+● **Logros Rápidos:** Alto impacto y bajo esfuerzo.
 
-● Apuestas Estratégicas: Alto impacto y alto esfuerzo.
+● **Apuestas Estratégicas:** Alto impacto y alto esfuerzo.
 
-● Deseables: Bajo impacto y bajo esfuerzo.
+● **Deseables:** Bajo impacto y bajo esfuerzo.
 
-● Despriorizar: Bajo impacto y alto esfuerzo.
+● **Despriorizar:** Bajo impacto y alto esfuerzo.
 
 A.8 Metodología de Desarrollo de Hoja de Ruta
 
 La secuenciación de la hoja de ruta se deriva directamente de posiciones en la matriz y evidencia de 
 diagnóstico.
 
-Fase 1 **Logros Rápidos** 0 a 6 meses. Elementos de bajo esfuerzo y alto impacto ejecutados primero para 
+Fase 1 Logros Rápidos 0 a 6 meses. Elementos de bajo esfuerzo y alto impacto ejecutados primero para 
 entregar ROI rápidamente y validar gobernanza, conexiones de datos y monitoreo.
 
 Fase 2 Mejoras Fundacionales 6 a 12 meses. Abordar calidad de datos, integración y brechas de 
