@@ -195,7 +195,7 @@ export interface ReportTranslations {
   // Matrix quadrant names
   matrix: {
     quickWins: string;
-    strategicGoals: string;
+    strategicBets: string;
     niceToHave: string;
     deprioritize: string;
   };
@@ -676,7 +676,7 @@ export const en: ReportTranslations = {
   
   matrix: {
     quickWins: "Quick Wins",
-    strategicGoals: "Strategic Goals",
+    strategicBets: "Strategic Bets",
     niceToHave: "Nice to Have",
     deprioritize: "Deprioritize",
   },
@@ -1144,7 +1144,7 @@ export const es: ReportTranslations = {
   
   matrix: {
     quickWins: "Logros Rápidos",
-    strategicGoals: "Metas Estratégicas",
+    strategicBets: "Apuestas Estratégicas",
     niceToHave: "Deseable",
     deprioritize: "Despriorizar",
   },

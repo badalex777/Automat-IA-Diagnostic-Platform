@@ -321,7 +321,7 @@ export interface TopOpportunity {
 
 export interface MatrixDistribution {
   quickWins: { count: number; opportunities: string[] };
-  strategicGoals: { count: number; opportunities: string[] };
+  strategicBets: { count: number; opportunities: string[] };
   niceToHaves: { count: number; opportunities: string[] };
   deprioritize: { count: number; opportunities: string[] };
 }
@@ -483,7 +483,7 @@ export interface OpportunityData {
     implementationEffort: number;
     baseImpact: number;
     businessImpact: number; // Enhanced impact
-    quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
+    quadrant: 'Quick Wins' | 'Strategic Bets' | 'Nice-To-Haves' | 'Deprioritize';
   };
 }
 
@@ -508,7 +508,7 @@ export interface ConsolidationData {
   matrixPosition: {
     implementationEffort: number;
     businessImpact: number;
-    quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
+    quadrant: 'Quick Wins' | 'Strategic Bets' | 'Nice-To-Haves' | 'Deprioritize';
   };
 }
 
@@ -810,11 +810,11 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
       const businessImpact = calculateConsolidationBusinessImpact(metrics, companyContext);
       
       // Determine quadrant
-      let quadrant: 'Quick Wins' | 'Strategic Goals' | 'Nice-To-Haves' | 'Deprioritize';
+      let quadrant: 'Quick Wins' | 'Strategic Bets' | 'Nice-To-Haves' | 'Deprioritize';
       if (businessImpact >= 75 && implementationEffort <= 50) {
         quadrant = 'Quick Wins';
       } else if (businessImpact >= 75 && implementationEffort > 50) {
-        quadrant = 'Strategic Goals';
+        quadrant = 'Strategic Bets';
       } else if (businessImpact < 75 && implementationEffort <= 50) {
         quadrant = 'Nice-To-Haves';
       } else {
@@ -912,7 +912,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
   // ===== MATRIX DISTRIBUTION CALCULATION =====
   const matrixDistribution: MatrixDistribution = {
     quickWins: { count: 0, opportunities: [] },
-    strategicGoals: { count: 0, opportunities: [] },
+    strategicBets: { count: 0, opportunities: [] },
     niceToHaves: { count: 0, opportunities: [] },
     deprioritize: { count: 0, opportunities: [] },
   };
@@ -924,9 +924,9 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         matrixDistribution.quickWins.count++;
         matrixDistribution.quickWins.opportunities.push(oppName);
         break;
-      case 'Strategic Goals':
-        matrixDistribution.strategicGoals.count++;
-        matrixDistribution.strategicGoals.opportunities.push(oppName);
+      case 'Strategic Bets':
+        matrixDistribution.strategicBets.count++;
+        matrixDistribution.strategicBets.opportunities.push(oppName);
         break;
       case 'Nice-To-Haves':
         matrixDistribution.niceToHaves.count++;
@@ -947,10 +947,10 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
     phase1QuickWins: allOpportunities.filter(o => o.matrixPosition.quadrant === 'Quick Wins'),
     phase2Foundational: allOpportunities.filter(o => 
       o.matrixPosition.quadrant === 'Nice-To-Haves' || 
-      (o.matrixPosition.quadrant === 'Strategic Goals' && o.matrixPosition.implementationEffort < 65)
+      (o.matrixPosition.quadrant === 'Strategic Bets' && o.matrixPosition.implementationEffort < 65)
     ),
     phase3Strategic: allOpportunities.filter(o => 
-      o.matrixPosition.quadrant === 'Strategic Goals' && o.matrixPosition.implementationEffort >= 65
+      o.matrixPosition.quadrant === 'Strategic Bets' && o.matrixPosition.implementationEffort >= 65
     ),
   };
 

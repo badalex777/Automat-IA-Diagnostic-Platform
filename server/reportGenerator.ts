@@ -931,9 +931,9 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     ...data.roadmapPhases.phase3Strategic
   ];
   
-  // Generate Strategic Bets list - ONLY individual opportunities that are Strategic Goals (high impact + high effort)
+  // Generate Strategic Bets list - ONLY individual opportunities that are Strategic Bets (high impact + high effort)
   // Exclude consolidations - those will appear in Section 4.8
-  const strategicBetOpps = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Strategic Goals');
+  const strategicBetOpps = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Strategic Bets');
   const strategicBetsList = strategicBetOpps.length > 0
     ? strategicBetOpps
         .slice(0, 5) // Limit to top 5
@@ -980,7 +980,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Calculate total consolidations across all workflows
   const totalConsolidations = data.workflows.reduce((sum: number, wd: any) => sum + wd.consolidations.length, 0);
   const consolidationCountLine = totalConsolidations > 0 
-    ? `\n• Workflow Consolidations Identified: ${totalConsolidations}` 
+    ? `\n• **Workflow Consolidations Identified:** ${totalConsolidations}` 
     : '';
   
   // Generate Consolidations list for Section 4.8
@@ -1310,7 +1310,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   const matrixHeaders = [ctx.t.headers.quadrant, ctx.t.headers.opportunities, ctx.t.headers.count];
   const matrixRows = [
     [ctx.t.matrix.quickWins, data.matrixDistribution.quickWins.opportunities.join(", "), data.matrixDistribution.quickWins.count.toString()],
-    [ctx.t.matrix.strategicGoals, data.matrixDistribution.strategicGoals.opportunities.join(", "), data.matrixDistribution.strategicGoals.count.toString()],
+    [ctx.t.matrix.strategicBets, data.matrixDistribution.strategicBets.opportunities.join(", "), data.matrixDistribution.strategicBets.count.toString()],
     [ctx.t.matrix.niceToHave, data.matrixDistribution.niceToHaves.opportunities.join(", "), data.matrixDistribution.niceToHaves.count.toString()],
     [ctx.t.matrix.deprioritize, data.matrixDistribution.deprioritize.opportunities.join(", "), data.matrixDistribution.deprioritize.count.toString()],
   ];
