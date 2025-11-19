@@ -339,7 +339,7 @@ Fase 10: Entregables Finales
 
 El proceso de diagnóstico concluye con la entrega de dos productos completos:
 
-1. Reporte Ejecutivo de Diagnóstico (EDR): Este documento consolida todos los hallazgos, evaluaciones de 
+1. **Reporte Ejecutivo de Diagnóstico (EDR):** Este documento consolida todos los hallazgos, evaluaciones de 
 preparación, análisis FODA, proyecciones de ROI, matrices de oportunidades y la hoja de ruta de 
 automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-10), 
 descripción general del diagnóstico, hallazgos y análisis, hoja de ruta de automatización, Conclusiones y 
@@ -348,7 +348,7 @@ Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción 
 de Cálculo de ROI, F: Procedencia de Datos y Pista de Auditoría). Diseñado para partes interesadas ejecutivas 
 y técnicas para guiar la toma de decisiones estratégicas y planificación de implementación.
 
-2. Presentación Ejecutiva: Una presentación resumida destacando hallazgos clave, oportunidades validadas 
+2. **Presentación Ejecutiva:** Una presentación resumida destacando hallazgos clave, oportunidades validadas 
 y la hoja de ruta recomendada, adaptada para comunicación a nivel de junta directiva y liderazgo senior.
 `;
 
@@ -362,13 +362,13 @@ análisis cubrió {{workflow_count}} flujos de trabajo en funciones administrati
 
 Cada flujo de trabajo fue evaluado en tres dimensiones:
 
-• Factibilidad Técnica – La capacidad de los sistemas actuales, estructuras de datos y rutas de integración 
+• **Factibilidad Técnica** – La capacidad de los sistemas actuales, estructuras de datos y rutas de integración 
 para soportar la automatización de manera segura y confiable.
 
-• Preparación Organizacional – El grado de estandarización de procesos, consistencia de datos y adaptabilidad 
+• **Preparación Organizacional** – El grado de estandarización de procesos, consistencia de datos y adaptabilidad 
 al cambio dentro de la organización.
 
-• Impacto Empresarial – ROI cuantificado, período de retorno y potencial de beneficio anual derivado de 
+• **Impacto Empresarial** – ROI cuantificado, período de retorno y potencial de beneficio anual derivado de 
 oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la 
 Matriz de Impacto Base (ROI + ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones 
 aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
@@ -379,11 +379,11 @@ priorizar automatizaciones que sean tanto técnicamente factibles como financier
 
 4.2 Hallazgos Clave del Diagnóstico
 
-• Total de Flujos de Trabajo Analizados: {{workflow_count}}
-• Oportunidades de Automatización Validadas: {{opportunity_count}}
-• Potencial de Beneficio Anual Total: {{annual_benefit}}
-• Período de Retorno Promedio: {{avg_payback}} meses
-• FTE Ahorrados: {{fte_savings}}
+• **Total de Flujos de Trabajo Analizados:** {{workflow_count}}
+• **Oportunidades de Automatización Validadas:** {{opportunity_count}}
+• **Potencial de Beneficio Anual Total:** {{annual_benefit}}
+• **Período de Retorno Promedio:** {{avg_payback}} meses
+• **FTE Ahorrados:** {{fte_savings}}
 
 Las puntuaciones de preparación variaron entre los flujos de trabajo, reflejando diferencias en calidad de 
 datos, estructura de proceso y madurez de integración.

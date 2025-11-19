@@ -331,7 +331,7 @@ Phase 10: Final Deliverables
 
 The diagnostic process concludes with the delivery of two comprehensive outputs:
 
-1. Executive Diagnostic Report (EDR): This document consolidates all findings, readiness
+1. **Executive Diagnostic Report (EDR):** This document consolidates all findings, readiness
 assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation
 roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-10), diagnostic
 overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six
@@ -340,7 +340,7 @@ C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Method
 F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide
 strategic decision-making and implementation planning.
 
-2. Executive Presentation: A summarized presentation highlighting key findings, validated
+2. **Executive Presentation:** A summarized presentation highlighting key findings, validated
 opportunities, and the recommended roadmap, tailored for board-level and senior leadership
 communication.
 `;
@@ -356,11 +356,11 @@ analysis covered {{workflow_count}} workflows across key back-office functions i
 
 Each workflow was evaluated across three dimensions:
 
-• Technical Feasibility – The ability of current systems, data structures, and integration pathways to support automation securely and reliably.
+• **Technical Feasibility** – The ability of current systems, data structures, and integration pathways to support automation securely and reliably.
 
-• Organizational Readiness – The degree of process standardization, data consistency, and change adaptability within the organization.
+• **Organizational Readiness** – The degree of process standardization, data consistency, and change adaptability within the organization.
 
-• Business Impact – Quantified ROI, payback period, and annual benefit potential derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
+• **Business Impact** – Quantified ROI, payback period, and annual benefit potential derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
 
 All automation opportunities were positioned within Automat-IA's Opportunity Matrix, aligning
 technical readiness with financial value. The objective was to identify and prioritize automations
@@ -368,11 +368,11 @@ that are both technically feasible and financially justified.
 
 4.2 Key Diagnostic Findings
 
-• Total Workflows Analyzed: {{workflow_count}}
-• Validated Automation Opportunities: {{opportunity_count}}{{consolidation_count_line}}
-• Total Annual Benefit Potential: {{annual_benefit}}
-• Average Payback Period: {{avg_payback}} months
-• FTE Saved: {{fte_savings}}
+• **Total Workflows Analyzed:** {{workflow_count}}
+• **Validated Automation Opportunities:** {{opportunity_count}}{{consolidation_count_line}}
+• **Total Annual Benefit Potential:** {{annual_benefit}}
+• **Average Payback Period:** {{avg_payback}} months
+• **FTE Saved:** {{fte_savings}}
 
 Readiness scores varied across workflows, reflecting differences in data quality, process
 structure, and integration maturity.
