@@ -308,3 +308,137 @@ export type InsertImplementationOpportunity = z.infer<typeof insertImplementatio
 
 export type WorkflowConsolidation = typeof workflowConsolidations.$inferSelect;
 export type InsertWorkflowConsolidation = z.infer<typeof insertWorkflowConsolidationSchema>;
+
+// ROI Calculator Data Types
+export const processInfoSchema = z.object({
+  processName: z.string().min(1, "Process name is required"),
+  businessUnit: z.string().min(1, "Business unit is required"),
+  dataSource: z.string().min(1, "Data source is required"),
+});
+
+export const peopleAndCostSchema = z.object({
+  employees: z.number().min(1, "Number of employees must be at least 1"),
+  hoursPerWeekPerEmployee: z.number().min(0.1, "Hours per week must be positive"),
+  averageAnnualSalary: z.number().min(1000, "Annual salary must be realistic"),
+  annualWorkingHours: z.number().min(1500, "Annual working hours must be at least 1500").max(2200, "Annual working hours cannot exceed 2200"),
+  overheadMultiplier: z.number().min(1).max(2).default(1.0),
+  source: z.string().min(1, "Source is required"),
+  
+  useProcessBasedCalculation: z.boolean().default(false),
+  processesPerPeriod: z.number().min(0).default(0),
+  timePerProcessMinutes: z.number().min(0).default(0),
+  processFrequency: z.enum(["daily", "weekly", "monthly"]).default("daily"),
+});
+
+export const timeSavingsSchema = z.object({
+  enabled: z.boolean().default(false),
+  percentTimeSaved: z.number().min(0).max(100).default(0),
+  source: z.string().min(1, "Source is required"),
+});
+
+export const qualityImpactSchema = z.object({
+  enabled: z.boolean().default(false),
+  
+  calculationMethod: z.enum(["manual", "rubric"]).default("manual"),
+  
+  transactionsPerWeek: z.number().min(0).default(0),
+  currentErrorRate: z.number().min(0).max(100).default(0),
+  
+  postAIErrorRate: z.number().min(0).max(100).default(0),
+  
+  financialCostPerError: z.number().min(0).default(0),
+  reworkMinutesPerError: z.number().min(0).default(0),
+  
+  percentQualityImprovement: z.number().min(0).max(100).default(0),
+  
+  source: z.string().min(1, "Source is required"),
+});
+
+export const revenueUpliftSchema = z.object({
+  enabled: z.boolean().default(false),
+  percentReallocated: z.number().min(0).max(100).default(40),
+  revenueValuePerHour: z.number().min(0).default(0),
+  source: z.string().min(1, "Source is required"),
+});
+
+export const costsAndRampupSchema = z.object({
+  implementationCost: z.number().min(0).default(0),
+  annualSoftwareCost: z.number().min(0).default(0),
+  trainingHoursPerEmployee: z.number().min(0).default(0),
+  changeMgmtCosts: z.number().min(0).default(0),
+  rampUpMonths: z.number().min(1).max(12).default(6),
+  
+  rampUpCalculationMethod: z.enum(["manual", "rubric"]).default("manual"),
+  rampUpEfficiencyPercent: z.number().min(20).max(150).default(100),
+  
+  rubricComplexity: z.enum(["low", "moderate", "high", "very_high"]).default("moderate"),
+  rubricDigitalComfort: z.enum(["very_uncomfortable", "somewhat_uncomfortable", "neutral", "comfortable", "very_comfortable"]).default("neutral"),
+  rubricRolloutApproach: z.enum(["pilot_first", "phased", "parallel", "bigbang"]).default("phased"),
+  rubricSupportStructure: z.enum(["strong", "basic", "minimal"]).default("basic"),
+  
+  source: z.string().min(1, "Source is required"),
+});
+
+export const scenarioType = z.enum(["best", "base", "conservative", "worst"]);
+
+export const roiCalculationSchema = z.object({
+  processInfo: processInfoSchema,
+  peopleAndCost: peopleAndCostSchema,
+  timeSavings: timeSavingsSchema,
+  qualityImpact: qualityImpactSchema,
+  revenueUplift: revenueUpliftSchema,
+  costsAndRampup: costsAndRampupSchema,
+  selectedScenario: scenarioType.default("base"),
+});
+
+export const scenarioMultipliers = {
+  best: {
+    name: "Best Case",
+    description: "Optimistic but achievable outcomes with higher adoption and efficiency gains",
+    timeSavingsMultiplier: 1.15,
+    errorReductionMultiplier: 1.2,
+    reallocationMultiplier: 1.0,
+    costOverrunMultiplier: 0.95,
+    rampUpEfficiencyMultiplier: 1.15,
+    color: "text-green-600",
+  },
+  base: {
+    name: "Base Case", 
+    description: "Realistic baseline expectations using input values as-is",
+    timeSavingsMultiplier: 1.0,
+    errorReductionMultiplier: 1.0,
+    reallocationMultiplier: 0.7,
+    costOverrunMultiplier: 1.0,
+    rampUpEfficiencyMultiplier: 1.0,
+    color: "text-blue-600",
+  },
+  conservative: {
+    name: "Conservative",
+    description: "Cautious middle-ground estimates with reduced benefits and cost padding",
+    timeSavingsMultiplier: 0.7,
+    errorReductionMultiplier: 0.7,
+    reallocationMultiplier: 0.4,
+    costOverrunMultiplier: 1.1,
+    rampUpEfficiencyMultiplier: 0.8,
+    color: "text-orange-600",
+  },
+  worst: {
+    name: "Worst Case",
+    description: "Downside risk scenario with significant implementation challenges",
+    timeSavingsMultiplier: 0.4,
+    errorReductionMultiplier: 0.5,
+    reallocationMultiplier: 0.0,
+    costOverrunMultiplier: 1.2,
+    rampUpEfficiencyMultiplier: 0.7,
+    color: "text-red-600",
+  },
+} as const;
+
+export type ProcessInfo = z.infer<typeof processInfoSchema>;
+export type PeopleAndCost = z.infer<typeof peopleAndCostSchema>;
+export type TimeSavings = z.infer<typeof timeSavingsSchema>;
+export type QualityImpact = z.infer<typeof qualityImpactSchema>;
+export type RevenueUplift = z.infer<typeof revenueUpliftSchema>;
+export type CostsAndRampup = z.infer<typeof costsAndRampupSchema>;
+export type ROICalculation = z.infer<typeof roiCalculationSchema>;
+export type ScenarioType = z.infer<typeof scenarioType>;
