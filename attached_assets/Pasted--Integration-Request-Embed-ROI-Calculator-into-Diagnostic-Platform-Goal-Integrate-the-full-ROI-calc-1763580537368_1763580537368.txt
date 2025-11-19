@@ -1,0 +1,106 @@
+
+Integration Request: Embed ROI Calculator into Diagnostic Platform
+Goal
+Integrate the full ROI calculation functionality from my separate "ROI Calculator Platform" Replit into this diagnostic platform. The calculator should auto-populate from PIF response data (including rubric assessments) and save results to the existing implementationOpportunities table and matrix.
+Current State
+This platform (diagnostic) has: Companies → Workflows → Steps, TFA assessments, PIF responses with embedded rubrics, Autopopulated opportunity matrix, opportunity roadmap, report generation, etc. 
+Other platform (calculator) has: A complete ROI calculator with multi-year projections, scenario modeling, and Word export functionality(ROI insights per opportunity, Company handbook and operator guide)
+Problem: Client employees complete PIF forms which contain all the process data AND rubric assessments, but I (the consultant) have to manually re-enter this data into a separate calculator
+What Needs to Happen
+1. Add Calculator UI Component
+Transplant the entire ROI Calculator component from the other platform, including:
+Multi-step form (6 steps: Process Info, People & Cost, Time Savings, Quality Impact, Revenue Uplift, Costs & Rampup)
+Scenario selector (Conservative, Base, Best, Worst)
+Multi-year calculation engine (handles ramp-up periods properly)
+Results dashboard with charts
+Word export for ROI Insights Report
+2. Auto-Populate Calculator from PIF Data
+When I click "Create Implementation Opportunity" (after TFA and PIFs are completed), the calculator should open with ALL of these pre-filled from PIF responses:
+// People & Cost (from pifResponses.roiInputs)
+employees: roiInputs.employeeCount
+processesPerPeriod: roiInputs.processesPerPeriod 
+timePerProcessMinutes: roiInputs.minutesPerProcess
+processFrequency: roiInputs.frequency
+useProcessBasedCalculation: true // since we have process data
+// Time Savings Rubric (from PIF rubric assessment)
+timeSavings.enabled: true
+timeSavings.percentTimeSaved: // calculated from PIF rubric responses
+// Quality Impact Rubric (from PIF rubric assessment)
+qualityImpact.enabled: roiInputs.hasQualityImpact
+qualityImpact.currentErrorRate: roiInputs.errorRate
+qualityImpact.reworkMinutesPerError: roiInputs.reworkMinutesPerError
+qualityImpact.financialCostPerError: roiInputs.costPerError
+qualityImpact.percentQualityImprovement: // calculated from PIF rubric responses
+// Revenue Uplift Rubric (from PIF rubric assessment)
+revenueUplift.enabled: // based on PIF responses
+revenueUplift.percentReallocated: // calculated from PIF rubric responses
+3. What I (Consultant) Manually Input
+After calculator opens with PIF data pre-populated, I only need to add:
+Annual working hours (company-specific, 1500-2200 range)
+Average annual salary
+Overhead multiplier (typically 1.2-1.5)
+Implementation cost
+Annual software cost
+Training hours per employee
+Change management costs
+Ramp-up assessment (manual % or use rubric)
+4. Calculate & Auto-Save to implementationOpportunities
+When I click "Calculate ROI", the system should:
+Run all calculations (multi-year projections, scenarios, etc.)
+Display results in dashboard
+Automatically save these outputs to the implementationOpportunities table:
+// Basic info
+name: // from opportunity name input
+description: // from description input
+workflowId: // current workflow
+stepId: // optional, if step-specific
+// Financial metrics (calculated outputs)
+annualRoi: // Year 1 dollar ROI
+annualRunRateRoi: // Steady-state ROI %
+cumulativeNetBenefit3Year: // 3-year total
+cumulativeNetBenefit5Year: // 5-year total
+// Time savings (calculated outputs)
+hoursSavedPerWeek:
+annualHoursSaved:
+fteSavings:
+// Quality impact outputs (if enabled)
+errorReductionPct:
+errorsAvoidedAnnually:
+// Revenue uplift outputs (if enabled)
+hoursReallocatedToRevenue:
+revenueUpliftAnnual:
+// Implementation details
+implementationCost: // from manual input
+rampupPeriodMonths: // calculated or manual
+paybackPeriodMonths: // calculated
+trainingHoursPerEmployee: // from manual input
+// Toggle states
+errorMetricsEnabled: // based on qualityImpact.enabled
+revenueMetricsEnabled: // based on revenueUplift.enabled
+5. Corrected User Flow
+Client employees complete PIF forms (with process data + rubric assessments) → saved to pifResponses
+I (consultant) review completed TFA and PIFs for a workflow
+I click "Create Implementation Opportunity"
+Calculator opens with all PIF data (process data + rubrics) already populated
+I add the manual inputs (salary, costs, working hours, ramp-up)
+I click "Calculate ROI" → results display
+System automatically saves all calculated outputs to implementationOpportunities table
+Created opportunities operate with current functionality(Opportunity matrix population, Roadmap positioning, EDR population.
+Technical Requirements
+Keep ALL existing diagnostic platform functionality unchanged
+Use existing tables: companies, workflows, workflowSteps, pifResponses, implementationOpportunities
+Do NOT create new company/workflow management features
+Calculator reads from pifResponses (both roiInputs and rubric assessment responses)
+Calculator writes calculated outputs to existing implementationOpportunities table
+All calculation logic must be transplanted intact (multi-year projections, scenario multipliers, rubric systems)
+Files/Components to Transplant
+From the ROI Calculator Platform Replit, bring over:
+client/src/components/ROICalculator.tsx (main calculator component)
+All form step components (ProcessInfoForm, PeopleAndCostForm, TimeSavingsForm, QualityImpactForm, RevenueUpliftForm, CostsAndRampupForm)
+client/src/lib/multiYearCalculations.ts (calculation engine)
+client/src/components/ResultsDashboard.tsx
+client/src/components/ScenarioSelector.tsx
+Word export functionality (docx generation)
+All rubric logic and scenario multipliers from shared/schema.ts
+Integration Point
+Add "Create Implementation Opportunity" button to workflow detail page. When clicked, open calculator modal/page with PIF data pre-loaded. After calculation and save, return to workflow page showing the new opportunity in the existing opportunities list.

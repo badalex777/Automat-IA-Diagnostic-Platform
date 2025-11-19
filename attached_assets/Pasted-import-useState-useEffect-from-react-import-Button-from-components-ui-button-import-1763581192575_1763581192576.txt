@@ -1,0 +1,431 @@
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Calculator } from 'lucide-react';
+import { 
+  ROICalculation, 
+  ScenarioType, 
+  scenarioMultipliers,
+  ProcessInfo,
+  PeopleAndCost,
+  TimeSavings,
+  QualityImpact,
+  RevenueUplift,
+  CostsAndRampup
+} from '@shared/schema';
+import { calculateMultiYearROI, MultiYearResults } from '@/lib/multiYearCalculations';
+
+import Header from './Header';
+import ScenarioSelector from './ScenarioSelector';
+import ProcessInfoForm from './ProcessInfoForm';
+import PeopleAndCostForm from './PeopleAndCostForm';
+import OptionalModulesForm from './OptionalModulesForm';
+import CostsAndRampupForm from './CostsAndRampupForm';
+import ResultsDashboard from './ResultsDashboard';
+
+interface ROICalculatorProps {
+  initialData?: ROICalculation;
+  onSave?: (data: ROICalculation) => void;
+}
+
+export default function ROICalculator({ initialData, onSave }: ROICalculatorProps) {
+  const [showFormulaDialog, setShowFormulaDialog] = useState(false);
+  
+  // Form state
+  const [processInfo, setProcessInfo] = useState<ProcessInfo>(
+    initialData?.processInfo || {
+      processName: 'Invoice Processing',
+      businessUnit: 'Finance Department', 
+      dataSource: 'Sarah from Finance - Q3 analysis',
+    }
+  );
+  
+  const [peopleAndCost, setPeopleAndCost] = useState<PeopleAndCost>(
+    initialData?.peopleAndCost || {
+      employees: 3,
+      hoursPerWeekPerEmployee: 20,
+      averageAnnualSalary: 55000,
+      annualWorkingHours: 1920,
+      overheadMultiplier: 1.2,
+      source: 'HR records and Finance team estimates',
+      useProcessBasedCalculation: false,
+      processesPerPeriod: 0,
+      timePerProcessMinutes: 0,
+      processFrequency: 'daily',
+    }
+  );
+  
+  const [timeSavings, setTimeSavings] = useState<TimeSavings>(
+    initialData?.timeSavings || {
+      enabled: true,
+      percentTimeSaved: 60,
+      source: 'Process analysis by Operations Manager',
+    }
+  );
+  
+  const [qualityImpact, setQualityImpact] = useState<QualityImpact>(
+    initialData?.qualityImpact || {
+      enabled: true,
+      calculationMethod: 'manual',
+      transactionsPerWeek: 150,
+      currentErrorRate: 5,
+      postAIErrorRate: 1,
+      financialCostPerError: 25,
+      reworkMinutesPerError: 120,
+      percentQualityImprovement: 0,
+      source: 'Quality metrics from last quarter',
+    }
+  );
+  
+  const [revenueUplift, setRevenueUplift] = useState<RevenueUplift>(
+    initialData?.revenueUplift || {
+      enabled: true,
+      percentReallocated: 40,
+      revenueValuePerHour: 85,
+      source: 'Sales team revenue per hour analysis',
+    }
+  );
+  
+  const [costsAndRampup, setCostsAndRampup] = useState<CostsAndRampup>(
+    initialData?.costsAndRampup || {
+      implementationCost: 25000,
+      annualSoftwareCost: 12000,
+      trainingHoursPerEmployee: 8,
+      changeMgmtCosts: 5000,
+      rampUpMonths: 6,
+      rampUpCalculationMethod: 'manual',
+      rampUpEfficiencyPercent: 100,
+      rubricComplexity: 'moderate',
+      rubricDigitalComfort: 'neutral',
+      rubricRolloutApproach: 'phased',
+      rubricSupportStructure: 'basic',
+      source: 'Vendor quotes and IT department estimates',
+    }
+  );
+  
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioType>(initialData?.selectedScenario || 'base');
+
+  // Update state when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setProcessInfo(initialData.processInfo);
+      setPeopleAndCost(initialData.peopleAndCost);
+      setTimeSavings(initialData.timeSavings);
+      setQualityImpact(initialData.qualityImpact);
+      setRevenueUplift(initialData.revenueUplift);
+      setCostsAndRampup(initialData.costsAndRampup);
+      setSelectedScenario(initialData.selectedScenario);
+    }
+  }, [initialData]);
+
+  // Helper function to ensure valid numbers (no NaN or Infinity)
+  const safeNumber = (value: number): number => {
+    if (typeof value !== 'number' || isNaN(value) || !isFinite(value)) {
+      return 0;
+    }
+    return value;
+  };
+
+  // ROI Calculation Logic
+  const calculateROI = (scenarioKey: ScenarioType = selectedScenario) => {
+    const scenario = scenarioMultipliers[scenarioKey];
+    
+    // Calculate effective hourly rate with safeguards
+    const effectiveHourlyRate = peopleAndCost.annualWorkingHours > 0 
+      ? (peopleAndCost.averageAnnualSalary / peopleAndCost.annualWorkingHours) * peopleAndCost.overheadMultiplier
+      : 0;
+    
+    // Calculate total hours and time savings with safeguards
+    const totalHoursPerWeek = (peopleAndCost.employees || 0) * (peopleAndCost.hoursPerWeekPerEmployee || 0);
+    let hoursSavedWeekly = 0;
+    let timeSavingsAnnual = 0;
+    let adjustedTimeSavingsPercent = 0;
+    
+    if (timeSavings.enabled && timeSavings.percentTimeSaved !== undefined && timeSavings.percentTimeSaved !== null) {
+      // Apply scenario multiplier to time savings percentage, capped at 100%
+      adjustedTimeSavingsPercent = Math.min((timeSavings.percentTimeSaved || 0) * scenario.timeSavingsMultiplier, 100);
+      hoursSavedWeekly = (totalHoursPerWeek * adjustedTimeSavingsPercent / 100);
+      timeSavingsAnnual = hoursSavedWeekly * 52 * effectiveHourlyRate;
+    }
+    
+    // Calculate quality impact savings (combines error avoidance + rework reduction)
+    let qualitySavingsAnnual = 0;
+    let errorRateReduction = 0;
+    let errorsAvoidedAnnually = 0;
+    let calculatedPostAIErrorRate = qualityImpact.postAIErrorRate;
+    let adjustedQualityImprovement = 0;
+    
+    if (qualityImpact.enabled) {
+      // Use calculation method to determine how to calculate error reduction
+      if (qualityImpact.calculationMethod === 'rubric') {
+        // Rubric-driven: apply scenario multiplier to quality improvement percentage
+        adjustedQualityImprovement = qualityImpact.percentQualityImprovement * scenario.errorReductionMultiplier;
+        // Cap improvement at 100% to prevent impossible results
+        adjustedQualityImprovement = Math.min(adjustedQualityImprovement, 100);
+        errorRateReduction = qualityImpact.currentErrorRate * (adjustedQualityImprovement / 100);
+        calculatedPostAIErrorRate = qualityImpact.currentErrorRate - errorRateReduction;
+      } else {
+        // Manual entry: apply scenario multiplier to the error rate reduction
+        const rawErrorReduction = qualityImpact.currentErrorRate - qualityImpact.postAIErrorRate;
+        errorRateReduction = rawErrorReduction * scenario.errorReductionMultiplier;
+        // Cap error reduction to current error rate (can't reduce more than what exists)
+        errorRateReduction = Math.min(errorRateReduction, qualityImpact.currentErrorRate);
+        calculatedPostAIErrorRate = qualityImpact.currentErrorRate - errorRateReduction;
+      }
+      
+      errorsAvoidedAnnually = errorRateReduction * qualityImpact.transactionsPerWeek * 52 / 100;
+      // Convert rework minutes to hours for calculation
+      const reworkHours = qualityImpact.reworkMinutesPerError / 60;
+      qualitySavingsAnnual = errorsAvoidedAnnually * (reworkHours * effectiveHourlyRate + qualityImpact.financialCostPerError);
+    }
+    
+    // Calculate revenue uplift with safeguards
+    let revenueSavingsAnnual = 0;
+    let hoursReallocatedAnnually = 0;
+    let adjustedReallocationPercent = 0;
+    if (revenueUplift.enabled && revenueUplift.percentReallocated !== undefined && revenueUplift.percentReallocated !== null) {
+      // Apply scenario multiplier to reallocation percentage, capped at 100%
+      adjustedReallocationPercent = Math.min((revenueUplift.percentReallocated || 0) * scenario.reallocationMultiplier, 100);
+      hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100);
+      // Use manual revenue per hour if provided, otherwise auto-calculate from salary data
+      const revenuePerHour = (revenueUplift.revenueValuePerHour && revenueUplift.revenueValuePerHour > 0)
+        ? revenueUplift.revenueValuePerHour
+        : effectiveHourlyRate;
+      revenueSavingsAnnual = hoursReallocatedAnnually * revenuePerHour;
+    }
+    
+    // Calculate total benefits and costs with safeguards
+    const annualBenefits = (timeSavingsAnnual || 0) + (qualitySavingsAnnual || 0) + (revenueSavingsAnnual || 0);
+    const trainingCosts = (peopleAndCost.employees || 0) * (costsAndRampup.trainingHoursPerEmployee || 0) * effectiveHourlyRate;
+    const annualCosts = ((costsAndRampup.implementationCost || 0) + (costsAndRampup.annualSoftwareCost || 0) + trainingCosts + (costsAndRampup.changeMgmtCosts || 0)) * scenario.costOverrunMultiplier;
+    
+    const netBenefit = annualBenefits - annualCosts;
+    
+    // Annual Run-Rate ROI (steady-state, post-ramp-up)
+    const runRateROI = annualCosts > 0 ? (netBenefit / annualCosts) * 100 : 0;
+    
+    // Year 1 Actual ROI (with ramp-up and efficiency applied)
+    // Step 1: Calculate base ramp factor from months
+    const baseRampFactor = (12 - (costsAndRampup.rampUpMonths || 6) + ((costsAndRampup.rampUpMonths || 6) / 2)) / 12;
+    
+    // Step 2: Get efficiency percentage (default 100% if not set)
+    const baseEfficiency = costsAndRampup.rampUpEfficiencyPercent || 100;
+    
+    // Step 3: Apply scenario multiplier to efficiency
+    const scenarioAdjustedEfficiency = Math.max(20, Math.min(150, baseEfficiency * scenario.rampUpEfficiencyMultiplier));
+    
+    // Step 4: Combine base ramp factor with efficiency
+    const year1RampFactor = baseRampFactor * (scenarioAdjustedEfficiency / 100);
+    
+    const year1Benefits = annualBenefits * year1RampFactor;
+    const year1NetBenefit = year1Benefits - annualCosts;
+    const year1ActualROI = annualCosts > 0 ? (year1NetBenefit / annualCosts) * 100 : 0;
+    
+    const paybackMonths = annualCosts > 0 && annualBenefits > 0 ? (annualCosts / (annualBenefits / 12)) : 0;
+    const ftesSaved = peopleAndCost.annualWorkingHours > 0 ? (hoursSavedWeekly * 52) / peopleAndCost.annualWorkingHours : 0;
+    
+    // Calculate error reduction percentage (already accounts for scenario multiplier)
+    const errorReductionPercent = qualityImpact.enabled && qualityImpact.currentErrorRate > 0
+      ? (errorRateReduction / qualityImpact.currentErrorRate) * 100
+      : 0;
+    
+    // Single-year results (base for multi-year projections)
+    const singleYearResults = {
+      roiPercentage: safeNumber(runRateROI), // Keep for backward compatibility
+      runRateROI: safeNumber(runRateROI), // Annual run-rate ROI (steady-state)
+      year1ActualROI: safeNumber(year1ActualROI), // Year 1 ROI with ramp-up
+      year1RampFactor: safeNumber(year1RampFactor),
+      year1Benefits: safeNumber(year1Benefits), // Year 1 ramped benefits
+      year1NetBenefit: safeNumber(year1NetBenefit), // Year 1 ramped net benefit
+      paybackMonths: safeNumber(paybackMonths),
+      annualBenefits: safeNumber(annualBenefits),
+      annualCosts: safeNumber(annualCosts),
+      netBenefit: safeNumber(netBenefit),
+      hoursSavedWeekly: safeNumber(hoursSavedWeekly),
+      hoursSavedAnnually: safeNumber(hoursSavedWeekly * 52),
+      ftesSaved: safeNumber(ftesSaved),
+      timeSavings: safeNumber(timeSavingsAnnual),
+      qualitySavings: safeNumber(qualitySavingsAnnual),
+      revenueSavings: safeNumber(revenueSavingsAnnual),
+      
+      // Granular Quality Impact Metrics (scenario-adjusted)
+      errorReductionPercent: safeNumber(errorReductionPercent),
+      errorsAvoidedAnnually: safeNumber(errorsAvoidedAnnually),
+      qualityImprovementPercent: safeNumber(adjustedQualityImprovement || qualityImpact.percentQualityImprovement || 0),
+      currentErrorRate: safeNumber(qualityImpact.currentErrorRate || 0),
+      postAIErrorRate: safeNumber(calculatedPostAIErrorRate),
+      
+      // Granular Revenue Uplift Metrics (scenario-adjusted)
+      hoursReallocatedAnnually: safeNumber(hoursReallocatedAnnually),
+      revenueReallocationPercent: safeNumber(adjustedReallocationPercent || revenueUplift.percentReallocated || 0),
+      
+      // Granular Time Savings Metrics (scenario-adjusted)
+      timeSavingsPercent: safeNumber(adjustedTimeSavingsPercent || timeSavings.percentTimeSaved || 0),
+    };
+    
+    // Multi-year projections with ramp-up modeling
+    const costBreakdown = {
+      implementationCost: (costsAndRampup.implementationCost || 0) * scenario.costOverrunMultiplier,
+      annualSoftwareCost: (costsAndRampup.annualSoftwareCost || 0) * scenario.costOverrunMultiplier,
+      trainingCosts: trainingCosts * scenario.costOverrunMultiplier,
+      changeMgmtCosts: (costsAndRampup.changeMgmtCosts || 0) * scenario.costOverrunMultiplier,
+    };
+    
+    const multiYearResults = calculateMultiYearROI(
+      singleYearResults,
+      costBreakdown,
+      costsAndRampup.rampUpMonths || 6,
+      5, // 5-year projection
+      year1RampFactor // Pass efficiency-adjusted ramp factor
+    );
+    
+    return {
+      ...singleYearResults,
+      multiYear: multiYearResults,
+    };
+  };
+
+  const results = calculateROI();
+
+  const handleCalculateClick = () => {
+    console.log('Calculate ROI triggered', { selectedScenario, results });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+        {/* Scenario Selector */}
+        <ScenarioSelector 
+          selectedScenario={selectedScenario}
+          onScenarioChange={setSelectedScenario}
+        />
+        
+        {/* Input Forms */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <ProcessInfoForm 
+              data={processInfo}
+              onChange={setProcessInfo}
+            />
+            
+            <PeopleAndCostForm 
+              data={peopleAndCost}
+              onChange={setPeopleAndCost}
+            />
+            
+            <CostsAndRampupForm 
+              data={costsAndRampup}
+              onChange={setCostsAndRampup}
+            />
+          </div>
+          
+          <div className="space-y-6">
+            <OptionalModulesForm 
+              timeSavings={timeSavings}
+              qualityImpact={qualityImpact}
+              revenueUplift={revenueUplift}
+              onTimeSavingsChange={setTimeSavings}
+              onQualityImpactChange={setQualityImpact}
+              onRevenueUpliftChange={setRevenueUplift}
+              averageAnnualSalary={peopleAndCost.averageAnnualSalary}
+              annualWorkingHours={peopleAndCost.annualWorkingHours}
+              overheadMultiplier={peopleAndCost.overheadMultiplier}
+              employees={peopleAndCost.employees}
+              processesPerPeriod={peopleAndCost.processesPerPeriod}
+              processFrequency={peopleAndCost.processFrequency}
+            />
+          </div>
+        </div>
+        
+        {/* Calculate Button */}
+        <div className="flex justify-center">
+          <Button 
+            size="lg" 
+            className="px-8 py-3 hover-elevate"
+            onClick={handleCalculateClick}
+            data-testid="button-calculate-roi"
+          >
+            <Calculator className="mr-2 h-5 w-5" />
+            Calculate ROI
+          </Button>
+        </div>
+        
+        {/* Results Dashboard */}
+        <ResultsDashboard 
+          results={results}
+          selectedScenario={selectedScenario}
+          onViewFormula={() => setShowFormulaDialog(true)}
+          onScenarioChange={setSelectedScenario}
+          calculateROI={calculateROI}
+          allData={{
+            processInfo,
+            peopleAndCost,
+            timeSavings,
+            qualityImpact,
+            revenueUplift,
+            costsAndRampup
+          }}
+        />
+      </main>
+      
+      {/* Formula Dialog */}
+      <Dialog open={showFormulaDialog} onOpenChange={setShowFormulaDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>ROI Calculation Formulas</DialogTitle>
+            <DialogDescription>
+              Transparent methodology and calculations used for {scenarioMultipliers[selectedScenario].name} scenario
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="space-y-6 text-sm">
+              <div>
+                <h4 className="font-semibold mb-2">Core Calculations</h4>
+                <div className="space-y-2 font-mono text-xs bg-muted p-3 rounded-md">
+                  <p>Effective Hourly Rate = Annual Salary ÷ Annual Working Hours × Overhead Multiplier</p>
+                  <p>Total Hours/Week = Hours per Employee × Number of Employees</p>
+                  <p>Hours Saved/Week = Total Hours × % Time Saved × Scenario Multiplier</p>
+                  <p>Annual Hours Saved = Weekly Hours Saved × 52</p>
+                  <p>FTEs Saved = Annual Hours Saved ÷ Annual Working Hours</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-2">Scenario Multipliers ({scenarioMultipliers[selectedScenario].name})</h4>
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div>Time Savings: {(scenarioMultipliers[selectedScenario].timeSavingsMultiplier * 100).toFixed(0)}%</div>
+                  <div>Error Reduction: {(scenarioMultipliers[selectedScenario].errorReductionMultiplier * 100).toFixed(0)}%</div>
+                  <div>Reallocation: {(scenarioMultipliers[selectedScenario].reallocationMultiplier * 100).toFixed(0)}%</div>
+                  <div>Cost Overrun: {(scenarioMultipliers[selectedScenario].costOverrunMultiplier * 100).toFixed(0)}%</div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-2">Benefits Calculation</h4>
+                <div className="space-y-2 font-mono text-xs bg-muted p-3 rounded-md">
+                  <p>Time Savings = Hours Saved × Effective Hourly Rate</p>
+                  <p>Quality Impact = Errors Avoided × (Rework Hours × Hourly Rate + Financial Cost)</p>
+                  <p>Revenue Uplift = Saved Hours × % Reallocated × Revenue/Hour</p>
+                  <p>Total Benefits = Time + Quality + Revenue Savings</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-2">Final ROI</h4>
+                <div className="space-y-2 font-mono text-xs bg-muted p-3 rounded-md">
+                  <p>Total Costs = (Implementation + Software + Training + Change Mgmt) × Cost Multiplier</p>
+                  <p>Net Benefit = Total Benefits - Total Costs</p>
+                  <p>ROI % = (Net Benefit ÷ Total Costs) × 100</p>
+                  <p>Payback Period = Total Costs ÷ (Net Benefit ÷ 12) months</p>
+                </div>
+              </div>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
