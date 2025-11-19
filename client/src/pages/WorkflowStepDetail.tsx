@@ -25,13 +25,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Plus, FileText, BarChart3, Target, Info, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, Plus, FileText, BarChart3, Target, Info, Pencil, Trash2, Calculator } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
 import ReadinessRubric from "@/components/ReadinessRubric";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import PIFExecutiveSummary from "@/components/PIFExecutiveSummary";
+import ROICalculatorDialog from "@/components/calculator/ROICalculatorDialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity, ImplementationOpportunity } from "@shared/schema";
@@ -45,6 +46,7 @@ export default function WorkflowStepDetail() {
   const stepId = params?.stepId || '';
   const { toast } = useToast();
   const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
+  const [isROICalculatorOpen, setIsROICalculatorOpen] = useState(false);
   const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
 
@@ -83,7 +85,7 @@ export default function WorkflowStepDetail() {
   });
 
   const createOpportunityMutation = useMutation({
-    mutationFn: async (data: InsertImplementationOpportunity) => {
+    mutationFn: async (data: InsertImplementationOpportunity & { roiCalculationData?: any }) => {
       const res = await apiRequest('POST', `/api/workflows/${workflowId}/opportunities`, data);
       return await res.json();
     },
@@ -450,11 +452,23 @@ export default function WorkflowStepDetail() {
             {hasStepPIF && stepReadinessRubric && (
               <div className="flex justify-end">
                 <Button
-                  onClick={() => setIsOpportunityDialogOpen(true)}
+                  onClick={() => {
+                    // If PIF response exists and complete, open ROI Calculator
+                    const stepPif = stepPIFs[0];
+                    if (stepPif?.completedAt) {
+                      setIsROICalculatorOpen(true);
+                    } else {
+                      // Fallback to manual form
+                      setIsOpportunityDialogOpen(true);
+                    }
+                  }}
                   data-testid="button-create-opportunity"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Opportunity
+                  {stepPIFs[0]?.completedAt ? (
+                    <><Calculator className="h-4 w-4 mr-2" />Create Opportunity (ROI Calculator)</>
+                  ) : (
+                    <><Plus className="h-4 w-4 mr-2" />Create Opportunity (Manual)</>
+                  )}
                 </Button>
               </div>
             )}
@@ -615,6 +629,23 @@ export default function WorkflowStepDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* ROI Calculator Dialog */}
+      {step && workflow && company && stepPIFs[0] && (
+        <ROICalculatorDialog
+          stepId={stepId}
+          stepName={step.stepName}
+          workflowId={workflowId}
+          workflowName={workflow.name}
+          companyId={companyId}
+          isOpen={isROICalculatorOpen}
+          onClose={() => setIsROICalculatorOpen(false)}
+          onSave={async (data) => {
+            await createOpportunityMutation.mutateAsync(data);
+            setIsROICalculatorOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }

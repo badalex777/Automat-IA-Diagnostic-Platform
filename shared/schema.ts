@@ -269,7 +269,8 @@ export const insertImplementationOpportunitySchema = createInsertSchema(implemen
   rampupPeriodMonths: z.coerce.number().optional(),
   paybackPeriodMonths: z.coerce.number().optional(),
   trainingHoursPerEmployee: z.coerce.number().optional(),
-});
+  roiCalculationData: z.any().optional(), // JSONB field storing complete ROI Calculator state
+}).passthrough(); // Allow roiCalculationData nested fields to pass through validation
 
 export const updateImplementationOpportunitySchema = insertImplementationOpportunitySchema.omit({ workflowId: true }).partial();
 
