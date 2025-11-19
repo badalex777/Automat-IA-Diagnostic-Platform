@@ -4,6 +4,18 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
+**November 19, 2025 - Markdown Cleanup and List Formatting Fixes**
+- **Numbered List Corrections**: Fixed Section 7.4 and Phase 10 numbered lists by removing blank lines between items to restore proper 1→2 sequencing (prevented numbering resets)
+- **Quadrant Bolding Refinement**: Established clear bolding strategy across both languages
+  - Bold quadrant names ONLY in section titles (4.5, 4.6, 4.7) and definition lists (Section 8.7 Quadrants)
+  - Plain text for all narrative mentions of quadrant names (Executive Summary, Roadmap, Appendix A.8)
+  - Prevents visible ** markdown artifacts in rendered DOCX
+- **Section Heading Cleanup**: Removed markdown from all headings to prevent ** rendering in document
+  - Section 6.1: "Phase 1 – **Quick Wins**" → "Phase 1 – Quick Wins"
+  - All phase descriptions and roadmap summaries updated
+- **Impact**: Eliminates all visible markdown in narrative text while maintaining proper bold emphasis in definitions and titles
+- **Files Modified**: `server/reportPrompts.ts`, `server/reportPrompts_es.ts`
+
 **November 19, 2025 - EDR Formatting Refinements & Strategic Goals → Strategic Bets Terminology Update**
 - **Terminology Standardization**: Replaced all instances of "Strategic Goals" with "Strategic Bets" across codebase
   - Updated MatrixDistribution interface: `strategicGoals` → `strategicBets` property
@@ -11,7 +23,6 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
   - Fixed quadrant filter in report generation logic (`reportGenerator.ts`)
   - Updated roadmap aggregation and matrix distribution code (`reportDataAggregator.ts`)
 - **Section 4.2 Enhancement**: Bolded "Workflow consolidations identified" bullet in both English and Spanish
-- **Quadrant Name Bolding**: Added bold formatting to all 100+ instances of quadrant names (Quick Wins, Strategic Bets, Nice-to-Have, Deprioritize) throughout both English and Spanish prompt files
 - **Appendix A Formatting**: Changed all definition-style headings from period to colon with bold markup
   - "Gap capture in TFAs." → "**Gap capture in TFAs:**"
   - "Midpoint response rule." → "**Midpoint response rule:**"
