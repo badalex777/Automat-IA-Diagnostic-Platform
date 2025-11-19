@@ -399,7 +399,7 @@ en las operaciones y cualquier interdependencia.]
 `;
 
 export const DIAGNOSTIC_OVERVIEW_PART3 = `
-4.5 Potencial de Implementación Inmediata (**Logros Rápidos**)
+4.5 Potencial de Implementación Inmediata (Logros Rápidos)
 
 {{quickwin_count}} oportunidades demostraron alta preparación y bajo esfuerzo de implementación, 
 clasificándolas como Logros Rápidos. Estas oportunidades abarcan los siguientes flujos de trabajo y pasos:
@@ -413,7 +413,7 @@ con partes interesadas comprometidas.
 
 [Comentario del Analista: Describa cada oportunidad de Logro Rápido, qué automatiza y el impacto esperado]
 
-4.6 **Apuestas Estratégicas** para Valor a Largo Plazo
+4.6 Apuestas Estratégicas para Valor a Largo Plazo
 
 Un subconjunto de oportunidades de alto impacto ofrece potencial significativo pero requiere mayor esfuerzo 
 de implementación debido a deuda técnica, dependencias de sistemas legados o requisitos de coordinación 
@@ -428,7 +428,7 @@ técnica y los Logros Rápidos tempranos hayan construido capacidad y momentum o
 [Comentario del Analista: Describa cada oportunidad de Apuesta Estratégica, qué automatiza y la propuesta 
 de valor a largo plazo]
 
-4.7 Oportunidades **Deseables**
+4.7 Oportunidades Deseables
 
 Un conjunto de oportunidades de impacto moderado o bajo ofrece potencial de optimización con esfuerzo de 
 implementación relativamente bajo. Estas oportunidades Deseables pueden servir como iniciativas de prueba 
@@ -863,11 +863,9 @@ A.7 Metodología de Matriz de Oportunidades
 La Matriz de Oportunidades convierte preparación e impacto empresarial en un modelo de priorización 
 transparente.
 
-Marco de dos matrices.
-
+**Marco de dos matrices:**
 1. **Matriz de Oportunidades Base 0 a 100:** Comparación de eficiencia pura en base consistente relativa a 
 la empresa usando Impacto Base.
-
 2. **Matriz de Oportunidades Mejorada 0 a 150:** Agrega valor más allá de la eficiencia:
 
 ○ Bonificación de Reducción de Errores hasta 25 puntos basada en tasas de error medidas y reelaboración 

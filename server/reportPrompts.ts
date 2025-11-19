@@ -388,7 +388,7 @@ operations, and any interdependencies.]
 `;
 
 export const DIAGNOSTIC_OVERVIEW_PART3 = `
-4.5 Immediate Implementation Potential (**Quick Wins**)
+4.5 Immediate Implementation Potential (Quick Wins)
 
 {{quickwin_count}} opportunities demonstrated high readiness and low implementation effort,
 classifying them as Quick Wins. These opportunities span the following workflows and steps:
@@ -402,7 +402,7 @@ processes with engaged stakeholders.
 
 [Analyst Commentary: Describe each Quick Win opportunity, what it automates, and expected impact]
 
-4.6 **Strategic Bets** for Long-Term Value
+4.6 Strategic Bets for Long-Term Value
 
 A subset of high-impact opportunities offers significant potential but requires higher
 implementation effort due to technical debt, legacy system dependencies, or cross-departmental
@@ -416,7 +416,7 @@ and early Quick Wins have built organizational capability and momentum.
 
 [Analyst Commentary: Describe each Strategic Bet opportunity, what it automates, and long-term value proposition]
 
-4.7 **Nice-to-Have** Opportunities
+4.7 Nice-to-Have Opportunities
 
 A set of moderate or low-impact opportunities offers optimization potential with relatively low
 implementation effort. These Nice-to-Have opportunities can serve as proof-of-concept initiatives,
@@ -837,11 +837,9 @@ A.7 Opportunity Matrix Methodology
 The Opportunity Matrix converts readiness and business impact into a transparent prioritization
 model.
 
-Two-matrix framework.
-
+**Two-matrix framework:**
 1. **Base Opportunity Matrix 0 to 100:** Pure efficiency comparison on a consistent
 company-relative basis using Base Impact.
-
 2. **Enhanced Opportunity Matrix 0 to 150:** Adds value beyond efficiency:
 
 ○ Error Reduction Bonus up to 25 points based on measured error rates and
