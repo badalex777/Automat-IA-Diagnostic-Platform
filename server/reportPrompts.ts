@@ -264,10 +264,10 @@ data-driven prioritization rather than subjective ranking.
 
 The matrix plots two core dimensions:
 
-Vertical Axis: Business Impact combines ROI percentage, annual benefit, and
+**Vertical Axis:** Business Impact combines ROI percentage, annual benefit, and
 strategic contribution to organizational goals.
 
-Horizontal Axis: Implementation Effort reflects the technical difficulty, integration
+**Horizontal Axis:** Implementation Effort reflects the technical difficulty, integration
 complexity, and step-level readiness scores derived from the combination of
 workflow-level TFA and step-specific PIF assessments.
 
@@ -278,15 +278,15 @@ relative effort.
 
 The matrix is divided into four quadrants that guide prioritization:
 
-Quick Wins: High impact and low effort; immediate candidates for early implementation.
+**Quick Wins:** High impact and low effort; immediate candidates for early implementation.
 
-Strategic bets: High impact and high effort; long-term projects with significant value
+**Strategic Bets:** High impact and high effort; long-term projects with significant value
 potential.
 
-Nice-to-have: Moderate or low impact and low effort; useful for optimization or
+**Nice-to-Have:** Moderate or low impact and low effort; useful for optimization or
 proof-of-concept.
 
-Deprioritize: Low impact and high effort; low priority until foundational changes improve
+**Deprioritize:** Low impact and high effort; low priority until foundational changes improve
 feasibility.
 
 This quadrant model ensures that automation decisions balance short-term value with long-term

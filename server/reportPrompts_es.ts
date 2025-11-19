@@ -267,10 +267,10 @@ implementación, permitiendo priorización basada en datos en lugar de clasifica
 
 La matriz traza dos dimensiones principales:
 
-Eje Vertical: Impacto Empresarial combina porcentaje de ROI, beneficio anual y contribución estratégica 
+**Eje Vertical:** Impacto Empresarial combina porcentaje de ROI, beneficio anual y contribución estratégica 
 a los objetivos organizacionales.
 
-Eje Horizontal: Esfuerzo de Implementación refleja la dificultad técnica, complejidad de integración y 
+**Eje Horizontal:** Esfuerzo de Implementación refleja la dificultad técnica, complejidad de integración y 
 puntuaciones de preparación a nivel de paso derivadas de la combinación de evaluaciones TFA a nivel de 
 flujo de trabajo y PIF específicas de paso.
 
@@ -280,14 +280,14 @@ Este enfoque de dos ejes destaca qué oportunidades entregan el mayor retorno po
 
 La matriz se divide en cuatro cuadrantes que guían la priorización:
 
-Logros Rápidos: Alto impacto y bajo esfuerzo; candidatos inmediatos para implementación temprana.
+**Logros Rápidos:** Alto impacto y bajo esfuerzo; candidatos inmediatos para implementación temprana.
 
-Apuestas Estratégicas: Alto impacto y alto esfuerzo; proyectos a largo plazo con potencial de valor 
+**Apuestas Estratégicas:** Alto impacto y alto esfuerzo; proyectos a largo plazo con potencial de valor 
 significativo.
 
-Deseables: Impacto moderado o bajo y bajo esfuerzo; útiles para optimización o prueba de concepto.
+**Deseables:** Impacto moderado o bajo y bajo esfuerzo; útiles para optimización o prueba de concepto.
 
-Despriorizar: Bajo impacto y alto esfuerzo; baja prioridad hasta que los cambios fundacionales mejoren 
+**Despriorizar:** Bajo impacto y alto esfuerzo; baja prioridad hasta que los cambios fundacionales mejoren 
 la factibilidad.
 
 Este modelo de cuadrantes asegura que las decisiones de automatización equilibren el valor a corto plazo 
