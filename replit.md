@@ -4,6 +4,24 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
+**November 19, 2025 - EDR Formatting Refinements & Strategic Goals → Strategic Bets Terminology Update**
+- **Terminology Standardization**: Replaced all instances of "Strategic Goals" with "Strategic Bets" across codebase
+  - Updated MatrixDistribution interface: `strategicGoals` → `strategicBets` property
+  - Updated translation keys and values in both English and Spanish (`reportTranslations.ts`)
+  - Fixed quadrant filter in report generation logic (`reportGenerator.ts`)
+  - Updated roadmap aggregation and matrix distribution code (`reportDataAggregator.ts`)
+- **Section 4.2 Enhancement**: Bolded "Workflow consolidations identified" bullet in both English and Spanish
+- **Quadrant Name Bolding**: Added bold formatting to all 100+ instances of quadrant names (Quick Wins, Strategic Bets, Nice-to-Have, Deprioritize) throughout both English and Spanish prompt files
+- **Appendix A Formatting**: Changed all definition-style headings from period to colon with bold markup
+  - "Gap capture in TFAs." → "**Gap capture in TFAs:**"
+  - "Midpoint response rule." → "**Midpoint response rule:**"
+  - "Rationale for 50% readiness weighting." → "**Rationale for 50% readiness weighting:**"
+- **Section 8.7 Improvements**: Fixed matrix subsection formatting with bold colons for "Axes:", "Quadrants:", and matrix names
+- **Section 8.1 Refinements**: Bolded limitation headings with colons in both languages
+- **Appendix D Consistency**: Applied bold + colon pattern to all Performance Summary titles
+- **Impact**: Professional DOCX formatting with consistent bold emphasis throughout all narrative, tables, and appendices in both languages
+- **Files Modified**: `server/reportGenerator.ts`, `server/reportDataAggregator.ts`, `server/reportTranslations.ts`, `server/reportPrompts.ts`, `server/reportPrompts_es.ts`
+
 **November 18, 2025 - Comprehensive EDR Line Break and Formatting Fix**
 - **Framework Name Detector**: Tightened `isFrameworkName()` to only trigger on standalone headings (colon + ≤20 chars), preventing false matches on mid-sentence framework mentions like "TFA: Completed by IT and system owners..."
 - **List Processing**: Implemented multi-line accumulation for numbered lists and bullet points. List items now properly accumulate continuation lines until a blank line, new list marker, or special heading is encountered
