@@ -54,6 +54,7 @@ export function OpportunityForm({
       cumulativeNetBenefit5Year: initialData?.cumulativeNetBenefit5Year,
       hoursSavedPerWeek: initialData?.hoursSavedPerWeek,
       annualHoursSaved: initialData?.annualHoursSaved,
+      fteSavings: initialData?.fteSavings,
       errorReductionPct: initialData?.errorReductionPct,
       errorsAvoidedAnnually: initialData?.errorsAvoidedAnnually,
       hoursReallocatedToRevenue: initialData?.hoursReallocatedToRevenue,
@@ -85,12 +86,11 @@ export function OpportunityForm({
     }
   }, [revenueMetricsEnabled, form]);
 
-  // Convert string values to numbers, auto-calculate annual hours and FTE on submit
+  // Convert string values to numbers - FTE saved is now direct input from ROI calculator
   const handleSubmit = (data: any) => {
     const hoursSavedPerWeek = data.hoursSavedPerWeek ? parseFloat(data.hoursSavedPerWeek) : undefined;
-    const annualHoursSaved = hoursSavedPerWeek ? hoursSavedPerWeek * 50 : undefined;
-    // Auto-calculate FTE from hours: FTE = hours/week ÷ 40
-    const fteSavings = hoursSavedPerWeek ? hoursSavedPerWeek / 40 : undefined;
+    const fteSavings = data.fteSavings ? parseFloat(data.fteSavings) : undefined;
+    const annualHoursSaved = data.annualHoursSaved ? parseFloat(data.annualHoursSaved) : undefined;
     
     const converted = {
       ...data,
@@ -102,7 +102,7 @@ export function OpportunityForm({
       cumulativeNetBenefit5Year: data.cumulativeNetBenefit5Year ? parseFloat(data.cumulativeNetBenefit5Year) : undefined,
       hoursSavedPerWeek,
       annualHoursSaved,
-      fteSavings, // Auto-calculated from hours
+      fteSavings, // Direct input from ROI calculator
       errorReductionPct: data.errorReductionPct ? parseFloat(data.errorReductionPct) : undefined,
       errorsAvoidedAnnually: data.errorsAvoidedAnnually ? parseInt(data.errorsAvoidedAnnually) : undefined,
       hoursReallocatedToRevenue: data.hoursReallocatedToRevenue ? parseFloat(data.hoursReallocatedToRevenue) : undefined,
@@ -268,30 +268,58 @@ export function OpportunityForm({
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="hoursSavedPerWeek"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Hours Saved Per Week</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number"
-                    step="any"
-                    placeholder="e.g., 40"
-                    data-testid="input-hours-saved-per-week"
-                    {...field}
-                    value={field.value || ""}
-                    onChange={e => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Full-time employee equivalent
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="fteSavings"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>FTE Saved</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="e.g., 1.5"
+                      data-testid="input-fte-savings"
+                      {...field}
+                      value={field.value || ""}
+                      onChange={e => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Full-time equivalent saved (from ROI calculator)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="hoursSavedPerWeek"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hours Saved Per Week</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      step="any"
+                      placeholder="e.g., 40"
+                      data-testid="input-hours-saved-per-week"
+                      {...field}
+                      value={field.value || ""}
+                      onChange={e => field.onChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    For display purposes (optional)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Implementation Effort Metrics */}
