@@ -581,7 +581,7 @@ la preparación organizacional.
 export const AUTOMATION_ROADMAP_PHASE1 = `
 6.1 Fase 1 – Logros Rápidos (Corto Plazo, 0 a 6 meses)
 
-Objetivo: Lograr mejoras operacionales inmediatas con complejidad y riesgo mínimos.
+**Objetivo:** Lograr mejoras operacionales inmediatas con complejidad y riesgo mínimos.
 
 Los Logros Rápidos típicamente involucran flujos de trabajo repetitivos basados en reglas con datos limpios 
 y conectividad de sistemas existente. Su implementación demuestra el valor de la automatización mientras 
@@ -589,7 +589,7 @@ establece confianza interna y bases de gobernanza.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE1_OUTCOMES = `
-Resultados Esperados:
+**Resultados Esperados:**
 
 ● Realización rápida de ROI y ganancias de eficiencia visibles.
 
@@ -603,7 +603,7 @@ Resultados Esperados:
 export const AUTOMATION_ROADMAP_PHASE2 = `
 6.2 Fase 2 – Mejoras Fundacionales (Mediano Plazo, 6 a 12 meses)
 
-Objetivo: Fortalecer las bases tecnológicas y procedimentales requeridas para automatización escalable.
+**Objetivo:** Fortalecer las bases tecnológicas y procedimentales requeridas para automatización escalable.
 
 Esta fase se enfoca en flujos de trabajo que tienen potencial de ROI fuerte pero requieren mejora en 
 calidad de datos, integración de sistemas o claridad de proceso antes del despliegue. Construye la columna 
@@ -611,7 +611,7 @@ vertebral operacional que permite la expansión sostenible de la capacidad de au
 `;
 
 export const AUTOMATION_ROADMAP_PHASE2_OUTCOMES = `
-Áreas de Enfoque:
+**Áreas de Enfoque:**
 
 ● Remediación de limitaciones técnicas y de datos identificadas durante el TFA.
 
@@ -623,7 +623,7 @@ export const AUTOMATION_ROADMAP_PHASE2_OUTCOMES = `
 
 ● Fortalecimiento de procesos de gobernanza de automatización y compartición de conocimiento interno.
 
-Resultados Esperados:
+**Resultados Esperados:**
 
 ● Mejora de la confiabilidad de datos, interoperabilidad de sistemas y transparencia de procesos.
 
@@ -637,7 +637,7 @@ Resultados Esperados:
 export const AUTOMATION_ROADMAP_PHASE3 = `
 6.3 Fase 3 – Implementaciones Estratégicas (Largo Plazo, 12 a 18+ meses)
 
-Objetivo: Desplegar automatizaciones de alto impacto y complejas que impulsen eficiencia transformadora 
+**Objetivo:** Desplegar automatizaciones de alto impacto y complejas que impulsen eficiencia transformadora 
 y valor empresarial a largo plazo.
 
 Estas iniciativas, extraídas del cuadrante de Alto Impacto / Alto Esfuerzo de la Matriz de Oportunidades, 
@@ -647,7 +647,7 @@ a gran escala.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE3_OUTCOMES = `
-Áreas de Enfoque:
+**Áreas de Enfoque:**
 
 ● Despliegue de automatizaciones impulsadas por IA o de múltiples sistemas en todos los departamentos.
 
@@ -658,7 +658,7 @@ orquestación inteligente de flujos de trabajo.
 
 ● Escalamiento de cobertura de automatización para asegurar continuidad de proceso de extremo a extremo.
 
-Resultados Esperados:
+**Resultados Esperados:**
 
 ● Mejoras medibles en velocidad, precisión y rendimiento de procesos.
 
@@ -695,26 +695,26 @@ El diagnóstico integra entradas cuantitativas y cualitativas de múltiples capa
 asegurar profundidad analítica, integridad de datos y trazabilidad. Cada flujo captura una dimensión 
 distinta de los flujos de trabajo analizados.
 
-Evaluaciones de Factibilidad Técnica (TFA): Completadas por propietarios de TI y sistemas para documentar 
+**Evaluaciones de Factibilidad Técnica (TFA):** Completadas por propietarios de TI y sistemas para documentar 
 el entorno del sistema, calidad de datos, factibilidad de integración y postura de seguridad. Los TFA 
 establecen las condiciones técnicas que determinan si la automatización es factible dentro de cada flujo 
 de trabajo.
 
-Formularios de Perspectivas de Proceso (PIF): Completados por propietarios de procesos y usuarios finales 
+**Formularios de Perspectivas de Proceso (PIF):** Completados por propietarios de procesos y usuarios finales 
 para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad 
 de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas 
 de error observadas. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
 
-Entrevistas con Partes Interesadas: Sesiones con líderes departamentales y expertos en la materia validan 
+**Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales y expertos en la materia validan 
 candidatos de automatización, contextualizan respuestas TFA y PIF y proporcionan datos no encontrados en 
 la documentación del sistema, incluyendo rangos salariales, conteos de roles por flujo de trabajo y mapas 
 de procesos de alto nivel.
 
-Entrevistas con Usuarios Finales: Discusiones con quienes realizan el trabajo verifican entradas PIF, 
+**Entrevistas con Usuarios Finales:** Discusiones con quienes realizan el trabajo verifican entradas PIF, 
 permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción 
 o propensas a errores.
 
-Revisión de Documentación: Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas 
+**Revisión de Documentación:** Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas 
 para verificar datos de formularios y confirmar condiciones de proceso. Cuando estén disponibles, se 
 incorporan documentos de política, capturas de pantalla o registros de tareas como evidencia de respaldo.
 
@@ -967,25 +967,25 @@ y auditable.
 
 E.1 Fórmulas Financieras Centrales
 
-Retorno de Inversión (ROI)
+**Retorno de Inversión (ROI)**
 
-ROI (%) = (Beneficio Neto / Costos Totales) × 100
+**ROI (%)** = (Beneficio Neto / Costos Totales) × 100
 
-Componentes:
-Beneficio Neto = Beneficios Anuales Totales − Costos Anuales Totales
-Costos Totales = Implementación + Software + Capacitación + Gestión del Cambio
+**Componentes:**
+**Beneficio Neto** = Beneficios Anuales Totales − Costos Anuales Totales
+**Costos Totales** = Implementación + Software + Capacitación + Gestión del Cambio
 
-Interpretación:
+**Interpretación:**
 El ROI expresa el retorno financiero anual de estado estable después de que la automatización está 
 completamente operacional. Un ROI positivo indica que los beneficios anualizados exceden los costos totales.
 
-Período de Retorno (Meses)
+**Período de Retorno (Meses)**
 
-Retorno = Inversión Total / Beneficio Neto Mensual
+**Retorno** = Inversión Total / Beneficio Neto Mensual
 
-Beneficio Neto Mensual = (Beneficios Anuales − Costos Recurrentes) / 12
+**Beneficio Neto Mensual** = (Beneficios Anuales − Costos Recurrentes) / 12
 
-Interpretación:
+**Interpretación:**
 Mide cuántos meses se requieren para que los beneficios netos acumulativos recuperen la inversión inicial, 
 incluyendo un factor de arranque de Año-1 para reflejar adopción progresiva en lugar de realización 
 instantánea.
@@ -996,18 +996,18 @@ E.2 Fórmulas de Beneficio Neto
 export const APPENDIX_E_PART2 = `
 E.3 Conversiones de FTE y Horas
 
-FTE Ahorrados = Horas Anuales Ahorradas / 2,080
+**FTE Ahorrados** = Horas Anuales Ahorradas / 2,080
 
-Horas Anuales Ahorradas = (Horas de Proceso Semanales × Empleados Involucrados × % de Ahorro de Tiempo) × 52
+**Horas Anuales Ahorradas** = (Horas de Proceso Semanales × Empleados Involucrados × % de Ahorro de Tiempo) × 52
 
-Año de Trabajo Estándar: 2,080 horas (52 semanas × 40 horas)
+**Año de Trabajo Estándar:** 2,080 horas (52 semanas × 40 horas)
 
-Interpretación: Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo. Los FTE 
+**Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo. Los FTE 
 fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
 
 E.4 Desglose de Beneficio Anual
 
-Beneficios Anuales Totales = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + 
+**Beneficios Anuales Totales** = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + 
 Beneficios de Incremento de Ingresos
 `;
 
@@ -1029,19 +1029,19 @@ Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propie
 motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología 
 prioriza la credibilidad sobre el optimismo a través de:
 
-● Sistema de rúbrica de múltiples capas: TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y 
+● **Sistema de rúbrica de múltiples capas:** TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y 
 PIF (40 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para 
 evaluación de preparación precisa.
 
-● Pista de auditoría transparente: Cada entrada está vinculada a su encuestado fuente, método de 
+● **Pista de auditoría transparente:** Cada entrada está vinculada a su encuestado fuente, método de 
 recopilación y fecha de validación, permitiendo trazabilidad completa desde datos brutos hasta 
 proyecciones finales.
 
-● Metodología respaldada por investigación: Los multiplicadores conservadores reflejan desafíos de 
+● **Metodología respaldada por investigación:** Los multiplicadores conservadores reflejan desafíos de 
 implementación del mundo real, asegurando estimaciones financieras defendibles que los clientes 
 pueden verificar internamente.
 
-● Arquitectura de análisis a nivel de paso: Cada paso de flujo de trabajo recibe evaluación independiente, 
+● **Arquitectura de análisis a nivel de paso:** Cada paso de flujo de trabajo recibe evaluación independiente, 
 con TFA compartido a nivel de flujo de trabajo (60% de peso) y PIF recopilado por paso (40% de peso) 
 para cálculo preciso de Esfuerzo de Implementación.
 
