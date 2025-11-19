@@ -628,7 +628,7 @@ transformations viable.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE3_OUTCOMES = `
-Focus Areas:
+**Focus Areas:**
 
 ● Deployment of multi-system or AI-driven automations across departments.
 
