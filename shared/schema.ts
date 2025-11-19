@@ -442,3 +442,14 @@ export type RevenueUplift = z.infer<typeof revenueUpliftSchema>;
 export type CostsAndRampup = z.infer<typeof costsAndRampupSchema>;
 export type ROICalculation = z.infer<typeof roiCalculationSchema>;
 export type ScenarioType = z.infer<typeof scenarioType>;
+
+export interface RoiInputs {
+  employeeCount?: number;
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  processesPerPeriod?: number;
+  minutesPerProcess?: number;
+  hasQualityImpact?: boolean;
+  errorRate?: number;
+  reworkMinutesPerError?: number;
+  costPerError?: number;
+}
