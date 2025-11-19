@@ -1201,11 +1201,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     const totalTopFTE = data.top3Opportunities.reduce((sum, opp) => sum + opp.fteSavings, 0);
 
     const financialSummaryRows = [
-      [`Total ${ctx.t.metricLabels.annualBenefit}`, ctx.fmt.currency(totalTopBenefit), ctx.t.metricLabels.combinedQuantifiableValue],
-      [`Total ${ctx.t.metricLabels.estimatedImplementationCost}`, ctx.fmt.currency(totalTopCost), ctx.t.metricLabels.includesImplementationTraining],
-      ["Average ROI", ctx.fmt.number(avgTopROI, 1) + "%", ctx.t.metricLabels.modeledConservativeFramework],
-      [`Average ${ctx.t.metricLabels.paybackPeriod}`, ctx.fmt.number(avgTopPayback, 1) + " " + ctx.t.formatStrings.monthsAbbrev, ctx.t.metricLabels.timeToRecoverCost],
-      [`Total ${ctx.t.metricLabels.fteSaved}`, ctx.fmt.number(totalTopFTE, 2), ctx.t.metricLabels.fteHoursFreed],
+      [`**Total ${ctx.t.metricLabels.annualBenefit}**`, ctx.fmt.currency(totalTopBenefit), ctx.t.metricLabels.combinedQuantifiableValue],
+      [`**Total ${ctx.t.metricLabels.estimatedImplementationCost}**`, ctx.fmt.currency(totalTopCost), ctx.t.metricLabels.includesImplementationTraining],
+      ["**Average ROI**", ctx.fmt.number(avgTopROI, 1) + "%", ctx.t.metricLabels.modeledConservativeFramework],
+      [`**Average ${ctx.t.metricLabels.paybackPeriod}**`, ctx.fmt.number(avgTopPayback, 1) + " " + ctx.t.formatStrings.monthsAbbrev, ctx.t.metricLabels.timeToRecoverCost],
+      [`**Total ${ctx.t.metricLabels.fteSaved}**`, ctx.fmt.number(totalTopFTE, 2), ctx.t.metricLabels.fteHoursFreed],
     ];
 
     sections.push(createTableCaption("4.4", ctx.t.tableCaptions["4.4"], ctx.t.labels.table));
