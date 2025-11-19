@@ -561,7 +561,7 @@ pacing with organizational readiness.
 export const AUTOMATION_ROADMAP_PHASE1 = `
 6.1 Phase 1 – Quick Wins (Short-Term, 0 to 6 months)
 
-Objective: Achieve immediate operational improvements with minimal complexity and risk.
+**Objective:** Achieve immediate operational improvements with minimal complexity and risk.
 
 Quick Wins typically involve repetitive, rules-based workflows with clean data and existing
 system connectivity. Their implementation demonstrates the value of automation while
@@ -569,7 +569,7 @@ establishing internal confidence and governance foundations.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE1_OUTCOMES = `
-Expected Outcomes:
+**Expected Outcomes:**
 
 ● Rapid ROI realization and visible efficiency gains.
 
@@ -583,7 +583,7 @@ Expected Outcomes:
 export const AUTOMATION_ROADMAP_PHASE2 = `
 6.2 Phase 2 – Foundational Enhancements (Mid-Term, 6 to 12 months)
 
-Objective: Strengthen the technological and procedural foundations required for scalable
+**Objective:** Strengthen the technological and procedural foundations required for scalable
 automation.
 
 This phase focuses on workflows that have strong ROI potential but require improvement in
@@ -592,7 +592,7 @@ backbone that enables sustainable expansion of automation capability.
 `;
 
 export const AUTOMATION_ROADMAP_PHASE2_OUTCOMES = `
-Focus Areas:
+**Focus Areas:**
 
 ● Remediation of technical and data limitations identified during the TFA.
 
@@ -604,7 +604,7 @@ Focus Areas:
 
 ● Strengthening of internal automation governance and knowledge-sharing processes.
 
-Expected Outcomes:
+**Expected Outcomes:**
 
 ● Improved data reliability, system interoperability, and process transparency.
 
@@ -618,7 +618,7 @@ Expected Outcomes:
 export const AUTOMATION_ROADMAP_PHASE3 = `
 6.3 Phase 3 – Strategic Implementations (Long-Term, 12 to 18+ months)
 
-Objective: Deploy high-impact, complex automations that drive transformative efficiency and
+**Objective:** Deploy high-impact, complex automations that drive transformative efficiency and
 long-term business value.
 
 These initiatives, drawn from the High Impact / High Effort quadrant of the Opportunity Matrix,
@@ -639,7 +639,7 @@ analytics, and intelligent workflow orchestration.
 
 ● Scaling of automation coverage to ensure end-to-end process continuity.
 
-Expected Outcomes:
+**Expected Outcomes:**
 
 ● Measurable improvements in process speed, accuracy, and throughput.
 
@@ -675,24 +675,24 @@ The diagnostic integrates quantitative and qualitative inputs from multiple orga
 to ensure analytical depth, data integrity, and traceability. Each stream captures a distinct
 dimension of the analyzed workflows.
 
-Technical Feasibility Assessments (TFA): Completed by IT and system owners to document
+**Technical Feasibility Assessments (TFA):** Completed by IT and system owners to document
 system environment, data quality, integration feasibility, and security posture. TFAs establish the
 technical conditions that determine whether automation is feasible within each workflow.
 
-Process Insights Forms (PIF): Completed by process owners and end users to capture
+**Process Insights Forms (PIF):** Completed by process owners and end users to capture
 operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness,
 and collect metrics such as process volume, frequency, average duration, and observed error
 rates. PIF inputs feed readiness scoring and ROI modeling.
 
-Stakeholder Interviews: Sessions with department leads and subject-matter experts validate
+**Stakeholder Interviews:** Sessions with department leads and subject-matter experts validate
 automation candidates, contextualize TFA and PIF responses, and provide data not found in
 system documentation, including salary ranges, role counts per workflow, and high-level
 process maps.
 
-End-User Interviews: Discussions with those performing the work verify PIF inputs, enable
+**End-User Interviews:** Discussions with those performing the work verify PIF inputs, enable
 detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
 
-Documentation Review: Review of workflow diagrams, SOPs, and system documentation to
+**Documentation Review:** Review of workflow diagrams, SOPs, and system documentation to
 cross-check form data and confirm process conditions. Where available, policy documents,
 screen captures, or task logs are incorporated as supporting evidence.
 
@@ -973,18 +973,18 @@ E.2 Net Benefit Formulas
 export const APPENDIX_E_PART2 = `
 E.3 FTE and Hours Conversions
 
-FTE Saved = Annual Hours Saved / 2,080
+**FTE Saved =** Annual Hours Saved / 2,080
 
-Annual Hours Saved = (Weekly Process Hours × Employees Involved × Time Savings %) × 52
+**Annual Hours Saved =** (Weekly Process Hours × Employees Involved × Time Savings %) × 52
 
-Standard Work Year: 2,080 hours (52 weeks × 40 hours)
+**Standard Work Year:** 2,080 hours (52 weeks × 40 hours)
 
-Interpretation: Converts time saved into full-time-equivalent capacity. Fractional FTEs indicate
+**Interpretation:** Converts time saved into full-time-equivalent capacity. Fractional FTEs indicate
 redeployable time rather than headcount reduction.
 
 E.4 Annual Benefit Breakdown
 
-Total Annual Benefits = Time Savings Benefits + Error Reduction Benefits + Revenue Uplift Benefits
+**Total Annual Benefits =** Time Savings Benefits + Error Reduction Benefits + Revenue Uplift Benefits
 `;
 
 export const APPENDIX_E_PART3 = `
@@ -1005,17 +1005,17 @@ All calculations are performed using Automat-IA's proprietary ROI Calculator Fra
 structured analytical engine built on the Conservative Scenario Framework. This methodology
 prioritizes credibility over optimism through:
 
-● Multi-layered rubric system: TFA (21 weighted questions across 4 technical dimensions)
+● **Multi-layered rubric system:** TFA (21 weighted questions across 4 technical dimensions)
 and PIF (40 questions across 8 operational dimensions) provide step-level granularity for
 precise readiness assessment.
 
-● Transparent audit trail: Every input is linked to its source respondent, collection method,
+● **Transparent audit trail:** Every input is linked to its source respondent, collection method,
 and validation date, enabling complete traceability from raw data to final projections.
 
-● Research-backed methodology: Conservative multipliers reflect real-world implementation
+● **Research-backed methodology:** Conservative multipliers reflect real-world implementation
 challenges, ensuring defensible financial estimates that clients can verify internally.
 
-● Step-level analysis architecture: Each workflow step receives independent assessment,
+● **Step-level analysis architecture:** Each workflow step receives independent assessment,
 with TFA shared at workflow level (60% weight) and PIF collected per step (40% weight)
 for accurate Implementation Effort calculation.
 

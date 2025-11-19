@@ -451,6 +451,49 @@ function createHeading(text: string, level: typeof HeadingLevel[keyof typeof Hea
 /**
  * Create a simple data table with borders
  */
+function createTableWithBoldFirstColumn(
+  headers: string[],
+  rows: string[][],
+  columnWidths?: number[]
+): Table {
+  const headerRow = new TableRow({
+    children: headers.map((h, i) => new TableCell({
+      children: [new Paragraph({
+        children: [new TextRun({ text: h, bold: true, color: COLORS.DARK_GRAY })],
+        alignment: AlignmentType.CENTER,
+      })],
+      shading: {
+        fill: COLORS.LIGHT_GREEN,
+        type: ShadingType.CLEAR,
+      },
+      width: columnWidths ? { size: columnWidths[i], type: WidthType.PERCENTAGE } : undefined,
+    })),
+    tableHeader: true,
+  });
+
+  const dataRows = rows.map(row => new TableRow({
+    children: row.map((cell, i) => new TableCell({
+      children: [new Paragraph({
+        children: [new TextRun({ text: cell, bold: i === 0 })], // Bold first column
+      })],
+      width: columnWidths ? { size: columnWidths[i], type: WidthType.PERCENTAGE } : undefined,
+    })),
+  }));
+
+  return new Table({
+    rows: [headerRow, ...dataRows],
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 3, color: COLORS.BORDER_COLOR },
+      bottom: { style: BorderStyle.SINGLE, size: 3, color: COLORS.BORDER_COLOR },
+      left: { style: BorderStyle.SINGLE, size: 3, color: COLORS.BORDER_COLOR },
+      right: { style: BorderStyle.SINGLE, size: 3, color: COLORS.BORDER_COLOR },
+      insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: COLORS.BORDER_COLOR },
+      insideVertical: { style: BorderStyle.SINGLE, size: 1, color: COLORS.BORDER_COLOR },
+    },
+  });
+}
+
 function createTable(
   headers: string[],
   rows: string[][],
@@ -1304,7 +1347,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.1", ctx.t.tableCaptions["6.1"], ctx.t.labels.table));
-    sections.push(createTable(phase1Headers, phase1Rows));
+    sections.push(createTableWithBoldFirstColumn(phase1Headers, phase1Rows));
   }
   
   // Add spacing between table and outcomes
@@ -1328,7 +1371,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.2", ctx.t.tableCaptions["6.2"], ctx.t.labels.table));
-    sections.push(createTable(phase2Headers, phase2Rows));
+    sections.push(createTableWithBoldFirstColumn(phase2Headers, phase2Rows));
   }
   
   // Add spacing between table and outcomes
@@ -1352,7 +1395,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       ctx.fmt.number(opp.roiMetrics.fteSavings, 2),
     ]);
     sections.push(createTableCaption("6.3", ctx.t.tableCaptions["6.3"], ctx.t.labels.table));
-    sections.push(createTable(phase3Headers, phase3Rows));
+    sections.push(createTableWithBoldFirstColumn(phase3Headers, phase3Rows));
   }
   
   // Add spacing between table and outcomes
@@ -1390,7 +1433,11 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // ===== CONCLUSIONS & NEXT STEPS =====
   sections.push(createHeading(ctx.t.conclusions.title, HeadingLevel.HEADING_1));
 
-  sections.push(createBodyParagraph(ctx.t.conclusions.keyConclusions));
+  sections.push(new Paragraph({
+    children: [new TextRun({ text: ctx.t.conclusions.keyConclusions, bold: true })],
+    alignment: AlignmentType.BOTH,
+    spacing: { after: 120 },
+  }));
   sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet1, data.roadmapPhases.phase1QuickWins.length, ctx.fmt.currency(data.portfolioMetrics.totalAnnualBenefit))));
   sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet2));
   sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet3));
@@ -1477,7 +1524,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     [ctx.t.tfaComponents.workflowBrittleness, "10%", ctx.t.tableDescriptions.workflowBrittlenessDesc],
   ];
   sections.push(createTableCaption("B.1", ctx.t.tableCaptions["B.1"], ctx.t.labels.table));
-  sections.push(createTable(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
+  sections.push(createTableWithBoldFirstColumn(metricWeightHeaders, metricWeightRows, [35, 15, 50]));
   
   sections.push(createBodyParagraph(ctx.t.tableDescriptions.whyTheseWeights));
   sections.push(createBulletParagraph(ctx.t.appendixNarratives.whyTheseWeightsBullet1));
@@ -1721,7 +1768,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     [ctx.t.appendixETables.revenueUpliftBenefits, ctx.t.appendixETables.revenueUpliftFormula, ctx.t.appendixETables.revenueUpliftPurpose],
   ];
   sections.push(createTableCaption("E.4", ctx.t.tableCaptions["E.4"], ctx.t.labels.table));
-  sections.push(createTable(benefitHeaders, benefitRows, [25, 40, 35]));
+  sections.push(createTableWithBoldFirstColumn(benefitHeaders, benefitRows, [25, 40, 35]));
   sections.push(createBodyParagraph(ctx.t.appendixETables.benefitCalculationsFooter));
 
   // E.5 Scenario Adjustment Framework Table
@@ -1735,7 +1782,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     [ctx.t.appendixETables.rampUpEfficiencyAdjustment, ctx.t.appendixETables.rampUpEfficiencyRationale],
   ];
   sections.push(createTableCaption("E.5", ctx.t.tableCaptions["E.5"], ctx.t.labels.table));
-  sections.push(createTable(scenarioHeaders, scenarioRows, [35, 65]));
+  sections.push(createTableWithBoldFirstColumn(scenarioHeaders, scenarioRows, [35, 65]));
   sections.push(createBodyParagraph(ctx.t.appendixETables.conservativeFrameworkFooter));
 
   // E.6 Key Modeling Assumptions Table
@@ -1750,7 +1797,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     [ctx.t.appendixETables.oneTimeCostsLabel, ctx.t.appendixETables.oneTimeCostsValue, ctx.t.appendixETables.oneTimeCostsRationale],
   ];
   sections.push(createTableCaption("E.6", ctx.t.tableCaptions["E.6"], ctx.t.labels.table));
-  sections.push(createTable(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
+  sections.push(createTableWithBoldFirstColumn(assumptionsHeaders, assumptionsRows, [25, 30, 45]));
 
   // E.7 Formula Integrity (text)
   sections.push(...createTextParagraphs(APPENDIX_E_PART5, numberingRegistry, 'appendix-e-5'));
