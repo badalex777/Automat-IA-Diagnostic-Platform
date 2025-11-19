@@ -729,9 +729,9 @@ auditable.
 Opportunity Matrix:
 Final analytical layer that unifies readiness and ROI into a single prioritization framework.
 
-● X axis: Business Impact, a normalized score derived from efficiency and value.
+● **X-axis:** Business Impact, a normalized score derived from efficiency and value.
 
-● Y axis: Implementation Effort, a weighted composite score combining readiness, ramp-up
+● **Y-axis:** Implementation Effort, a weighted composite score combining readiness, ramp-up
 period, payback period, and training hours. See Section A.5 for detailed methodology.
 
 A.3 Data Integrity and Knowledge Gap Handling
@@ -751,11 +751,11 @@ clients.
 
 Base Impact components and normalization.
 
-● ROI Score: (Annual run-rate ROI ÷ Company annual revenue) × 1000, capped at 100.
+● **ROI Score:** (Annual run-rate ROI ÷ Company annual revenue) × 1000, capped at 100.
 
-● Hours Score: (FTE savings ÷ Total employees) × 1000, capped at 100.
+● **Hours Score:** (FTE savings ÷ Total employees) × 1000, capped at 100.
 
-● Base Impact (0 to 100) equals ROI Score 60 percent plus Hours Score 40 percent.
+● **Base Impact (0 to 100)** equals ROI Score 60 percent plus Hours Score 40 percent.
 
 Normalization by revenue and FTEs prevents bias toward larger firms and captures the relative
 significance of benefits.
@@ -857,9 +857,9 @@ always greater than or equal to Base.
 
 Axes.
 
-● X axis: Business Impact (Base or Enhanced, depending on the view presented).
+● **X-axis:** Business Impact (Base or Enhanced, depending on the view presented).
 
-● Y axis: Implementation Effort (0 to 100), a weighted composite combining readiness score
+● **Y-axis:** Implementation Effort (0 to 100), a weighted composite combining readiness score
 (50 percent), ramp-up period (20 percent), payback period (20 percent), and training hours
 (10 percent). See Section A.5 for detailed methodology.
 

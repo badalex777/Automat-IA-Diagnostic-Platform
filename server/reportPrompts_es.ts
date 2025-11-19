@@ -752,9 +752,9 @@ retorno y métricas empresariales relacionadas. Todos los cálculos son versiona
 Matriz de Oportunidades:
 Capa analítica final que unifica preparación y ROI en un marco único de priorización.
 
-● Eje X: Impacto Empresarial, una puntuación normalizada derivada de eficiencia y valor.
+● **Eje X:** Impacto Empresarial, una puntuación normalizada derivada de eficiencia y valor.
 
-● Eje Y: Esfuerzo de Implementación, una puntuación compuesta ponderada que combina preparación, período 
+● **Eje Y:** Esfuerzo de Implementación, una puntuación compuesta ponderada que combina preparación, período 
 de arranque, período de retorno y horas de capacitación. Vea la Sección A.5 para metodología detallada.
 
 A.3 Integridad de Datos y Manejo de Brechas de Conocimiento
@@ -774,12 +774,12 @@ entre clientes.
 
 Componentes de Impacto Base y normalización.
 
-● Puntuación de ROI: (ROI de tasa de ejecución anual ÷ Ingresos anuales de la empresa) × 1000, con tope 
+● **Puntuación de ROI:** (ROI de tasa de ejecución anual ÷ Ingresos anuales de la empresa) × 1000, con tope 
 en 100.
 
-● Puntuación de Horas: (Ahorro de FTE ÷ Total de empleados) × 1000, con tope en 100.
+● **Puntuación de Horas:** (Ahorro de FTE ÷ Total de empleados) × 1000, con tope en 100.
 
-● Impacto Base (0 a 100) igual a Puntuación de ROI 60 por ciento más Puntuación de Horas 40 por ciento.
+● **Impacto Base (0 a 100)** igual a Puntuación de ROI 60 por ciento más Puntuación de Horas 40 por ciento.
 
 La normalización por ingresos y FTEs previene sesgo hacia empresas más grandes y captura la significancia 
 relativa de los beneficios.
@@ -883,9 +883,9 @@ siempre mayor o igual a Base.
 
 Ejes.
 
-● Eje X: Impacto Empresarial (Base o Mejorado, dependiendo de la vista presentada).
+● **Eje X:** Impacto Empresarial (Base o Mejorado, dependiendo de la vista presentada).
 
-● Eje Y: Esfuerzo de Implementación (0 a 100), un compuesto ponderado que combina puntuación de preparación 
+● **Eje Y:** Esfuerzo de Implementación (0 a 100), un compuesto ponderado que combina puntuación de preparación 
 (50 por ciento), período de arranque (20 por ciento), período de retorno (20 por ciento) y horas de 
 capacitación (10 por ciento). Vea la Sección A.5 para metodología detallada.
 
