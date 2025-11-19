@@ -69,6 +69,29 @@ class NumberingRegistry {
 }
 
 /**
+ * Build TextRun children from text with inline **bold** markdown syntax
+ * Parses text like "Normal **bold text** more normal" into alternating TextRun objects
+ * @param text - Text with **bold** markers
+ * @returns Array of TextRun objects with appropriate bold flags
+ */
+function buildTextRunsFromInlineMarkup(text: string): TextRun[] {
+  const segments = text.split('**');
+  const runs: TextRun[] = [];
+  
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    if (segment.length === 0) continue; // Skip empty segments
+    
+    // Odd indices (1, 3, 5...) are bold segments (between ** pairs)
+    // Even indices (0, 2, 4...) are normal text
+    const isBold = i % 2 === 1;
+    runs.push(new TextRun({ text: segment, bold: isBold }));
+  }
+  
+  return runs;
+}
+
+/**
  * Create a body paragraph with justified alignment (for content after cover page)
  */
 function createBodyParagraph(text: string, options: {spacing?: any} = {}): Paragraph {
@@ -283,7 +306,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       const text = currentParagraph.join(' ').trim();
       if (text) {
         paragraphs.push(new Paragraph({
-          text,
+          children: buildTextRunsFromInlineMarkup(text),
           alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
@@ -298,13 +321,23 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       if (text) {
         if (currentListType === 'bullet') {
           paragraphs.push(new Paragraph({
-            text,
+            children: buildTextRunsFromInlineMarkup(text),
             alignment: AlignmentType.BOTH,
             bullet: { level: 0 },
             spacing: { after: 60 },
           }));
         } else if (currentListType === 'numbered') {
-          paragraphs.push(createNumberedParagraph(text, registry, currentListKey!));
+          // For numbered paragraphs, we need to update createNumberedParagraph to accept children instead of text
+          paragraphs.push(new Paragraph({
+            children: buildTextRunsFromInlineMarkup(text),
+            alignment: AlignmentType.BOTH,
+            numbering: {
+              reference: "decimal-numbering",
+              level: 0,
+              instance: registry.getInstance(currentListKey!),
+            },
+            spacing: { after: 120 },
+          }));
         }
       }
       currentListItem = [];
@@ -374,18 +407,20 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       const match = trimmed.match(/^([^.]+(?:\([^)]+\))?[.:])(.*)$/);
       if (match) {
         const [, boldPart, rest] = match;
+        // Use buildTextRunsFromInlineMarkup for the rest part to support **bold** markdown
+        const restRuns = rest ? buildTextRunsFromInlineMarkup(rest) : [];
         paragraphs.push(new Paragraph({
           children: [
             new TextRun({ text: boldPart, bold: true }),
-            new TextRun({ text: rest }),
+            ...restRuns,
           ],
           alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
       } else {
-        // Fallback if pattern doesn't match
+        // Fallback if pattern doesn't match - use markdown parser
         paragraphs.push(new Paragraph({
-          children: [new TextRun({ text: trimmed, bold: true })],
+          children: buildTextRunsFromInlineMarkup(trimmed),
           alignment: AlignmentType.BOTH,
           spacing: { after: 120 },
         }));
