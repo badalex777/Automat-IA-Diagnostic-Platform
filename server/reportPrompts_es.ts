@@ -794,18 +794,18 @@ Fórmula y pesos.
 
 El Esfuerzo de Implementación se calcula como un compuesto ponderado de cuatro factores:
 
-● Puntuación de Preparación (invertida): 50 por ciento. Derivada de la evaluación combinada TFA (60 por 
+● **Puntuación de Preparación (invertida):** 50 por ciento. Derivada de la evaluación combinada TFA (60 por 
 ciento) y PIF (40 por ciento). Mayor preparación resulta en menor esfuerzo. Este es el impulsor principal 
 porque refleja datos completos de evaluación del cliente en 61 preguntas combinadas.
 
-● Período de Arranque: 20 por ciento. Meses estimados desde el inicio hasta la operación de estado estable. 
+● **Período de Arranque:** 20 por ciento. Meses estimados desde el inicio hasta la operación de estado estable. 
 Normalizado en una escala donde 2 meses o menos equivale a 0 (menor esfuerzo) y 12+ meses equivale a 100 
 (mayor esfuerzo).
 
-● Período de Retorno: 20 por ciento. Meses estimados para recuperar costos de implementación. Normalizado 
+● **Período de Retorno:** 20 por ciento. Meses estimados para recuperar costos de implementación. Normalizado 
 donde 3 meses o menos equivale a 0 (menor esfuerzo) y 18+ meses equivale a 100 (mayor esfuerzo).
 
-● Horas de Capacitación por Empleado: 10 por ciento. Capacitación de usuario final estimada requerida. 
+● **Horas de Capacitación por Empleado:** 10 por ciento. Capacitación de usuario final estimada requerida. 
 Normalizada donde 1 hora o menos equivale a 0 (menor esfuerzo) y 20+ horas equivale a 100 (mayor esfuerzo).
 
 Fundamento para ponderación de preparación del 50 por ciento. La Rúbrica de Preparación sintetiza datos 
@@ -837,24 +837,24 @@ A.6 Metodología de Modelado de ROI
 
 Conservadurismo de doble capa.
 
-Capa 1: Estimación base basada en rúbrica.
+**Capa 1: Estimación base basada en rúbrica.**
 Rúbricas estructuradas convierten entradas PIF en porcentajes base para ahorro de tiempo, mejora de 
 calidad y reasignación de ingresos, considerando tipo de proceso, complejidad, repetición y estructura 
 de datos.
 
-Capa 2: Multiplicadores de escenario.
+**Capa 2: Multiplicadores de escenario.**
 Multiplicadores ajustados por riesgo reflejan tasas de adopción, manejo de excepciones, cobertura y 
 madurez de integración. El escenario conservador aplica ajustes a la baja en todas las categorías de 
 beneficio.
 
-Fórmulas clave.
+**Fórmulas clave.**
 
-● Beneficio Anual = Valor de ahorro de tiempo + Valor de mejora de calidad + Valor de incremento de 
+● **Beneficio Anual =** Valor de ahorro de tiempo + Valor de mejora de calidad + Valor de incremento de 
 ingresos.
 
-● Retorno (meses) = Costo de implementación ÷ Beneficio Anual × 12.
+● **Retorno (meses) =** Costo de implementación ÷ Beneficio Anual × 12.
 
-● ROI por ciento (usado en metodología y matrices, incluso si no se muestra en cada tabla) = 
+● **ROI por ciento** (usado en metodología y matrices, incluso si no se muestra en cada tabla) **=** 
 (Beneficio Anual − Costo anual) ÷ Costo anual × 100.
 
 Las entradas, parámetros y versiones están documentados en el Apéndice E: Metodología de Calculadora 

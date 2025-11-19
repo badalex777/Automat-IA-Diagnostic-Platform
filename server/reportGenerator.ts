@@ -93,10 +93,11 @@ function buildTextRunsFromInlineMarkup(text: string): TextRun[] {
 
 /**
  * Create a body paragraph with justified alignment (for content after cover page)
+ * Supports inline **bold** markdown syntax
  */
 function createBodyParagraph(text: string, options: {spacing?: any} = {}): Paragraph {
   return new Paragraph({
-    text,
+    children: buildTextRunsFromInlineMarkup(text),
     alignment: AlignmentType.BOTH,
     spacing: options.spacing || { after: 120 },
   });
@@ -104,10 +105,11 @@ function createBodyParagraph(text: string, options: {spacing?: any} = {}): Parag
 
 /**
  * Create a bulleted paragraph with proper docx bullets
+ * Supports inline **bold** markdown syntax
  */
 function createBulletParagraph(text: string): Paragraph {
   return new Paragraph({
-    text,
+    children: buildTextRunsFromInlineMarkup(text),
     alignment: AlignmentType.BOTH,
     bullet: { level: 0 },
     spacing: { after: 60 },
@@ -116,6 +118,7 @@ function createBulletParagraph(text: string): Paragraph {
 
 /**
  * Create a numbered paragraph with proper DOCX numbering
+ * Supports inline **bold** markdown syntax
  * @param text - The paragraph text
  * @param registry - The numbering registry to get instance IDs
  * @param listKey - Unique key for this list (e.g., 'next-steps', 'methodology')
@@ -128,7 +131,7 @@ function createNumberedParagraph(
   level: number = 0
 ): Paragraph {
   return new Paragraph({
-    text,
+    children: buildTextRunsFromInlineMarkup(text),
     alignment: AlignmentType.BOTH,
     numbering: {
       reference: "decimal-numbering",
@@ -551,7 +554,7 @@ function createTable(
 
   const dataRows = rows.map(row => new TableRow({
     children: row.map((cell, i) => new TableCell({
-      children: [new Paragraph({ text: cell })],
+      children: [new Paragraph({ children: buildTextRunsFromInlineMarkup(cell) })],
       width: columnWidths ? { size: columnWidths[i], type: WidthType.PERCENTAGE } : undefined,
     })),
   }));

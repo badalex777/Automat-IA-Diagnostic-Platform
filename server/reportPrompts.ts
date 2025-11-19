@@ -770,18 +770,18 @@ Formula and weights.
 
 Implementation Effort is calculated as a weighted composite of four factors:
 
-● Readiness Score (inverted): 50 percent. Derived from the combined TFA (60 percent) and
+● **Readiness Score (inverted):** 50 percent. Derived from the combined TFA (60 percent) and
 PIF (40 percent) assessment. Higher readiness results in lower effort. This is the primary
 driver because it reflects comprehensive client assessment data across 61 combined questions.
 
-● Ramp-up Period: 20 percent. Estimated months from kickoff to steady-state operation.
+● **Ramp-up Period:** 20 percent. Estimated months from kickoff to steady-state operation.
 Normalized on a scale where 2 months or less equals 0 (lowest effort) and 12+ months
 equals 100 (highest effort).
 
-● Payback Period: 20 percent. Estimated months to recover implementation costs. Normalized
+● **Payback Period:** 20 percent. Estimated months to recover implementation costs. Normalized
 where 3 months or less equals 0 (lowest effort) and 18+ months equals 100 (highest effort).
 
-● Training Hours per Employee: 10 percent. Estimated end-user training required. Normalized
+● **Training Hours per Employee:** 10 percent. Estimated end-user training required. Normalized
 where 1 hour or less equals 0 (lowest effort) and 20+ hours equals 100 (highest effort).
 
 Rationale for 50 percent readiness weighting. The Readiness Rubric synthesizes actual client
@@ -812,23 +812,23 @@ A.6 ROI Modeling Methodology
 
 Double-layer conservatism.
 
-Layer 1: Rubric-based base estimation.
+**Layer 1: Rubric-based base estimation.**
 Structured rubrics convert PIF inputs into base percentages for time savings, quality
 improvement, and revenue reallocation, considering process type, complexity, repetition, and
 data structure.
 
-Layer 2: Scenario multipliers.
+**Layer 2: Scenario multipliers.**
 Risk-adjusted multipliers reflect adoption rates, exception handling, coverage, and integration
 maturity. Conservative scenario applies downward adjustments across benefit categories.
 
-Key formulas.
+**Key formulas.**
 
-● Annual Benefit = Time savings value + Quality improvement value + Revenue uplift
+● **Annual Benefit =** Time savings value + Quality improvement value + Revenue uplift
 value.
 
-● Payback (months) = Implementation cost ÷ Annual Benefit × 12.
+● **Payback (months) =** Implementation cost ÷ Annual Benefit × 12.
 
-● ROI percent (used in methodology and matrices, even if not shown in every table) =
+● **ROI percent** (used in methodology and matrices, even if not shown in every table) **=**
 (Annual Benefit − Annual cost) ÷ Annual cost × 100.
 
 Inputs, parameters, and versions are documented in Appendix E: ROI Calculator
