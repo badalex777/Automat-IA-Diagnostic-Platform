@@ -297,41 +297,37 @@ export const PIF_SECTIONS: PIFSection[] = [
     ]
   },
   {
-    section: "Time & Volume Data",
-    weight: 0, // Used for ROI calculations, not Readiness Rubric
-    description: "Provide details about how often you perform this work so we can calculate the total time savings and ROI potential",
+    section: "Experience Insights",
+    weight: 0, // Used for context, not Readiness Rubric scoring
+    description: "Share your hands-on knowledge about this process - you're the expert, and your insights are critical for identifying the best automation opportunities",
     questions: [
       {
         id: 17,
-        question: "How many employees perform this task?",
-        section: "Time & Volume Data",
-        type: "number",
-        placeholder: "Enter number of employees"
+        question: "What specific steps do you personally perform in this workflow?",
+        section: "Experience Insights",
+        type: "textarea",
+        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
       },
       {
         id: 18,
-        question: "How often is this task performed?",
-        section: "Time & Volume Data",
-        type: "radio",
-        options: [
-          { value: "daily", label: "Daily" },
-          { value: "weekly", label: "Weekly" },
-          { value: "monthly", label: "Monthly" }
-        ]
+        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
+        section: "Experience Insights",
+        type: "textarea",
+        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
       },
       {
         id: 19,
-        question: "How many times is this process completed in the selected period?",
-        section: "Time & Volume Data",
-        type: "number",
-        placeholder: "e.g., 5 times per day"
+        question: "Are there exceptions or special cases you need to watch out for during this process?",
+        section: "Experience Insights",
+        type: "textarea",
+        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
       },
       {
         id: 20,
-        question: "How many minutes does each process take?",
-        section: "Time & Volume Data",
-        type: "number",
-        placeholder: "Enter minutes per process"
+        question: "What tools or systems do you use most in your daily work?",
+        section: "Experience Insights",
+        type: "textarea",
+        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
       }
     ]
   },

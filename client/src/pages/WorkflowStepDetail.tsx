@@ -209,15 +209,16 @@ export default function WorkflowStepDetail() {
   const stepOpportunities = allOpportunities?.filter(opp => opp.stepId === stepId) || [];
 
   // Calculate step-specific aggregated PIF scores
+  // Note: TFA is no longer required for opportunity creation since ROI Calculator only uses PIF data
   let stepAggregatedPIF: AggregatedPIFScores | null = null;
   let stepReadinessRubric = null;
   let stepReadiness: number | null = null;
 
-  if (hasTFA && hasStepPIF) {
+  if (hasStepPIF) {
     // Use the same aggregation function as workflow-level
     stepAggregatedPIF = calculateAggregatedPIFScores(stepPIFs);
 
-    // Calculate TFA section scores
+    // Calculate TFA section scores (if TFA exists, otherwise use default/empty scores)
     const sectionScores = {
       systemEnvironment: 0,
       dataQuality: 0,
@@ -225,7 +226,7 @@ export default function WorkflowStepDetail() {
       securityCompliance: 0,
     };
 
-    if (tfaAssessment.responses) {
+    if (tfaAssessment?.responses) {
       const responses = tfaAssessment.responses as Record<string, string | number>;
       
       allSections.forEach((section) => {
@@ -443,7 +444,7 @@ export default function WorkflowStepDetail() {
             ) : (
               <Card className="p-6">
                 <p className="text-muted-foreground text-center">
-                  Complete both TFA and PIF assessments to view readiness analysis.
+                  Complete the PIF assessment to view readiness analysis. (Note: TFA provides additional readiness insights but is not required.)
                 </p>
               </Card>
             )}
@@ -556,7 +557,7 @@ export default function WorkflowStepDetail() {
                 <p className="text-muted-foreground text-center">
                   {hasStepPIF && stepReadinessRubric
                     ? 'No opportunities created yet. Create one to get started.'
-                    : 'Complete both TFA and PIF assessments before creating opportunities.'}
+                    : 'Complete the PIF assessment before creating opportunities.'}
                 </p>
               </Card>
             )}
