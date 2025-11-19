@@ -766,7 +766,7 @@ Implementation Effort represents the vertical axis of the Opportunity Matrix and
 complexity and resource requirements for bringing an automation opportunity to production. Lower
 scores indicate easier implementation.
 
-Formula and weights.
+**Formula and weights.**
 
 Implementation Effort is calculated as a weighted composite of four factors:
 
@@ -791,17 +791,17 @@ readiness at 50 percent ensures that ground-truth client data anchors the effort
 while still allowing differentiation between opportunities within the same workflow based on
 their specific implementation characteristics.
 
-Example calculation.
+**Example calculation.**
 
 Opportunity with 38 percent readiness, 12-month ramp-up, 18-month payback, 15 hours training:
 
-● Readiness effort (inverted): 100 − 38 = 62 → 62 × 0.50 = 31.0
+● **Readiness effort (inverted):** 100 − 38 = 62 → 62 × 0.50 = 31.0
 
-● Ramp-up effort: ((12 − 2) ÷ (12 − 2)) × 100 = 100 → 100 × 0.20 = 20.0
+● **Ramp-up effort:** ((12 − 2) ÷ (12 − 2)) × 100 = 100 → 100 × 0.20 = 20.0
 
-● Payback effort: ((18 − 3) ÷ (18 − 3)) × 100 = 100 → 100 × 0.20 = 20.0
+● **Payback effort:** ((18 − 3) ÷ (18 − 3)) × 100 = 100 → 100 × 0.20 = 20.0
 
-● Training effort: ((15 − 1) ÷ (20 − 1)) × 100 = 73.7 → 73.7 × 0.10 = 7.4
+● **Training effort:** ((15 − 1) ÷ (20 − 1)) × 100 = 73.7 → 73.7 × 0.10 = 7.4
 
 Total Implementation Effort = 31.0 + 20.0 + 20.0 + 7.4 = 78.4
 
