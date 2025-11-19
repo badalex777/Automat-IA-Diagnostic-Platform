@@ -1666,7 +1666,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
-      const weeklyHours = (opp.roiMetrics.fteSavings * 2080) / 52;
+      const weeklyHours = parseFloat(opp.opportunity.hoursSavedPerWeek || "0");
       portfolioRows.push([
         w.workflow.name,
         opp.opportunity.name,
@@ -1701,7 +1701,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       );
       
       // Performance Summary paragraph
-      const annualHours = opp.roiMetrics.fteSavings * 2080;
+      const annualHours = parseFloat(opp.opportunity.annualHoursSaved || "0");
       sections.push(createBodyParagraph(
         formatTemplate(ctx.t.appendixNarratives.performanceSummaryTemplate,
           ctx.fmt.currency(opp.roiMetrics.annualRoi),
@@ -1715,7 +1715,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       const year1Net = opp.roiMetrics.annualRoi - implCost;
       const year3Net = (opp.roiMetrics.annualRoi * 3) - implCost;
       const year5Net = (opp.roiMetrics.annualRoi * 5) - implCost;
-      const weeklyHours = annualHours / 52;
+      const weeklyHours = parseFloat(opp.opportunity.hoursSavedPerWeek || "0");
       
       const keyMetricsHeaders = [ctx.t.headers.metric, ctx.t.headers.value];
       const keyMetricsRows = [

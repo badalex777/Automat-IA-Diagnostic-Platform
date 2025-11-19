@@ -453,7 +453,7 @@ export function generateSWOTAnalysis(
     }
   });
   
-  const estimatedFTE = totalAnnualHours / 2080; // Standard work year
+  const estimatedFTE = totalAnnualHours / 2080; // Approximation for display - actual FTE from ROI calculator
   const avgErrorRate = pifResponses.length > 0 ? weightedErrorRate / pifResponses.length : 0;
   const volumeContext = volumeDescriptions.length > 0 
     ? volumeDescriptions.join('; ') 

@@ -235,7 +235,7 @@ export function calculateEnhancedImpact(
     let hoursReallocatedScore = 0;
     let revenueUpliftScore = 0;
     
-    const hoursReallocatedFTE = hoursReallocated / 2080;
+    const hoursReallocatedFTE = hoursReallocated / 2080; // Approximation for bonus calculation
     if (companyEmployees > 0) {
       hoursReallocatedScore = Math.min((hoursReallocatedFTE / companyEmployees) * 1000, 100);
     } else {

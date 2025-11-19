@@ -97,8 +97,8 @@ export function formatDiagnosticDate(date: Date): string {
  * - {{implementation_cost}} → opportunity.implementationCost
  * - {{net_benefit_3yr}} → opportunity.netBenefit3Year (optional)
  * - {{net_benefit_5yr}} → opportunity.netBenefit5Year (optional)
- * - {{annual_hours_saved}} → opportunity.fteSavings * 2080
- * - {{weekly_hours_saved}} → annual_hours_saved / 52
+ * - {{annual_hours_saved}} → opportunity.annualHoursSaved (from ROI calculator based on client company's FTE definition)
+ * - {{weekly_hours_saved}} → opportunity.hoursSavedPerWeek (from ROI calculator)
  * - {{dominant_component}} → calculated from impact breakdown
  * 
  * READINESS SCORES (per workflow):
