@@ -129,6 +129,7 @@ export const implementationOpportunities = pgTable("implementation_opportunities
   trainingHoursPerEmployee: decimal("training_hours_per_employee", { precision: 6, scale: 2 }),
   errorMetricsEnabled: boolean("error_metrics_enabled").default(false).notNull(),
   revenueMetricsEnabled: boolean("revenue_metrics_enabled").default(false).notNull(),
+  roiCalculationData: jsonb("roi_calculation_data"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   workflowIdIdx: index("implementation_opportunities_workflow_id_idx").on(table.workflowId),
