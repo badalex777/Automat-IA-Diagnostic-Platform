@@ -942,25 +942,27 @@ risk-adjusted, and auditable.
 
 E.1 Core Financial Formulas
 
-Return on Investment (ROI)
+**Return on Investment (ROI)**
 
-ROI (%) = (Net Benefit / Total Costs) × 100
+**ROI (%) =** (Net Benefit / Total Costs) × 100
 
-Components:
-Net Benefit = Total Annual Benefits − Total Annual Costs
-Total Costs = Implementation + Software + Training + Change Management
+**Components:**
 
-Interpretation:
+**Net Benefit =** Total Annual Benefits − Total Annual Costs
+
+**Total Costs =** Implementation + Software + Training + Change Management
+
+**Interpretation:**
 ROI expresses the steady-state annual financial return after the automation is fully operational.
 A positive ROI indicates that annualized benefits exceed total costs.
 
-Payback Period (Months)
+**Payback Period (Months)**
 
-Payback = Total Investment / Monthly Net Benefit
+**Payback =** Total Investment / Monthly Net Benefit
 
-Monthly Net Benefit = (Annual Benefits − Recurring Costs) / 12
+**Monthly Net Benefit =** (Annual Benefits − Recurring Costs) / 12
 
-Interpretation:
+**Interpretation:**
 Measures how many months are required for cumulative net benefits to recover initial
 investment, including a Year-1 ramp-up factor to reflect progressive adoption rather than instant
 realization.
