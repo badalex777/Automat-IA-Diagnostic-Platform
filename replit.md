@@ -4,6 +4,19 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
+**November 19, 2025 - FTE Calculation Refactor: Platform Now Accepts Pre-Calculated FTE from ROI Calculator**
+- **Architectural Change**: Platform no longer calculates FTE from hours using hardcoded 2080-hour assumption
+- **New Data Flow**: OpportunityForm now accepts `fteSavings` as direct input field from ROI Calculator (alongside `hoursSavedPerWeek` and `annualHoursSaved` for reference)
+- **Client-Company-Specific FTE**: All documentation updated to reflect FTE is based on each client company's actual full-time equivalent definition (e.g., 1,920, 2,080, 2,100 hours/year)
+- **Removed Hardcoded 2080 References**:
+  - `server/reportGenerator.ts`: Now uses `opportunity.hoursSavedPerWeek` and `opportunity.annualHoursSaved` directly instead of calculating from FTE × 2080
+  - `server/reportPrompts.ts` and `server/reportPrompts_es.ts`: Updated comments to indicate hours come from ROI calculator
+  - `client/src/lib/translations.ts`: Handbook content updated in both English and Spanish to explain client-company-specific FTE
+  - `shared/pifCalculations.ts` and `shared/opportunityCalculations.ts`: Added clarifying comments that 2080 is approximation for internal calculations only
+- **OpportunityForm Changes**: Removed auto-calculation logic `fteSavings = hoursSavedPerWeek / 40`, now accepts FTE directly
+- **Impact**: More accurate company-relative scoring by respecting each client's unique FTE definition, better alignment with ROI Calculator's sophisticated time-savings modeling
+- **Files Modified**: `client/src/components/OpportunityForm.tsx`, `server/reportGenerator.ts`, `server/reportPrompts.ts`, `server/reportPrompts_es.ts`, `client/src/lib/translations.ts`, `shared/pifCalculations.ts`, `shared/opportunityCalculations.ts`
+
 **November 19, 2025 - Complete Markdown and Formatting Fix**
 - **Section Heading Cleanup (4.5, 4.6, 4.7)**: Removed all ** markdown from section titles
   - "4.5 Immediate Implementation Potential (**Quick Wins**)" → "4.5 Immediate Implementation Potential (Quick Wins)"
