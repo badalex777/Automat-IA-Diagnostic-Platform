@@ -25,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronLeft, Plus, FileText, BarChart3, Target, Info, Pencil, Trash2, Calculator } from "lucide-react";
+import { ChevronLeft, Plus, FileText, BarChart3, Target, Info, Pencil, Trash2, Calculator, Eye } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import ShareableLinkCard from "@/components/ShareableLinkCard";
 import { OpportunityForm } from "@/components/OpportunityForm";
@@ -33,6 +33,7 @@ import ReadinessRubric from "@/components/ReadinessRubric";
 import { PIFRespondentDetail } from "@/components/PIFRespondentDetail";
 import PIFExecutiveSummary from "@/components/PIFExecutiveSummary";
 import ROICalculatorDialog from "@/components/calculator/ROICalculatorDialog";
+import ROIDetailsDialog from "@/components/calculator/ROIDetailsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, InsertImplementationOpportunity, ImplementationOpportunity } from "@shared/schema";
@@ -49,6 +50,7 @@ export default function WorkflowStepDetail() {
   const [isROICalculatorOpen, setIsROICalculatorOpen] = useState(false);
   const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [selectedOpportunityId, setSelectedOpportunityId] = useState<string | null>(null);
 
   const { data: company, isLoading: companyLoading } = useQuery<Company>({
     queryKey: [`/api/companies/${companyId}`],
@@ -475,12 +477,26 @@ export default function WorkflowStepDetail() {
 
             {stepOpportunities.length > 0 ? (
               <div className="space-y-4">
-                {stepOpportunities.map((opp) => (
+                {stepOpportunities.map((opp) => {
+                  const hasROI = !!opp.roiCalculationData;
+                  return (
                   <Card key={opp.id} className="p-6" data-testid={`card-opportunity-${opp.id}`}>
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="text-lg font-semibold">{opp.name}</h3>
+                          {hasROI && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7"
+                              onClick={() => setSelectedOpportunityId(opp.id)}
+                              data-testid={`button-view-roi-${opp.id}`}
+                              title="View ROI Details"
+                            >
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                           <Button
                             size="icon"
                             variant="ghost"
@@ -532,7 +548,8 @@ export default function WorkflowStepDetail() {
                       </div>
                     </div>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <Card className="p-6">
@@ -644,6 +661,15 @@ export default function WorkflowStepDetail() {
             await createOpportunityMutation.mutateAsync(data);
             setIsROICalculatorOpen(false);
           }}
+        />
+      )}
+
+      {/* ROI Details Dialog */}
+      {selectedOpportunityId && (
+        <ROIDetailsDialog
+          opportunityId={selectedOpportunityId}
+          isOpen={!!selectedOpportunityId}
+          onClose={() => setSelectedOpportunityId(null)}
         />
       )}
     </div>
