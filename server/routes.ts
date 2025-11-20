@@ -1217,37 +1217,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pif/shareable/:shareableId/submit", async (req, res) => {
     try {
+      console.log('[PIF Shareable Submit] Received request:', {
+        shareableId: req.params.shareableId,
+        bodyKeys: Object.keys(req.body),
+        responsesCount: req.body.responses ? Object.keys(req.body.responses).length : 0,
+      });
+
       const validatedData = pifSubmitSchema.parse(req.body);
       const { respondentName, respondentRole, respondentResponsibilities, verificationCode, shareableId, responses, stepId, email } = validatedData;
+
+      console.log('[PIF Shareable Submit] Validated data:', {
+        respondentName,
+        respondentRole,
+        verificationCode,
+        shareableId,
+        email,
+        responsesCount: Object.keys(responses).length,
+        responsesKeys: Object.keys(responses),
+      });
 
       // Get PIF template by shareableId
       const templates = await storage.getPIFByShareableId(shareableId);
       if (!templates || templates.length === 0) {
+        console.log('[PIF Shareable Submit] No templates found for shareableId:', shareableId);
         return res.status(404).json({ error: "Survey not found" });
       }
 
       const template = templates[0];
+      console.log('[PIF Shareable Submit] Found template:', {
+        templateId: template.id,
+        templateShareableId: template.shareableId,
+        templateVerificationCode: template.verificationCode,
+        templateWorkflowId: template.workflowId,
+        templateStepId: template.stepId,
+      });
 
       // Validate verification code (server-side security check)
       if (!verificationCode || !verificationCode.trim()) {
+        console.log('[PIF Shareable Submit] Verification code missing');
         return res.status(400).json({ 
           error: "Verification code is required." 
         });
       }
 
       if (verificationCode.trim() !== template.verificationCode) {
+        console.log('[PIF Shareable Submit] Verification code mismatch:', {
+          provided: verificationCode.trim(),
+          expected: template.verificationCode,
+        });
         return res.status(400).json({ 
           error: "Invalid verification code. Please check the code provided with the survey link." 
         });
       }
+
+      console.log('[PIF Shareable Submit] Verification code validated successfully');
 
       // Calculate PIF scores from responses
       const pifScores = calculatePIFScores(responses);
       const roiInputs = extractROIInputs(responses);
       const qualitativeResponses = extractQualitativeResponses(responses);
 
+      console.log('[PIF Shareable Submit] Calculated scores and extracted data:', {
+        pifScores,
+        roiInputs,
+        qualitativeResponses,
+      });
+
       // Create new PIF response with verified data and calculated scores
-      const pifResponse = await storage.createPIFResponse({
+      const newResponseData = {
         workflowId: template.workflowId,
         stepId: template.stepId || null, // Use stepId from template, not request body
         respondentName,
@@ -1263,11 +1300,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         qualitativeResponses,
         verified: true,
         completedAt: new Date(), // Mark as completed on submission
+      };
+
+      console.log('[PIF Shareable Submit] Creating new PIF response with data:', {
+        workflowId: newResponseData.workflowId,
+        stepId: newResponseData.stepId,
+        respondentName: newResponseData.respondentName,
+        email: newResponseData.email,
+        responsesCount: Object.keys(newResponseData.responses).length,
+        roiInputsKeys: Object.keys(newResponseData.roiInputs),
+        hasCompletedAt: !!newResponseData.completedAt,
+      });
+
+      const pifResponse = await storage.createPIFResponse(newResponseData);
+
+      console.log('[PIF Shareable Submit] PIF response created successfully:', {
+        id: pifResponse.id,
+        shareableId: pifResponse.shareableId,
+        completedAt: pifResponse.completedAt,
+        responsesCount: pifResponse.responses ? Object.keys(pifResponse.responses as Record<string, string>).length : 0,
+        roiInputs: pifResponse.roiInputs,
       });
 
       res.status(201).json(pifResponse);
     } catch (error: any) {
+      console.error('[PIF Shareable Submit] Error:', error);
       if (error.name === 'ZodError') {
+        console.error('[PIF Shareable Submit] Zod validation error:', error.issues);
         return res.status(400).json({ error: error.message });
       }
       res.status(500).json({ error: "Internal server error" });
