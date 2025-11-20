@@ -7,7 +7,7 @@ export interface PIFTranslations {
     revenueUplift: { name: string; description: string };
     experienceInsights: { name: string; description: string };
     timeVolumeData: { name: string; description: string };
-    qualityImpactModule: { name: string; description: string };
+    qualityImprovementPotential: { name: string; description: string };
   };
   questions: {
     [questionId: number]: {
@@ -107,8 +107,8 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         name: "Time & Volume Data",
         description: "Provide details about how often you perform this work so we can calculate the total time savings and ROI potential"
       },
-      qualityImpactModule: {
-        name: "Quality Impact Module",
+      qualityImprovementPotential: {
+        name: "Quality Improvement Potential",
         description: "Tell us about errors or quality issues so we can show how AI could help you produce more accurate, consistent work"
       }
     },
@@ -269,60 +269,89 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       17: {
-        question: "What specific steps do you personally perform in this workflow?",
-        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
-      },
-      18: {
-        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
-        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
-      },
-      19: {
-        question: "Are there exceptions or special cases you need to watch out for during this process?",
-        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
-      },
-      20: {
-        question: "What tools or systems do you use most in your daily work?",
-        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
-      },
-      21: {
-        question: "What do you find most frustrating or limiting about these tools?",
-        placeholder: "Describe the main pain points or limitations you experience"
-      },
-      22: {
-        question: "What are the biggest time-wasters in your current workflow?",
-        placeholder: "Describe tasks that take longer than they should"
-      },
-      23: {
-        question: "If you could automate one part of this process, what would it be and why?",
-        placeholder: "Describe what you'd automate and the impact it would have"
-      },
-      24: {
-        question: "What do you usually produce or complete at the end of your step?",
-        placeholder: "Example: Approved file, completed report, data entry in system, email sent to customer, invoice processed"
-      },
-      25: {
-        question: "What makes this process slow, repetitive, or error-prone in your experience?",
-        placeholder: "Describe key difficulties or pain points you encounter"
-      },
-      26: {
-        question: "What happens if this process is delayed or done incorrectly?",
-        placeholder: "Describe the business impact of delays or errors"
-      },
-      27: {
-        question: "Is there anything else about this workflow that we should know?",
-        placeholder: "Any additional context, edge cases, or important details"
-      },
-      28: {
-        question: "How many employees perform this task?",
+        question: "How many people regularly perform this workflow?",
         placeholder: "Enter number of employees"
       },
-      29: {
-        question: "How often is this task performed?",
+      18: {
+        question: "How often do you complete this workflow?",
         options: {
           "daily": { label: "Daily" },
           "weekly": { label: "Weekly" },
           "monthly": { label: "Monthly" }
         }
+      },
+      19: {
+        question: "In that period, how many instances do you typically complete?",
+        placeholder: "Enter number of instances"
+      },
+      20: {
+        question: "About how many minutes does each instance take end-to-end?",
+        placeholder: "Enter minutes per instance"
+      },
+      21: {
+        question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
+        options: {
+          "no": { label: "No", description: "Quality impact is not a significant factor" },
+          "yes": { label: "Yes", description: "We have measurable quality issues (errors, rework, defects)" }
+        }
+      },
+      22: {
+        question: "How often do errors or quality issues currently occur in this process?",
+        options: {
+          "very_frequent": { label: "Very frequent", description: "Errors occur in more than 30% of cases" },
+          "frequent": { label: "Frequent", description: "Errors occur in 15-30% of cases" },
+          "occasional": { label: "Occasional", description: "Errors occur in 5-15% of cases" },
+          "rare": { label: "Rare", description: "Errors occur in less than 5% of cases" }
+        }
+      },
+      23: {
+        question: "What is the primary cause of errors or quality issues?",
+        options: {
+          "fatigue": { label: "Manual, repetitive work leading to human fatigue or oversight" },
+          "missing_info": { label: "Missing or incomplete information when making decisions" },
+          "interpretation": { label: "Inconsistent interpretation of rules or standards" },
+          "complexity": { label: "High complexity requiring significant expertise or judgment" },
+          "communication": { label: "Communication gaps or misunderstandings between people" }
+        }
+      },
+      24: {
+        question: "When are errors or quality issues typically discovered?",
+        options: {
+          "after_delivery": { label: "After delivery to customer", description: "Customer complaints, returns, escalations" },
+          "end_process": { label: "At the end of the process", description: "Final review or quality check" },
+          "during_process": { label: "During the process", description: "Spotted before completion" },
+          "early": { label: "Early in the process", description: "Caught quickly with minimal rework" }
+        }
+      },
+      25: {
+        question: "How standardized is the current process?",
+        options: {
+          "variable": { label: "Highly variable", description: "Each case is handled differently" },
+          "guidelines": { label: "Some guidelines", description: "General approach but flexibility in execution" },
+          "documented": { label: "Documented process", description: "Clear steps and procedures to follow" },
+          "strict": { label: "Strict standards", description: "Detailed rules and quality requirements" }
+        }
+      },
+      26: {
+        question: "What type of work best describes this process?",
+        options: {
+          "rule_based": { label: "Rule-based decisions", description: "Clear if/then rules" },
+          "pattern": { label: "Pattern recognition", description: "Identifying similarities or trends" },
+          "contextual": { label: "Contextual judgment", description: "Requires understanding unique situations" },
+          "subjective": { label: "Highly subjective", description: "Based on personal opinion or preferences" }
+        }
+      },
+      27: {
+        question: "Current Error Rate (%)(estimate)",
+        placeholder: "Enter percentage (e.g., 15 for 15%)"
+      },
+      28: {
+        question: "Rework Minutes per Error",
+        placeholder: "Enter minutes per error"
+      },
+      29: {
+        question: "Financial Cost per Error (USD)",
+        placeholder: "Enter cost in USD (e.g., 50)"
       },
       30: {
         question: "How many times is this process completed in the selected period?",
@@ -482,8 +511,8 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         name: "Datos de Tiempo y Volumen",
         description: "Proporcione detalles sobre con qué frecuencia realiza este trabajo para que podamos calcular el ahorro total de tiempo y el potencial de ROI"
       },
-      qualityImpactModule: {
-        name: "Módulo de Impacto en la Calidad",
+      qualityImprovementPotential: {
+        name: "Potencial de Mejora de Calidad",
         description: "Cuéntenos sobre errores o problemas de calidad para que podamos mostrar cómo la IA podría ayudarle a producir un trabajo más preciso y consistente"
       }
     },
@@ -644,60 +673,89 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       17: {
-        question: "¿Qué pasos específicos realiza personalmente en este flujo de trabajo?",
-        placeholder: "Ejemplo: Recibo solicitudes por correo electrónico, verifico datos del cliente en CRM, creo pedido en el sistema, envío confirmación. Sea específico sobre sus acciones."
-      },
-      18: {
-        question: "¿Qué conocimiento crítico o experiencia se necesita para manejar este flujo de trabajo correctamente?",
-        placeholder: "Ejemplo: Comprender las políticas de precios de la empresa, saber cómo interpretar especificaciones técnicas, familiaridad con requisitos de cumplimiento"
-      },
-      19: {
-        question: "¿Hay excepciones o casos especiales que debe tener en cuenta durante este proceso?",
-        placeholder: "Ejemplo: Solicitudes urgentes (2-3 veces/semana, dependen de escalaciones de clientes), Pedidos internacionales (10% del volumen, requieren verificación fiscal), Clientes VIP (necesitan aprobación del director)"
-      },
-      20: {
-        question: "¿Qué herramientas o sistemas utiliza más en su trabajo diario?",
-        placeholder: "Ejemplo: Excel, Google Sheets, ERP, CRM, Email, Slack, sistemas internos"
-      },
-      21: {
-        question: "¿Qué encuentra más frustrante o limitante sobre estas herramientas?",
-        placeholder: "Describa los principales puntos de dolor o limitaciones que experimenta"
-      },
-      22: {
-        question: "¿Cuáles son los mayores desperdicios de tiempo en su flujo de trabajo actual?",
-        placeholder: "Describa tareas que toman más tiempo del que deberían"
-      },
-      23: {
-        question: "Si pudiera automatizar una parte de este proceso, ¿cuál sería y por qué?",
-        placeholder: "Describa qué automatizaría y el impacto que tendría"
-      },
-      24: {
-        question: "¿Qué produce o completa usualmente al final de su paso?",
-        placeholder: "Ejemplo: Archivo aprobado, reporte completado, entrada de datos en sistema, correo enviado al cliente, factura procesada"
-      },
-      25: {
-        question: "¿Qué hace que este proceso sea lento, repetitivo o propenso a errores en su experiencia?",
-        placeholder: "Describa las dificultades clave o puntos de dolor que encuentra"
-      },
-      26: {
-        question: "¿Qué sucede si este proceso se retrasa o se hace incorrectamente?",
-        placeholder: "Describa el impacto comercial de retrasos o errores"
-      },
-      27: {
-        question: "¿Hay algo más sobre este flujo de trabajo que debamos saber?",
-        placeholder: "Cualquier contexto adicional, casos extremos o detalles importantes"
-      },
-      28: {
-        question: "¿Cuántos empleados realizan esta tarea?",
+        question: "¿Cuántas personas realizan regularmente este flujo de trabajo?",
         placeholder: "Ingrese el número de empleados"
       },
-      29: {
-        question: "¿Con qué frecuencia se realiza esta tarea?",
+      18: {
+        question: "¿Con qué frecuencia completa este flujo de trabajo?",
         options: {
           "daily": { label: "Diariamente" },
           "weekly": { label: "Semanalmente" },
           "monthly": { label: "Mensualmente" }
         }
+      },
+      19: {
+        question: "En ese período, ¿cuántas instancias completa típicamente?",
+        placeholder: "Ingrese el número de instancias"
+      },
+      20: {
+        question: "¿Aproximadamente cuántos minutos toma cada instancia de principio a fin?",
+        placeholder: "Ingrese minutos por instancia"
+      },
+      21: {
+        question: "¿Este flujo de trabajo tiene un impacto medible en la calidad (errores que cuestan tiempo o dinero)?",
+        options: {
+          "no": { label: "No", description: "El impacto en la calidad no es un factor significativo" },
+          "yes": { label: "Sí", description: "Tenemos problemas de calidad medibles (errores, retrabajo, defectos)" }
+        }
+      },
+      22: {
+        question: "¿Con qué frecuencia ocurren actualmente errores o problemas de calidad en este proceso?",
+        options: {
+          "very_frequent": { label: "Muy frecuente", description: "Los errores ocurren en más del 30% de los casos" },
+          "frequent": { label: "Frecuente", description: "Los errores ocurren en el 15-30% de los casos" },
+          "occasional": { label: "Ocasional", description: "Los errores ocurren en el 5-15% de los casos" },
+          "rare": { label: "Raro", description: "Los errores ocurren en menos del 5% de los casos" }
+        }
+      },
+      23: {
+        question: "¿Cuál es la causa principal de los errores o problemas de calidad?",
+        options: {
+          "fatigue": { label: "Trabajo manual repetitivo que lleva a fatiga u omisión humana" },
+          "missing_info": { label: "Información faltante o incompleta al tomar decisiones" },
+          "interpretation": { label: "Interpretación inconsistente de reglas o estándares" },
+          "complexity": { label: "Alta complejidad que requiere experiencia o juicio significativo" },
+          "communication": { label: "Brechas de comunicación o malentendidos entre personas" }
+        }
+      },
+      24: {
+        question: "¿Cuándo se descubren típicamente los errores o problemas de calidad?",
+        options: {
+          "after_delivery": { label: "Después de la entrega al cliente", description: "Quejas de clientes, devoluciones, escalaciones" },
+          "end_process": { label: "Al final del proceso", description: "Revisión final o control de calidad" },
+          "during_process": { label: "Durante el proceso", description: "Detectado antes de completarse" },
+          "early": { label: "Temprano en el proceso", description: "Capturado rápidamente con retrabajo mínimo" }
+        }
+      },
+      25: {
+        question: "¿Qué tan estandarizado está el proceso actual?",
+        options: {
+          "variable": { label: "Altamente variable", description: "Cada caso se maneja de manera diferente" },
+          "guidelines": { label: "Algunas pautas", description: "Enfoque general pero flexibilidad en la ejecución" },
+          "documented": { label: "Proceso documentado", description: "Pasos y procedimientos claros a seguir" },
+          "strict": { label: "Estándares estrictos", description: "Reglas detalladas y requisitos de calidad" }
+        }
+      },
+      26: {
+        question: "¿Qué tipo de trabajo describe mejor este proceso?",
+        options: {
+          "rule_based": { label: "Decisiones basadas en reglas", description: "Reglas claras de si/entonces" },
+          "pattern": { label: "Reconocimiento de patrones", description: "Identificar similitudes o tendencias" },
+          "contextual": { label: "Juicio contextual", description: "Requiere comprender situaciones únicas" },
+          "subjective": { label: "Altamente subjetivo", description: "Basado en opinión personal o preferencias" }
+        }
+      },
+      27: {
+        question: "Tasa de Error Actual (%)(estimación)",
+        placeholder: "Ingrese porcentaje (ej., 15 para 15%)"
+      },
+      28: {
+        question: "Minutos de Retrabajo por Error",
+        placeholder: "Ingrese minutos por error"
+      },
+      29: {
+        question: "Costo Financiero por Error (USD)",
+        placeholder: "Ingrese costo en USD (ej., 50)"
       },
       30: {
         question: "¿Cuántas veces se completa este proceso en el período seleccionado?",

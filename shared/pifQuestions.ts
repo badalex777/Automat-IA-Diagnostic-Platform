@@ -297,49 +297,53 @@ export const PIF_SECTIONS: PIFSection[] = [
     ]
   },
   {
-    section: "Experience Insights",
-    weight: 0, // Used for context, not Readiness Rubric scoring
-    description: "Share your hands-on knowledge about this process - you're the expert, and your insights are critical for identifying the best automation opportunities",
+    section: "Time & Volume Data",
+    weight: 0, // Used for ROI estimation, not Readiness Rubric
+    description: "Provide details about how often you perform this work so we can calculate the total time savings and ROI potential",
     questions: [
       {
         id: 17,
-        question: "What specific steps do you personally perform in this workflow?",
-        section: "Experience Insights",
-        type: "textarea",
-        placeholder: "Example: I receive requests via email, verify customer data in CRM, create order in system, send confirmation. Be specific about your actions."
+        question: "How many people regularly perform this workflow?",
+        section: "Time & Volume Data",
+        type: "number",
+        placeholder: "Enter number of employees"
       },
       {
         id: 18,
-        question: "What critical knowledge or expertise is needed to handle this workflow correctly?",
-        section: "Experience Insights",
-        type: "textarea",
-        placeholder: "Example: Understanding company pricing policies, knowing how to interpret technical specifications, familiarity with compliance requirements"
+        question: "How often do you complete this workflow?",
+        section: "Time & Volume Data",
+        type: "radio",
+        options: [
+          { value: "daily", label: "Daily" },
+          { value: "weekly", label: "Weekly" },
+          { value: "monthly", label: "Monthly" }
+        ]
       },
       {
         id: 19,
-        question: "Are there exceptions or special cases you need to watch out for during this process?",
-        section: "Experience Insights",
-        type: "textarea",
-        placeholder: "Example: Urgent requests (2-3 times/week, depend on client escalations), International orders (10% of volume, require tax verification), VIP customers (need director approval)"
+        question: "In that period, how many instances do you typically complete?",
+        section: "Time & Volume Data",
+        type: "number",
+        placeholder: "Enter number of instances"
       },
       {
         id: 20,
-        question: "What tools or systems do you use most in your daily work?",
-        section: "Experience Insights",
-        type: "textarea",
-        placeholder: "Example: Excel, Google Sheets, ERP, CRM, Email, Slack, internal systems"
+        question: "About how many minutes does each instance take end-to-end?",
+        section: "Time & Volume Data",
+        type: "number",
+        placeholder: "Enter minutes per instance"
       }
     ]
   },
   {
-    section: "Quality Impact Module",
+    section: "Quality Improvement Potential",
     weight: 0, // Used for ROI estimation, not Readiness Rubric (conditional section)
     description: "Tell us about errors or quality issues so we can show how AI could help you produce more accurate, consistent work",
     questions: [
       {
         id: 21,
         question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         options: [
           { value: "no", label: "No", description: "Quality impact is not a significant factor" },
@@ -349,7 +353,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       {
         id: 22,
         question: "How often do errors or quality issues currently occur in this process?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         conditional: {
           dependsOn: 21,
@@ -365,7 +369,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       {
         id: 23,
         question: "What is the primary cause of errors or quality issues?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         conditional: {
           dependsOn: 21,
@@ -382,7 +386,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       {
         id: 24,
         question: "When are errors or quality issues typically discovered?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         conditional: {
           dependsOn: 21,
@@ -398,7 +402,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       {
         id: 25,
         question: "How standardized is the current process?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         conditional: {
           dependsOn: 21,
@@ -414,7 +418,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       {
         id: 26,
         question: "What type of work best describes this process?",
-        section: "Quality Impact Module",
+        section: "Quality Improvement Potential",
         type: "radio",
         conditional: {
           dependsOn: 21,
@@ -429,8 +433,8 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 27,
-        question: "What is the current error rate?",
-        section: "Quality Impact Module",
+        question: "Current Error Rate (%)(estimate)",
+        section: "Quality Improvement Potential",
         type: "number",
         placeholder: "Enter percentage (e.g., 15 for 15%)",
         conditional: {
@@ -440,8 +444,8 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 28,
-        question: "How many minutes of rework does each error require?",
-        section: "Quality Impact Module",
+        question: "Rework Minutes per Error",
+        section: "Quality Improvement Potential",
         type: "number",
         placeholder: "Enter minutes per error",
         conditional: {
@@ -451,8 +455,8 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 29,
-        question: "What is the estimated cost per error (in USD)?",
-        section: "Quality Impact Module",
+        question: "Financial Cost per Error (USD)",
+        section: "Quality Improvement Potential",
         type: "number",
         placeholder: "Enter cost in USD (e.g., 50)",
         conditional: {
@@ -528,16 +532,16 @@ export function extractROIInputs(responses: Record<string, string>): {
   reworkMinutesPerError: number | null;
   costPerError: number | null;
 } {
-  // Q17-Q20: Time & Volume Data - Always captured
+  // Q17-Q20: Time & Volume Data section (restored numeric questions)
   const employeeCount = responses['17'] ? parseInt(responses['17']) : null;
   const frequency = responses['18'] as 'daily' | 'weekly' | 'monthly' | null || null;
   const processesPerPeriod = responses['19'] ? parseInt(responses['19']) : null;
   const minutesPerProcess = responses['20'] ? parseInt(responses['20']) : null;
 
-  // Q21: Quality Impact yes/no
+  // Q21: Quality Improvement Potential - yes/no gate
   const hasQualityImpact = responses['21'] === 'yes';
 
-  // Q27-Q29: Only captured when Q21 is 'yes'
+  // Q27-Q29: Error metrics (only captured when Q21 is 'yes')
   const errorRate = hasQualityImpact && responses['27'] ? parseFloat(responses['27']) : null;
   const reworkMinutesPerError = hasQualityImpact && responses['28'] ? parseInt(responses['28']) : null;
   const costPerError = hasQualityImpact && responses['29'] ? parseFloat(responses['29']) : null;
