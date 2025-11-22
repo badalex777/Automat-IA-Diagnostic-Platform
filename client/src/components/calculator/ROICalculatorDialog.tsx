@@ -194,7 +194,7 @@ export default function ROICalculatorDialog({
           </div>
         ) : (
           <div className="flex flex-col h-full">
-            <ScrollArea className="flex-1 px-6">
+            <ScrollArea className="flex-1 px-6 max-h-[calc(90vh-180px)]">
               <div className="space-y-6 pb-6">
                 {/* Step 1: Process Information */}
                 <div className="relative">
