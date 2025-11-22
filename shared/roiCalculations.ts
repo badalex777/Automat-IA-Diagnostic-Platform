@@ -51,7 +51,24 @@ export function calculateROI(
     : 0;
 
   // Calculate total weekly hours
-  const totalWeeklyHours = peopleAndCost.hoursPerWeekPerEmployee * peopleAndCost.employees;
+  // If process-based calculation is enabled, calculate from process data
+  let hoursPerWeekPerEmployee = peopleAndCost.hoursPerWeekPerEmployee;
+  if (peopleAndCost.useProcessBasedCalculation && 
+      peopleAndCost.processesPerPeriod > 0 && 
+      peopleAndCost.timePerProcessMinutes > 0) {
+    const hoursPerProcess = peopleAndCost.timePerProcessMinutes / 60;
+    const totalHoursPerPeriod = peopleAndCost.processesPerPeriod * hoursPerProcess;
+    
+    if (peopleAndCost.processFrequency === 'daily') {
+      hoursPerWeekPerEmployee = totalHoursPerPeriod * 5; // 5 working days
+    } else if (peopleAndCost.processFrequency === 'weekly') {
+      hoursPerWeekPerEmployee = totalHoursPerPeriod;
+    } else { // monthly
+      hoursPerWeekPerEmployee = totalHoursPerPeriod / 4.33; // ~4.33 weeks per month
+    }
+  }
+  
+  const totalWeeklyHours = hoursPerWeekPerEmployee * peopleAndCost.employees;
   const annualHours = totalWeeklyHours * 52;
 
   // === TIME SAVINGS MODULE ===
