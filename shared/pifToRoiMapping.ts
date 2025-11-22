@@ -62,6 +62,26 @@ export function mapProcessInfo(stepName: string, workflowName: string, pifRespon
 export function mapPeopleAndCost(pifResponse: PIFResponse): PeopleAndCost {
   const roiInputs = getRoiInputs(pifResponse);
   
+  // Calculate hours per week per employee from process data
+  const calculateHoursFromProcesses = (): number => {
+    const processes = roiInputs.processesPerPeriod || 0;
+    const minutes = roiInputs.minutesPerProcess || 0;
+    const frequency = roiInputs.frequency || 'daily';
+    
+    if (!processes || !minutes) return 0;
+    
+    const hoursPerProcess = minutes / 60;
+    const totalHoursPerPeriod = processes * hoursPerProcess;
+    
+    if (frequency === 'daily') {
+      return totalHoursPerPeriod * 5; // 5 working days
+    } else if (frequency === 'weekly') {
+      return totalHoursPerPeriod;
+    } else { // monthly
+      return totalHoursPerPeriod / 4.33; // ~4.33 weeks per month
+    }
+  };
+  
   return {
     // Auto-populated from PIF Q17-20
     employees: roiInputs.employeeCount || 1,
@@ -69,8 +89,8 @@ export function mapPeopleAndCost(pifResponse: PIFResponse): PeopleAndCost {
     timePerProcessMinutes: roiInputs.minutesPerProcess || 0,
     processFrequency: roiInputs.frequency || 'daily',
     
-    // Auto-calculated (will be computed by component)
-    hoursPerWeekPerEmployee: 0,
+    // Auto-calculated from process data
+    hoursPerWeekPerEmployee: calculateHoursFromProcesses(),
     useProcessBasedCalculation: true,
     
     // Manual consultant inputs (leave at defaults/empty)

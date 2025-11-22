@@ -7,9 +7,10 @@ import { ProcessInfo } from '@shared/schema';
 interface ProcessInfoFormProps {
   data: ProcessInfo;
   onChange: (data: ProcessInfo) => void;
+  showFromPIFBadge?: boolean;
 }
 
-export default function ProcessInfoForm({ data, onChange }: ProcessInfoFormProps) {
+export default function ProcessInfoForm({ data, onChange, showFromPIFBadge }: ProcessInfoFormProps) {
   const handleChange = (field: keyof ProcessInfo, value: string) => {
     onChange({ ...data, [field]: value });
   };
@@ -18,9 +19,19 @@ export default function ProcessInfoForm({ data, onChange }: ProcessInfoFormProps
     <Card>
       <CardHeader>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <CardTitle>Process Information</CardTitle>
-            <Badge variant="outline" className="w-fit">Step 1 of 6</Badge>
+            <div className="flex items-center gap-2 flex-wrap">
+              {showFromPIFBadge && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs"
+                >
+                  From PIF
+                </Badge>
+              )}
+              <Badge variant="outline" className="w-fit">Step 1 of 6</Badge>
+            </div>
           </div>
           <CardDescription className="text-sm text-muted-foreground">
             Define the business process being analyzed. This establishes the baseline context for calculating time savings and operational improvements from AI implementation.

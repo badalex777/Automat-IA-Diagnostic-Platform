@@ -197,81 +197,45 @@ export default function ROICalculatorDialog({
             <ScrollArea className="flex-1 px-6 max-h-[calc(90vh-180px)]">
               <div className="space-y-6 pb-6">
                 {/* Step 1: Process Information */}
-                <div className="relative">
-                  <ProcessInfoForm
-                    data={calculatorState.processInfo}
-                    onChange={handleProcessInfoChange}
-                  />
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute top-4 right-4 bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-                  >
-                    From PIF
-                  </Badge>
-                </div>
+                <ProcessInfoForm
+                  data={calculatorState.processInfo}
+                  onChange={handleProcessInfoChange}
+                  showFromPIFBadge={true}
+                />
 
                 {/* Step 2: People & Cost */}
-                <div className="relative">
-                  <PeopleAndCostForm
-                    data={calculatorState.peopleAndCost}
-                    onChange={handlePeopleAndCostChange}
-                  />
-                  <div className="absolute top-4 right-4 flex gap-2">
-                    <Badge 
-                      variant="secondary" 
-                      className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-                    >
-                      Partial PIF
-                    </Badge>
-                    {(calculatorState.peopleAndCost.averageAnnualSalary === 0 || 
-                      calculatorState.peopleAndCost.annualWorkingHours === 0) && (
-                      <Badge 
-                        variant="secondary" 
-                        className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20"
-                      >
-                        Manual Required
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+                <PeopleAndCostForm
+                  data={calculatorState.peopleAndCost}
+                  onChange={handlePeopleAndCostChange}
+                  showPartialPIFBadge={true}
+                  showManualRequiredBadge={
+                    calculatorState.peopleAndCost.averageAnnualSalary === 0 || 
+                    calculatorState.peopleAndCost.annualWorkingHours === 0
+                  }
+                />
 
                 {/* Steps 3-5: Optional Modules */}
-                <div className="relative">
-                  <OptionalModulesForm
-                    timeSavings={calculatorState.timeSavings}
-                    qualityImpact={calculatorState.qualityImpact}
-                    revenueUplift={calculatorState.revenueUplift}
-                    onTimeSavingsChange={handleTimeSavingsChange}
-                    onQualityImpactChange={handleQualityImpactChange}
-                    onRevenueUpliftChange={handleRevenueUpliftChange}
-                    averageAnnualSalary={calculatorState.peopleAndCost.averageAnnualSalary}
-                    annualWorkingHours={calculatorState.peopleAndCost.annualWorkingHours}
-                    overheadMultiplier={calculatorState.peopleAndCost.overheadMultiplier}
-                    employees={calculatorState.peopleAndCost.employees}
-                    processesPerPeriod={calculatorState.peopleAndCost.processesPerPeriod}
-                    processFrequency={calculatorState.peopleAndCost.processFrequency}
-                  />
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute top-4 right-4 bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
-                  >
-                    From PIF
-                  </Badge>
-                </div>
+                <OptionalModulesForm
+                  timeSavings={calculatorState.timeSavings}
+                  qualityImpact={calculatorState.qualityImpact}
+                  revenueUplift={calculatorState.revenueUplift}
+                  onTimeSavingsChange={handleTimeSavingsChange}
+                  onQualityImpactChange={handleQualityImpactChange}
+                  onRevenueUpliftChange={handleRevenueUpliftChange}
+                  averageAnnualSalary={calculatorState.peopleAndCost.averageAnnualSalary}
+                  annualWorkingHours={calculatorState.peopleAndCost.annualWorkingHours}
+                  overheadMultiplier={calculatorState.peopleAndCost.overheadMultiplier}
+                  employees={calculatorState.peopleAndCost.employees}
+                  processesPerPeriod={calculatorState.peopleAndCost.processesPerPeriod}
+                  processFrequency={calculatorState.peopleAndCost.processFrequency}
+                  showFromPIFBadge={true}
+                />
 
                 {/* Step 6: Costs & Rampup */}
-                <div className="relative">
-                  <CostsAndRampupForm
-                    data={calculatorState.costsAndRampup}
-                    onChange={handleCostsAndRampupChange}
-                  />
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute top-4 right-4 bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20"
-                  >
-                    Manual Required
-                  </Badge>
-                </div>
+                <CostsAndRampupForm
+                  data={calculatorState.costsAndRampup}
+                  onChange={handleCostsAndRampupChange}
+                />
 
                 {/* Scenario Selector */}
                 <ScenarioSelector

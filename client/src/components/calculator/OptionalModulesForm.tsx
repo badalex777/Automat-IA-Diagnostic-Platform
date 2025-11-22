@@ -24,6 +24,7 @@ interface OptionalModulesFormProps {
   employees: number;
   processesPerPeriod: number;
   processFrequency: 'daily' | 'weekly' | 'monthly';
+  showFromPIFBadge?: boolean;
 }
 
 export default function OptionalModulesForm({
@@ -39,6 +40,7 @@ export default function OptionalModulesForm({
   employees,
   processesPerPeriod,
   processFrequency,
+  showFromPIFBadge,
 }: OptionalModulesFormProps) {
   const [showRubric, setShowRubric] = useState(false);
   const [showQualityRubric, setShowQualityRubric] = useState(false);
@@ -81,16 +83,24 @@ export default function OptionalModulesForm({
       <Card>
         <CardHeader>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                Time Savings Module
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle>Time Savings Module</CardTitle>
+              <div className="flex items-center gap-2 flex-wrap">
+                {showFromPIFBadge && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs"
+                  >
+                    From PIF
+                  </Badge>
+                )}
                 <Badge variant="outline">Step 3 of 6</Badge>
-              </CardTitle>
-              <Switch
-                checked={timeSavings.enabled}
-                onCheckedChange={(enabled) => onTimeSavingsChange({ ...timeSavings, enabled })}
-                data-testid="switch-time-savings"
-              />
+                <Switch
+                  checked={timeSavings.enabled}
+                  onCheckedChange={(enabled) => onTimeSavingsChange({ ...timeSavings, enabled })}
+                  data-testid="switch-time-savings"
+                />
+              </div>
             </div>
             <CardDescription className="text-sm text-muted-foreground">
               Quantify productivity gains from AI automation. Time savings directly translate to cost reductions and are often the largest contributor to ROI calculations.

@@ -11,9 +11,11 @@ import { useEffect, useState } from 'react';
 interface PeopleAndCostFormProps {
   data: PeopleAndCost;
   onChange: (data: PeopleAndCost) => void;
+  showManualRequiredBadge?: boolean;
+  showPartialPIFBadge?: boolean;
 }
 
-export default function PeopleAndCostForm({ data, onChange }: PeopleAndCostFormProps) {
+export default function PeopleAndCostForm({ data, onChange, showManualRequiredBadge, showPartialPIFBadge }: PeopleAndCostFormProps) {
   const [workingHoursError, setWorkingHoursError] = useState<string>('');
 
   const handleChange = (field: keyof PeopleAndCost, value: string | number | boolean) => {
@@ -65,9 +67,27 @@ export default function PeopleAndCostForm({ data, onChange }: PeopleAndCostFormP
     <Card>
       <CardHeader>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <CardTitle>People & Cost Data</CardTitle>
-            <Badge variant="outline" className="w-fit">Step 2 of 6</Badge>
+            <div className="flex items-center gap-2 flex-wrap">
+              {showPartialPIFBadge && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs"
+                >
+                  Partial PIF
+                </Badge>
+              )}
+              {showManualRequiredBadge && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs"
+                >
+                  Manual input required
+                </Badge>
+              )}
+              <Badge variant="outline" className="w-fit">Step 2 of 6</Badge>
+            </div>
           </div>
           <CardDescription className="text-sm text-muted-foreground">
             Capture labor costs and workforce allocation. These metrics form the foundation for calculating potential cost savings and determining the financial impact of AI automation.

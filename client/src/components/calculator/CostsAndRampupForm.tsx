@@ -9,9 +9,10 @@ import RampUpEfficiencyRubric from './RampUpEfficiencyRubric';
 interface CostsAndRampupFormProps {
   data: CostsAndRampup;
   onChange: (data: CostsAndRampup) => void;
+  showManualRequiredBadge?: boolean;
 }
 
-export default function CostsAndRampupForm({ data, onChange }: CostsAndRampupFormProps) {
+export default function CostsAndRampupForm({ data, onChange, showManualRequiredBadge = true }: CostsAndRampupFormProps) {
   const handleChange = (field: keyof CostsAndRampup, value: string | number) => {
     onChange({ ...data, [field]: value });
   };
@@ -20,9 +21,19 @@ export default function CostsAndRampupForm({ data, onChange }: CostsAndRampupFor
     <Card>
       <CardHeader>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
             <CardTitle>Costs & Implementation</CardTitle>
-            <Badge variant="outline" className="w-fit">Step 6 of 6</Badge>
+            <div className="flex items-center gap-2 flex-wrap">
+              {showManualRequiredBadge && (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs"
+                >
+                  Manual input required
+                </Badge>
+              )}
+              <Badge variant="outline" className="w-fit">Step 6 of 6</Badge>
+            </div>
           </div>
           <CardDescription className="text-sm text-muted-foreground">
             Define total investment required for AI implementation. These costs are essential for calculating true ROI and determining payback period accurately.
