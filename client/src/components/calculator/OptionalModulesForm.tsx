@@ -171,16 +171,24 @@ export default function OptionalModulesForm({
       <Card>
         <CardHeader>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                Quality Impact Module
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle>Quality Impact Module</CardTitle>
+              <div className="flex items-center gap-2 flex-wrap">
+                {showFromPIFBadge && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs"
+                  >
+                    From PIF
+                  </Badge>
+                )}
                 <Badge variant="outline">Step 4 of 6</Badge>
-              </CardTitle>
-              <Switch
-                checked={qualityImpact.enabled}
-                onCheckedChange={(enabled) => onQualityImpactChange({ ...qualityImpact, enabled })}
-                data-testid="switch-quality-impact"
-              />
+                <Switch
+                  checked={qualityImpact.enabled}
+                  onCheckedChange={(enabled) => onQualityImpactChange({ ...qualityImpact, enabled })}
+                  data-testid="switch-quality-impact"
+                />
+              </div>
             </div>
             <CardDescription className="text-sm text-muted-foreground">
               Calculate savings from improved quality, reduced errors, and eliminated rework. AI systems improve accuracy and consistency, reducing costly mistakes and quality issues.
@@ -408,16 +416,24 @@ export default function OptionalModulesForm({
       <Card>
         <CardHeader>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                Revenue Uplift Module
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <CardTitle>Revenue Uplift Module</CardTitle>
+              <div className="flex items-center gap-2 flex-wrap">
+                {showFromPIFBadge && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs"
+                  >
+                    From PIF
+                  </Badge>
+                )}
                 <Badge variant="outline">Step 5 of 6</Badge>
-              </CardTitle>
-              <Switch
-                checked={revenueUplift.enabled}
-                onCheckedChange={(enabled) => onRevenueUpliftChange({ ...revenueUplift, enabled })}
-                data-testid="switch-revenue-uplift"
-              />
+                <Switch
+                  checked={revenueUplift.enabled}
+                  onCheckedChange={(enabled) => onRevenueUpliftChange({ ...revenueUplift, enabled })}
+                  data-testid="switch-revenue-uplift"
+                />
+              </div>
             </div>
             <CardDescription className="text-sm text-muted-foreground">
               Calculate revenue gains from reallocating saved time to higher-value activities. Time freed by AI can be redirected to revenue-generating tasks, multiplying ROI impact.
