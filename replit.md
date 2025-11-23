@@ -4,6 +4,18 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
+**November 23, 2025 - PIF Shareable Link Security Enhancement**
+- **Critical Security Fix**: PIF access codes now validated server-side before displaying form content
+- **Backend Changes**: GET `/api/pif/shareable/:shareableId` route now requires and validates `code` query parameter, returning 403 Forbidden for invalid/missing codes
+- **Frontend Changes**: PIFForm extracts access code from URL query parameters and displays appropriate error screens:
+  - "Access Code Required" when no code is provided in URL
+  - "Access Denied" when code validation fails (403 response)
+  - Form renders only when access code is valid
+- **User Experience**: ShareableLinkCard now embeds verification code in generated URLs (e.g., `/pif/{id}?code={code}`) for seamless single-click access
+- **Bug Fix**: WorkflowStepDetail.tsx now uses optional chaining (`tfaAssessment?.score`) to handle missing TFA assessments gracefully
+- **Security Impact**: Prevents unauthorized users from viewing PIF form content by enforcing access code validation at the GET endpoint level, not just at submission
+- **Files Modified**: `server/routes.ts`, `client/src/pages/PIFForm.tsx`, `client/src/components/ShareableLinkCard.tsx`, `client/src/pages/WorkflowStepDetail.tsx`
+
 **November 19, 2025 - FTE Calculation Refactor: Platform Now Accepts Pre-Calculated FTE from ROI Calculator**
 - **Architectural Change**: Platform no longer calculates FTE from hours using hardcoded 2080-hour assumption
 - **New Data Flow**: OpportunityForm now accepts `fteSavings` as direct input field from ROI Calculator (alongside `hoursSavedPerWeek` and `annualHoursSaved` for reference)
