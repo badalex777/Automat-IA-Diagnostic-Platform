@@ -4,6 +4,24 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
+**November 23, 2025 - Unified Security Model: TFA Form Matches PIF Access Code Validation**
+- **Security Enhancement**: Both TFA and PIF forms now use identical security architecture - intro/disclaimer page visible to anyone, but verification code + respondent info required to access actual form questions
+- **TFA Backend Changes**: 
+  - GET `/api/tfa/shareable/:shareableId` returns only basic metadata (company name, workflow name) without requiring access code validation
+  - New POST `/api/tfa/shareable/:shareableId/validate-code` endpoint validates verification code when user clicks "Next" on intro section
+  - Returns 403 if code is missing/invalid, allowing frontend to show error and block progression
+- **TFA Frontend Changes**: 
+  - TFAForm loads intro section for anyone (no code required to view company/workflow info)
+  - Added `validateAccessCode()` function called when clicking "Next" on intro section (Section 0)
+  - Added `codeValidated` state to track validation status
+  - Navigation blocked beyond intro section until code is validated server-side
+  - Intro section permanently hidden after validation (`{currentSection === 0 && !codeValidated && ...}`)
+  - Previous button disabled on Section 1 after validation to prevent returning to hidden intro
+- **Shareable Link Format**: Both TFA and PIF URLs no longer include `?code=` parameter - code must be manually entered on form
+- **Security Model**: Intro/disclaimer is public (company/workflow names visible), but form questions and respondent info require valid code
+- **ShareableLinkCard Update**: Instruction text now says "intro page" for TFA and "disclaimer page" for PIF
+- **Files Modified**: `server/routes.ts`, `client/src/pages/TFAForm.tsx`, `client/src/components/ShareableLinkCard.tsx`
+
 **November 23, 2025 - PIF Access Code Validation at Disclaimer Page**
 - **Security Enhancement**: PIF access code validation now happens when clicking "Next" on disclaimer page, not on initial page load
 - **User Experience**: Anyone with the shareable link can view the disclaimer section, but must enter the correct verification code to proceed to the rest of the form
