@@ -685,13 +685,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Company not found" });
       }
 
-      // Sanitize assessment to exclude verification code and other sensitive fields
-      const { verificationCode, verificationToken, ...sanitizedAssessment } = assessment;
-
+      // Return only non-sensitive metadata (no questions, no verification code)
+      // This allows anyone to see the intro/welcome page without validating access code
       res.json({
-        assessment: sanitizedAssessment,
-        workflow,
-        company,
+        shareableId: req.params.shareableId,
+        companyName: company.name,
+        workflowName: workflow.name,
+        workflowId: assessment.workflowId,
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // New endpoint to validate TFA access code
+  app.post("/api/tfa/shareable/:shareableId/validate-code", async (req, res) => {
+    try {
+      const { verificationCode } = req.body;
+      
+      if (!verificationCode || !verificationCode.trim()) {
+        return res.status(400).json({ error: "Verification code is required" });
+      }
+
+      const assessment = await storage.getTFAByShareableId(req.params.shareableId);
+      if (!assessment) {
+        return res.status(404).json({ error: "Assessment not found" });
+      }
+
+      if (verificationCode.trim() !== assessment.verificationCode) {
+        console.log('[TFA Code Validation] Invalid code:', {
+          provided: verificationCode.trim(),
+          expected: assessment.verificationCode,
+        });
+        return res.status(403).json({ 
+          error: "Invalid verification code. Please check the code and try again." 
+        });
+      }
+
+      console.log('[TFA Code Validation] Code validated successfully');
+      
+      // Code is valid - return success
+      res.json({ 
+        valid: true,
+        message: "Access code validated successfully" 
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

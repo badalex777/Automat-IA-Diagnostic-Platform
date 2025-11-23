@@ -18,9 +18,10 @@ import { getUITranslation, getSectionTranslation, getQuestionTranslation, getGap
 import type { TFAAssessment, Workflow, Company } from "@shared/schema";
 
 interface TFAData {
-  assessment: TFAAssessment;
-  workflow: Workflow;
-  company: Company;
+  shareableId: string;
+  companyName: string;
+  workflowName: string;
+  workflowId: string;
 }
 
 export default function TFAForm() {
@@ -33,8 +34,10 @@ export default function TFAForm() {
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
-  const [currentSection, setCurrentSection] = useState(0);
+  const [currentSection, setCurrentSection] = useState(0); // 0 = intro/welcome, 1+ = TFA sections
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
+  const [codeValidated, setCodeValidated] = useState(false);
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
   
   // TFA-specific language state (independent from admin UI)
   const [language, setLanguage] = useState<'en' | 'es'>(() => {
@@ -51,6 +54,7 @@ export default function TFAForm() {
   const t = getUITranslation(language);
   const gapMeta = getGapMetadataTranslation(language);
 
+  // Fetch basic metadata (no code validation required)
   const { data: tfaData, isLoading, error } = useQuery<TFAData>({
     queryKey: [`/api/tfa/shareable/${shareableLink}`],
     enabled: !!shareableLink,
@@ -65,6 +69,40 @@ export default function TFAForm() {
       });
     }
   }, [error, toast, t.errorLoadingAssessment]);
+
+  // Function to validate access code
+  const validateAccessCode = async () => {
+    if (!verificationCode.trim()) {
+      toast({
+        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
+        description: language === 'en' 
+          ? 'Please enter the verification code to continue.' 
+          : 'Por favor ingrese el código de verificación para continuar.',
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    setIsValidatingCode(true);
+    try {
+      await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/validate-code`, {
+        verificationCode: verificationCode.trim()
+      });
+      setCodeValidated(true);
+      return true;
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Invalid Verification Code' : 'Código de Verificación Inválido',
+        description: error.message || (language === 'en' 
+          ? 'The verification code you entered is incorrect. Please check and try again.' 
+          : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsValidatingCode(false);
+    }
+  };
 
   const totalQuestions = tfaSections.reduce((acc, section) => acc + section.questions.length, 0);
   const answeredQuestions = Object.keys(answers).length;
@@ -82,9 +120,6 @@ export default function TFAForm() {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
     },
     onSuccess: () => {
-      if (tfaData?.workflow?.id) {
-        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${tfaData.workflow.id}/tfa`] });
-      }
       setLocation(`/tfa/${shareableLink}/thank-you`);
     },
     onError: (error: Error) => {
@@ -166,28 +201,47 @@ export default function TFAForm() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNext = () => {
-    // Validate respondent name and role if on first section
-    if (currentSection === 0 && !respondentName.trim()) {
+  const handleNext = async () => {
+    // Section 0 = intro/welcome - validate code, name, and role
+    if (currentSection === 0) {
+      if (!respondentName.trim()) {
+        toast({
+          title: t.nameRequired,
+          description: t.nameRequiredDescription,
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!respondentRole.trim()) {
+        toast({
+          title: language === 'en' ? "Role required" : "Rol requerido",
+          description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Validate access code before allowing progression
+      const isValid = await validateAccessCode();
+      if (!isValid) {
+        return; // Stay on intro section if code is invalid
+      }
+    } else if (!codeValidated) {
+      // Safety check: prevent navigation beyond intro if code not validated
       toast({
-        title: t.nameRequired,
-        description: t.nameRequiredDescription,
+        title: language === 'en' ? 'Access Restricted' : 'Acceso Restringido',
+        description: language === 'en' 
+          ? 'Please complete the introduction section first.' 
+          : 'Por favor complete la sección de introducción primero.',
         variant: "destructive",
       });
-      return;
-    }
-    if (currentSection === 0 && !respondentRole.trim()) {
-      toast({
-        title: language === 'en' ? "Role required" : "Rol requerido",
-        description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
-        variant: "destructive",
-      });
+      setCurrentSection(0); // Force back to intro
       return;
     }
 
     // Validate required questions in current section before proceeding
-    if (currentSection < tfaSections.length) {
-      const currentTFASection = tfaSections[currentSection];
+    // Note: currentSection - 1 because section 0 is intro, section 1+ are TFA sections
+    if (currentSection > 0 && currentSection <= tfaSections.length) {
+      const currentTFASection = tfaSections[currentSection - 1]; // -1 because intro is section 0
       const sectionQuestions = currentTFASection.questions;
       const missingSectionAnswers = sectionQuestions.filter(q => !answers[q.id.toString()]);
       
@@ -240,8 +294,6 @@ export default function TFAForm() {
       </div>
     );
   }
-
-  const { company, workflow } = tfaData;
   
   // Determine if we have knowledge gaps
   const hasKnowledgeGaps = Object.values(answers).some(v => v === "0");
@@ -255,9 +307,10 @@ export default function TFAForm() {
         .filter(Boolean)
     : [];
   
-  // Section flow: 0-5 (questions) → 6 (gap details if exists) → 7/6 (final comments)
-  const totalSections = tfaSections.length + (hasKnowledgeGaps ? 1 : 0) + 1; // questions + gap details (conditional) + comments
-  const isGapDetailsSection = hasKnowledgeGaps && currentSection === tfaSections.length;
+  // Section flow: 0 (intro) → 1-6 (TFA questions) → 7 (gap details if exists) → 8/7 (final comments)
+  const totalSections = 1 + tfaSections.length + (hasKnowledgeGaps ? 1 : 0) + 1; // intro + questions + gap details (conditional) + comments
+  const isIntroSection = currentSection === 0;
+  const isGapDetailsSection = hasKnowledgeGaps && currentSection === tfaSections.length + 1; // +1 for intro
   const isFinalCommentsSection = currentSection === totalSections - 1;
 
   return (
@@ -279,10 +332,7 @@ export default function TFAForm() {
                 </Select>
               </div>
               <h1 className="text-2xl font-semibold" data-testid="text-tfa-title">{t.title}</h1>
-              <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
-              {workflow.description && (
-                <p className="text-sm text-muted-foreground mt-2" data-testid="text-workflow-description">{workflow.description}</p>
-              )}
+              <p className="text-sm text-muted-foreground mt-1">{tfaData.companyName} • {tfaData.workflowName}</p>
             </div>
             <ThemeToggle />
           </div>
@@ -374,21 +424,21 @@ export default function TFAForm() {
           </>
         )}
 
-        {currentSection < tfaSections.length ? (
+        {currentSection >= 1 && currentSection <= tfaSections.length ? (
           <>
             <div className="mb-6">
               <h2 className="text-xl font-semibold" data-testid="text-section-title">
-                {t.section} {currentSection + 1}: {getSectionTranslation(tfaSections[currentSection].section, language).name}
+                {t.section} {currentSection}: {getSectionTranslation(tfaSections[currentSection - 1].section, language).name}
               </h2>
-              {tfaSections[currentSection].description && (
+              {tfaSections[currentSection - 1].description && (
                 <p className="text-sm text-muted-foreground mt-2">
-                  {getSectionTranslation(tfaSections[currentSection].section, language).description}
+                  {getSectionTranslation(tfaSections[currentSection - 1].section, language).description}
                 </p>
               )}
             </div>
             
             <div className="space-y-8">
-              {tfaSections[currentSection].questions.map((q) => {
+              {tfaSections[currentSection - 1].questions.map((q) => {
                 const questionTranslation = getQuestionTranslation(q.id, language);
                 return (
                   <TFAQuestionCard
