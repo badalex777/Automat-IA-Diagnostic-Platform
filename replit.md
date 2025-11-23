@@ -4,16 +4,22 @@ The Automat-IA Diagnostic Platform is a professional web application designed fo
 
 ### Recent Changes
 
-**November 23, 2025 - PIF Shareable Link Security Enhancement**
-- **Critical Security Fix**: PIF access codes now validated server-side before displaying form content
-- **Backend Changes**: GET `/api/pif/shareable/:shareableId` route now requires and validates `code` query parameter, returning 403 Forbidden for invalid/missing codes
-- **Frontend Changes**: PIFForm extracts access code from URL query parameters and displays appropriate error screens:
-  - "Access Code Required" when no code is provided in URL
-  - "Access Denied" when code validation fails (403 response)
-  - Form renders only when access code is valid
-- **User Experience**: ShareableLinkCard now embeds verification code in generated URLs (e.g., `/pif/{id}?code={code}`) for seamless single-click access
+**November 23, 2025 - PIF Access Code Validation at Disclaimer Page**
+- **Security Enhancement**: PIF access code validation now happens when clicking "Next" on disclaimer page, not on initial page load
+- **User Experience**: Anyone with the shareable link can view the disclaimer section, but must enter the correct verification code to proceed to the rest of the form
+- **Backend Changes**: 
+  - GET `/api/pif/shareable/:shareableId` returns only basic metadata (company name, workflow name, stepId) without requiring access code validation
+  - New POST `/api/pif/shareable/:shareableId/validate-code` endpoint validates verification code when user clicks "Next" on disclaimer
+  - Returns 403 if code is missing/invalid, allowing frontend to show error and block progression
+- **Frontend Changes**: 
+  - PIFForm loads disclaimer for anyone (no code required to view company/workflow info)
+  - Added `validateAccessCode()` function called when clicking "Next" on disclaimer section
+  - Added `codeValidated` state to track validation status
+  - Navigation blocked beyond disclaimer section until code is validated server-side
+  - Removed "Access Code Required" error screen (disclaimer always visible)
+- **Shareable Link Format**: URLs no longer include `?code=` parameter - code must be manually entered on disclaimer page
+- **Security Model**: Disclaimer is public (company/workflow names visible), but form questions and respondent info require valid code
 - **Bug Fix**: WorkflowStepDetail.tsx now uses optional chaining (`tfaAssessment?.score`) to handle missing TFA assessments gracefully
-- **Security Impact**: Prevents unauthorized users from viewing PIF form content by enforcing access code validation at the GET endpoint level, not just at submission
 - **Files Modified**: `server/routes.ts`, `client/src/pages/PIFForm.tsx`, `client/src/components/ShareableLinkCard.tsx`, `client/src/pages/WorkflowStepDetail.tsx`
 
 **November 19, 2025 - FTE Calculation Refactor: Platform Now Accepts Pre-Calculated FTE from ROI Calculator**
