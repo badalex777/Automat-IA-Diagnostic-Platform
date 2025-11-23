@@ -85,7 +85,7 @@ export default function ShareableLinkCard({
   });
 
   const shareableUrl = type === 'pif' && pifTemplate
-    ? `${window.location.origin}/pif/${pifTemplate.shareableId}`
+    ? `${window.location.origin}/pif/${pifTemplate.shareableId}?code=${pifTemplate.verificationCode}`
     : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
@@ -196,14 +196,14 @@ export default function ShareableLinkCard({
 
         {verificationCode && (
           <div className="bg-primary/10 border border-primary/20 rounded-md p-4 space-y-2">
-            <p className="font-semibold text-sm">Verification Code Required</p>
+            <p className="font-semibold text-sm">Verification Code</p>
             <div className="flex items-center gap-2">
               <code className="text-2xl font-mono font-bold tracking-wider" data-testid="text-verification-code">
                 {verificationCode}
               </code>
             </div>
             <p className="text-xs text-muted-foreground">
-              Share this code with the respondent. They must enter it when submitting the form.
+              The access code is included in the link above. Respondents can click the link to access the form directly.
             </p>
           </div>
         )}
