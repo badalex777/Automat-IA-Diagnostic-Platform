@@ -256,7 +256,7 @@ export default function WorkflowStepDetail() {
 
     // Calculate readiness rubric for this step
     stepReadinessRubric = calculateReadinessRubric(
-      tfaAssessment.score || 0,
+      tfaAssessment?.score || 0,
       sectionScores,
       stepAggregatedPIF
     );
