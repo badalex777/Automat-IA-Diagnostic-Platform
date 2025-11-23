@@ -1192,6 +1192,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const template = templates[0]; // Use first template (all should have same workflow/step)
       
+      // SECURITY: Validate access code before returning any form data
+      const providedCode = req.query.code as string;
+      
+      if (!providedCode || !providedCode.trim()) {
+        console.log('[PIF Shareable GET] Access code missing');
+        return res.status(403).json({ 
+          error: "Access code is required to view this survey." 
+        });
+      }
+
+      if (providedCode.trim() !== template.verificationCode) {
+        console.log('[PIF Shareable GET] Access code mismatch:', {
+          provided: providedCode.trim(),
+          expected: template.verificationCode,
+        });
+        return res.status(403).json({ 
+          error: "Invalid access code. Please check the code provided with the survey link." 
+        });
+      }
+
+      console.log('[PIF Shareable GET] Access code validated successfully');
+      
       const workflow = await storage.getWorkflow(template.workflowId);
       if (!workflow) {
         return res.status(404).json({ error: "Workflow not found" });
