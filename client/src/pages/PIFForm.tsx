@@ -30,9 +30,10 @@ export default function PIFForm() {
   const shareableId = params?.shareableId || '';
   const { toast } = useToast();
   
-  // Read stepId from URL query parameters
+  // Read stepId and access code from URL query parameters
   const urlParams = new URLSearchParams(window.location.search);
   const stepId = urlParams.get('stepId') || undefined;
+  const accessCode = urlParams.get('code') || '';
   
   const ALL_PIF_QUESTIONS = getAllPIFQuestions();
   
@@ -57,8 +58,8 @@ export default function PIFForm() {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   const { data: pifData, isLoading, error } = useQuery<PIFData>({
-    queryKey: [`/api/pif/shareable/${shareableId}`],
-    enabled: !!shareableId,
+    queryKey: [`/api/pif/shareable/${shareableId}?code=${accessCode}`],
+    enabled: !!shareableId && !!accessCode,
   });
 
   useEffect(() => {
@@ -176,10 +177,38 @@ export default function PIFForm() {
     });
   };
 
+  if (!accessCode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+          <h1 className="text-2xl font-semibold">Access Code Required</h1>
+          <p className="text-muted-foreground">
+            This survey requires a valid access code. Please use the link provided to you, which includes the access code.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">{t.ui.loadingSurvey}</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md text-center space-y-4">
+          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+          <h1 className="text-2xl font-semibold">Access Denied</h1>
+          <p className="text-muted-foreground">
+            {error.message || "Invalid access code. Please check the code provided with the survey link."}
+          </p>
+        </div>
       </div>
     );
   }
