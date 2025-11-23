@@ -203,7 +203,7 @@ export default function ShareableLinkCard({
               </code>
             </div>
             <p className="text-xs text-muted-foreground">
-              Share this code with the respondent. They must enter it on the disclaimer page to access the form.
+              Share this code with the respondent. They must enter it on the {type === 'pif' ? 'disclaimer' : 'intro'} page to access the form.
             </p>
           </div>
         )}
