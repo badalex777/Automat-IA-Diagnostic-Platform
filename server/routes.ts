@@ -1192,28 +1192,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const template = templates[0]; // Use first template (all should have same workflow/step)
       
-      // SECURITY: Validate access code before returning any form data
-      const providedCode = req.query.code as string;
-      
-      if (!providedCode || !providedCode.trim()) {
-        console.log('[PIF Shareable GET] Access code missing');
-        return res.status(403).json({ 
-          error: "Access code is required to view this survey." 
-        });
-      }
-
-      if (providedCode.trim() !== template.verificationCode) {
-        console.log('[PIF Shareable GET] Access code mismatch:', {
-          provided: providedCode.trim(),
-          expected: template.verificationCode,
-        });
-        return res.status(403).json({ 
-          error: "Invalid access code. Please check the code provided with the survey link." 
-        });
-      }
-
-      console.log('[PIF Shareable GET] Access code validated successfully');
-      
       const workflow = await storage.getWorkflow(template.workflowId);
       if (!workflow) {
         return res.status(404).json({ error: "Workflow not found" });
@@ -1224,13 +1202,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Company not found" });
       }
 
-      // Sanitize template to exclude verification code and other sensitive fields
-      const { verificationCode, ...sanitizedTemplate } = template;
-
+      // Return only non-sensitive metadata (no questions, no verification code)
+      // This allows anyone to see the disclaimer without validating access code
       res.json({
-        template: sanitizedTemplate,
-        workflow,
-        company,
+        shareableId: req.params.shareableId,
+        companyName: company.name,
+        workflowName: workflow.name,
+        stepId: template.stepId,
+        // Disclaimer text will be fetched from PIF_QUESTIONS in frontend
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // New endpoint to validate access code
+  app.post("/api/pif/shareable/:shareableId/validate-code", async (req, res) => {
+    try {
+      const { verificationCode } = req.body;
+      
+      if (!verificationCode || !verificationCode.trim()) {
+        return res.status(400).json({ error: "Verification code is required" });
+      }
+
+      const templates = await storage.getPIFByShareableId(req.params.shareableId);
+      if (!templates || templates.length === 0) {
+        return res.status(404).json({ error: "Survey not found" });
+      }
+      
+      const template = templates[0];
+
+      if (verificationCode.trim() !== template.verificationCode) {
+        console.log('[PIF Code Validation] Invalid code:', {
+          provided: verificationCode.trim(),
+          expected: template.verificationCode,
+        });
+        return res.status(403).json({ 
+          error: "Invalid verification code. Please check the code and try again." 
+        });
+      }
+
+      console.log('[PIF Code Validation] Code validated successfully');
+      
+      // Code is valid - return success
+      res.json({ 
+        valid: true,
+        message: "Access code validated successfully" 
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
