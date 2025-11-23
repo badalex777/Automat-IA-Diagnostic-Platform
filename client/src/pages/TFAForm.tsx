@@ -358,7 +358,7 @@ export default function TFAForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {currentSection === 0 && (
+        {currentSection === 0 && !codeValidated && (
           <>
             {/* Verification Code Section */}
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-6">
@@ -568,7 +568,7 @@ export default function TFAForm() {
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
           <Button 
             variant="outline" 
-            disabled={currentSection === 0}
+            disabled={currentSection === 0 || (codeValidated && currentSection === 1)}
             onClick={() => handleSectionChange(currentSection - 1)}
             data-testid="button-previous-section"
           >
