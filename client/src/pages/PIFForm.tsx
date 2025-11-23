@@ -19,9 +19,10 @@ import { pifTranslations } from "@shared/pifTranslations";
 import type { Workflow, Company, PIFResponse } from "@shared/schema";
 
 interface PIFData {
-  template: PIFResponse;
-  workflow: Workflow;
-  company: Company;
+  shareableId: string;
+  companyName: string;
+  workflowName: string;
+  stepId: string;
 }
 
 export default function PIFForm() {
@@ -29,11 +30,6 @@ export default function PIFForm() {
   const [, setLocation] = useLocation();
   const shareableId = params?.shareableId || '';
   const { toast } = useToast();
-  
-  // Read stepId and access code from URL query parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const stepId = urlParams.get('stepId') || undefined;
-  const accessCode = urlParams.get('code') || '';
   
   const ALL_PIF_QUESTIONS = getAllPIFQuestions();
   
@@ -56,10 +52,13 @@ export default function PIFForm() {
   const [verificationCode, setVerificationCode] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [codeValidated, setCodeValidated] = useState(false);
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
 
+  // Fetch basic metadata (no code validation required)
   const { data: pifData, isLoading, error } = useQuery<PIFData>({
-    queryKey: [`/api/pif/shareable/${shareableId}?code=${accessCode}`],
-    enabled: !!shareableId && !!accessCode,
+    queryKey: [`/api/pif/shareable/${shareableId}`],
+    enabled: !!shareableId,
   });
 
   useEffect(() => {
@@ -72,6 +71,40 @@ export default function PIFForm() {
     }
   }, [error, toast, t]);
 
+  // Function to validate access code
+  const validateAccessCode = async () => {
+    if (!verificationCode.trim()) {
+      toast({
+        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
+        description: language === 'en' 
+          ? 'Please enter the verification code to continue.' 
+          : 'Por favor ingrese el código de verificación para continuar.',
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    setIsValidatingCode(true);
+    try {
+      await apiRequest('POST', `/api/pif/shareable/${shareableId}/validate-code`, {
+        verificationCode: verificationCode.trim()
+      });
+      setCodeValidated(true);
+      return true;
+    } catch (error: any) {
+      toast({
+        title: language === 'en' ? 'Invalid Verification Code' : 'Código de Verificación Inválido',
+        description: error.message || (language === 'en' 
+          ? 'The verification code you entered is incorrect. Please check and try again.' 
+          : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsValidatingCode(false);
+    }
+  };
+
   const submitMutation = useMutation({
     mutationFn: async (data: { 
       respondentName: string;
@@ -82,17 +115,9 @@ export default function PIFForm() {
       stepId?: string;
       shareableId: string;
     }) => {
-      if (!pifData?.workflow?.id) throw new Error("Workflow not found");
       return await apiRequest('POST', `/api/pif/shareable/${data.shareableId}/submit`, data);
     },
     onSuccess: () => {
-      if (pifData?.workflow?.id) {
-        // Invalidate PIF responses cache
-        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pifData.workflow.id}/pif`] });
-        // Invalidate workflow detail cache so consultants see updated responses immediately
-        queryClient.invalidateQueries({ queryKey: [`/api/workflows/${pifData.workflow.id}`] });
-        queryClient.invalidateQueries({ queryKey: ['/api/workflows'] });
-      }
       setLocation(`/pif/${shareableId}/thank-you`);
     },
     onError: (error: Error) => {
@@ -173,23 +198,9 @@ export default function PIFForm() {
       verificationCode: verificationCode.trim().toUpperCase(),
       shareableId,
       responses: answers,
-      ...(stepId && { stepId }), // Include stepId if present
+      stepId: pifData?.stepId, // Include stepId from metadata
     });
   };
-
-  if (!accessCode) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="max-w-md text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
-          <h1 className="text-2xl font-semibold">Access Code Required</h1>
-          <p className="text-muted-foreground">
-            This survey requires a valid access code. Please use the link provided to you, which includes the access code.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -204,9 +215,9 @@ export default function PIFForm() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="max-w-md text-center space-y-4">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
-          <h1 className="text-2xl font-semibold">Access Denied</h1>
+          <h1 className="text-2xl font-semibold">Survey Not Found</h1>
           <p className="text-muted-foreground">
-            {error.message || "Invalid access code. Please check the code provided with the survey link."}
+            {error.message || "This survey link is invalid or has expired."}
           </p>
         </div>
       </div>
@@ -220,8 +231,6 @@ export default function PIFForm() {
       </div>
     );
   }
-
-  const { company, workflow } = pifData;
 
   // Section definitions: 0 = Disclaimer, 1 = Respondent Info, 2-9 = PIF sections
   const sections = PIF_SECTIONS;
@@ -253,9 +262,10 @@ export default function PIFForm() {
   }).length;
   const progress = requiredQuestionsCount > 0 ? (answeredCount / requiredQuestionsCount) * 100 : 0;
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Block progression beyond disclaimer if code hasn't been validated
     if (currentSection === 0) {
-      // Disclaimer section - require both disclaimer acceptance AND verification code
+      // Disclaimer section - require disclaimer acceptance and validate code
       if (!disclaimerAccepted) {
         toast({
           title: t.ui.acceptanceRequired,
@@ -264,17 +274,25 @@ export default function PIFForm() {
         });
         return;
       }
-      if (!verificationCode.trim()) {
-        toast({
-          title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
-          description: language === 'en' 
-            ? 'Please enter the verification code provided by your consultant before proceeding.' 
-            : 'Por favor ingrese el código de verificación proporcionado por su consultor antes de continuar.',
-          variant: "destructive",
-        });
-        return;
+      // Validate access code before allowing progression
+      const isValid = await validateAccessCode();
+      if (!isValid) {
+        return; // Stay on disclaimer section if code is invalid
       }
-    } else if (currentSection === 1) {
+    } else if (!codeValidated) {
+      // Safety check: prevent navigation beyond disclaimer if code not validated
+      toast({
+        title: language === 'en' ? 'Access Restricted' : 'Acceso Restringido',
+        description: language === 'en' 
+          ? 'Please complete the disclaimer section first.' 
+          : 'Por favor complete la sección de descargo de responsabilidad primero.',
+        variant: "destructive",
+      });
+      setCurrentSection(0); // Force back to disclaimer
+      return;
+    }
+    
+    if (currentSection === 1) {
       // Respondent Info section
       if (!respondentName.trim() || !respondentRole.trim() || !respondentResponsibilities.trim()) {
         toast({
@@ -341,9 +359,8 @@ export default function PIFForm() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <h1 className="text-2xl font-semibold" data-testid="text-pif-title">{t.ui.title}</h1>
-              <p className="text-sm text-muted-foreground mt-1">{company.name} • {workflow.name}</p>
-              {workflow.description && (
-                <p className="text-sm text-muted-foreground mt-2" data-testid="text-workflow-description">{workflow.description}</p>
+              {pifData && (
+                <p className="text-sm text-muted-foreground mt-1">{pifData.companyName} • {pifData.workflowName}</p>
               )}
             </div>
             <div className="flex items-center gap-3">

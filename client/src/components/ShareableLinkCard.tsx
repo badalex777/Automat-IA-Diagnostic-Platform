@@ -85,7 +85,7 @@ export default function ShareableLinkCard({
   });
 
   const shareableUrl = type === 'pif' && pifTemplate
-    ? `${window.location.origin}/pif/${pifTemplate.shareableId}?code=${pifTemplate.verificationCode}`
+    ? `${window.location.origin}/pif/${pifTemplate.shareableId}`
     : type === 'tfa' && existingAssessment?.shareableId 
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
@@ -203,7 +203,7 @@ export default function ShareableLinkCard({
               </code>
             </div>
             <p className="text-xs text-muted-foreground">
-              The access code is included in the link above. Respondents can click the link to access the form directly.
+              Share this code with the respondent. They must enter it on the disclaimer page to access the form.
             </p>
           </div>
         )}
