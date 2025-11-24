@@ -168,8 +168,8 @@ informe puede ser reproducida, distribuida o divulgada a terceros sin el consent
 de Automat-IA.
 
 Todos los hallazgos, métricas y recomendaciones se basan en información proporcionada por el cliente a 
-través de entrevistas, encuestas, Evaluaciones de Factibilidad Técnica (TFA), Formularios de Perspectivas 
-de Proceso (PIF) y documentación relacionada. Automat-IA asume que esta información es precisa y completa 
+través de entrevistas, encuestas(Evaluaciones de Factibilidad Técnica (TFA) y Formularios de Perspectivas 
+de Proceso (PIF)) y documentación relacionada. Automat-IA asume que esta información es precisa y completa 
 según el mejor conocimiento del cliente en el momento de la presentación. Cualquier omisión o inexactitud 
 puede afectar la validez de las conclusiones presentadas.
 
@@ -198,18 +198,34 @@ y rastreen los beneficios realizados contra las proyecciones presentadas en este
 `;
 
 export const METHODOLOGY_OVERVIEW = `
-Nuestro enfoque de diagnóstico integra el análisis de factibilidad técnica con la evaluación de impacto 
+Nuestro enfoque de diagnóstico integra el análisis de factibilidad técnica y viabilidad operacional con la evaluación de impacto 
 empresarial para producir una visión completa y basada en datos del potencial de automatización. La 
-metodología se desarrolla a través de diez fases clave, asegurando profundidad analítica, validación de 
+metodología se desarrolla a través de doce fases clave, asegurando profundidad analítica, validación de 
 partes interesadas y trazabilidad de hallazgos.
 
-Fase 1: Descubrimiento de Partes Interesadas y Definición de Contexto
+Fase 1: Recopilación Preliminar de Datos
+
+Se recopilan los Ingresos Anuales y el Número Total de FTE de la empresa cliente para cálculos de 
+impacto empresarial de oportunidades específicos de la empresa y realistas. La recopilación preliminar 
+de datos también incluye proporcionar nombres e información de contacto para el encuestado del TFA 
+(representante de TI/contacto técnico dentro de la organización del cliente) e información de contacto 
+del propietario del proceso de back-office para la distribución de evaluaciones en etapas posteriores.
+
+Fase 2: Descubrimiento de Partes Interesadas y Definición de Contexto
 
 Entrevistas estructuradas con propietarios de procesos, expertos en la materia y líderes departamentales 
-establecen una comprensión base de los flujos de trabajo actuales, puntos de dolor y objetivos de 
+establecen una identificación y comprensión base de los flujos de trabajo críticos, puntos de dolor y objetivos de 
 automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados.
 
-Fase 2: Evaluación de Factibilidad Técnica (TFA)
+Fase 3: Identificación de Encuestados PIF
+
+Los entrevistados (o el líder de RR.HH.) proporcionan el nombre e información de contacto de los 
+subordinados (usuarios finales) para la identificación de encuestados PIF. Idealmente, los datos 
+salariales para representantes a nivel de paso de cada flujo de trabajo de back-office identificado también 
+se proporcionan aquí para el modelado preciso de ROI de oportunidades en etapas posteriores. Esto incluye 
+salario promedio, horas semanales o anuales de FTE y multiplicador de gastos generales.
+
+Fase 4: Evaluación de Factibilidad Técnica (TFA)
 
 El TFA se realiza a nivel de flujo de trabajo y se comparte en todos los pasos dentro de ese flujo. Cada 
 flujo de trabajo se evalúa en cuatro dimensiones ponderadas: Entorno del Sistema, Calidad de Datos, 
@@ -218,19 +234,19 @@ Las respuestas generan una Calificación de Preparación Técnica (0 a 100), con
 registradas para aclaración para mantener la integridad de datos. Esta evaluación a nivel de flujo de trabajo 
 proporciona una base para comprender el entorno técnico que afecta todos los pasos dentro del proceso.
 
-Fase 3: Formulario de Perspectivas de Proceso (PIF)
+Fase 5: Formulario de Perspectivas de Proceso (PIF)
 
 Los PIF se recopilan a nivel de paso: cada paso de proceso individual dentro de un flujo de trabajo recibe 
 su propia evaluación PIF optimizada. El formulario consiste en hasta 29 preguntas (dependiendo de la lógica 
-condicional), principalmente de opción múltiple con solo 3 entradas numéricas requeridas de los encuestados. 
-Los participantes operacionales proporcionan datos cuantitativos incluyendo puntuaciones de claridad de 
+condicional), principalmente de opción múltiple con hasta 6 entradas numéricas simples requeridas de los encuestados. 
+Los participantes operacionales proporcionan datos cuantitativos incluyendo información de claridad de 
 proceso, indicadores de preparación al cambio, métricas de fragilidad de flujo de trabajo, datos de 
-tiempo/volumen y mediciones de impacto de calidad. Este enfoque cuantitativo y enfocado minimiza la fatiga 
+tiempo/volumen, potencial de incremento de ingresos y mediciones de impacto de calidad. Este enfoque cuantitativo y enfocado minimiza la fatiga 
 de encuesta mientras captura puntuaciones de preparación operacional estandarizadas y entradas precisas de 
 modelado de ROI a nivel de paso, permitiendo la identificación precisa de oportunidades de automatización sin 
 depender de promedios agregados de flujo de trabajo.
 
-Fase 4: Validación de Usuario Final y Mapeo de Flujo de Trabajo
+Fase 6: Validación de Usuario Final y Mapeo de Flujo de Trabajo
 
 Las sesiones de validación con usuarios finales confirman entradas PIF y mapean cada flujo de trabajo en 
 detalle, identificando ineficiencias específicas, tareas repetitivas, cuellos de botella, bucles de 
@@ -240,21 +256,24 @@ matices del flujo de trabajo, requisitos de conocimiento crítico, limitaciones 
 dolor del proceso. Esto asegura que los supuestos técnicos se alineen con las condiciones reales de 
 ejecución y que las estrategias de automatización aborden las oportunidades de mejora más impactantes.
 
-Fase 5: Identificación de Oportunidades
+Fase 7: Identificación de Oportunidades
 
-Al combinar datos TFA a nivel de flujo de trabajo con datos PIF a nivel de paso, se identifican y categorizan 
-oportunidades potenciales de automatización según factibilidad, complejidad de proceso y valor empresarial 
-esperado. Cada oportunidad está vinculada a su paso de flujo de trabajo de origen específico para 
+Al combinar datos TFA a nivel de flujo de trabajo, datos PIF a nivel de paso y datos de entrevistas con 
+partes interesadas y usuarios finales, se identifican y alcanzan preliminarmente oportunidades potenciales 
+de automatización. Cada oportunidad está vinculada a su paso de flujo de trabajo de origen específico para 
 auditabilidad y atribución precisa de impacto.
 
-Fase 6: Modelado y Cuantificación de ROI
+Fase 8: Modelado y Cuantificación de ROI
 
 Cada oportunidad validada se modela utilizando el Marco de Calculadora de ROI de Automat-IA para estimar 
 el impacto financiero, incluyendo ahorro de tiempo, reducción de errores e incremento potencial de ingresos. 
 Los resultados incluyen beneficio anualizado, porcentaje de ROI y período de retorno, calculados a través 
-del Marco de Escenario Conservador para asegurar realismo y disciplina analítica.
+del Marco de Escenario Conservador para asegurar realismo y disciplina analítica. El modelado de ROI se 
+basa principalmente en datos de respuesta PIF, sin embargo, otras entradas de datos como costos de 
+implementación, horas de capacitación por empleado y período de adaptación son estimadas por Automat-IA 
+y pueden estar sujetas a cambios si {{company_name}} decide proceder con la implementación.
 
-Fase 7: Priorización de Matriz de Oportunidades
+Fase 9: Priorización de Matriz de Oportunidades
 
 7.1 Descripción General
 
@@ -267,8 +286,8 @@ implementación, permitiendo priorización basada en datos en lugar de clasifica
 
 La matriz traza dos dimensiones principales:
 
-**Eje Vertical:** Impacto Empresarial combina porcentaje de ROI, beneficio anual y contribución estratégica 
-a los objetivos organizacionales.
+**Eje Vertical:** Impacto Empresarial combina ROI anual, FTE ahorrados y, cuando corresponda, 
+beneficios adicionales como reducción de errores e incremento de ingresos.
 
 **Eje Horizontal:** Esfuerzo de Implementación refleja la dificultad técnica, complejidad de integración y 
 puntuaciones de preparación a nivel de paso derivadas de la combinación de evaluaciones TFA a nivel de 
@@ -297,8 +316,9 @@ con la escalabilidad a largo plazo.
 
 Automat-IA aplica un Marco de Dos Matrices:
 
-1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial basado en el porcentaje de 
-ROI anual y ahorro de FTE, proporcionando priorización inicial que respalda la visibilidad ejecutiva y 
+1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial combinando el ROI anual de las 
+oportunidades identificadas dividido por los Ingresos Anuales de la empresa para producir un ROI-como-porcentaje-de-ingresos, 
+que luego se combina con el ahorro de FTE. Esto proporciona una priorización inicial que respalda la visibilidad ejecutiva y 
 secuenciación rápida de oportunidades.
 2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto 
 Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a 
@@ -306,7 +326,7 @@ través de reducción de errores o incremento de ingresos. Esta matriz refinada 
 de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de 
 ganancias a corto plazo y valor de automatización sostenible a largo plazo.
 
-Fase 8: Sesión de Validación y Alineación de Partes Interesadas
+Fase 10: Sesión de Validación y Alineación de Partes Interesadas
 
 Después de que se genera la Matriz de Oportunidades, se realiza una sesión de validación con partes 
 interesadas clave para confirmar la priorización, abordar riesgos ocultos y alinear las oportunidades de 
@@ -317,7 +337,7 @@ estratégico, permitiendo al equipo ajustar clasificaciones y secuenciación seg
 de Oportunidades validada luego alimenta directamente la hoja de ruta de automatización final y se convierte 
 en la base del Reporte Ejecutivo de Diagnóstico.
 
-Fase 9: Desarrollo de Hoja de Ruta de Automatización
+Fase 11: Desarrollo de Hoja de Ruta de Automatización
 
 Las oportunidades seleccionadas de las matrices validadas se secuencian en una hoja de ruta de tres fases 
 que convierte los hallazgos de diagnóstico en pasos de implementación accionables:
@@ -334,13 +354,13 @@ aprovechan la base construida anteriormente.
 La hoja de ruta actúa como un plan de ejecución estructurado, asegurando una transición lógica desde 
 ganancias de eficiencia inmediatas hasta habilitación de IA a nivel organizacional.
 
-Fase 10: Entregables Finales
+Fase 12: Entregables Finales
 
 El proceso de diagnóstico concluye con la entrega de dos productos completos:
 
 1. **Reporte Ejecutivo de Diagnóstico (EDR):** Este documento consolida todos los hallazgos, evaluaciones de 
 preparación, análisis FODA, proyecciones de ROI, matrices de oportunidades y la hoja de ruta de 
-automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-10), 
+automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-12), 
 descripción general del diagnóstico, hallazgos y análisis, hoja de ruta de automatización, Conclusiones y 
 Próximos Pasos, y seis apéndices completos (A: Metodología Detallada, B: Ponderación de Métricas de 
 Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción Detallada de ROI, E: Metodología 

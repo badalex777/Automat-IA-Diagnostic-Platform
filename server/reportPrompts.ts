@@ -166,7 +166,7 @@ executive and technical teams. No portion of this report may be reproduced, dist
 third parties without prior written consent from Automat-IA.
 
 All findings, metrics, and recommendations are based on information provided by the client through
-interviews, surveys, Technical Feasibility Assessments (TFAs), Process Insights Forms (PIFs), and
+interviews, surveys(Technical Feasibility Assessments (TFAs) & Process Insights Forms (PIFs)) and
 related documentation. Automat-IA assumes that this information is accurate and complete to the best of
 the client's knowledge at the time of submission. Any omissions or inaccuracies may affect the validity of
 the conclusions presented.
@@ -194,18 +194,33 @@ projections presented herein.
 `;
 
 export const METHODOLOGY_OVERVIEW = `
-Our diagnostic approach integrates technical feasibility analysis with business impact
+Our diagnostic approach integrates technical feasibility analysis and operational viability with business impact
 evaluation to produce a complete, data-driven view of automation potential. The methodology
-unfolds through ten key phases, ensuring analytical depth, stakeholder validation, and
+unfolds through twelve key phases, ensuring analytical depth, stakeholder validation, and
 traceability of insights.
 
-Phase 1: Stakeholder Discovery and Context Definition
+Phase 1: Preliminary Data Collection
+
+Client company's Annual Revenue and Total number of FTE are gathered for company-specific, 
+realistic opportunity business impact calculations. Preliminary data collection also includes 
+providing names and contact info for TFA respondent (IT representative/technical contact 
+within the client organization) and back-office process owner contact info for later-stage 
+assessment distribution.
+
+Phase 2: Stakeholder Discovery and Context Definition
 
 Structured interviews with process owners, subject matter experts, and departmental leads
-establish a baseline understanding of current workflows, pain points, and automation objectives.
+establish a baseline identification and understanding of critical workflows, pain points, and automation objectives.
 This ensures that the diagnostic scope and business priorities are aligned.
 
-Phase 2: Technical Feasibility Assessment (TFA)
+Phase 3: PIF Respondent Identification
+
+Interviewees (or the HR lead) provide the name and contact info of the subordinates 
+(end-users) for PIF respondent identification. Ideally, salary data for step-level representatives 
+of each identified back-office workflow is also provided here for later-stage accurate opportunity 
+ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
+
+Phase 4: Technical Feasibility Assessment (TFA)
 
 The TFA is conducted at the workflow level and shared across all steps within that workflow.
 Each workflow is evaluated across four weighted dimensions: System Environment, Data
@@ -215,19 +230,19 @@ knowledge gaps recorded for clarification to maintain data integrity. This workf
 assessment provides a foundation for understanding the technical environment that affects all
 steps within the process.
 
-Phase 3: Process Insights Form (PIF)
+Phase 5: Process Insights Form (PIF)
 
 PIFs are collected at the step level—each individual process step within a workflow receives its
 own streamlined PIF assessment. The form consists of up to 29 questions (depending on
-conditional logic), primarily multiple-choice with only 3 numeric inputs required from respondents.
-Operational participants provide quantitative data including process clarity scores, change
-readiness indicators, workflow brittleness metrics, time/volume data, and quality impact
+conditional logic), primarily multiple-choice with up to 6 simple numeric inputs required from respondents.
+Operational participants provide quantitative data including process clarity information, change
+readiness indicators, workflow brittleness metrics, time/volume data, revenue uplift potential, and quality impact
 measurements. This focused, quantitative approach minimizes survey fatigue while capturing
 standardized operational readiness scores and accurate ROI modeling inputs at the step level,
 enabling precise automation opportunity identification without relying on aggregated workflow
 averages.
 
-Phase 4: End-User Validation and Workflow Mapping
+Phase 6: End-User Validation and Workflow Mapping
 
 Validation sessions with end users confirm PIF inputs and map each workflow in detail,
 identifying specific inefficiencies, repetitive tasks, bottlenecks, rework loops, error-prone
@@ -237,21 +252,23 @@ limitations, and process pain points. This ensures that technical assumptions al
 execution conditions and that automation strategies address the most impactful improvement
 opportunities.
 
-Phase 5: Opportunity Identification
+Phase 7: Opportunity Identification
 
-By combining workflow-level TFA data with step-level PIF data, potential automation
-opportunities are identified and categorized according to feasibility, process complexity, and
-expected business value. Each opportunity is linked to its specific originating workflow step for
-auditability and precise impact attribution.
+By combining workflow-level TFA data, step-level PIF data and stakeholder and end-user interview data, 
+potential automation opportunities are identified and preliminarily scoped. Each opportunity is linked 
+to its specific originating workflow step for auditability and precise impact attribution.
 
-Phase 6: ROI Modeling and Quantification
+Phase 8: ROI Modeling and Quantification
 
 Each validated opportunity is modeled using Automat-IA's ROI Calculator Framework to
 estimate financial impact, including time savings, error reduction, and potential revenue uplift.
 Results include annualized benefit, ROI percentage, and payback period, calculated through
-the Conservative Scenario Framework to ensure realism and analytical discipline.
+the Conservative Scenario Framework to ensure realism and analytical discipline. ROI modeling is 
+primarily based on PIF response data, however, other data inputs such as implementation costs, 
+training hours per employee and ramp-up period are estimated by Automat-IA and might be subject 
+to change if {{company_name}} decides to proceed with implementation.
 
-Phase 7: Opportunity Matrix Prioritization
+Phase 9: Opportunity Matrix Prioritization
 
 7.1 General Overview
 
@@ -264,8 +281,8 @@ data-driven prioritization rather than subjective ranking.
 
 The matrix plots two core dimensions:
 
-**Vertical Axis:** Business Impact combines ROI percentage, annual benefit, and
-strategic contribution to organizational goals.
+**Vertical Axis:** Business Impact combines annual ROI, FTE saved and, when applicable, 
+additional benefits such as error reduction & revenue uplift.
 
 **Horizontal Axis:** Implementation Effort reflects the technical difficulty, integration
 complexity, and step-level readiness scores derived from the combination of
@@ -296,10 +313,10 @@ scalability.
 
 Automat-IA applies a Two-Matrix Framework:
 
-1. The Base Impact Opportunity Matrix calculates Business Impact based on Annual ROI percentage and FTE savings, providing initial prioritization that supports executive visibility and quick sequencing of opportunities.
+1. The Base Impact Opportunity Matrix calculates Business Impact by combining the identified opportunities Annual ROI divided by the company's Annual Revenue to produce a ROI-as-a-percentage-of-revenue, which is then combined with FTE savings. This provides an initial prioritization that supports executive visibility and fast sequencing of opportunities.
 2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
 
-Phase 8: Validation Session and Stakeholder Alignment
+Phase 10: Validation Session and Stakeholder Alignment
 
 After the Opportunity Matrix is generated, a validation session is conducted with key
 stakeholders to confirm prioritization, address hidden risks, and align automation opportunities
@@ -309,7 +326,7 @@ implementation feasibility, resource availability, and strategic fit, allowing t
 rankings and sequencing as needed. The validated Opportunity Matrix then feeds directly into
 the final automation roadmap and becomes the foundation for the Executive Diagnostic Report.
 
-Phase 9: Automation Roadmap Development
+Phase 11: Automation Roadmap Development
 
 Opportunities selected from the validated matrices are sequenced into a three-phase roadmap
 that converts diagnostic insights into actionable implementation steps:
@@ -326,13 +343,13 @@ transformations that leverage the foundation built earlier.
 The roadmap acts as a structured execution plan, ensuring a logical transition from immediate
 efficiency gains to organization-wide AI enablement.
 
-Phase 10: Final Deliverables
+Phase 12: Final Deliverables
 
 The diagnostic process concludes with the delivery of two comprehensive outputs:
 
 1. **Executive Diagnostic Report (EDR):** This document consolidates all findings, readiness
 assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation
-roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-10), diagnostic
+roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-12), diagnostic
 overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six
 comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Weighting,
 C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology,
