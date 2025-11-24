@@ -205,7 +205,7 @@ partes interesadas y trazabilidad de hallazgos.
 
 Fase 1: Recopilación Preliminar de Datos
 
-Se recopilan los Ingresos Anuales y el Número Total de FTE de la empresa cliente para cálculos de 
+Se recopilan los Ingresos Anuales y el Número Total de FTE de {{company_name}} para cálculos de 
 impacto empresarial de oportunidades específicos de la empresa y realistas. La recopilación preliminar 
 de datos también incluye proporcionar nombres e información de contacto para el encuestado del TFA 
 (representante de TI/contacto técnico dentro de la organización del cliente) e información de contacto 
@@ -219,7 +219,7 @@ automatización. Esto asegura que el alcance del diagnóstico y las prioridades 
 
 Fase 3: Identificación de Encuestados PIF
 
-Los entrevistados (o el líder de RR.HH.) proporcionan el nombre e información de contacto de los 
+Después del descubrimiento de partes interesadas y definición de contexto, los entrevistados o un representante de RR.HH. proporcionan el nombre e información de contacto de los 
 subordinados (usuarios finales) para la identificación de encuestados PIF. Idealmente, los datos 
 salariales para representantes a nivel de paso de cada flujo de trabajo de back-office identificado también 
 se proporcionan aquí para el modelado preciso de ROI de oportunidades en etapas posteriores. Esto incluye 

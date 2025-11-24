@@ -201,7 +201,7 @@ traceability of insights.
 
 Phase 1: Preliminary Data Collection
 
-Client company's Annual Revenue and Total number of FTE are gathered for company-specific, 
+{{company_name}}'s Annual Revenue and Total number of FTE are gathered for company-specific, 
 realistic opportunity business impact calculations. Preliminary data collection also includes 
 providing names and contact info for TFA respondent (IT representative/technical contact 
 within the client organization) and back-office process owner contact info for later-stage 
@@ -215,7 +215,7 @@ This ensures that the diagnostic scope and business priorities are aligned.
 
 Phase 3: PIF Respondent Identification
 
-Interviewees (or the HR lead) provide the name and contact info of the subordinates 
+After stakeholder discovery and context definition, the interviewed stakeholders or an HR representative provide the name and contact info of the subordinates 
 (end-users) for PIF respondent identification. Ideally, salary data for step-level representatives 
 of each identified back-office workflow is also provided here for later-stage accurate opportunity 
 ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
