@@ -1614,26 +1614,45 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     alignment: AlignmentType.BOTH,
     spacing: { after: 120 },
   }));
-  sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet1, data.roadmapPhases.phase1QuickWins.length, ctx.fmt.currency(data.portfolioMetrics.totalAnnualBenefit))));
+  sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet1, data.portfolioMetrics.totalOpportunities, ctx.fmt.currency(data.portfolioMetrics.totalAnnualBenefit))));
   sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet2));
-  sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet3));
+  
+  // Dynamic bullet 3: Determine which phase has the highest individual ROI percentage
+  const getMaxRoiFromPhase = (opportunities: typeof data.roadmapPhases.phase1QuickWins): number => {
+    if (opportunities.length === 0) return 0;
+    return Math.max(...opportunities.map(o => parseFloat(o.opportunity.annualRunRateRoi || "0")));
+  };
+  
+  const phase1MaxRoi = getMaxRoiFromPhase(data.roadmapPhases.phase1QuickWins);
+  const phase2MaxRoi = getMaxRoiFromPhase(data.roadmapPhases.phase2Foundational);
+  const phase3MaxRoi = getMaxRoiFromPhase(data.roadmapPhases.phase3Strategic);
+  
+  let bullet3Text: string;
+  if (phase1MaxRoi === 0 && phase2MaxRoi === 0 && phase3MaxRoi === 0) {
+    bullet3Text = ctx.t.keyConclusionsBullets.bullet3NoOpportunities;
+  } else if (phase1MaxRoi >= phase2MaxRoi && phase1MaxRoi >= phase3MaxRoi) {
+    bullet3Text = ctx.t.keyConclusionsBullets.bullet3Phase1;
+  } else if (phase2MaxRoi >= phase1MaxRoi && phase2MaxRoi >= phase3MaxRoi) {
+    bullet3Text = ctx.t.keyConclusionsBullets.bullet3Phase2;
+  } else {
+    bullet3Text = ctx.t.keyConclusionsBullets.bullet3Phase3;
+  }
+  sections.push(createBulletParagraph(bullet3Text));
+  
   sections.push(createBulletParagraph(formatTemplate(ctx.t.keyConclusionsBullets.bullet4, Math.round(data.portfolioMetrics.averagePaybackMonths))));
   sections.push(createBulletParagraph(ctx.t.keyConclusionsBullets.bullet5));
   
   sections.push(createBodyParagraph(ctx.t.keyConclusionsBullets.strategicInterpretationPrompt));
 
-  sections.push(createBodyParagraph(ctx.t.conclusions.recommendedNextSteps));
-  
-  // Format each step as: **Step Title:** Description (inline, no separate lines)
+  // Recommended Next Steps as bold subtitle
   sections.push(new Paragraph({
-    children: [
-      new TextRun({ text: ctx.t.conclusions.step1Title + ": ", bold: true }),
-      new TextRun({ text: ctx.t.conclusions.step1Content }),
-    ],
+    children: [new TextRun({ text: ctx.t.conclusions.recommendedNextSteps, bold: true })],
     alignment: AlignmentType.BOTH,
-    spacing: { after: 120 },
+    spacing: { before: 240, after: 120 },
   }));
   
+  // Format each step as: **Step Title:** Description (inline, no separate lines)
+  // Note: Step 1 (Executive Alignment Session) removed as it will have already occurred by report delivery
   sections.push(new Paragraph({
     children: [
       new TextRun({ text: ctx.t.conclusions.step2Title + ": ", bold: true }),

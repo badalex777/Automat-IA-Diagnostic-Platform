@@ -69,8 +69,6 @@ export interface ReportTranslations {
     title: string;
     keyConclusions: string;
     recommendedNextSteps: string;
-    step1Title: string;
-    step1Content: string;
     step2Title: string;
     step2Content: string;
     step3Title: string;
@@ -444,7 +442,10 @@ export interface ReportTranslations {
   keyConclusionsBullets: {
     bullet1: string;
     bullet2: string;
-    bullet3: string;
+    bullet3Phase1: string;
+    bullet3Phase2: string;
+    bullet3Phase3: string;
+    bullet3NoOpportunities: string;
     bullet4: string;
     bullet5: string;
     strategicInterpretationPrompt: string;
@@ -582,13 +583,11 @@ export const en: ReportTranslations = {
     title: "Conclusions and Next Steps",
     keyConclusions: "Key Conclusions",
     recommendedNextSteps: "Recommended Next Steps",
-    step1Title: "Executive Alignment Session",
-    step1Content: "Convene leadership to review findings, validate prioritization, and secure sponsorship for Phase 1 initiatives.",
-    step2Title: "Detailed Solution Design (Phase 1 Opportunities)",
+    step2Title: "1. Detailed Solution Design (Phase 1 Opportunities)",
     step2Content: "Conduct technical design sessions for top-priority Quick Wins to define architecture, integration points, and implementation approach.",
-    step3Title: "Tool Procurement and Vendor Setup",
+    step3Title: "2. Tool Procurement and Vendor Setup",
     step3Content: "Finalize automation platform selection, execute contracts, and initiate environment setup.",
-    step4Title: "Center of Excellence (CoE) Readiness",
+    step4Title: "3. Center of Excellence (CoE) Readiness",
     step4Content: "Establish governance, standards, and support capabilities to sustain automation efforts beyond Phase 1.",
     closingStatement: "This diagnostic provides a data-driven foundation for your automation journey. We recommend moving forward with Phase 1 Quick Wins within the next quarter to begin realizing benefits and building organizational capability.",
   },
@@ -922,11 +921,14 @@ export const en: ReportTranslations = {
   keyConclusionsBullets: {
     bullet1: "Use of data and structured process readiness for automation with {0} identified opportunities representing {1} in annual benefits.",
     bullet2: "Quick Wins opportunities in Phase 1 represent an excellent starting point for demonstrating value and building momentum.",
-    bullet3: "Strategic opportunities in Phase 3 represent the highest individual ROI but requires foundational improvements first.",
+    bullet3Phase1: "Quick Wins in Phase 1 deliver the highest individual ROI, enabling immediate value capture while building organizational momentum.",
+    bullet3Phase2: "Foundational opportunities in Phase 2 offer the highest individual ROI, combining strong returns with essential infrastructure development.",
+    bullet3Phase3: "Strategic opportunities in Phase 3 represent the highest individual ROI but require foundational improvements first.",
+    bullet3NoOpportunities: "Opportunities are distributed across phases with varying ROI profiles, enabling flexible prioritization based on organizational readiness.",
     bullet4: "Average payback period of {0} months indicates relatively rapid return on automation investments.",
     bullet5: "Technical feasibility assessments reveal varying levels of readiness across workflows, informing implementation sequencing.",
     strategicInterpretationPrompt: "[Strategic Interpretation: Synthesizes the diagnostic findings into strategic guidance. What is the overall automation maturity level? What organizational capabilities need strengthening? How does this automation roadmap align with broader digital transformation goals? What executive sponsorship and change management will be critical?]",
-    step5Title: "5. 6-Month Roadmap Review Cadence",
+    step5Title: "4. 6-Month Roadmap Review Cadence",
     step5Content: "Establish regular checkpoints to assess progress, reprioritize based on business changes, and identify new opportunities.",
   },
   
@@ -1060,13 +1062,11 @@ export const es: ReportTranslations = {
     title: "Conclusiones y Próximos Pasos",
     keyConclusions: "Conclusiones Clave",
     recommendedNextSteps: "Próximos Pasos Recomendados",
-    step1Title: "Sesión de Alineación Ejecutiva",
-    step1Content: "Reunir al liderazgo para revisar hallazgos, validar priorización y asegurar patrocinio para iniciativas de Fase 1.",
-    step2Title: "Diseño Detallado de Solución (Oportunidades de Fase 1)",
+    step2Title: "1. Diseño Detallado de Solución (Oportunidades de Fase 1)",
     step2Content: "Realizar sesiones de diseño técnico para Logros Rápidos de alta prioridad para definir arquitectura, puntos de integración y enfoque de implementación.",
-    step3Title: "Adquisición de Herramientas y Configuración de Proveedores",
+    step3Title: "2. Adquisición de Herramientas y Configuración de Proveedores",
     step3Content: "Finalizar selección de plataforma de automatización, ejecutar contratos e iniciar configuración de entorno.",
-    step4Title: "Preparación del Centro de Excelencia (CoE)",
+    step4Title: "3. Preparación del Centro de Excelencia (CoE)",
     step4Content: "Establecer gobierno, estándares y capacidades de soporte para sostener los esfuerzos de automatización más allá de la Fase 1.",
     closingStatement: "Este diagnóstico proporciona una base basada en datos para su viaje de automatización. Recomendamos avanzar con los Logros Rápidos de Fase 1 dentro del próximo trimestre para comenzar a realizar beneficios y desarrollar capacidad organizacional.",
   },
@@ -1400,11 +1400,14 @@ export const es: ReportTranslations = {
   keyConclusionsBullets: {
     bullet1: "Uso de datos y preparación de procesos estructurados para automatización con {0} oportunidades identificadas que representan {1} en beneficios anuales.",
     bullet2: "Las oportunidades de Logros Rápidos en Fase 1 representan un excelente punto de partida para demostrar valor y generar impulso.",
-    bullet3: "Las oportunidades estratégicas en Fase 3 representan el ROI individual más alto pero requieren mejoras fundacionales primero.",
+    bullet3Phase1: "Los Logros Rápidos en Fase 1 entregan el ROI individual más alto, permitiendo captura de valor inmediato mientras se genera impulso organizacional.",
+    bullet3Phase2: "Las oportunidades Fundacionales en Fase 2 ofrecen el ROI individual más alto, combinando retornos sólidos con desarrollo de infraestructura esencial.",
+    bullet3Phase3: "Las oportunidades estratégicas en Fase 3 representan el ROI individual más alto pero requieren mejoras fundacionales primero.",
+    bullet3NoOpportunities: "Las oportunidades están distribuidas entre fases con perfiles de ROI variados, permitiendo priorización flexible basada en preparación organizacional.",
     bullet4: "El período de recuperación promedio de {0} meses indica un retorno relativamente rápido de las inversiones en automatización.",
     bullet5: "Las evaluaciones de factibilidad técnica revelan niveles variables de preparación entre flujos de trabajo, informando la secuencia de implementación.",
     strategicInterpretationPrompt: "[Interpretación Estratégica: Sintetiza los hallazgos del diagnóstico en orientación estratégica. ¿Cuál es el nivel general de madurez de automatización? ¿Qué capacidades organizacionales necesitan fortalecimiento? ¿Cómo se alinea esta hoja de ruta de automatización con objetivos de transformación digital más amplios? ¿Qué patrocinio ejecutivo y gestión del cambio serán críticos?]",
-    step5Title: "5. Cadencia de Revisión de Hoja de Ruta de 6 Meses",
+    step5Title: "4. Cadencia de Revisión de Hoja de Ruta de 6 Meses",
     step5Content: "Establecer puntos de control regulares para evaluar el progreso, repriorizar según cambios empresariales e identificar nuevas oportunidades.",
   },
   
