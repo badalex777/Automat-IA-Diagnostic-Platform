@@ -516,7 +516,7 @@ export default function PIFForm() {
                 {currentPIFSection.section === "Revenue Uplift" && t.sections.revenueUplift.name}
                 {currentPIFSection.section === "Your Experience & Insights" && t.sections.experienceInsights.name}
                 {currentPIFSection.section === "Time & Volume Data" && t.sections.timeVolumeData.name}
-                {currentPIFSection.section === "Quality Impact Module" && t.sections.qualityImpactModule.name}
+                {currentPIFSection.section === "Quality Improvement Potential" && t.sections.qualityImprovementPotential.name}
               </h2>
               {currentPIFSection.description && (
                 <p className="text-sm text-muted-foreground mt-2">
@@ -527,7 +527,7 @@ export default function PIFForm() {
                   {currentPIFSection.section === "Revenue Uplift" && t.sections.revenueUplift.description}
                   {currentPIFSection.section === "Your Experience & Insights" && t.sections.experienceInsights.description}
                   {currentPIFSection.section === "Time & Volume Data" && t.sections.timeVolumeData.description}
-                  {currentPIFSection.section === "Quality Impact Module" && t.sections.qualityImpactModule.description}
+                  {currentPIFSection.section === "Quality Improvement Potential" && t.sections.qualityImprovementPotential.description}
                 </p>
               )}
             </div>
