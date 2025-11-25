@@ -931,7 +931,7 @@ D.1 Tabla de Resumen de Portafolio
 `;
 
 export const APPENDIX_D_MODELING_NOTES = `
-D.3 Notas de Modelado y Trazabilidad
+D.4 Notas de Modelado y Trazabilidad
 
 ● Los cálculos siguen la Calculadora de ROI de Automat-IA y el Marco de Escenario Conservador.
 

@@ -794,7 +794,7 @@ function validateTemplateVars(vars: Record<string, string>): { valid: boolean; e
 }
 
 /**
- * Build consolidated opportunity summary table (Appendix D.4, was D.0a)
+ * Build consolidated opportunity summary table (Appendix D.3a)
  */
 function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
   const sections: Paragraph[] = [];
@@ -824,14 +824,14 @@ function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: an
       ]);
     });
   
-  sections.push(createTableCaption("D.4", (ctx.t.tableCaptions as any)["D.4"], ctx.t.labels.table));
+  sections.push(createTableCaption("D.3a", (ctx.t.tableCaptions as any)["D.3a"], ctx.t.labels.table));
   sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
   
   return sections;
 }
 
 /**
- * Build consolidation constituent mapping table (Appendix D.5, was D.0b)
+ * Build consolidation constituent mapping table (Appendix D.3b)
  */
 function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
   const sections: Paragraph[] = [];
@@ -858,7 +858,7 @@ function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: a
     });
   });
   
-  sections.push(createTableCaption("D.5", (ctx.t.tableCaptions as any)["D.5"], ctx.t.labels.table));
+  sections.push(createTableCaption("D.3b", (ctx.t.tableCaptions as any)["D.3b"], ctx.t.labels.table));
   sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
   
   return sections;
@@ -1910,10 +1910,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     });
   });
   
-  // D.3 Modeling Notes
-  sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES, numberingRegistry, 'appendix-d-modeling'));
-  
-  // D.4 and D.5 - Consolidated Opportunities (conditional, moved to end after modeling notes)
+  // D.3 Consolidated Opportunities (conditional, before Modeling Notes)
   if (allConsolidations.length > 0) {
     sections.push(
       new Paragraph({
@@ -1925,15 +1922,18 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     
     sections.push(createBodyParagraph(ctx.t.appendixIntros.consolidatedOpportunities));
     
-    // D.4 - Consolidated Opportunity Summary (was D.0a)
+    // D.3a - Consolidated Opportunity Summary
     sections.push(...buildConsolidatedSummaryTable(ctx, allConsolidations));
     
-    // D.5 - Consolidation Constituent Mapping (was D.0b)
+    // D.3b - Consolidation Constituent Mapping
     sections.push(...buildConsolidationMappingTable(ctx, allConsolidations));
     
     sections.push(createBodyParagraph(ctx.t.appendixNarratives.consolidationRepresentsParagraph));
     sections.push(createHorizontalSeparator());
   }
+  
+  // D.4 Modeling Notes (moved to end)
+  sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES, numberingRegistry, 'appendix-d-modeling'));
   
   sections.push(new Paragraph({ children: [new PageBreak()] }));
 

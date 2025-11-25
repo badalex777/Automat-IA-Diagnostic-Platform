@@ -914,7 +914,7 @@ D.1 Portfolio Summary Table
 `;
 
 export const APPENDIX_D_MODELING_NOTES = `
-D.3 Modeling Notes and Traceability
+D.4 Modeling Notes and Traceability
 
 ● Calculations follow the Automat-IA ROI Calculator and Conservative Scenario
 Framework.

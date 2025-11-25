@@ -112,8 +112,8 @@ export interface ReportTranslations {
     "6.4": string;
     "B.1": string;
     "D.1": string;
-    "D.4": string;
-    "D.5": string;
+    "D.3a": string;
+    "D.3b": string;
     "E.2": string;
     "E.4": string;
     "E.5": string;
@@ -605,8 +605,8 @@ export const en: ReportTranslations = {
     "6.4": "18-Month Implementation Timeline",
     "B.1": "Readiness Score Component Weighting",
     "D.1": "Portfolio Overview — All Opportunities",
-    "D.4": "Consolidated Opportunity Summary",
-    "D.5": "Consolidation Constituent Mapping",
+    "D.3a": "Consolidated Opportunity Summary",
+    "D.3b": "Consolidation Constituent Mapping",
     "E.2": "Net Benefit Formulas",
     "E.4": "Annual Benefit Breakdown",
     "E.5": "Scenario Adjustment Framework",
@@ -806,7 +806,7 @@ export const en: ReportTranslations = {
     businessImpactComponents: "Business Impact Components",
     impactMajority: "For this opportunity, the majority of measurable benefit is driven by time savings. Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance.",
     noSwotAvailable: "No step-level SWOT analyses available.",
-    consolidatedOpportunities: "D.0 Consolidated Opportunities",
+    consolidatedOpportunities: "D.3 Consolidated Opportunities",
     consolidatedDesc: "When multiple automation opportunities exist across related process steps within a workflow, they may be consolidated into strategic implementation packages. Consolidations enable coordinated deployment that leverages shared resources, minimizes integration overhead, and achieves greater business impact through platform-level synergy. The tables below present consolidated opportunity summaries with aggregated financial metrics and constituent mappings for traceability.",
     roiInsightsPrefix: "D.2.",
     yearOnePartial: "Accounts for partial realization during adoption phase",
@@ -846,7 +846,7 @@ export const en: ReportTranslations = {
     topThreeOpportunities: "4.3 Top Three Automation Opportunities",
     financialSummary: "4.4 Financial Summary of Top Opportunities",
     executiveInterpretation: "5.4 Executive Interpretation",
-    consolidatedOpportunitiesSection: "D.0 Consolidated Opportunities",
+    consolidatedOpportunitiesSection: "D.3 Consolidated Opportunities",
     roadmapTimeline: "6.4 18-Month Automation Roadmap",
   },
   
@@ -912,7 +912,7 @@ export const en: ReportTranslations = {
     roiInsightsHeading: "D.{0} ROI Insights — {1} / {2}",
     monthsAbbrev: "mo",
     hoursPerYear: "hours/year",
-    consolidatedOpportunitiesHeading: "D.0 Consolidated Opportunities",
+    consolidatedOpportunitiesHeading: "D.3 Consolidated Opportunities",
   },
   
   keyConclusionsBullets: {
@@ -1081,8 +1081,8 @@ export const es: ReportTranslations = {
     "6.4": "Cronograma de Implementación de 18 Meses",
     "B.1": "Ponderación de Componentes de Puntuación de Preparación",
     "D.1": "Visión General del Portafolio — Todas las Oportunidades",
-    "D.4": "Resumen de Oportunidades Consolidadas",
-    "D.5": "Mapeo de Constituyentes de Consolidación",
+    "D.3a": "Resumen de Oportunidades Consolidadas",
+    "D.3b": "Mapeo de Constituyentes de Consolidación",
     "E.2": "Fórmulas de Beneficio Neto",
     "E.4": "Desglose de Beneficio Anual",
     "E.5": "Marco de Ajuste de Escenarios",
@@ -1282,7 +1282,7 @@ export const es: ReportTranslations = {
     businessImpactComponents: "Componentes de Impacto Empresarial",
     impactMajority: "Para esta oportunidad, la mayoría del beneficio medible está impulsado por el ahorro de tiempo. Los impactos de calidad e ingresos se modelan conservadoramente o se omiten donde los datos de respaldo son insuficientes. La aceleración cuenta para la adopción y estabilización, por lo que los resultados del Año 1 reflejan el rendimiento alcanzable.",
     noSwotAvailable: "No hay análisis FODA a nivel de paso disponibles.",
-    consolidatedOpportunities: "D.0 Oportunidades Consolidadas",
+    consolidatedOpportunities: "D.3 Oportunidades Consolidadas",
     consolidatedDesc: "Cuando existen múltiples oportunidades de automatización a través de pasos de proceso relacionados dentro de un flujo de trabajo, pueden consolidarse en paquetes de implementación estratégica. Las consolidaciones permiten despliegue coordinado que aprovecha recursos compartidos, minimiza sobrecarga de integración y logra mayor impacto empresarial a través de sinergia a nivel de plataforma. Las tablas a continuación presentan resúmenes de oportunidades consolidadas con métricas financieras agregadas y mapeos de constituyentes para trazabilidad.",
     roiInsightsPrefix: "D.2.",
     yearOnePartial: "Cuenta para realización parcial durante la fase de adopción",
@@ -1322,7 +1322,7 @@ export const es: ReportTranslations = {
     topThreeOpportunities: "4.3 Tres Principales Oportunidades de Automatización",
     financialSummary: "4.4 Resumen Financiero de Principales Oportunidades",
     executiveInterpretation: "5.4 Interpretación Ejecutiva",
-    consolidatedOpportunitiesSection: "D.0 Oportunidades Consolidadas",
+    consolidatedOpportunitiesSection: "D.3 Oportunidades Consolidadas",
     roadmapTimeline: "6.4 Hoja de Ruta de Automatización de 18 Meses",
   },
   
@@ -1388,7 +1388,7 @@ export const es: ReportTranslations = {
     roiInsightsHeading: "D.{0} Hallazgos de ROI — {1} / {2}",
     monthsAbbrev: "meses",
     hoursPerYear: "horas/año",
-    consolidatedOpportunitiesHeading: "D.0 Oportunidades Consolidadas",
+    consolidatedOpportunitiesHeading: "D.3 Oportunidades Consolidadas",
   },
   
   keyConclusionsBullets: {
