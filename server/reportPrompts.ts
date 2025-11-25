@@ -998,26 +998,17 @@ E.6 Key Modeling Assumptions
 export const APPENDIX_E_PART5 = `
 E.7 Formula Integrity and Audit Trail
 
-All calculations are performed using Automat-IA's proprietary ROI Calculator Framework, a
-structured analytical engine built on the Conservative Scenario Framework. This methodology
-prioritizes credibility over optimism through:
+All calculations are performed using Automat-IA's proprietary ROI Calculator Framework, a structured analytical engine built on the Conservative Scenario Framework. This methodology prioritizes credibility over optimism through:
 
-● **Multi-layered rubric system:** TFA (21 weighted questions across 4 technical dimensions)
-and PIF (29 questions across 8 operational dimensions) provide step-level granularity for
-precise readiness assessment.
+● **Multi-layered rubric system:** TFA (21 weighted questions across 4 technical dimensions) and PIF (29 questions across 8 operational dimensions) provide step-level granularity for precise readiness assessment.
 
-● **Transparent audit trail:** Every input is linked to its source respondent, collection method,
-and validation date, enabling complete traceability from raw data to final projections.
+● **Transparent audit trail:** Every input is linked to its source respondent, collection method, and validation date, enabling complete traceability from raw data to final projections.
 
-● **Research-backed methodology:** Conservative multipliers reflect real-world implementation
-challenges, ensuring defensible financial estimates that clients can verify internally.
+● **Research-backed methodology:** Conservative multipliers reflect real-world implementation challenges, ensuring defensible financial estimates that clients can verify internally.
 
-● **Step-level analysis architecture:** Each workflow step receives independent assessment,
-with TFA shared at workflow level (60% weight) and PIF collected per step (40% weight)
-for accurate Implementation Effort calculation.
+● **Step-level analysis architecture:** Each workflow step receives independent assessment, with TFA shared at workflow level (60% weight) and PIF collected per step (40% weight) for accurate Implementation Effort calculation.
 
-Every figure in this report can be traced back to its originating dataset in Appendix F: Data
-Provenance and Audit Trail.
+Every figure in this report can be traced back to its originating dataset in Appendix F: Data Provenance and Audit Trail.
 `;
 
 /**

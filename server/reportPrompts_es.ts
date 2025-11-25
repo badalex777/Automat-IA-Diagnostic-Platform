@@ -1013,28 +1013,17 @@ E.6 Supuestos Clave de Modelado
 export const APPENDIX_E_PART5 = `
 E.7 Integridad de Fórmulas y Pista de Auditoría
 
-Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propietario de Automat-IA, un 
-motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología 
-prioriza la credibilidad sobre el optimismo a través de:
+Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propietario de Automat-IA, un motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología prioriza la credibilidad sobre el optimismo a través de:
 
-● **Sistema de rúbrica de múltiples capas:** TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y 
-PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para 
-evaluación de preparación precisa.
+● **Sistema de rúbrica de múltiples capas:** TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para evaluación de preparación precisa.
 
-● **Pista de auditoría transparente:** Cada entrada está vinculada a su encuestado fuente, método de 
-recopilación y fecha de validación, permitiendo trazabilidad completa desde datos brutos hasta 
-proyecciones finales.
+● **Pista de auditoría transparente:** Cada entrada está vinculada a su encuestado fuente, método de recopilación y fecha de validación, permitiendo trazabilidad completa desde datos brutos hasta proyecciones finales.
 
-● **Metodología respaldada por investigación:** Los multiplicadores conservadores reflejan desafíos de 
-implementación del mundo real, asegurando estimaciones financieras defendibles que los clientes 
-pueden verificar internamente.
+● **Metodología respaldada por investigación:** Los multiplicadores conservadores reflejan desafíos de implementación del mundo real, asegurando estimaciones financieras defendibles que los clientes pueden verificar internamente.
 
-● **Arquitectura de análisis a nivel de paso:** Cada paso de flujo de trabajo recibe evaluación independiente, 
-con TFA compartido a nivel de flujo de trabajo (60% de peso) y PIF recopilado por paso (40% de peso) 
-para cálculo preciso de Esfuerzo de Implementación.
+● **Arquitectura de análisis a nivel de paso:** Cada paso de flujo de trabajo recibe evaluación independiente, con TFA compartido a nivel de flujo de trabajo (60% de peso) y PIF recopilado por paso (40% de peso) para cálculo preciso de Esfuerzo de Implementación.
 
-Cada cifra en este informe puede rastrearse hasta su conjunto de datos de origen en el Apéndice F: 
-Procedencia de Datos y Pista de Auditoría.
+Cada cifra en este informe puede rastrearse hasta su conjunto de datos de origen en el Apéndice F: Procedencia de Datos y Pista de Auditoría.
 `;
 
 /**
