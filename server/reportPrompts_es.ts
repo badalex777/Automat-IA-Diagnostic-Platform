@@ -219,11 +219,7 @@ automatización. Esto asegura que el alcance del diagnóstico y las prioridades 
 
 Fase 3: Identificación de Encuestados PIF
 
-Después del descubrimiento de partes interesadas y definición de contexto, los entrevistados o un representante de RR.HH. proporcionan el nombre e información de contacto de los 
-subordinados (usuarios finales) para la identificación de encuestados PIF. Idealmente, los datos 
-salariales para representantes a nivel de paso de cada flujo de trabajo de back-office identificado también 
-se proporcionan aquí para el modelado preciso de ROI de oportunidades en etapas posteriores. Esto incluye 
-salario promedio, horas semanales o anuales de FTE y multiplicador de gastos generales.
+Después del descubrimiento de partes interesadas y definición de contexto, las partes interesadas entrevistadas (propietarios de procesos, expertos en la materia y líderes departamentales) o el contacto de RR.HH. proporcionado dentro de {{company_name}} proporcionan el nombre e información de contacto de los empleados que realizan el flujo de trabajo analizado (usuarios finales) para la identificación de encuestados PIF. Idealmente, los datos salariales para estos representantes a nivel de paso de cada flujo de trabajo de back-office identificado también se proporcionan aquí para el modelado preciso de ROI de oportunidades en etapas posteriores. Esto incluye salario promedio, horas semanales o anuales de FTE y multiplicador de gastos generales.
 
 Fase 4: Evaluación de Factibilidad Técnica (TFA)
 
@@ -380,16 +376,12 @@ análisis cubrió {{workflow_count}} flujos de trabajo en funciones administrati
 
 Cada flujo de trabajo fue evaluado en tres dimensiones:
 
-• **Factibilidad Técnica** – La capacidad de los sistemas actuales, estructuras de datos y rutas de integración 
-para soportar la automatización de manera segura y confiable.
+• **Factibilidad Técnica** – La capacidad de los sistemas actuales, estructuras de datos, rutas de integración y postura de seguridad para soportar la automatización de manera segura y confiable.
 
 • **Preparación Organizacional** – El grado de estandarización de procesos, consistencia de datos y adaptabilidad 
 al cambio dentro de la organización.
 
-• **Impacto Empresarial** – ROI cuantificado, período de retorno y potencial de beneficio anual derivado de 
-oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la 
-Matriz de Impacto Base (ROI + ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones 
-aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
+• **Impacto Empresarial** – ROI cuantificado, período de retorno, FTE ahorrados, potencial de beneficio anual, reducción de errores e incremento de ingresos, derivados de oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la Matriz de Impacto Base (ROI-como-porcentaje de ingresos + ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
 
 Todas las oportunidades de automatización fueron posicionadas dentro de la Matriz de Oportunidades de 
 Automat-IA, alineando la preparación técnica con el valor financiero. El objetivo fue identificar y 
@@ -463,7 +455,29 @@ automatización.
 
 [Comentario del Analista: Describa cada oportunidad Deseable, qué automatiza y el potencial de optimización]
 
-4.8 Oportunidades Consolidadas
+4.8 Oportunidades Despriorizadas (No Recomendadas)
+
+Un subconjunto de oportunidades de automatización identificadas ha sido explícitamente despriorizado debido 
+a relaciones costo-beneficio desfavorables. Estas oportunidades caen en el cuadrante superior izquierdo de 
+la Matriz de Oportunidades, caracterizadas por alto esfuerzo de implementación combinado con bajo impacto 
+empresarial. Perseguir estas representaría una mala asignación de recursos—lo que denominamos "pozos de 
+dinero":
+
+{{deprioritize_list}}
+
+Las oportunidades despriorizadas típicamente exhiben una o más de las siguientes características: 
+dependencias extensivas de sistemas legados que requieren modernización significativa, bajos volúmenes de 
+transacciones que no pueden justificar los costos de implementación, alta complejidad técnica con beneficio 
+operacional mínimo, o requisitos de coordinación transdepartamental desproporcionados respecto a los 
+retornos esperados.
+
+Identificar qué NO automatizar es igualmente valioso que identificar Logros Rápidos. Estas oportunidades 
+deben revisarse solo si las condiciones fundacionales cambian significativamente (por ejemplo, 
+actualizaciones de sistemas, aumentos de volumen o cambios de prioridad estratégica).
+
+[Comentario del Analista: Explique por qué cada oportunidad despriorizada no es recomendada y las condiciones bajo las cuales podría justificarse una reevaluación]
+
+4.9 Oportunidades Consolidadas
 
 Algunos resultados de alto impacto requieren coordinar múltiples iniciativas de automatización en
 pasos de flujo de trabajo relacionados. Estas Oportunidades Consolidadas agrupan oportunidades
@@ -479,7 +493,7 @@ puntuales.
 
 [Comentario del Analista: Describa cada consolidación, su justificación estratégica y el impacto organizacional esperado]
 
-4.9 Brechas Fundacionales que Dificultan la Escala
+4.10 Brechas Fundacionales que Dificultan la Escala
 
 El análisis de preparación a nivel de paso reveló debilidades recurrentes que limitan la escalabilidad en 
 múltiples flujos de trabajo. Las brechas fundacionales comunes incluyen:
@@ -494,7 +508,7 @@ de esfuerzo medio y permitirá el escalamiento exitoso de iniciativas de automat
 [Comentario del Analista: Explique cada categoría de brecha fundacional, flujos de trabajo afectados y 
 cronograma de remediación recomendado]
 
-4.10 Preparación Organizacional y Cultural
+4.11 Preparación Organizacional y Cultural
 
 Las entrevistas con partes interesadas y las respuestas PIF a nivel de paso revelaron diferentes niveles 
 de conciencia de automatización y adaptabilidad al cambio entre departamentos. Los factores de preparación 
@@ -508,7 +522,9 @@ establecimiento de campeones internos para construir confianza y capacidad. Una 
 acelera los cronogramas de implementación y mejora las tasas de adopción para todas las iniciativas de 
 automatización.
 
-4.11 Enfoque Recomendado
+[Comentario del Analista: Proporcione perspectivas cualitativas de las entrevistas con partes interesadas y usuarios finales sobre dinámicas culturales, patrones de resistencia, campeones del cambio y observaciones de preparación organizacional no capturadas en las evaluaciones cuantitativas]
+
+4.12 Enfoque Recomendado
 
 ● Priorizar Logros Rápidos en la Fase 1 para demostrar ROI y construir confianza interna.
 

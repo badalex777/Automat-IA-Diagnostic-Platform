@@ -933,28 +933,124 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         .join('\n')
     : ctx.t.fallbackMessages.noQuickWins;
   
-  // Generate foundational gaps list from common SWOT weaknesses
-  const allWeaknesses = data.appendixB
+  // Generate foundational gaps list with categorized weaknesses and workflow context
+  // Map readiness dimension categories for classification - includes English AND Spanish keywords
+  const gapCategoryKeywords = {
+    integration: [
+      // English
+      'integration', 'api', 'connectivity', 'interface', 'legacy', 'system',
+      // Spanish
+      'integración', 'conectividad', 'interfaz', 'legado', 'sistema'
+    ],
+    dataQuality: [
+      // English
+      'data quality', 'data integrity', 'data consistency', 'data governance', 'missing data', 'incomplete',
+      // Spanish
+      'calidad de datos', 'integridad de datos', 'consistencia de datos', 'gobernanza de datos', 'datos faltantes', 'incompleto'
+    ],
+    processClarity: [
+      // English
+      'process clarity', 'documentation', 'undefined', 'ambiguous', 'inconsistent process', 'ownership',
+      // Spanish
+      'claridad de proceso', 'documentación', 'indefinido', 'ambiguo', 'proceso inconsistente', 'propiedad'
+    ],
+    security: [
+      // English
+      'security', 'compliance', 'access control', 'authentication', 'audit',
+      // Spanish
+      'seguridad', 'cumplimiento', 'control de acceso', 'autenticación', 'auditoría'
+    ],
+    changeReadiness: [
+      // English
+      'change', 'resistance', 'adoption', 'training', 'capability',
+      // Spanish
+      'cambio', 'resistencia', 'adopción', 'capacitación', 'capacidad'
+    ]
+  };
+
+  // Category ID to localized label mapping
+  const getCategoryLabel = (categoryId: string): string => {
+    const labels: Record<string, string> = {
+      integration: ctx.t.gapCategories?.integrationFeasibility || 'Integration Feasibility',
+      dataQuality: ctx.t.gapCategories?.dataQuality || 'Data Quality',
+      processClarity: ctx.t.gapCategories?.processClarity || 'Process Clarity',
+      security: ctx.t.gapCategories?.securityCompliance || 'Security & Compliance',
+      changeReadiness: ctx.t.gapCategories?.changeReadiness || 'Change Readiness',
+      systemEnvironment: ctx.t.gapCategories?.systemEnvironment || 'System Environment'
+    };
+    return labels[categoryId] || labels.systemEnvironment;
+  };
+
+  // Returns stable category ID (not localized label) for grouping
+  const categorizeGap = (text: string): string => {
+    const lower = text.toLowerCase();
+    if (gapCategoryKeywords.integration.some(k => lower.includes(k))) return 'integration';
+    if (gapCategoryKeywords.dataQuality.some(k => lower.includes(k))) return 'dataQuality';
+    if (gapCategoryKeywords.processClarity.some(k => lower.includes(k))) return 'processClarity';
+    if (gapCategoryKeywords.security.some(k => lower.includes(k))) return 'security';
+    if (gapCategoryKeywords.changeReadiness.some(k => lower.includes(k))) return 'changeReadiness';
+    return 'systemEnvironment';
+  };
+
+  // Collect weaknesses AND threats with workflow context
+  const categorizedGaps = data.appendixB
     .flatMap(wb => {
-      // Collect weaknesses from both workflow-level and step-level SWOTs
-      const weaknesses: string[] = [];
-      if (wb.workflowLevelSWOT?.swotAnalysis?.weaknesses) {
-        weaknesses.push(...wb.workflowLevelSWOT.swotAnalysis.weaknesses.slice(0, 2));
+      const gaps: { category: string; description: string; workflow: string }[] = [];
+      const workflowName = wb.workflowName;
+      
+      // Collect from workflow-level SWOT
+      if (wb.workflowLevelSWOT?.swotAnalysis) {
+        const swot = wb.workflowLevelSWOT.swotAnalysis;
+        if (swot.weaknesses) {
+          swot.weaknesses.slice(0, 2).forEach(w => {
+            gaps.push({ category: categorizeGap(w), description: w, workflow: workflowName });
+          });
+        }
+        if (swot.threats) {
+          swot.threats.slice(0, 1).forEach(t => {
+            gaps.push({ category: categorizeGap(t), description: t, workflow: workflowName });
+          });
+        }
       }
+      
+      // Collect from step-level SWOTs
       if (wb.stepLevelSWOTs) {
         wb.stepLevelSWOTs.forEach(step => {
           if (step.swotAnalysis?.weaknesses) {
-            weaknesses.push(...step.swotAnalysis.weaknesses.slice(0, 1));
+            step.swotAnalysis.weaknesses.slice(0, 1).forEach(w => {
+              gaps.push({ category: categorizeGap(w), description: w, workflow: workflowName });
+            });
+          }
+          if (step.swotAnalysis?.threats) {
+            step.swotAnalysis.threats.slice(0, 1).forEach(t => {
+              gaps.push({ category: categorizeGap(t), description: t, workflow: workflowName });
+            });
           }
         });
       }
-      return weaknesses;
-    })
-    .filter((gap, idx, arr) => arr.indexOf(gap) === idx) // Remove duplicates
-    .slice(0, 5); // Limit to top 5 unique gaps
-  
-  const foundationalGapsList = allWeaknesses.length > 0
-    ? allWeaknesses.map((gap, idx) => `${idx + 1}. ${gap}`).join('\n')
+      return gaps;
+    });
+
+  // Group by category and format with context
+  const gapsByCategory = categorizedGaps.reduce((acc, gap) => {
+    if (!acc[gap.category]) acc[gap.category] = [];
+    // Avoid duplicates within same category
+    const exists = acc[gap.category].some(g => g.description === gap.description);
+    if (!exists) acc[gap.category].push(gap);
+    return acc;
+  }, {} as Record<string, typeof categorizedGaps>);
+
+  // Format foundational gaps with category, workflow, and specific issue
+  const formattedGaps: string[] = [];
+  Object.entries(gapsByCategory).slice(0, 5).forEach(([categoryId, gaps], idx) => {
+    const topGap = gaps[0];
+    const affectedWorkflows = Array.from(new Set(gaps.map(g => g.workflow))).join(', ');
+    const localizedCategory = getCategoryLabel(categoryId);
+    formattedGaps.push(`${idx + 1}. **${localizedCategory}** (${affectedWorkflows}): ${topGap.description}`);
+  });
+
+  const foundationalGapsList = formattedGaps.length > 0
+    ? formattedGaps.join('\n')
     : ctx.t.fallbackMessages.noFoundationalGaps;
   
   // Combine all roadmap opportunities for filtering
@@ -981,6 +1077,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
         .join('\n')
     : ctx.t.fallbackMessages.noNiceToHave;
+  
+  // Generate Deprioritize list (upper-left quadrant: high effort, low impact - "money pits")
+  const deprioritizeOpportunities = allRoadmapOpps.filter(o => o.matrixPosition.quadrant === 'Deprioritize');
+  const deprioritizeList = deprioritizeOpportunities.length > 0
+    ? deprioritizeOpportunities
+        .map((opp, idx) => `${idx + 1}. ${opp.opportunity.name} (${opp.workflow.name} - ${formatTemplate(ctx.t.formatStrings.stepFormat, opp.step.stepOrder, opp.step.name)})`)
+        .join('\n')
+    : ctx.t.fallbackMessages.noDeprioritize || 'No deprioritized opportunities identified in this diagnostic.';
   
   // Generate cultural readiness summary from PIF insights (broader filter)
   const allQuestionInsights = data.appendixB.flatMap(wb => {
@@ -1057,6 +1161,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     strategic_bets_list: strategicBetsList,
     nice_to_have_list: niceToHaveList,
     nice_to_have_count: data.matrixDistribution.niceToHaves.count.toString(),
+    deprioritize_list: deprioritizeList,
     consolidations_list: consolidationsList,
     consolidations_count: totalConsolidations.toString(),
     cultural_readiness_summary: culturalReadinessSummary,

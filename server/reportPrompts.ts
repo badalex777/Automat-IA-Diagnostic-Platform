@@ -215,10 +215,7 @@ This ensures that the diagnostic scope and business priorities are aligned.
 
 Phase 3: PIF Respondent Identification
 
-After stakeholder discovery and context definition, the interviewed stakeholders or an HR representative provide the name and contact info of the subordinates 
-(end-users) for PIF respondent identification. Ideally, salary data for step-level representatives 
-of each identified back-office workflow is also provided here for later-stage accurate opportunity 
-ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
+After stakeholder discovery and context definition, the interviewed stakeholders (process owners, subject matter experts, and departmental leads) or the provided HR contact within {{company_name}} provide the name and contact info of the employees who are performing the analyzed workflow (end-users) for PIF respondent identification. Ideally, salary data for these step-level representatives of each identified back-office workflow is also provided here for later-stage accurate opportunity ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
 
 Phase 4: Technical Feasibility Assessment (TFA)
 
@@ -371,11 +368,11 @@ analysis covered {{workflow_count}} workflows across key back-office functions i
 
 Each workflow was evaluated across three dimensions:
 
-• **Technical Feasibility** – The ability of current systems, data structures, and integration pathways to support automation securely and reliably.
+• **Technical Feasibility** – The ability of current systems, data structures, integration pathways and security posture to support automation securely and reliably.
 
 • **Organizational Readiness** – The degree of process standardization, data consistency, and change adaptability within the organization.
 
-• **Business Impact** – Quantified ROI, payback period, and annual benefit potential derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
+• **Business Impact** – Quantified ROI, payback period, FTE saved, annual benefit potential, error reduction and revenue uplift, derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI-as-a-percentage of revenue + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
 
 All automation opportunities were positioned within Automat-IA's Opportunity Matrix, aligning
 technical readiness with financial value. The objective was to identify and prioritize automations
@@ -447,7 +444,29 @@ valuable learning experiences for teams new to automation technologies.
 
 [Analyst Commentary: Describe each Nice-to-Have opportunity, what it automates, and optimization potential]
 
-4.8 Consolidated Opportunities
+4.8 Deprioritized Opportunities (Not Recommended)
+
+A subset of identified automation opportunities has been explicitly deprioritized due to 
+unfavorable cost-benefit ratios. These opportunities fall into the upper-left quadrant of 
+the Opportunity Matrix, characterized by high implementation effort combined with low 
+business impact. Pursuing these would represent a misallocation of resources—what we 
+term "money pits":
+
+{{deprioritize_list}}
+
+Deprioritized opportunities typically exhibit one or more of the following characteristics:
+extensive legacy system dependencies requiring significant modernization, low transaction 
+volumes that cannot justify implementation costs, high technical complexity with minimal 
+operational benefit, or cross-departmental coordination requirements disproportionate to 
+expected returns.
+
+Identifying what NOT to automate is equally valuable as identifying Quick Wins. These 
+opportunities should be revisited only if foundational conditions change significantly 
+(e.g., system upgrades, volume increases, or strategic priority shifts).
+
+[Analyst Commentary: Explain why each deprioritized opportunity is not recommended and conditions under which reassessment might be warranted]
+
+4.9 Consolidated Opportunities
 
 Some high-impact outcomes require coordinating multiple automation initiatives across related
 workflow steps. These Consolidated Opportunities bundle individual opportunities into strategic
@@ -461,7 +480,7 @@ enabling comprehensive workflow transformation rather than point-solution improv
 
 [Analyst Commentary: Describe each consolidation, its strategic rationale, and expected organizational impact]
 
-4.9 Foundational Gaps Hindering Scale
+4.10 Foundational Gaps Hindering Scale
 
 Step-level readiness analysis revealed recurring weaknesses that limit scalability across multiple
 workflows. Common foundational gaps include:
@@ -475,7 +494,7 @@ and enable successful scaling of automation initiatives.
 
 [Analyst Commentary: Explain each foundational gap category, affected workflows, and recommended remediation timeline]
 
-4.10 Organizational and Cultural Readiness
+4.11 Organizational and Cultural Readiness
 
 Stakeholder interviews and step-level PIF responses revealed differing levels of automation
 awareness and change adaptability across departments. Cultural readiness factors include:
@@ -487,7 +506,9 @@ cross-departmental communication initiatives, automation literacy training, and 
 internal champions to build confidence and capability. Strong cultural readiness accelerates
 implementation timelines and improves adoption rates for all automation initiatives.
 
-4.11 Recommended Focus
+[Analyst Commentary: Provide qualitative insights from stakeholder and end-user interviews regarding cultural dynamics, resistance patterns, change champions, and organizational readiness observations not captured in quantitative assessments]
+
+4.12 Recommended Focus
 
 ● Prioritize Quick Wins in Phase 1 to demonstrate ROI and build internal confidence.
 

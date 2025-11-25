@@ -27,9 +27,20 @@ export interface ReportTranslations {
     noFoundationalGaps: string;
     noStrategicBets: string;
     noNiceToHave: string;
+    noDeprioritize: string;
     noConsolidations: string;
     noCulturalInsights: string;
     systemEnvironmentLimitations: string;
+  };
+  
+  // Gap category labels for foundational gaps
+  gapCategories?: {
+    integrationFeasibility: string;
+    dataQuality: string;
+    processClarity: string;
+    securityCompliance: string;
+    changeReadiness: string;
+    systemEnvironment: string;
   };
   
   // Fallback values (for empty/missing data)
@@ -520,9 +531,19 @@ export const en: ReportTranslations = {
     noFoundationalGaps: "• Process documentation gaps\n• System integration limitations\n• Data quality inconsistencies",
     noStrategicBets: "No Strategic Bet opportunities identified. All opportunities are either Quick Wins or require foundational improvements.",
     noNiceToHave: "No Nice-to-Have opportunities identified. All opportunities are either Quick Wins, Strategic Bets, or require foundational improvements.",
+    noDeprioritize: "No deprioritized opportunities identified in this diagnostic. All assessed opportunities demonstrate favorable cost-benefit ratios.",
     noConsolidations: "No consolidated opportunities identified. All opportunities are currently assessed individually.",
     noCulturalInsights: "• Varying levels of automation awareness across departments\n• Strong stakeholder engagement in high-readiness workflows\n• Need for change management support in cross-functional processes\n• Opportunity for automation literacy training",
     systemEnvironmentLimitations: "System environment limitations",
+  },
+  
+  gapCategories: {
+    integrationFeasibility: "Integration Feasibility",
+    dataQuality: "Data Quality",
+    processClarity: "Process Clarity",
+    securityCompliance: "Security & Compliance",
+    changeReadiness: "Change Readiness",
+    systemEnvironment: "System Environment",
   },
   
   fallback: {
@@ -988,9 +1009,19 @@ export const es: ReportTranslations = {
     noFoundationalGaps: "• Brechas en la documentación de procesos\n• Limitaciones de integración de sistemas\n• Inconsistencias en la calidad de datos",
     noStrategicBets: "No se identificaron oportunidades de Apuestas Estratégicas. Todas las oportunidades son Logros Rápidos o requieren mejoras fundacionales.",
     noNiceToHave: "No se identificaron oportunidades Deseables. Todas las oportunidades son Logros Rápidos, Apuestas Estratégicas o requieren mejoras fundacionales.",
+    noDeprioritize: "No se identificaron oportunidades desprior­izadas en este diagnóstico. Todas las oportunidades evaluadas demuestran relaciones costo-beneficio favorables.",
     noConsolidations: "No se identificaron oportunidades consolidadas. Todas las oportunidades se evalúan actualmente de forma individual.",
     noCulturalInsights: "• Niveles variables de conciencia sobre automatización en los departamentos\n• Fuerte compromiso de las partes interesadas en flujos de trabajo de alta preparación\n• Necesidad de apoyo en gestión del cambio en procesos interfuncionales\n• Oportunidad para capacitación en alfabetización de automatización",
     systemEnvironmentLimitations: "Limitaciones del entorno del sistema",
+  },
+  
+  gapCategories: {
+    integrationFeasibility: "Factibilidad de Integración",
+    dataQuality: "Calidad de Datos",
+    processClarity: "Claridad de Proceso",
+    securityCompliance: "Seguridad y Cumplimiento",
+    changeReadiness: "Preparación al Cambio",
+    systemEnvironment: "Entorno del Sistema",
   },
   
   fallback: {
