@@ -1029,7 +1029,7 @@ export const es: ReportTranslations = {
   },
   
   matrixDescriptions: {
-    baseMatrix: "La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial combinando el ROI Anual de las oportunidades identificadas dividido por los Ingresos Anuales de la empresa para producir un ROI-como-porcentaje-de-ingresos, que luego se combina con ahorros de FTE. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de ganancias a corto plazo y valor de automatización sostenible a largo plazo.",
+    baseMatrix: "La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial normalizando el ROI Anual como porcentaje de los ingresos de la empresa, luego convirtiéndolo a una puntuación de 0-100 usando un multiplicador x1000 (por ejemplo, 5% de ingresos = 50 puntos). Esta Puntuación de ROI se pondera al 60% y se combina con una Puntuación de Horas (40%) derivada del ahorro de tiempo semanal. La Matriz de Oportunidades Mejorada extiende la Matriz Base añadiendo bonificaciones de calidad e ingresos al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150. Esta matriz refinada destaca oportunidades donde el impacto se extiende más allá de las puras ganancias de eficiencia.",
   },
   
   phaseHeaders: {

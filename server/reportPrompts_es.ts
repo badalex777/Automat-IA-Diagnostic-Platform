@@ -312,10 +312,7 @@ con la escalabilidad a largo plazo.
 
 Automat-IA aplica un Marco de Dos Matrices:
 
-1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial combinando el ROI anual de las 
-oportunidades identificadas dividido por los Ingresos Anuales de la empresa para producir un ROI-como-porcentaje-de-ingresos, 
-que luego se combina con el ahorro de FTE. Esto proporciona una priorización inicial que respalda la visibilidad ejecutiva y 
-secuenciación rápida de oportunidades.
+1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial normalizando el ROI Anual como porcentaje de los ingresos de la empresa, luego convirtiéndolo a una puntuación de 0-100 usando un multiplicador x1000 (por ejemplo, 5% de ingresos = 50 puntos). Esta Puntuación de ROI se pondera al 60% y se combina con una Puntuación de Horas (40%) derivada del ahorro de tiempo semanal. El resultado es una puntuación de impacto relativa a la empresa que permite comparación consistente entre oportunidades de diferentes escalas.
 2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto 
 Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a 
 través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones 
@@ -369,7 +366,7 @@ Cada flujo de trabajo fue evaluado en tres dimensiones:
 • **Preparación Organizacional** – El grado de estandarización de procesos, consistencia de datos y adaptabilidad 
 al cambio dentro de la organización.
 
-• **Impacto Empresarial** – ROI cuantificado, período de retorno, FTE ahorrados, potencial de beneficio anual, reducción de errores e incremento de ingresos, derivados de oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la Matriz de Impacto Base (ROI-como-porcentaje de ingresos + ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
+• **Impacto Empresarial** – ROI cuantificado, período de retorno, FTE ahorrados, potencial de beneficio anual, reducción de errores e incremento de ingresos, derivados de oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la Matriz de Impacto Base (ROI normalizado a una puntuación de 0-100 usando conversión de porcentaje-de-ingresos con multiplicador x1000, combinado con ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
 
 Todas las oportunidades de automatización fueron posicionadas dentro de la Matriz de Oportunidades de 
 Automat-IA, alineando la preparación técnica con el valor financiero. El objetivo fue identificar y 

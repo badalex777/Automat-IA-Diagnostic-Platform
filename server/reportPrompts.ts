@@ -360,7 +360,7 @@ Each workflow was evaluated across three dimensions:
 
 • **Organizational Readiness** – The degree of process standardization, data consistency, and change adaptability within the organization.
 
-• **Business Impact** – Quantified ROI, payback period, FTE saved, annual benefit potential, error reduction and revenue uplift, derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI-as-a-percentage of revenue + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
+• **Business Impact** – Quantified ROI, payback period, FTE saved, annual benefit potential, error reduction and revenue uplift, derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI normalized to a 0-100 score using percentage-of-revenue conversion with a x1000 multiplier, combined with FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
 
 All automation opportunities were positioned within Automat-IA's Opportunity Matrix, aligning
 technical readiness with financial value. The objective was to identify and prioritize automations
