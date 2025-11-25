@@ -1,0 +1,30 @@
+EDR methodology overview and diagnostic overview Corrections
+Methodology Overview:
+This paragraph:
+Interviewees (or the HR lead) provide the name and contact info of the subordinates (end-users) for PIF respondent identification. Ideally, salary data for step-level representatives of each identified back-office workflow is also provided here for later-stage accurate opportunity ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
+
+
+Needs to be replaced with this paragraph:
+Interviewed stakeholders(process owners, subject matter experts, and departmental leads) or the provided HR contact within {{client company name}} provide the name and contact info of the  employees who are performing the analysed workflow (end-users) for PIF respondent identification. Ideally, salary data for these step-level representatives of each identified back-office workflow is also provided here for later-stage accurate opportunity ROI modeling. This includes average salary, FTE weekly or yearly hours, and overhead multiplier.
+
+Diagnostic Overview
+This paragraph:
+Technical Feasibility – The ability of current systems, data structures, and integration pathways to support automation securely and reliably.
+
+Needs to be replaced with this paragraph:
+Technical Feasibility – The ability of current systems, data structures, integration pathways and security posture to support automation securely and reliably.
+
+
+This paragraph:
+Business Impact – Quantified ROI, payback period, and annual benefit potential derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
+
+
+Needs to be replaced with this paragraph:
+Business Impact – Quantified ROI, payback period, FTE saved, annual benefit potential, error reduction and revenue uplift, derived from modeled automation opportunities. Business Impact is calculated using two approaches: the Base Impact Matrix (ROI-as-a-percentage of revenue + FTE savings) and the Enhanced Impact Matrix (Base Impact + additive bonuses for error reduction and revenue uplift when applicable).
+
+Also, there needs to be another section after 4.7. this section needs to be for the “deprioritize” opportunities located on the upper left quadrant of the matrix. this new section needs to have the same structure as current 4.5, 4.6 and 4.7. subsequent subsections need to be renumbered accordingly. This section is important because a big part of the value I offer is also identifying opportunities that are NOT worth pursuing and that would become “money pits”.
+
+4.9(attached) is being populated incorrectly. Please enhance this. It should list the foundational gaps identifies. It should be based on the weaknesses and threats for the workflow readiness. It should not only mention the variable that is limited(integration feasibility, data quality, process clarity, etc) and the precise thing that is being limited(e.g: integration feasibility in x workflow may hider scale due to outdated API integrations). 
+
+4.10 should also have a bracketed part for analyst commentary where I can put my input based on the qualitative interviews throughout the diagnostic..
+This paragraph:
