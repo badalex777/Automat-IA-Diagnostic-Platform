@@ -1,0 +1,42 @@
+EDR appendices  Corrections
+Appendix A
+
+This paragraph:
+Process Insights Forms (PIF): Completed by process owners and end users to capture operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness, and collect metrics such as process volume, frequency, average duration, and observed error rates. PIF inputs feed readiness scoring and ROI modeling.
+
+Needs to be replaced with this paragraph:
+Process Insights Forms (PIF): Completed by employees who are actually performing the analysed workflow/steps within the workflow(end users) to capture operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness, and collect metrics such as process volume, frequency, average duration, and observed error rates. Apart from this, situational data covering potential time savings, revenue uplift and  error reduction factors is also collected here. PIF inputs feed readiness scoring and ROI modeling.
+
+This paragraph:
+Stakeholder Interviews: Sessions with department leads and subject-matter experts validate automation candidates, contextualize TFA and PIF responses, and provide data not found in system documentation, including salary ranges, role counts per workflow, and high-level process maps.
+
+Needs to be replaced with this paragraph:
+Stakeholder Interviews: Sessions with department leads, process owners and subject-matter experts help Automat-IA identify automation candidates, and also establish a baseline understanding of critical workflows, pain points, and automation objectives. This ensures that the diagnostic scope and business priorities are aligned. The outcome of these interviews is the identification of the workflows that will be analysed during the diagnosis. 
+
+Appendix A also hasn’t included in Data Sources and Collection the new phase 1 and phase 3 parts of the methodology overview(preliminary data collection) and PIF respondent identification respectively. These new data sources and collection steps need to be expressly mentioned in this subsection of the appendix. 
+
+This paragraph is clunky, please change:
+For a complete record of data inputs, see Appendix F: Data Provenance and Audit Trail. It lists, per step, the data type, source, respondent name and role, department, collection method, and date.
+
+This paragraph:
+21 weighted questions scored 1 to 5, with a "Don't know" option to flag gaps. Section weights: System Environment 25 percent, Data Quality 30 percent, Integration Feasibility 30 percent, Security and Compliance 15 percent. TFA outputs a 0 to 100 technical readiness score.
+
+Needs to say instead of just “flag gaps”, say “flag knowledge gaps”. The section weights text needs to be bold as well and the sections need to be in bullet points for better readability. 
+
+This paragraph:
+40 questions capturing operational readiness across process clarity, change magnitude, and workflow brittleness, plus quantitative metrics for volumes, times, participants, and quality. When multiple respondents exist, responses are aggregated with variance tracking.
+
+Needs to be replaced with this paragraph:
+40 questions capturing operational readiness across process clarity, change magnitude, and workflow brittleness, plus quantitative metrics for volumes, times, participants, and quality. Apart from this, data concerning time saving, error reduction and revenue uplift potential for the specific process step is also collected here. When multiple respondents exist, responses are aggregated with variance tracking.
+
+In the opportunity matrix subsection(Attached), the y axis has a weird line break, please fix. 
+
+In a.3, the steps for the gap capture in the tfas needs to be an actual numbered list, not a numbered list paragraph as it is currently. 
+
+Now in terms of what we were talking about for the normalization of scores for business impact, please include a short text that explains why the x100 x 10 is necessary and how it works. Other sections of the EDR that say that this calculation or that one of the variables measuring business impact is ROI-as-a-percentage of revenue need to be updated accordingly as well.
+A.5 bullet point list has more awkward line breaks. Also, the percentages of the scoring methodology need to be boldened or made more visible, maybe by stating the factor and the weight in bold and then the description.
+In a.6, the text saying Double-layer conservatism should be bold, also layer 1 and 2 need to be bullets, not paragraphs.
+Key formulas has a fullstop after, it needs to be a colon.
+
+In a.7, The two matrix framework is also incorrect, the data is not accurate, we just made a similar correction earlier, please fix so report says what the actual difference is between base impact and enhanced impact matrices. Also, in Error reduction and revenue uplift bullet points, the bullet is “○ “ character, not actual bullet points. Please fix. In general, the two matrix framework in a.7 is clunky and unclear. Please clarify and enhance it. In axes, there are more weird Line breaks in y axes.
+A.8: phases need to be bulleted, not paragraphs.
