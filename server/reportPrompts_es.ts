@@ -719,27 +719,19 @@ el entorno del sistema, calidad de datos, factibilidad de integración y postura
 establecen las condiciones técnicas que determinan si la automatización es factible dentro de cada flujo 
 de trabajo.
 
-**Formularios de Perspectivas de Proceso (PIF):** Completados por propietarios de procesos y usuarios finales 
-para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad 
-de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas 
-de error observadas. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
+**Formularios de Perspectivas de Proceso (PIF):** Completados por empleados que realmente realizan los pasos del flujo de trabajo analizado (usuarios finales) para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas de error observadas. Adicionalmente, se recopila aquí información situacional sobre potencial de ahorro de tiempo, incremento de ingresos y factores de reducción de errores. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
 
-**Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales y expertos en la materia validan 
-candidatos de automatización, contextualizan respuestas TFA y PIF y proporcionan datos no encontrados en 
-la documentación del sistema, incluyendo rangos salariales, conteos de roles por flujo de trabajo y mapas 
-de procesos de alto nivel.
+**Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales, propietarios de procesos y expertos en la materia ayudan a Automat-IA a identificar candidatos de automatización y establecer un entendimiento base de flujos de trabajo críticos, puntos de dolor y objetivos de automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados. El resultado de estas entrevistas es la identificación de los flujos de trabajo que serán analizados durante el diagnóstico.
 
-**Entrevistas con Usuarios Finales:** Discusiones con quienes realizan el trabajo verifican entradas PIF, 
-permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción 
-o propensas a errores.
+**Recopilación de Datos Preliminar (Fase 1):** Recopilación inicial del contexto organizacional incluyendo estructura de la empresa, ingresos, conteo de empleados y desglose departamental. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
 
-**Revisión de Documentación:** Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas 
-para verificar datos de formularios y confirmar condiciones de proceso. Cuando estén disponibles, se 
-incorporan documentos de política, capturas de pantalla o registros de tareas como evidencia de respaldo.
+**Entrevistas con Usuarios Finales:** Discusiones con quienes realizan el trabajo verifican entradas PIF, permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción o propensas a errores.
 
-Para un registro completo de entradas de datos, vea el Apéndice F: Procedencia de Datos y Pista de 
-Auditoría. Lista, por paso, el tipo de dato, fuente, nombre y rol del encuestado, departamento, método 
-de recopilación y fecha.
+**Identificación de Encuestados PIF (Fase 3):** Identificación sistemática de empleados que realizan cada paso del flujo de trabajo, asegurando que las respuestas PIF provengan de aquellos con conocimiento operacional directo. Este paso valida la idoneidad del encuestado y captura perspectivas específicas del rol.
+
+**Revisión de Documentación:** Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas para verificar datos de formularios y confirmar condiciones de proceso. Cuando estén disponibles, se incorporan documentos de política, capturas de pantalla o registros de tareas como evidencia de respaldo.
+
+Para un registro completo de entradas de datos, vea el Apéndice F: Procedencia de Datos y Pista de Auditoría, que lista por paso el tipo de dato, fuente, nombre y rol del encuestado, departamento, método de recopilación y fecha.
 
 A.2 Marcos de Diagnóstico
 
@@ -747,15 +739,20 @@ Automat-IA aplica un marco estructurado de múltiples capas que traduce entradas
 en indicadores medibles de preparación y rendimiento financiero.
 
 Evaluación de Factibilidad Técnica (TFA):
-21 preguntas ponderadas puntuadas de 1 a 5, con opción "No sé" para marcar brechas. Pesos de sección: 
-Entorno del Sistema 25 por ciento, Calidad de Datos 30 por ciento, Factibilidad de Integración 30 por 
-ciento, Seguridad y Cumplimiento 15 por ciento. TFA produce una puntuación de preparación técnica de 0 
-a 100.
+21 preguntas ponderadas puntuadas de 1 a 5, con opción "No sé" para marcar brechas de conocimiento. **Pesos de sección:**
+
+● Entorno del Sistema: 25 por ciento
+
+● Calidad de Datos: 30 por ciento
+
+● Factibilidad de Integración: 30 por ciento
+
+● Seguridad y Cumplimiento: 15 por ciento
+
+TFA produce una puntuación de preparación técnica de 0 a 100.
 
 Formulario de Perspectivas de Proceso (PIF):
-40 preguntas capturando preparación operacional en claridad de proceso, magnitud de cambio y fragilidad 
-de flujo de trabajo, más métricas cuantitativas para volúmenes, tiempos, participantes y calidad. Cuando 
-existen múltiples encuestados, las respuestas se agregan con seguimiento de varianza.
+29 preguntas capturando preparación operacional en claridad de proceso, magnitud de cambio y fragilidad de flujo de trabajo, más métricas cuantitativas para volúmenes, tiempos, participantes y calidad. Adicionalmente, se recopilan datos sobre potencial de ahorro de tiempo, reducción de errores e incremento de ingresos para cada paso del proceso. Cuando existen múltiples encuestados, las respuestas se agregan con seguimiento de varianza.
 
 Rúbrica de Preparación:
 Puntuación de preparación combinada por paso usando TFA (compartido a nivel de flujo de trabajo, 60%) y 
@@ -773,14 +770,19 @@ Capa analítica final que unifica preparación y ROI en un marco único de prior
 
 ● **Eje X:** Impacto Empresarial, una puntuación normalizada derivada de eficiencia y valor.
 
-● **Eje Y:** Esfuerzo de Implementación, una puntuación compuesta ponderada que combina preparación, período 
-de arranque, período de retorno y horas de capacitación. Vea la Sección A.5 para metodología detallada.
+● **Eje Y:** Esfuerzo de Implementación, una puntuación compuesta ponderada que combina preparación, período de arranque, período de retorno y horas de capacitación. Vea la Sección A.5 para metodología detallada.
 
 A.3 Integridad de Datos y Manejo de Brechas de Conocimiento
 
-**Captura de brechas en TFA:** Cada pregunta soporta una respuesta "No sé" que registra razones y fuentes 
-potenciales. Automat-IA luego: 1) extrae las brechas, 2) asigna seguimientos, 3) actualiza respuestas 
-una vez verificadas y 4) registra el contribuyente.
+**Captura de brechas en TFA:** Cada pregunta soporta una respuesta "No sé" que registra razones y fuentes potenciales. Automat-IA luego:
+
+1. Extrae las brechas
+
+2. Asigna seguimientos
+
+3. Actualiza respuestas una vez verificadas
+
+4. Registra el contribuyente
 
 **Regla de respuesta de punto medio:** Si ninguna parte interesada puede proporcionar una respuesta verificada, 
 se aplica una puntuación de punto medio neutral de 3 en la escala de 1 a 5 para preservar la completitud 
@@ -788,44 +790,35 @@ del conjunto de datos. Cada sustitución de punto medio se registra explícitame
 
 A.4 Metodología de Puntuación de Impacto Empresarial
 
-El Impacto Empresarial expresa el valor esperado relativo a la escala de la empresa para comparación justa 
-entre clientes.
+El Impacto Empresarial expresa el valor esperado relativo a la escala de la empresa para comparación justa entre clientes.
 
-Componentes de Impacto Base y normalización.
+**Componentes de Impacto Base y normalización.**
 
-● **Puntuación de ROI:** (ROI de tasa de ejecución anual ÷ Ingresos anuales de la empresa) × 1000, con tope 
-en 100.
+● **Puntuación de ROI:** (ROI de tasa de ejecución anual ÷ Ingresos anuales de la empresa) × 1000, con tope en 100.
 
 ● **Puntuación de Horas:** (Ahorro de FTE ÷ Total de empleados) × 1000, con tope en 100.
 
 ● **Impacto Base (0 a 100)** igual a Puntuación de ROI 60 por ciento más Puntuación de Horas 40 por ciento.
 
-La normalización por ingresos y FTEs previene sesgo hacia empresas más grandes y captura la significancia 
-relativa de los beneficios.
+**¿Por qué el multiplicador × 1000?** La fórmula convierte una proporción decimal a una puntuación de 0-100 donde cada punto porcentual de impacto equivale a 10 puntos. Por ejemplo: Si una oportunidad genera $50,000 en ROI anual para una empresa con $1,000,000 en ingresos, la proporción es 0.05 (5%). Multiplicar por 1000 produce una puntuación de 50. Esto significa que 1% de ingresos = 10 puntos, 5% = 50 puntos, y 10% = 100 puntos (el tope). La misma lógica aplica a la Puntuación de Horas relativa al tamaño de la fuerza laboral.
+
+La normalización por ingresos y FTEs previene sesgo hacia empresas más grandes y captura la significancia relativa de los beneficios.
 
 A.5 Metodología de Puntuación de Esfuerzo de Implementación
 
-El Esfuerzo de Implementación representa el eje vertical de la Matriz de Oportunidades y mide la complejidad 
-y requisitos de recursos para llevar una oportunidad de automatización a producción. Puntuaciones más bajas 
-indican implementación más fácil.
+El Esfuerzo de Implementación representa el eje vertical de la Matriz de Oportunidades y mide la complejidad y requisitos de recursos para llevar una oportunidad de automatización a producción. Puntuaciones más bajas indican implementación más fácil.
 
 **Fórmula y pesos.**
 
 El Esfuerzo de Implementación se calcula como un compuesto ponderado de cuatro factores:
 
-● **Puntuación de Preparación (invertida):** 50 por ciento. Derivada de la evaluación combinada TFA (60 por 
-ciento) y PIF (40 por ciento). Mayor preparación resulta en menor esfuerzo. Este es el impulsor principal 
-porque refleja datos completos de evaluación del cliente en 61 preguntas combinadas.
+● **Puntuación de Preparación (invertida): 50 por ciento.** Derivada de la evaluación combinada TFA (60 por ciento) y PIF (40 por ciento). Mayor preparación resulta en menor esfuerzo. Este es el impulsor principal porque refleja datos completos de evaluación del cliente en 50 preguntas combinadas.
 
-● **Período de Arranque:** 20 por ciento. Meses estimados desde el inicio hasta la operación de estado estable. 
-Normalizado en una escala donde 2 meses o menos equivale a 0 (menor esfuerzo) y 12+ meses equivale a 100 
-(mayor esfuerzo).
+● **Período de Arranque: 20 por ciento.** Meses estimados desde el inicio hasta la operación de estado estable. Normalizado en una escala donde 2 meses o menos equivale a 0 (menor esfuerzo) y 12+ meses equivale a 100 (mayor esfuerzo).
 
-● **Período de Retorno:** 20 por ciento. Meses estimados para recuperar costos de implementación. Normalizado 
-donde 3 meses o menos equivale a 0 (menor esfuerzo) y 18+ meses equivale a 100 (mayor esfuerzo).
+● **Período de Retorno: 20 por ciento.** Meses estimados para recuperar costos de implementación. Normalizado donde 3 meses o menos equivale a 0 (menor esfuerzo) y 18+ meses equivale a 100 (mayor esfuerzo).
 
-● **Horas de Capacitación por Empleado:** 10 por ciento. Capacitación de usuario final estimada requerida. 
-Normalizada donde 1 hora o menos equivale a 0 (menor esfuerzo) y 20+ horas equivale a 100 (mayor esfuerzo).
+● **Horas de Capacitación por Empleado: 10 por ciento.** Capacitación de usuario final estimada requerida. Normalizada donde 1 hora o menos equivale a 0 (menor esfuerzo) y 20+ horas equivale a 100 (mayor esfuerzo).
 
 **Fundamento para ponderación de preparación del 50 por ciento:** La Rúbrica de Preparación sintetiza datos 
 reales del cliente tanto de evaluaciones técnicas (TFA) como operacionales (PIF), mientras que arranque, 
@@ -854,57 +847,44 @@ de implementación.
 
 A.6 Metodología de Modelado de ROI
 
-Conservadurismo de doble capa.
+**Conservadurismo de doble capa.**
 
-**Capa 1: Estimación base basada en rúbrica.**
-Rúbricas estructuradas convierten entradas PIF en porcentajes base para ahorro de tiempo, mejora de 
-calidad y reasignación de ingresos, considerando tipo de proceso, complejidad, repetición y estructura 
-de datos.
+● **Capa 1: Estimación base basada en rúbrica.** Rúbricas estructuradas convierten entradas PIF en porcentajes base para ahorro de tiempo, mejora de calidad y reasignación de ingresos, considerando tipo de proceso, complejidad, repetición y estructura de datos.
 
-**Capa 2: Multiplicadores de escenario.**
-Multiplicadores ajustados por riesgo reflejan tasas de adopción, manejo de excepciones, cobertura y 
-madurez de integración. El escenario conservador aplica ajustes a la baja en todas las categorías de 
-beneficio.
+● **Capa 2: Multiplicadores de escenario.** Multiplicadores ajustados por riesgo reflejan tasas de adopción, manejo de excepciones, cobertura y madurez de integración. El escenario conservador aplica ajustes a la baja en todas las categorías de beneficio.
 
-**Fórmulas clave.**
+**Fórmulas clave:**
 
-● **Beneficio Anual =** Valor de ahorro de tiempo + Valor de mejora de calidad + Valor de incremento de 
-ingresos.
+● **Beneficio Anual =** Valor de ahorro de tiempo + Valor de mejora de calidad + Valor de incremento de ingresos.
 
 ● **Retorno (meses) =** Costo de implementación ÷ Beneficio Anual × 12.
 
-● **ROI por ciento** (usado en metodología y matrices, incluso si no se muestra en cada tabla) **=** 
-(Beneficio Anual − Costo anual) ÷ Costo anual × 100.
+● **ROI por ciento** (usado en metodología y matrices, incluso si no se muestra en cada tabla) **=** (Beneficio Anual − Costo anual) ÷ Costo anual × 100.
 
 Las entradas, parámetros y versiones están documentados en el Apéndice E: Metodología de Calculadora 
 de ROI.
 
 A.7 Metodología de Matriz de Oportunidades
 
-La Matriz de Oportunidades convierte preparación e impacto empresarial en un modelo de priorización 
-transparente.
+La Matriz de Oportunidades convierte preparación e impacto empresarial en un modelo de priorización transparente.
 
 **Marco de dos matrices:**
-1. **Matriz de Oportunidades Base 0 a 100:** Comparación de eficiencia pura en base consistente relativa a 
-la empresa usando Impacto Base.
-2. **Matriz de Oportunidades Mejorada 0 a 150:** Agrega valor más allá de la eficiencia:
 
-○ Bonificación de Reducción de Errores hasta 25 puntos basada en tasas de error medidas y reelaboración 
-evitada.
+● **Matriz de Oportunidades Base (Eje X 0 a 100):** Proporciona comparación de eficiencia pura en base consistente relativa a la empresa. El Eje X usa Impacto Base calculado de Puntuación de ROI (60%) y Puntuación de Horas (40%), ambos normalizados a la escala de la empresa. Esta vista permite comparación equitativa entre empresas de diferentes tamaños.
 
-○ Bonificación de Incremento de Ingresos hasta 25 puntos basada en reasignación de capacidad validada 
-hacia actividades de ingresos.
+● **Matriz de Oportunidades Mejorada (Eje X 0 a 150):** Extiende la Matriz Base agregando dimensiones de calidad e ingresos más allá de las ganancias de eficiencia pura:
 
-Impacto Mejorado = Impacto Base + Bonificación de Errores + Bonificación de Ingresos. Mejorado es 
-siempre mayor o igual a Base.
+  ● **Bonificación de Reducción de Errores:** Hasta 25 puntos adicionales basados en tasas de error medidas y reelaboración evitada.
+
+  ● **Bonificación de Incremento de Ingresos:** Hasta 25 puntos adicionales basados en reasignación de capacidad validada hacia actividades generadoras de ingresos.
+
+Impacto Mejorado = Impacto Base + Bonificación de Errores + Bonificación de Ingresos. Mejorado es siempre mayor o igual a Base. Esta vista resalta oportunidades donde mejoras de calidad o potencial de ingresos aumentan significativamente el valor estratégico.
 
 **Ejes:**
 
 ● **Eje X:** Impacto Empresarial (Base o Mejorado, dependiendo de la vista presentada).
 
-● **Eje Y:** Esfuerzo de Implementación (0 a 100), un compuesto ponderado que combina puntuación de preparación 
-(50 por ciento), período de arranque (20 por ciento), período de retorno (20 por ciento) y horas de 
-capacitación (10 por ciento). Vea la Sección A.5 para metodología detallada.
+● **Eje Y:** Esfuerzo de Implementación (0 a 100), un compuesto ponderado que combina puntuación de preparación (50 por ciento), período de arranque (20 por ciento), período de retorno (20 por ciento) y horas de capacitación (10 por ciento). Vea la Sección A.5 para metodología detallada.
 
 **Cuadrantes:**
 
@@ -918,20 +898,15 @@ capacitación (10 por ciento). Vea la Sección A.5 para metodología detallada.
 
 A.8 Metodología de Desarrollo de Hoja de Ruta
 
-La secuenciación de la hoja de ruta se deriva directamente de posiciones en la matriz y evidencia de 
-diagnóstico.
+La secuenciación de la hoja de ruta se deriva directamente de posiciones en la matriz y evidencia de diagnóstico.
 
-Fase 1 Logros Rápidos 0 a 6 meses. Elementos de bajo esfuerzo y alto impacto ejecutados primero para 
-entregar ROI rápidamente y validar gobernanza, conexiones de datos y monitoreo.
+● **Fase 1 Logros Rápidos (0 a 6 meses):** Elementos de bajo esfuerzo y alto impacto ejecutados primero para entregar ROI rápidamente y validar gobernanza, conexiones de datos y monitoreo.
 
-Fase 2 Mejoras Fundacionales 6 a 12 meses. Abordar calidad de datos, integración y brechas de 
-documentación y pilotear automatizaciones de complejidad media para elevar la preparación.
+● **Fase 2 Mejoras Fundacionales (6 a 12 meses):** Abordar calidad de datos, integración y brechas de documentación y pilotear automatizaciones de complejidad media para elevar la preparación.
 
-Fase 3 Implementaciones Estratégicas 12 a 18 meses más. Automatizaciones de alto impacto y mayor esfuerzo 
-que se extienden entre sistemas y funciones, a menudo con componentes de IA y requisitos de orquestación.
+● **Fase 3 Implementaciones Estratégicas (12 a 18+ meses):** Automatizaciones de alto impacto y mayor esfuerzo que se extienden entre sistemas y funciones, a menudo con componentes de IA y requisitos de orquestación.
 
-La secuenciación también considera dependencias técnicas, temporización de realización de valor, capacidad 
-de recursos, cadencia de gestión del cambio y ciclos presupuestarios.
+La secuenciación también considera dependencias técnicas, temporización de realización de valor, capacidad de recursos, cadencia de gestión del cambio y ciclos presupuestarios.
 
 A.9 Limitaciones Metodológicas
 
@@ -1047,7 +1022,7 @@ motor analítico estructurado construido sobre el Marco de Escenario Conservador
 prioriza la credibilidad sobre el optimismo a través de:
 
 ● **Sistema de rúbrica de múltiples capas:** TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y 
-PIF (40 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para 
+PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para 
 evaluación de preparación precisa.
 
 ● **Pista de auditoría transparente:** Cada entrada está vinculada a su encuestado fuente, método de 

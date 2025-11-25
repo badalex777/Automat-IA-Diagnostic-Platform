@@ -699,26 +699,19 @@ dimension of the analyzed workflows.
 system environment, data quality, integration feasibility, and security posture. TFAs establish the
 technical conditions that determine whether automation is feasible within each workflow.
 
-**Process Insights Forms (PIF):** Completed by process owners and end users to capture
-operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness,
-and collect metrics such as process volume, frequency, average duration, and observed error
-rates. PIF inputs feed readiness scoring and ROI modeling.
+**Process Insights Forms (PIF):** Completed by employees who are actually performing the analyzed workflow steps (end users) to capture operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness, and collect metrics such as process volume, frequency, average duration, and observed error rates. Additionally, situational data covering potential time savings, revenue uplift, and error reduction factors is collected here. PIF inputs feed readiness scoring and ROI modeling.
 
-**Stakeholder Interviews:** Sessions with department leads and subject-matter experts validate
-automation candidates, contextualize TFA and PIF responses, and provide data not found in
-system documentation, including salary ranges, role counts per workflow, and high-level
-process maps.
+**Stakeholder Interviews:** Sessions with department leads, process owners, and subject-matter experts help Automat-IA identify automation candidates and establish a baseline understanding of critical workflows, pain points, and automation objectives. This ensures that the diagnostic scope and business priorities are aligned. The outcome of these interviews is the identification of the workflows that will be analyzed during the diagnosis.
 
-**End-User Interviews:** Discussions with those performing the work verify PIF inputs, enable
-detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
+**Preliminary Data Collection (Phase 1):** Initial gathering of organizational context including company structure, revenue, employee count, and departmental breakdown. This foundational data enables company-relative normalization of scores and ensures accurate ROI modeling from the outset.
 
-**Documentation Review:** Review of workflow diagrams, SOPs, and system documentation to
-cross-check form data and confirm process conditions. Where available, policy documents,
-screen captures, or task logs are incorporated as supporting evidence.
+**End-User Interviews:** Discussions with those performing the work verify PIF inputs, enable detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
 
-For a complete record of data inputs, see Appendix F: Data Provenance and Audit Trail. It
-lists, per step, the data type, source, respondent name and role, department, collection
-method, and date.
+**PIF Respondent Identification (Phase 3):** Systematic identification of employees who perform each workflow step, ensuring that PIF responses come from those with direct operational knowledge. This step validates respondent suitability and captures role-specific perspectives.
+
+**Documentation Review:** Review of workflow diagrams, SOPs, and system documentation to cross-check form data and confirm process conditions. Where available, policy documents, screen captures, or task logs are incorporated as supporting evidence.
+
+For a complete record of data inputs, see Appendix F: Data Provenance and Audit Trail, which lists per step the data type, source, respondent name and role, department, collection method, and date.
 
 A.2 Diagnostic Frameworks
 
@@ -726,14 +719,20 @@ Automat-IA applies a structured, multi-layered framework that translates technic
 operational inputs into measurable readiness and financial performance indicators.
 
 Technical Feasibility Assessment (TFA):
-21 weighted questions scored 1 to 5, with a "Don't know" option to flag gaps. Section weights:
-System Environment 25 percent, Data Quality 30 percent, Integration Feasibility 30 percent,
-Security and Compliance 15 percent. TFA outputs a 0 to 100 technical readiness score.
+21 weighted questions scored 1 to 5, with a "Don't know" option to flag knowledge gaps. **Section weights:**
+
+● System Environment: 25 percent
+
+● Data Quality: 30 percent
+
+● Integration Feasibility: 30 percent
+
+● Security and Compliance: 15 percent
+
+TFA outputs a 0 to 100 technical readiness score.
 
 Process Insights Form (PIF):
-40 questions capturing operational readiness across process clarity, change magnitude, and
-workflow brittleness, plus quantitative metrics for volumes, times, participants, and quality. When
-multiple respondents exist, responses are aggregated with variance tracking.
+29 questions capturing operational readiness across process clarity, change magnitude, and workflow brittleness, plus quantitative metrics for volumes, times, participants, and quality. Additionally, data concerning time saving potential, error reduction, and revenue uplift is collected for each process step. When multiple respondents exist, responses are aggregated with variance tracking.
 
 Readiness Rubric:
 Combined readiness score per step using TFA (shared workflow-level, 60%) and step-specific
@@ -751,14 +750,19 @@ Final analytical layer that unifies readiness and ROI into a single prioritizati
 
 ● **X-axis:** Business Impact, a normalized score derived from efficiency and value.
 
-● **Y-axis:** Implementation Effort, a weighted composite score combining readiness, ramp-up
-period, payback period, and training hours. See Section A.5 for detailed methodology.
+● **Y-axis:** Implementation Effort, a weighted composite score combining readiness, ramp-up period, payback period, and training hours. See Section A.5 for detailed methodology.
 
 A.3 Data Integrity and Knowledge Gap Handling
 
-**Gap capture in TFAs:** Every question supports a "Don't know" response that records reasons
-and potential sources. Automat-IA then: 1) extracts the gaps, 2) assigns follow-ups, 3) updates
-responses once verified, and 4) records the contributor.
+**Gap capture in TFAs:** Every question supports a "Don't know" response that records reasons and potential sources. Automat-IA then:
+
+1. Extracts the gaps
+
+2. Assigns follow-ups
+
+3. Updates responses once verified
+
+4. Records the contributor
 
 **Midpoint response rule:** If no stakeholder can provide a verified answer, a neutral midpoint
 score of 3 on the 1 to 5 scale is applied to preserve dataset completeness. Each midpoint
@@ -766,10 +770,9 @@ substitution is explicitly logged for auditability.
 
 A.4 Business Impact Scoring Methodology
 
-Business Impact expresses expected value relative to company scale for fair comparison across
-clients.
+Business Impact expresses expected value relative to company scale for fair comparison across clients.
 
-Base Impact components and normalization.
+**Base Impact components and normalization.**
 
 ● **ROI Score:** (Annual run-rate ROI ÷ Company annual revenue) × 1000, capped at 100.
 
@@ -777,32 +780,25 @@ Base Impact components and normalization.
 
 ● **Base Impact (0 to 100)** equals ROI Score 60 percent plus Hours Score 40 percent.
 
-Normalization by revenue and FTEs prevents bias toward larger firms and captures the relative
-significance of benefits.
+**Why the × 1000 multiplier?** The formula converts a decimal ratio to a 0-100 score where each percentage point of impact equals 10 points. For example: If an opportunity generates $50,000 in annual ROI for a company with $1,000,000 in revenue, the ratio is 0.05 (5%). Multiplying by 1000 yields a score of 50. This means 1% of revenue = 10 points, 5% = 50 points, and 10% = 100 points (the cap). The same logic applies to Hours Score relative to workforce size.
+
+Normalization by revenue and FTEs prevents bias toward larger firms and captures the relative significance of benefits.
 
 A.5 Implementation Effort Scoring Methodology
 
-Implementation Effort represents the vertical axis of the Opportunity Matrix and measures the
-complexity and resource requirements for bringing an automation opportunity to production. Lower
-scores indicate easier implementation.
+Implementation Effort represents the vertical axis of the Opportunity Matrix and measures the complexity and resource requirements for bringing an automation opportunity to production. Lower scores indicate easier implementation.
 
 **Formula and weights.**
 
 Implementation Effort is calculated as a weighted composite of four factors:
 
-● **Readiness Score (inverted):** 50 percent. Derived from the combined TFA (60 percent) and
-PIF (40 percent) assessment. Higher readiness results in lower effort. This is the primary
-driver because it reflects comprehensive client assessment data across 61 combined questions.
+● **Readiness Score (inverted): 50 percent.** Derived from the combined TFA (60 percent) and PIF (40 percent) assessment. Higher readiness results in lower effort. This is the primary driver because it reflects comprehensive client assessment data across 50 combined questions.
 
-● **Ramp-up Period:** 20 percent. Estimated months from kickoff to steady-state operation.
-Normalized on a scale where 2 months or less equals 0 (lowest effort) and 12+ months
-equals 100 (highest effort).
+● **Ramp-up Period: 20 percent.** Estimated months from kickoff to steady-state operation. Normalized on a scale where 2 months or less equals 0 (lowest effort) and 12+ months equals 100 (highest effort).
 
-● **Payback Period:** 20 percent. Estimated months to recover implementation costs. Normalized
-where 3 months or less equals 0 (lowest effort) and 18+ months equals 100 (highest effort).
+● **Payback Period: 20 percent.** Estimated months to recover implementation costs. Normalized where 3 months or less equals 0 (lowest effort) and 18+ months equals 100 (highest effort).
 
-● **Training Hours per Employee:** 10 percent. Estimated end-user training required. Normalized
-where 1 hour or less equals 0 (lowest effort) and 20+ hours equals 100 (highest effort).
+● **Training Hours per Employee: 10 percent.** Estimated end-user training required. Normalized where 1 hour or less equals 0 (lowest effort) and 20+ hours equals 100 (highest effort).
 
 **Rationale for 50 percent readiness weighting:** The Readiness Rubric synthesizes actual client
 data from both technical (TFA) and operational (PIF) assessments, while ramp-up, payback, and
@@ -830,56 +826,44 @@ implementation complexity.
 
 A.6 ROI Modeling Methodology
 
-Double-layer conservatism.
+**Double-layer conservatism.**
 
-**Layer 1: Rubric-based base estimation.**
-Structured rubrics convert PIF inputs into base percentages for time savings, quality
-improvement, and revenue reallocation, considering process type, complexity, repetition, and
-data structure.
+● **Layer 1: Rubric-based base estimation.** Structured rubrics convert PIF inputs into base percentages for time savings, quality improvement, and revenue reallocation, considering process type, complexity, repetition, and data structure.
 
-**Layer 2: Scenario multipliers.**
-Risk-adjusted multipliers reflect adoption rates, exception handling, coverage, and integration
-maturity. Conservative scenario applies downward adjustments across benefit categories.
+● **Layer 2: Scenario multipliers.** Risk-adjusted multipliers reflect adoption rates, exception handling, coverage, and integration maturity. Conservative scenario applies downward adjustments across benefit categories.
 
-**Key formulas.**
+**Key formulas:**
 
-● **Annual Benefit =** Time savings value + Quality improvement value + Revenue uplift
-value.
+● **Annual Benefit =** Time savings value + Quality improvement value + Revenue uplift value.
 
 ● **Payback (months) =** Implementation cost ÷ Annual Benefit × 12.
 
-● **ROI percent** (used in methodology and matrices, even if not shown in every table) **=**
-(Annual Benefit − Annual cost) ÷ Annual cost × 100.
+● **ROI percent** (used in methodology and matrices, even if not shown in every table) **=** (Annual Benefit − Annual cost) ÷ Annual cost × 100.
 
 Inputs, parameters, and versions are documented in Appendix E: ROI Calculator
 Methodology.
 
 A.7 Opportunity Matrix Methodology
 
-The Opportunity Matrix converts readiness and business impact into a transparent prioritization
-model.
+The Opportunity Matrix converts readiness and business impact into a transparent prioritization model.
 
 **Two-matrix framework:**
-1. **Base Opportunity Matrix 0 to 100:** Pure efficiency comparison on a consistent
-company-relative basis using Base Impact.
-2. **Enhanced Opportunity Matrix 0 to 150:** Adds value beyond efficiency:
 
-○ Error Reduction Bonus up to 25 points based on measured error rates and
-rework avoided.
+● **Base Opportunity Matrix (X-axis 0 to 100):** Provides pure efficiency comparison on a consistent company-relative basis. The X-axis uses Base Impact calculated from ROI Score (60%) and Hours Score (40%), both normalized to company scale. This view enables apples-to-apples comparison across different company sizes.
 
-○ Revenue Uplift Bonus up to 25 points based on validated capacity reallocation
-toward revenue activities.
+● **Enhanced Opportunity Matrix (X-axis 0 to 150):** Extends the Base Matrix by adding quality and revenue dimensions beyond pure efficiency gains:
 
-Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus. Enhanced is
-always greater than or equal to Base.
+  ● **Error Reduction Bonus:** Up to 25 additional points based on measured error rates and rework avoided.
+
+  ● **Revenue Uplift Bonus:** Up to 25 additional points based on validated capacity reallocation toward revenue-generating activities.
+
+Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus. Enhanced is always greater than or equal to Base. This view surfaces opportunities where quality improvements or revenue potential significantly increase strategic value.
 
 **Axes:**
 
 ● **X-axis:** Business Impact (Base or Enhanced, depending on the view presented).
 
-● **Y-axis:** Implementation Effort (0 to 100), a weighted composite combining readiness score
-(50 percent), ramp-up period (20 percent), payback period (20 percent), and training hours
-(10 percent). See Section A.5 for detailed methodology.
+● **Y-axis:** Implementation Effort (0 to 100), a weighted composite combining readiness score (50 percent), ramp-up period (20 percent), payback period (20 percent), and training hours (10 percent). See Section A.5 for detailed methodology.
 
 **Quadrants:**
 
@@ -895,18 +879,13 @@ A.8 Roadmap Development Methodology
 
 Roadmap sequencing is derived directly from matrix positions and diagnostic evidence.
 
-Phase 1 Quick Wins 0 to 6 months. Low effort and high impact items executed first to deliver
-ROI quickly and validate governance, data connections, and monitoring.
+● **Phase 1 Quick Wins (0 to 6 months):** Low effort and high impact items executed first to deliver ROI quickly and validate governance, data connections, and monitoring.
 
-Phase 2 Foundational Enhancements 6 to 12 months. Address data quality, integration, and
-documentation gaps and pilot mid-complexity automations to raise readiness.
+● **Phase 2 Foundational Enhancements (6 to 12 months):** Address data quality, integration, and documentation gaps and pilot mid-complexity automations to raise readiness.
 
-Phase 3 Strategic Implementations 12 to 18 plus months. High-impact, higher-effort
-automations that extend across systems and functions, often with AI components and
-orchestration requirements.
+● **Phase 3 Strategic Implementations (12 to 18+ months):** High-impact, higher-effort automations that extend across systems and functions, often with AI components and orchestration requirements.
 
-Sequencing also considers technical dependencies, value realization timing, resource capacity,
-change management cadence, and budget cycles.
+Sequencing also considers technical dependencies, value realization timing, resource capacity, change management cadence, and budget cycles.
 
 A.9 Methodological Limitations
 
@@ -1024,7 +1003,7 @@ structured analytical engine built on the Conservative Scenario Framework. This 
 prioritizes credibility over optimism through:
 
 ● **Multi-layered rubric system:** TFA (21 weighted questions across 4 technical dimensions)
-and PIF (40 questions across 8 operational dimensions) provide step-level granularity for
+and PIF (29 questions across 8 operational dimensions) provide step-level granularity for
 precise readiness assessment.
 
 ● **Transparent audit trail:** Every input is linked to its source respondent, collection method,
