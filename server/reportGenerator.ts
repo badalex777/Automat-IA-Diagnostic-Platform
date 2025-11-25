@@ -385,10 +385,11 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
     const trimmed = line.trim();
 
     if (trimmed === '') {
-      // Blank line - flush both paragraph and list item, reset list context
+      // Blank line - flush both paragraph and list item
+      // Do NOT reset list context here - we want numbered lists to continue across blank lines
+      // The list context will be reset when we encounter a different content type
       flushParagraph();
       flushListItem();
-      resetListContext();
       continue;
     }
 
@@ -1987,8 +1988,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     [ctx.t.appendixETables.effectiveHourlyRate, ctx.t.appendixETables.effectiveHourlyRateValue, ctx.t.appendixETables.effectiveHourlyRateRationale],
     [ctx.t.appendixETables.standardWorkYear, ctx.t.appendixETables.standardWorkYearValue, ctx.t.appendixETables.standardWorkYearRationale],
     [ctx.t.appendixETables.processBaseline, ctx.t.appendixETables.processBaselineValue, ctx.t.appendixETables.processBaselineRationale],
-    [ctx.t.appendixETables.automationCapability, ctx.t.appendixETables.automationCapabilityValue, ctx.t.appendixETables.automationCapabilityRationale],
-    [ctx.t.appendixETables.recurringCostsLabel, ctx.t.appendixETables.recurringCostsValue, ctx.t.appendixETables.recurringCostsRationale],
+    [ctx.t.appendixETables.dataAccuracy, ctx.t.appendixETables.dataAccuracyValue, ctx.t.appendixETables.dataAccuracyRationale],
     [ctx.t.appendixETables.oneTimeCostsLabel, ctx.t.appendixETables.oneTimeCostsValue, ctx.t.appendixETables.oneTimeCostsRationale],
   ];
   sections.push(createTableCaption("E.6", ctx.t.tableCaptions["E.6"], ctx.t.labels.table));

@@ -723,11 +723,11 @@ de trabajo.
 
 **Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales, propietarios de procesos y expertos en la materia ayudan a Automat-IA a identificar candidatos de automatización y establecer un entendimiento base de flujos de trabajo críticos, puntos de dolor y objetivos de automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados. El resultado de estas entrevistas es la identificación de los flujos de trabajo que serán analizados durante el diagnóstico.
 
-**Recopilación de Datos Preliminar (Fase 1):** Recopilación inicial del contexto organizacional incluyendo estructura de la empresa, ingresos, conteo de empleados y desglose departamental. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
+**Recopilación de Datos Preliminar:** Recopilación del contexto financiero y operacional específico de la empresa incluyendo Ingresos Anuales, Total de ETCs, e información de contacto para el encuestado de TFA (representante de TI o contacto técnico) y propietario de procesos de back-office. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
 
 **Entrevistas con Usuarios Finales:** Discusiones con quienes realizan el trabajo verifican entradas PIF, permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción o propensas a errores.
 
-**Identificación de Encuestados PIF (Fase 3):** Identificación sistemática de empleados que realizan cada paso del flujo de trabajo, asegurando que las respuestas PIF provengan de aquellos con conocimiento operacional directo. Este paso valida la idoneidad del encuestado y captura perspectivas específicas del rol.
+**Identificación de Encuestados PIF:** Identificación sistemática de empleados que realizan cada paso del flujo de trabajo, asegurando que las respuestas PIF provengan de aquellos con conocimiento operacional directo. Este paso valida la idoneidad del encuestado, captura perspectivas específicas del rol y recopila tarifas por hora específicas del rol para un modelado de costos preciso.
 
 **Revisión de Documentación:** Revisión de diagramas de flujos de trabajo, procedimientos operativos estándar (SOP) y documentación de sistemas para verificar datos de formularios y confirmar condiciones de proceso. Cuando estén disponibles, se incorporan documentos de política, capturas de pantalla o registros de tareas como evidencia de respaldo.
 
@@ -948,7 +948,7 @@ que se validen para evitar inflar el beneficio.
 ● El período de retorno se calcula usando el motor de ROI basado en costo de implementación y beneficio 
 anual.
 
-● Las conversiones de FTE se basan en 2,080 horas por año (equivalente estándar de tiempo completo).
+● Las conversiones de FTE usan horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar.
 `;
 
 export const APPENDIX_E_PART1 = `
@@ -988,14 +988,13 @@ E.2 Fórmulas de Beneficio Neto
 export const APPENDIX_E_PART2 = `
 E.3 Conversiones de FTE y Horas
 
-**FTE Ahorrados** = Horas Anuales Ahorradas / 2,080
+**FTE Ahorrados** = Horas Anuales Ahorradas / Horas Anuales de ETC Específicas de la Empresa
 
 **Horas Anuales Ahorradas** = (Horas de Proceso Semanales × Empleados Involucrados × % de Ahorro de Tiempo) × 52
 
-**Año de Trabajo Estándar:** 2,080 horas (52 semanas × 40 horas)
+**Año de Trabajo Estándar:** Horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar
 
-**Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo. Los FTE 
-fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
+**Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo utilizando horas de trabajo específicas de la empresa en lugar de una suposición genérica de la industria. Esto fundamenta las proyecciones en el contexto operacional real del cliente. Los FTE fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
 
 E.4 Desglose de Beneficio Anual
 

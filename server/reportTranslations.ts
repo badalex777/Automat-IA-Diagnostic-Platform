@@ -483,20 +483,17 @@ export interface ReportTranslations {
     effectiveHourlyRate: string;
     standardWorkYear: string;
     processBaseline: string;
-    automationCapability: string;
+    dataAccuracy: string;
     effectiveHourlyRateValue: string;
     standardWorkYearValue: string;
     processBaselineValue: string;
-    automationCapabilityValue: string;
+    dataAccuracyValue: string;
     effectiveHourlyRateRationale: string;
     standardWorkYearRationale: string;
     processBaselineRationale: string;
-    automationCapabilityRationale: string;
+    dataAccuracyRationale: string;
     rampUpEfficiencyAdjustment: string;
     rampUpEfficiencyRationale: string;
-    recurringCostsLabel: string;
-    recurringCostsValue: string;
-    recurringCostsRationale: string;
     oneTimeCostsLabel: string;
     oneTimeCostsValue: string;
     oneTimeCostsRationale: string;
@@ -556,7 +553,7 @@ export const en: ReportTranslations = {
   },
   
   matrixDescriptions: {
-    baseMatrix: "The Base Impact Opportunity Matrix calculates Business Impact by combining the identified opportunities' Annual ROI divided by the company's Annual Revenue to produce a ROI-as-a-percentage-of-revenue, which is then combined with FTE savings. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.",
+    baseMatrix: "The Base Impact Opportunity Matrix calculates Business Impact by normalizing Annual ROI as a percentage of company revenue, then converting it to a 0-100 score using a x1000 multiplier (e.g., 5% of revenue = 50 points). This ROI Score is weighted at 60% and combined with an Hours Score (40%) derived from weekly time savings. The Enhanced Opportunity Matrix extends the Base Matrix by adding quality and revenue bonuses to the Business Impact axis, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift.",
   },
   
   phaseHeaders: {
@@ -715,7 +712,7 @@ export const en: ReportTranslations = {
   },
   
   appendices: {
-    a: "Appendix A: Project Scope and Interview Summary",
+    a: "Appendix A: Detailed Methodology",
     b: "Appendix B: Readiness Score Metric Weighting",
     c: "Appendix C: Step-Level SWOT Analysis by Workflow",
     d: "Appendix D: Opportunity-Level Financial Details",
@@ -754,7 +751,7 @@ export const en: ReportTranslations = {
     hoursPerYearWith: " hours per year, with an expected payback of",
     monthsPeriod: " months.",
     consolidationsRepresent: "Consolidations represent strategic groupings recommended for coordinated implementation. Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections.",
-    portfolioSummary: "Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance.",
+    portfolioSummary: "Use the Portfolio Overview to compare opportunity scale, cost, and realization pace at a glance.",
     consolidatedOpportunitiesShown: "Consolidated opportunities are shown aggregated above; individual constituents are included here for detailed review.",
     detailedPerOpportunity: "Detailed per-opportunity pages follow.",
     knowledgeGapResolutionDetails: "Knowledge Gap Resolution Details:",
@@ -878,7 +875,7 @@ export const en: ReportTranslations = {
     performanceSummaryTemplate: "**Performance Summary:** Under the conservative scenario, estimated annual benefit is {0}, equivalent to {1} FTEs or approximately {2} hours per year, with an expected payback of {3} months.",
     allValuesModeledConservative: "All values modeled under Automat-IA Conservative Scenario.",
     impactMajorityParagraph: "For this opportunity, the majority of measurable benefit is driven by time savings. Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance.",
-    portfolioSummaryParagraph: "Use the portfolio summary to compare opportunity scale, cost, and realization pace at a glance. {0}Detailed per-opportunity pages follow.",
+    portfolioSummaryParagraph: "Use the Portfolio Overview to compare opportunity scale, cost, and realization pace at a glance. {0}Detailed per-opportunity pages follow.",
     consolidationRepresentsParagraph: "Consolidations represent strategic groupings recommended for coordinated implementation. Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections.",
   },
   
@@ -955,27 +952,24 @@ export const en: ReportTranslations = {
     errorReductionAdjustment: "Error Reduction Adjustment",
     revenueReallocationAdjustment: "Revenue Reallocation Adjustment",
     costOverrunAdjustment: "Cost Overrun Adjustment",
-    timeSavingsRationale: "Apply 60-75% realization factor to account for exceptions, learning curves, and process variations",
-    errorReductionRationale: "Only include when error data is documented; apply 50% discount to projected improvements",
-    revenueReallocationRationale: "Exclude unless business validates capacity can be redirected; apply 40% discount when included",
-    costOverrunRationale: "Add 20% contingency to implementation costs to reflect typical project overruns",
+    timeSavingsRationale: "Apply 70% realization factor to account for adoption friction, learning curves, and partial automation coverage",
+    errorReductionRationale: "Only include when error data is documented; apply 70% multiplier to projected improvements",
+    revenueReallocationRationale: "Exclude unless business validates capacity can be redirected; apply 40% multiplier when included",
+    costOverrunRationale: "Apply 110% cost multiplier (10% contingency) to reflect typical scope creep and integration complexity",
     effectiveHourlyRate: "Effective Hourly Rate",
     standardWorkYear: "Standard Work Year",
     processBaseline: "Process Baseline",
-    automationCapability: "Automation Capability",
-    effectiveHourlyRateValue: "$50-$75 per hour",
-    standardWorkYearValue: "2,080 hours",
+    dataAccuracy: "Data Accuracy",
+    effectiveHourlyRateValue: "Company-specific rate",
+    standardWorkYearValue: "Company-specific annual FTE hours",
     processBaselineValue: "Current state as reported",
-    automationCapabilityValue: "60-80% task coverage",
-    effectiveHourlyRateRationale: "Blended rate reflecting salary, benefits, and overhead across roles",
-    standardWorkYearRationale: "52 weeks × 40 hours, industry standard for FTE calculations",
+    dataAccuracyValue: "Real, complete, accurate",
+    effectiveHourlyRateRationale: "Role-specific hourly rates collected during PIF Respondent Identification step",
+    standardWorkYearRationale: "Company-specific annual FTE hours collected in Preliminary Data Collection",
     processBaselineRationale: "PIF data establishes pre-automation performance baseline",
-    automationCapabilityRationale: "Realistic automation scope accounting for exceptions and edge cases",
+    dataAccuracyRationale: "Collaborative diagnostic process; data quality directly impacts diagnosis quality",
     rampUpEfficiencyAdjustment: "Ramp-Up Efficiency Adjustment",
-    rampUpEfficiencyRationale: "Year 1 benefits discounted by 50% to reflect gradual adoption and stabilization",
-    recurringCostsLabel: "Recurring Costs",
-    recurringCostsValue: "10-15% of implementation",
-    recurringCostsRationale: "Annual software licenses, maintenance, and support",
+    rampUpEfficiencyRationale: "Apply 80% multiplier to Year 1 benefits to reflect gradual adoption, user comfort, and rollout approach",
     oneTimeCostsLabel: "One-Time Costs",
     oneTimeCostsValue: "Implementation + Training",
     oneTimeCostsRationale: "Includes build, configuration, testing, and change management",
@@ -1086,7 +1080,7 @@ export const es: ReportTranslations = {
     "6.3": "Fase 3 — Estratégica",
     "6.4": "Cronograma de Implementación de 18 Meses",
     "B.1": "Ponderación de Componentes de Puntuación de Preparación",
-    "D.1": "Resumen de Cartera — Todas las Oportunidades",
+    "D.1": "Visión General del Portafolio — Todas las Oportunidades",
     "D.4": "Resumen de Oportunidades Consolidadas",
     "D.5": "Mapeo de Constituyentes de Consolidación",
     "E.2": "Fórmulas de Beneficio Neto",
@@ -1194,7 +1188,7 @@ export const es: ReportTranslations = {
   },
   
   appendices: {
-    a: "Apéndice A: Alcance del Proyecto y Resumen de Entrevistas",
+    a: "Apéndice A: Metodología Detallada",
     b: "Apéndice B: Ponderación de Métricas de Puntuación de Preparación",
     c: "Apéndice C: Análisis FODA a Nivel de Paso por Flujo de Trabajo",
     d: "Apéndice D: Detalles Financieros a Nivel de Oportunidad",
@@ -1233,7 +1227,7 @@ export const es: ReportTranslations = {
     hoursPerYearWith: " horas por año, con un retorno esperado de",
     monthsPeriod: " meses.",
     consolidationsRepresent: "Las consolidaciones representan agrupaciones estratégicas recomendadas para implementación coordinada. Las oportunidades constituyentes individuales y sus análisis financieros detallados se presentan en secciones posteriores.",
-    portfolioSummary: "Use el resumen de cartera para comparar escala de oportunidad, costo y ritmo de realización de un vistazo.",
+    portfolioSummary: "Use la Visión General del Portafolio para comparar escala de oportunidad, costo y ritmo de realización de un vistazo.",
     consolidatedOpportunitiesShown: "Las oportunidades consolidadas se muestran agregadas arriba; los constituyentes individuales se incluyen aquí para revisión detallada.",
     detailedPerOpportunity: "Siguen las páginas detalladas por oportunidad.",
     knowledgeGapResolutionDetails: "Detalles de Resolución de Brecha de Conocimiento:",
@@ -1357,7 +1351,7 @@ export const es: ReportTranslations = {
     performanceSummaryTemplate: "**Resumen de Rendimiento:** Bajo el escenario conservador, el beneficio anual estimado es {0}, equivalente a {1} FTEs o aproximadamente {2} horas por año, con un período de recuperación esperado de {3} meses.",
     allValuesModeledConservative: "Todos los valores modelados bajo el Escenario Conservador de Automat-IA.",
     impactMajorityParagraph: "Para esta oportunidad, la mayoría del beneficio medible proviene del ahorro de tiempo. Los impactos de calidad e ingresos se modelan de manera conservadora o se omiten cuando los datos de respaldo son insuficientes. El período de aceleración considera la adopción y estabilización para que los resultados del Año 1 reflejen un rendimiento alcanzable.",
-    portfolioSummaryParagraph: "Utilice el resumen del portafolio para comparar la escala de oportunidad, costo y ritmo de realización de un vistazo. {0}Las páginas detalladas por oportunidad siguen a continuación.",
+    portfolioSummaryParagraph: "Utilice la Visión General del Portafolio para comparar la escala de oportunidad, costo y ritmo de realización de un vistazo. {0}Las páginas detalladas por oportunidad siguen a continuación.",
     consolidationRepresentsParagraph: "Las consolidaciones representan agrupaciones estratégicas recomendadas para implementación coordinada. Las oportunidades constituyentes individuales y sus análisis financieros detallados se presentan en secciones subsiguientes.",
   },
   
@@ -1434,27 +1428,24 @@ export const es: ReportTranslations = {
     errorReductionAdjustment: "Ajuste de Reducción de Errores",
     revenueReallocationAdjustment: "Ajuste de Reasignación de Ingresos",
     costOverrunAdjustment: "Ajuste de Sobrecosto",
-    timeSavingsRationale: "Aplicar factor de realización del 60-75% para considerar excepciones, curvas de aprendizaje y variaciones de proceso",
-    errorReductionRationale: "Incluir solo cuando los datos de error estén documentados; aplicar descuento del 50% a las mejoras proyectadas",
-    revenueReallocationRationale: "Excluir a menos que el negocio valide que la capacidad puede redirigirse; aplicar descuento del 40% cuando se incluya",
-    costOverrunRationale: "Agregar contingencia del 20% a los costos de implementación para reflejar sobrecostos típicos del proyecto",
+    timeSavingsRationale: "Aplicar factor de realización del 70% para considerar fricción de adopción, curvas de aprendizaje y cobertura parcial de automatización",
+    errorReductionRationale: "Incluir solo cuando los datos de error estén documentados; aplicar multiplicador del 70% a las mejoras proyectadas",
+    revenueReallocationRationale: "Excluir a menos que el negocio valide que la capacidad puede redirigirse; aplicar multiplicador del 40% cuando se incluya",
+    costOverrunRationale: "Aplicar multiplicador de costo del 110% (contingencia del 10%) para reflejar desviación de alcance típica y complejidad de integración",
     effectiveHourlyRate: "Tarifa por Hora Efectiva",
     standardWorkYear: "Año Laboral Estándar",
     processBaseline: "Línea Base del Proceso",
-    automationCapability: "Capacidad de Automatización",
-    effectiveHourlyRateValue: "$50-$75 por hora",
-    standardWorkYearValue: "2.080 horas",
+    dataAccuracy: "Precisión de Datos",
+    effectiveHourlyRateValue: "Tarifa específica de la empresa",
+    standardWorkYearValue: "Horas anuales de ETC específicas de la empresa",
     processBaselineValue: "Estado actual según informado",
-    automationCapabilityValue: "60-80% de cobertura de tareas",
-    effectiveHourlyRateRationale: "Tarifa combinada que refleja salario, beneficios y gastos generales en todos los roles",
-    standardWorkYearRationale: "52 semanas × 40 horas, estándar de la industria para cálculos de FTE",
+    dataAccuracyValue: "Reales, completos, precisos",
+    effectiveHourlyRateRationale: "Tarifas por hora específicas del rol recopiladas durante el paso de Identificación de Encuestados PIF",
+    standardWorkYearRationale: "Horas anuales de ETC específicas de la empresa recopiladas en Recopilación de Datos Preliminar",
     processBaselineRationale: "Los datos del PIF establecen la línea base de rendimiento previa a la automatización",
-    automationCapabilityRationale: "Alcance de automatización realista considerando excepciones y casos extremos",
+    dataAccuracyRationale: "Proceso de diagnóstico colaborativo; la calidad de los datos impacta directamente la calidad del diagnóstico",
     rampUpEfficiencyAdjustment: "Ajuste de Eficiencia de Aceleración",
-    rampUpEfficiencyRationale: "Beneficios de Año 1 con descuento del 50% para reflejar adopción gradual y estabilización",
-    recurringCostsLabel: "Costos Recurrentes",
-    recurringCostsValue: "10-15% de implementación",
-    recurringCostsRationale: "Licencias de software anuales, mantenimiento y soporte",
+    rampUpEfficiencyRationale: "Aplicar multiplicador del 80% a los beneficios del Año 1 para reflejar adopción gradual, comodidad del usuario y enfoque de implementación",
     oneTimeCostsLabel: "Costos Únicos",
     oneTimeCostsValue: "Implementación + Capacitación",
     oneTimeCostsRationale: "Incluye construcción, configuración, pruebas y gestión del cambio",

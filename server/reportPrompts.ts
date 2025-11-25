@@ -310,8 +310,9 @@ scalability.
 
 Automat-IA applies a Two-Matrix Framework:
 
-1. The Base Impact Opportunity Matrix calculates Business Impact by combining the identified opportunities Annual ROI divided by the company's Annual Revenue to produce a ROI-as-a-percentage-of-revenue, which is then combined with FTE savings. This provides an initial prioritization that supports executive visibility and fast sequencing of opportunities.
-2. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.
+1. The Base Impact Opportunity Matrix calculates Business Impact by normalizing Annual ROI as a percentage of company revenue, then converting it to a 0-100 score using a x1000 multiplier (e.g., 5% of revenue = 50 points). This ROI Score is weighted at 60% and combined with an Hours Score (40%) derived from weekly time savings. The result is a company-relative impact score that enables consistent comparison across opportunities of different scales.
+
+2. The Enhanced Opportunity Matrix extends the Base Matrix by adding quality and revenue bonuses to the Business Impact axis, expanding the scale from 0-100 to 0-150. Error Reduction Bonus (up to 25 points) rewards opportunities with documented error rates and rework reduction. Revenue Uplift Bonus (up to 25 points) rewards validated capacity reallocation toward revenue-generating activities. This refined matrix surfaces opportunities where impact extends beyond pure efficiency gains.
 
 Phase 10: Validation Session and Stakeholder Alignment
 
@@ -703,11 +704,11 @@ technical conditions that determine whether automation is feasible within each w
 
 **Stakeholder Interviews:** Sessions with department leads, process owners, and subject-matter experts help Automat-IA identify automation candidates and establish a baseline understanding of critical workflows, pain points, and automation objectives. This ensures that the diagnostic scope and business priorities are aligned. The outcome of these interviews is the identification of the workflows that will be analyzed during the diagnosis.
 
-**Preliminary Data Collection (Phase 1):** Initial gathering of organizational context including company structure, revenue, employee count, and departmental breakdown. This foundational data enables company-relative normalization of scores and ensures accurate ROI modeling from the outset.
+**Preliminary Data Collection:** Gathering of company-specific financial and operational context including Annual Revenue, Total FTEs, and contact information for the TFA respondent (IT representative or technical contact) and back-office process owner. This foundational data enables company-relative normalization of scores and ensures accurate ROI modeling from the outset.
 
 **End-User Interviews:** Discussions with those performing the work verify PIF inputs, enable detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
 
-**PIF Respondent Identification (Phase 3):** Systematic identification of employees who perform each workflow step, ensuring that PIF responses come from those with direct operational knowledge. This step validates respondent suitability and captures role-specific perspectives.
+**PIF Respondent Identification:** Systematic identification of employees who perform each workflow step, ensuring that PIF responses come from those with direct operational knowledge. This step validates respondent suitability, captures role-specific perspectives, and collects role-specific hourly rates for accurate cost modeling.
 
 **Documentation Review:** Review of workflow diagrams, SOPs, and system documentation to cross-check form data and confirm process conditions. Where available, policy documents, screen captures, or task logs are incorporated as supporting evidence.
 
@@ -928,7 +929,7 @@ avoid inflating benefit.
 ● Payback period is calculated using the ROI engine based on implementation cost and
 annual benefit.
 
-● FTE conversions are based on 2,080 hours per year (standard full-time equivalent).
+● FTE conversions use company-specific annual FTE hours collected during Preliminary Data Collection.
 `;
 
 export const APPENDIX_E_PART1 = `
@@ -970,14 +971,13 @@ E.2 Net Benefit Formulas
 export const APPENDIX_E_PART2 = `
 E.3 FTE and Hours Conversions
 
-**FTE Saved =** Annual Hours Saved / 2,080
+**FTE Saved =** Annual Hours Saved / Company-Specific Annual FTE Hours
 
 **Annual Hours Saved =** (Weekly Process Hours × Employees Involved × Time Savings %) × 52
 
-**Standard Work Year:** 2,080 hours (52 weeks × 40 hours)
+**Standard Work Year:** Company-specific annual FTE hours collected during Preliminary Data Collection
 
-**Interpretation:** Converts time saved into full-time-equivalent capacity. Fractional FTEs indicate
-redeployable time rather than headcount reduction.
+**Interpretation:** Converts time saved into full-time-equivalent capacity using company-specific work hours rather than a generic industry assumption. This grounds projections in the client's actual operational context. Fractional FTEs indicate redeployable time rather than headcount reduction.
 
 E.4 Annual Benefit Breakdown
 
