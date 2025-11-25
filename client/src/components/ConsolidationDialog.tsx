@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -30,6 +31,7 @@ import { ArrowUpCircle, Clock, Wallet, TrendingUp, Users } from "lucide-react";
 
 const consolidationFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
   opportunityIds: z.array(z.string()).min(1, "Select at least one opportunity"),
 });
 
@@ -46,6 +48,7 @@ interface ConsolidationDialogProps {
   initialData?: {
     id?: string;
     name: string;
+    description?: string | null;
     opportunityIds: string[];
   };
 }
@@ -64,9 +67,19 @@ export function ConsolidationDialog({
     resolver: zodResolver(consolidationFormSchema),
     defaultValues: {
       name: initialData?.name || "",
+      description: initialData?.description || "",
       opportunityIds: initialData?.opportunityIds || [],
     },
   });
+
+  // Reset form when initialData changes (e.g., switching between create and edit mode)
+  useEffect(() => {
+    form.reset({
+      name: initialData?.name || "",
+      description: initialData?.description || "",
+      opportunityIds: initialData?.opportunityIds || [],
+    });
+  }, [initialData, form]);
 
   const selectedIds = form.watch("opportunityIds");
 
@@ -96,6 +109,7 @@ export function ConsolidationDialog({
     const consolidation: InsertWorkflowConsolidation = {
       workflowId,
       name: data.name,
+      description: data.description || null,
       opportunityIds: data.opportunityIds,
     };
     onSubmit(consolidation);
@@ -153,6 +167,25 @@ export function ConsolidationDialog({
                           {...field}
                           placeholder="e.g., Customer Service Platform"
                           data-testid="input-consolidation-name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Describe the strategic rationale for this consolidation and its expected organizational impact..."
+                          className="min-h-20 resize-none"
+                          data-testid="input-consolidation-description"
                         />
                       </FormControl>
                       <FormMessage />

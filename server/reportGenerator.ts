@@ -92,6 +92,38 @@ function buildTextRunsFromInlineMarkup(text: string): TextRun[] {
 }
 
 /**
+ * Build TextRun children from multi-line text with inline **bold** markdown syntax
+ * Each line separated by \\n gets a soft line break (like Shift+Enter in Word)
+ * This keeps multiple lines within a single paragraph/list item
+ * @param text - Multi-line text with **bold** markers, lines separated by \\n
+ * @returns Array of TextRun objects with bold flags and line breaks
+ */
+function buildTextRunsWithLineBreaks(text: string): TextRun[] {
+  const lines = text.split('\n');
+  const runs: TextRun[] = [];
+  
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex];
+    const segments = line.split('**');
+    
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      if (segment.length === 0) continue;
+      
+      const isBold = i % 2 === 1;
+      runs.push(new TextRun({ text: segment, bold: isBold }));
+    }
+    
+    // Add a line break after each line (except the last one)
+    if (lineIndex < lines.length - 1) {
+      runs.push(new TextRun({ text: '', break: 1 }));
+    }
+  }
+  
+  return runs;
+}
+
+/**
  * Create a body paragraph with justified alignment (for content after cover page)
  * Supports inline **bold** markdown syntax
  */
@@ -320,19 +352,20 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
 
   const flushListItem = () => {
     if (currentListItem.length > 0) {
-      const text = currentListItem.join(' ').trim();
+      // Join lines with newline to preserve line breaks within list items
+      // This allows continuation lines (like Description/Constituents) to appear on separate lines
+      const text = currentListItem.join('\n').trim();
       if (text) {
         if (currentListType === 'bullet') {
           paragraphs.push(new Paragraph({
-            children: buildTextRunsFromInlineMarkup(text),
+            children: buildTextRunsWithLineBreaks(text),
             alignment: AlignmentType.BOTH,
             bullet: { level: 0 },
             spacing: { after: 60 },
           }));
         } else if (currentListType === 'numbered') {
-          // For numbered paragraphs, we need to update createNumberedParagraph to accept children instead of text
           paragraphs.push(new Paragraph({
-            children: buildTextRunsFromInlineMarkup(text),
+            children: buildTextRunsWithLineBreaks(text),
             alignment: AlignmentType.BOTH,
             numbering: {
               reference: "decimal-numbering",
@@ -996,7 +1029,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
           const constituents = cons.constituentOpportunities
             .map(c => `${c.name} (${formatTemplate(ctx.t.formatStrings.stepFormat, c.stepOrder, c.stepName)})`)
             .join(', ');
-          return `${idx + 1}. ${cons.consolidation.name} (${cons.workflowName})\n   ${ctx.t.headers.description}: ${cons.consolidation.description || ctx.t.fallback.none}\n   ${ctx.t.headers.constituents}: ${constituents}`;
+          return `${idx + 1}. ${cons.consolidation.name} (${cons.workflowName})\n   • **${ctx.t.headers.description}**: ${cons.consolidation.description || ctx.t.fallback.none}\n   • **${ctx.t.headers.constituents}**: ${constituents}`;
         })
         .join('\n\n')
     : ctx.t.fallbackMessages.noConsolidations;

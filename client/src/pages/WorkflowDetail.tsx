@@ -1666,6 +1666,7 @@ export default function WorkflowDetail() {
           initialData={editConsolidation ? {
             id: editConsolidation.id,
             name: editConsolidation.name,
+            description: editConsolidation.description,
             opportunityIds: editConsolidation.opportunityIds,
           } : undefined}
         />
