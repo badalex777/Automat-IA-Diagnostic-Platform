@@ -325,20 +325,15 @@ the final automation roadmap and becomes the foundation for the Executive Diagno
 
 Phase 11: Automation Roadmap Development
 
-Opportunities selected from the validated matrices are sequenced into a three-phase roadmap
-that converts diagnostic insights into actionable implementation steps:
+Opportunities selected from the validated matrices are sequenced into a three-phase roadmap that converts diagnostic insights into actionable implementation steps:
 
-Phase 1: Quick Wins (0 to 6 months) focus on low-complexity automations that deliver
-early ROI and demonstrate measurable results.
+• **Phase 1: Quick Wins (0 to 6 months)** – Focus on low-complexity automations that deliver early ROI and demonstrate measurable results.
 
-Phase 2: Foundational (6 to 12 months) builds the integration, data, and governance
-structures required for scalable automation.
+• **Phase 2: Foundational (6 to 12 months)** – Build the integration, data, and governance structures required for scalable automation.
 
-Phase 3: Strategic (12 to 18+ months) delivers high-value, cross-departmental
-transformations that leverage the foundation built earlier.
+• **Phase 3: Strategic (12 to 18+ months)** – Deliver high-value, cross-departmental transformations that leverage the foundation built earlier.
 
-The roadmap acts as a structured execution plan, ensuring a logical transition from immediate
-efficiency gains to organization-wide AI enablement.
+The roadmap acts as a structured execution plan, ensuring a logical transition from immediate efficiency gains to organization-wide AI enablement.
 
 Phase 12: Final Deliverables
 
@@ -558,7 +553,7 @@ For detailed financial breakdowns, refer to Appendix D: ROI Model and Benefit Co
 export const FINDINGS_ANALYSIS_PART5 = `
 5.3 Opportunity Matrix Analysis
 
-The Opportunity Matrix visualizes the positioning of all automation opportunities within a single model that positions opportunities in the matrix under the Business Impact and Implementation Effort axes. This provides an evidence-based view of where automation can create the highest return relative to complexity and readiness.
+The Opportunity Matrix visualizes the positioning of all automation opportunities within a single model that places opportunities in the matrix under the Business Impact and Implementation Effort axes. This provides an evidence-based view of where automation can create the highest return relative to complexity and readiness.
 `;
 
 export const FINDINGS_ANALYSIS_PART6 = `

@@ -335,20 +335,15 @@ en la base del Reporte Ejecutivo de Diagnóstico.
 
 Fase 11: Desarrollo de Hoja de Ruta de Automatización
 
-Las oportunidades seleccionadas de las matrices validadas se secuencian en una hoja de ruta de tres fases 
-que convierte los hallazgos de diagnóstico en pasos de implementación accionables:
+Las oportunidades seleccionadas de las matrices validadas se secuencian en una hoja de ruta de tres fases que convierte los hallazgos de diagnóstico en pasos de implementación accionables:
 
-Fase 1: Logros Rápidos (0 a 6 meses) se enfoca en automatizaciones de baja complejidad que entregan 
-ROI temprano y demuestran resultados medibles.
+• **Fase 1: Logros Rápidos (0 a 6 meses)** – Se enfoca en automatizaciones de baja complejidad que entregan ROI temprano y demuestran resultados medibles.
 
-Fase 2: Fundacional (6 a 12 meses) construye las estructuras de integración, datos y gobernanza 
-requeridas para automatización escalable.
+• **Fase 2: Fundacional (6 a 12 meses)** – Construye las estructuras de integración, datos y gobernanza requeridas para automatización escalable.
 
-Fase 3: Estratégica (12 a 18+ meses) entrega transformaciones de alto valor y transdepartamentales que 
-aprovechan la base construida anteriormente.
+• **Fase 3: Estratégica (12 a 18+ meses)** – Entrega transformaciones de alto valor y transdepartamentales que aprovechan la base construida anteriormente.
 
-La hoja de ruta actúa como un plan de ejecución estructurado, asegurando una transición lógica desde 
-ganancias de eficiencia inmediatas hasta habilitación de IA a nivel organizacional.
+La hoja de ruta actúa como un plan de ejecución estructurado, asegurando una transición lógica desde ganancias de eficiencia inmediatas hasta habilitación de IA a nivel organizacional.
 
 Fase 12: Entregables Finales
 
@@ -577,7 +572,7 @@ Para desgloses financieros detallados, consulte el Apéndice D: Modelo de ROI y 
 export const FINDINGS_ANALYSIS_PART5 = `
 5.3 Análisis de Matriz de Oportunidades
 
-La Matriz de Oportunidades visualiza el posicionamiento de todas las oportunidades de automatización dentro de un modelo único que posiciona las oportunidades en la matriz bajo los ejes de Impacto Empresarial y Esfuerzo de Implementación. Esto proporciona una vista basada en evidencia de dónde la automatización puede crear el mayor retorno relativo a la complejidad y preparación.
+La Matriz de Oportunidades visualiza el posicionamiento de todas las oportunidades de automatización dentro de un modelo único que ubica las oportunidades en la matriz bajo los ejes de Impacto Empresarial y Esfuerzo de Implementación. Esto proporciona una vista basada en evidencia de dónde la automatización puede crear el mayor retorno relativo a la complejidad y preparación.
 `;
 
 export const FINDINGS_ANALYSIS_PART6 = `
