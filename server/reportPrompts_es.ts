@@ -354,16 +354,9 @@ Fase 12: Entregables Finales
 
 El proceso de diagnóstico concluye con la entrega de dos productos completos:
 
-1. **Reporte Ejecutivo de Diagnóstico (EDR):** Este documento consolida todos los hallazgos, evaluaciones de 
-preparación, análisis FODA, proyecciones de ROI, matrices de oportunidades y la hoja de ruta de 
-automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-12), 
-descripción general del diagnóstico, hallazgos y análisis, hoja de ruta de automatización, Conclusiones y 
-Próximos Pasos, y seis apéndices completos (A: Metodología Detallada, B: Ponderación de Métricas de 
-Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción Detallada de ROI, E: Metodología 
-de Cálculo de ROI, F: Procedencia de Datos y Pista de Auditoría). Diseñado para partes interesadas ejecutivas 
-y técnicas para guiar la toma de decisiones estratégicas y planificación de implementación.
-2. **Presentación Ejecutiva:** Una presentación resumida destacando hallazgos clave, oportunidades validadas 
-y la hoja de ruta recomendada, adaptada para comunicación a nivel de junta directiva y liderazgo senior.
+1. **Reporte Ejecutivo de Diagnóstico (EDR):** Este documento consolida todos los hallazgos, evaluaciones de preparación, análisis FODA, proyecciones de ROI, matrices de oportunidades y la hoja de ruta de automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-12), descripción general del diagnóstico, hallazgos y análisis, hoja de ruta de automatización, Conclusiones y Próximos Pasos, y seis apéndices completos (A: Metodología Detallada, B: Ponderación de Métricas de Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción Detallada de ROI, E: Metodología de Cálculo de ROI, F: Procedencia de Datos y Pista de Auditoría). Diseñado para partes interesadas ejecutivas y técnicas para guiar la toma de decisiones estratégicas y planificación de implementación.
+
+2. **Presentación Ejecutiva:** Una presentación resumida destacando hallazgos clave, oportunidades validadas y la hoja de ruta recomendada, adaptada para comunicación a nivel de junta directiva y liderazgo senior.
 `;
 
 export const DIAGNOSTIC_OVERVIEW_PART1 = `
@@ -584,10 +577,7 @@ Para desgloses financieros detallados, consulte el Apéndice D: Modelo de ROI y 
 export const FINDINGS_ANALYSIS_PART5 = `
 5.3 Análisis de Matriz de Oportunidades
 
-La Matriz de Oportunidades visualiza el posicionamiento de todas las oportunidades de automatización dentro 
-de un modelo único que equilibra Impacto Empresarial y Esfuerzo de Implementación. Esto proporciona una 
-vista basada en evidencia de dónde la automatización puede crear el mayor retorno relativo a la complejidad 
-y preparación.
+La Matriz de Oportunidades visualiza el posicionamiento de todas las oportunidades de automatización dentro de un modelo único que posiciona las oportunidades en la matriz bajo los ejes de Impacto Empresarial y Esfuerzo de Implementación. Esto proporciona una vista basada en evidencia de dónde la automatización puede crear el mayor retorno relativo a la complejidad y preparación.
 `;
 
 export const FINDINGS_ANALYSIS_PART6 = `

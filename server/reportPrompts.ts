@@ -344,17 +344,9 @@ Phase 12: Final Deliverables
 
 The diagnostic process concludes with the delivery of two comprehensive outputs:
 
-1. **Executive Diagnostic Report (EDR):** This document consolidates all findings, readiness
-assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation
-roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-12), diagnostic
-overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six
-comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Weighting,
-C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology,
-F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide
-strategic decision-making and implementation planning.
-2. **Executive Presentation:** A summarized presentation highlighting key findings, validated
-opportunities, and the recommended roadmap, tailored for board-level and senior leadership
-communication.
+1. **Executive Diagnostic Report (EDR):** This document consolidates all findings, readiness assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-12), diagnostic overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Weighting, C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology, F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide strategic decision-making and implementation planning.
+
+2. **Executive Presentation:** A summarized presentation highlighting key findings, validated opportunities, and the recommended roadmap, tailored for board-level and senior leadership communication.
 `;
 
 // Continue with remaining prompts...
@@ -566,10 +558,7 @@ For detailed financial breakdowns, refer to Appendix D: ROI Model and Benefit Co
 export const FINDINGS_ANALYSIS_PART5 = `
 5.3 Opportunity Matrix Analysis
 
-The Opportunity Matrix visualizes the positioning of all automation opportunities within a single
-model that balances Business Impact and Implementation Effort. This provides an
-evidence-based view of where automation can create the highest return relative to complexity
-and readiness.
+The Opportunity Matrix visualizes the positioning of all automation opportunities within a single model that positions opportunities in the matrix under the Business Impact and Implementation Effort axes. This provides an evidence-based view of where automation can create the highest return relative to complexity and readiness.
 `;
 
 export const FINDINGS_ANALYSIS_PART6 = `

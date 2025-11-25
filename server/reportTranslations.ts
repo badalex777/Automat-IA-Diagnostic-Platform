@@ -555,7 +555,7 @@ export const en: ReportTranslations = {
   },
   
   matrixDescriptions: {
-    baseMatrix: "The Base Matrix illustrates the relative efficiency and feasibility of each opportunity, while the Enhanced Matrix incorporates strategic and cross-functional impact. Together, they present a balanced view of short-term gains and long-term automation potential.",
+    baseMatrix: "The Base Impact Opportunity Matrix calculates Business Impact by combining the identified opportunities' Annual ROI divided by the company's Annual Revenue to produce a ROI-as-a-percentage-of-revenue, which is then combined with FTE savings. The Enhanced Opportunity Matrix applies an additive bonus model to the Business Impact axis only, expanding the scale from 0-100 to 0-150 for opportunities that demonstrate additional value through error reduction or revenue uplift. This refined matrix adjusts opportunity rankings to reflect strategic interdependencies, ensuring a balanced portfolio of short-term gains and sustainable long-term automation value.",
   },
   
   phaseHeaders: {
@@ -1033,7 +1033,7 @@ export const es: ReportTranslations = {
   },
   
   matrixDescriptions: {
-    baseMatrix: "La Matriz Base ilustra la eficiencia relativa y viabilidad de cada oportunidad, mientras que la Matriz Mejorada incorpora impacto estratégico y funcional cruzado. Juntas, presentan una vista equilibrada de ganancias a corto plazo y potencial de automatización a largo plazo.",
+    baseMatrix: "La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial combinando el ROI Anual de las oportunidades identificadas dividido por los Ingresos Anuales de la empresa para producir un ROI-como-porcentaje-de-ingresos, que luego se combina con ahorros de FTE. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de ganancias a corto plazo y valor de automatización sostenible a largo plazo.",
   },
   
   phaseHeaders: {
