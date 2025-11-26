@@ -282,12 +282,9 @@ implementación, permitiendo priorización basada en datos en lugar de clasifica
 
 La matriz traza dos dimensiones principales:
 
-**Eje Vertical:** Impacto Empresarial combina ROI anual, FTE ahorrados y, cuando corresponda, 
-beneficios adicionales como reducción de errores e incremento de ingresos.
+● **Eje Vertical:** Impacto Empresarial combina ROI anual, FTE ahorrados y, cuando corresponda, beneficios adicionales como reducción de errores e incremento de ingresos.
 
-**Eje Horizontal:** Esfuerzo de Implementación refleja la dificultad técnica, complejidad de integración y 
-puntuaciones de preparación a nivel de paso derivadas de la combinación de evaluaciones TFA a nivel de 
-flujo de trabajo y PIF específicas de paso.
+● **Eje Horizontal:** Esfuerzo de Implementación refleja la dificultad técnica, complejidad de integración y puntuaciones de preparación a nivel de paso derivadas de la combinación de evaluaciones TFA a nivel de flujo de trabajo y PIF específicas de paso.
 
 Este enfoque de dos ejes destaca qué oportunidades entregan el mayor retorno por el menor esfuerzo relativo.
 
@@ -295,18 +292,15 @@ Este enfoque de dos ejes destaca qué oportunidades entregan el mayor retorno po
 
 La matriz se divide en cuatro cuadrantes que guían la priorización:
 
-**Logros Rápidos:** Alto impacto y bajo esfuerzo; candidatos inmediatos para implementación temprana.
+● **Logros Rápidos:** Alto impacto y bajo esfuerzo; candidatos inmediatos para implementación temprana.
 
-**Apuestas Estratégicas:** Alto impacto y alto esfuerzo; proyectos a largo plazo con potencial de valor 
-significativo.
+● **Apuestas Estratégicas:** Alto impacto y alto esfuerzo; proyectos a largo plazo con potencial de valor significativo.
 
-**Deseables:** Impacto moderado o bajo y bajo esfuerzo; útiles para optimización o prueba de concepto.
+● **Deseables:** Impacto moderado o bajo y bajo esfuerzo; útiles para optimización o prueba de concepto.
 
-**Despriorizar:** Bajo impacto y alto esfuerzo; baja prioridad hasta que los cambios fundacionales mejoren 
-la factibilidad.
+● **Despriorizar:** Bajo impacto y alto esfuerzo; baja prioridad hasta que los cambios fundacionales mejoren la factibilidad.
 
-Este modelo de cuadrantes asegura que las decisiones de automatización equilibren el valor a corto plazo 
-con la escalabilidad a largo plazo.
+Este modelo de cuadrantes asegura que las decisiones de automatización equilibren el valor a corto plazo con la escalabilidad a largo plazo.
 
 7.4 Matriz de Oportunidades Estándar vs. Mejorada
 

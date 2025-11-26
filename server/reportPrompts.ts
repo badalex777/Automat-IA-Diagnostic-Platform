@@ -278,33 +278,25 @@ data-driven prioritization rather than subjective ranking.
 
 The matrix plots two core dimensions:
 
-**Vertical Axis:** Business Impact combines annual ROI, FTE saved and, when applicable, 
-additional benefits such as error reduction & revenue uplift.
+● **Vertical Axis:** Business Impact combines annual ROI, FTE saved and, when applicable, additional benefits such as error reduction & revenue uplift.
 
-**Horizontal Axis:** Implementation Effort reflects the technical difficulty, integration
-complexity, and step-level readiness scores derived from the combination of
-workflow-level TFA and step-specific PIF assessments.
+● **Horizontal Axis:** Implementation Effort reflects the technical difficulty, integration complexity, and step-level readiness scores derived from the combination of workflow-level TFA and step-specific PIF assessments.
 
-This two-axis approach highlights which opportunities deliver the highest return for the lowest
-relative effort.
+This two-axis approach highlights which opportunities deliver the highest return for the lowest relative effort.
 
 7.3 Matrix Quadrants
 
 The matrix is divided into four quadrants that guide prioritization:
 
-**Quick Wins:** High impact and low effort; immediate candidates for early implementation.
+● **Quick Wins:** High impact and low effort; immediate candidates for early implementation.
 
-**Strategic Bets:** High impact and high effort; long-term projects with significant value
-potential.
+● **Strategic Bets:** High impact and high effort; long-term projects with significant value potential.
 
-**Nice-to-Have:** Moderate or low impact and low effort; useful for optimization or
-proof-of-concept.
+● **Nice-to-Have:** Moderate or low impact and low effort; useful for optimization or proof-of-concept.
 
-**Deprioritize:** Low impact and high effort; low priority until foundational changes improve
-feasibility.
+● **Deprioritize:** Low impact and high effort; low priority until foundational changes improve feasibility.
 
-This quadrant model ensures that automation decisions balance short-term value with long-term
-scalability.
+This quadrant model ensures that automation decisions balance short-term value with long-term scalability.
 
 7.4 Standard vs. Enhanced Opportunity Matrix
 
