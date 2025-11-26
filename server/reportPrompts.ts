@@ -966,8 +966,7 @@ E.4 Annual Benefit Breakdown
 export const APPENDIX_E_PART3 = `
 E.5 Scenario Adjustment Framework
 
-To reflect real-world execution realities, Automat-IA applies five adjustment layers that moderate
-both benefit and cost estimations:
+To reflect real-world execution realities, Automat-IA applies five adjustment layers that moderate both benefit and cost estimations:
 `;
 
 export const APPENDIX_E_PART4 = `

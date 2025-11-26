@@ -909,9 +909,7 @@ Este diagnóstico es una evaluación puntual de preparación y valor potencial, 
 `;
 
 export const APPENDIX_D_INTRO = `
-Este apéndice proporciona una vista financiera auditable de cada oportunidad de automatización validada. 
-Los resultados se modelan utilizando el Marco de Escenario Conservador de Automat-IA a menos que se 
-indique lo contrario. Las cifras financieras se redondean al centenar más cercano.
+Este apéndice proporciona una vista financiera auditable de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Automat-IA a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.
 
 D.1 Tabla de Resumen de Portafolio
 `;
@@ -921,24 +919,17 @@ D.4 Notas de Modelado y Trazabilidad
 
 ● Los cálculos siguen la Calculadora de ROI de Automat-IA y el Marco de Escenario Conservador.
 
-● Las entradas se originan de respuestas PIF validadas, entrevistas con partes interesadas y revisión 
-de documentación; vea el Apéndice F: Procedencia de Datos y Pista de Auditoría para nombres de 
-encuestados, roles, fechas y cualquier supuesto de punto medio.
+● Las entradas se originan de respuestas PIF validadas, entrevistas con partes interesadas y revisión de documentación; vea el Apéndice F: Procedencia de Datos y Pista de Auditoría para nombres de encuestados, roles, fechas y cualquier supuesto de punto medio.
 
-● Cuando los datos de calidad o ingresos no están verificados, los valores se mantienen en cero hasta 
-que se validen para evitar inflar el beneficio.
+● Cuando los datos de calidad o ingresos no están verificados, los valores se mantienen en cero hasta que se validen para evitar inflar el beneficio.
 
-● El período de retorno se calcula usando el motor de ROI basado en costo de implementación y beneficio 
-anual.
+● El período de retorno se calcula usando el motor de ROI basado en costo de implementación y beneficio anual.
 
 ● Las conversiones de FTE usan horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar.
 `;
 
 export const APPENDIX_E_PART1 = `
-Este apéndice documenta la lógica financiera y controles de escenarios utilizados para generar las 
-proyecciones de ROI, retorno y beneficios de Automat-IA. Todos los cálculos se realizan bajo el Marco 
-de Escenario Conservador, asegurando que cada cifra en este informe sea realista, ajustada por riesgo 
-y auditable.
+Este apéndice documenta la lógica financiera y controles de escenarios utilizados para generar las proyecciones de ROI, retorno y beneficios de Automat-IA. Todos los cálculos se realizan bajo el Marco de Escenario Conservador, asegurando que cada cifra en este informe sea realista, ajustada por riesgo y auditable.
 
 E.1 Fórmulas Financieras Centrales
 
@@ -978,15 +969,13 @@ E.3 Conversiones de FTE y Horas
 
 E.4 Desglose de Beneficio Anual
 
-**Beneficios Anuales Totales** = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + 
-Beneficios de Incremento de Ingresos
+**Beneficios Anuales Totales** = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + Beneficios de Incremento de Ingresos
 `;
 
 export const APPENDIX_E_PART3 = `
 E.5 Marco de Ajuste de Escenarios
 
-Para reflejar las realidades de ejecución del mundo real, Automat-IA aplica cinco capas de ajuste que 
-moderan tanto las estimaciones de beneficios como de costos:
+Para reflejar las realidades de ejecución del mundo real, Automat-IA aplica cinco capas de ajuste que moderan tanto las estimaciones de beneficios como de costos:
 `;
 
 export const APPENDIX_E_PART4 = `
