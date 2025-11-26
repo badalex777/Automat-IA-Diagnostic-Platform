@@ -67,6 +67,7 @@ export default function PIFForm() {
         title: t.ui.errorLoadingSurvey,
         description: error.message,
         variant: "destructive",
+        duration: 5000,
       });
     }
   }, [error, toast, t]);
@@ -80,6 +81,7 @@ export default function PIFForm() {
           ? 'Please enter the verification code to continue.' 
           : 'Por favor ingrese el código de verificación para continuar.',
         variant: "destructive",
+        duration: 5000,
       });
       return false;
     }
@@ -98,6 +100,7 @@ export default function PIFForm() {
           ? 'The verification code you entered is incorrect. Please check and try again.' 
           : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
         variant: "destructive",
+        duration: 5000,
       });
       return false;
     } finally {
@@ -125,6 +128,7 @@ export default function PIFForm() {
         title: t.ui.submissionFailed,
         description: error.message,
         variant: "destructive",
+        duration: 5000,
       });
     },
   });
@@ -135,6 +139,7 @@ export default function PIFForm() {
         title: t.ui.nameRequired,
         description: t.ui.nameRequiredDescription,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -144,6 +149,7 @@ export default function PIFForm() {
         title: t.ui.roleRequired,
         description: t.ui.roleRequiredDescription,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -153,6 +159,7 @@ export default function PIFForm() {
         title: t.ui.responsibilitiesRequired,
         description: t.ui.responsibilitiesRequiredDescription,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -164,6 +171,7 @@ export default function PIFForm() {
           ? 'Please enter the verification code provided by your consultant.' 
           : 'Por favor ingrese el código de verificación proporcionado por su consultor.',
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -187,6 +195,7 @@ export default function PIFForm() {
         title: t.ui.incompleteSurvey,
         description: `${t.ui.incompleteSurveyDescription} ${missingAnswers.length} ${t.ui.requiredQuestionsDescription.split('.')[0]}.`,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -271,6 +280,7 @@ export default function PIFForm() {
           title: t.ui.acceptanceRequired,
           description: t.ui.acceptanceRequiredDescription,
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -287,6 +297,7 @@ export default function PIFForm() {
           ? 'Please complete the disclaimer section first.' 
           : 'Por favor complete la sección de descargo de responsabilidad primero.',
         variant: "destructive",
+        duration: 5000,
       });
       setCurrentSection(0); // Force back to disclaimer
       return;
@@ -299,6 +310,7 @@ export default function PIFForm() {
           title: t.ui.requiredFields,
           description: t.ui.requiredFieldsDescription,
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -325,6 +337,7 @@ export default function PIFForm() {
             title: t.ui.requiredQuestions,
             description: `${t.ui.requiredQuestionsDescription} ${missingSectionAnswers.length} question(s) remaining.`,
             variant: "destructive",
+        duration: 5000,
           });
           return;
         }

@@ -66,6 +66,7 @@ export default function TFAForm() {
         title: t.errorLoadingAssessment,
         description: error.message,
         variant: "destructive",
+        duration: 5000,
       });
     }
   }, [error, toast, t.errorLoadingAssessment]);
@@ -79,6 +80,7 @@ export default function TFAForm() {
           ? 'Please enter the verification code to continue.' 
           : 'Por favor ingrese el código de verificación para continuar.',
         variant: "destructive",
+        duration: 5000,
       });
       return false;
     }
@@ -97,6 +99,7 @@ export default function TFAForm() {
           ? 'The verification code you entered is incorrect. Please check and try again.' 
           : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
         variant: "destructive",
+        duration: 5000,
       });
       return false;
     } finally {
@@ -127,6 +130,7 @@ export default function TFAForm() {
         title: t.submissionFailed,
         description: error.message,
         variant: "destructive",
+        duration: 5000,
       });
     },
   });
@@ -137,6 +141,7 @@ export default function TFAForm() {
         title: language === 'en' ? "Verification code required" : "Código de verificación requerido",
         description: language === 'en' ? "Please enter the verification code provided with the assessment link" : "Por favor ingrese el código de verificación proporcionado con el enlace de evaluación",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -145,6 +150,7 @@ export default function TFAForm() {
         title: t.nameRequired,
         description: t.nameRequiredDescription,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -153,6 +159,7 @@ export default function TFAForm() {
         title: language === 'en' ? "Role required" : "Rol requerido",
         description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -161,6 +168,7 @@ export default function TFAForm() {
         title: t.incompleteAssessment,
         description: t.incompleteAssessmentDescription,
         variant: "destructive",
+        duration: 5000,
       });
       return;
     }
@@ -181,6 +189,7 @@ export default function TFAForm() {
           title: t.gapDetailsRequired,
           description: t.gapDetailsRequiredDescription,
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -209,6 +218,7 @@ export default function TFAForm() {
           title: t.nameRequired,
           description: t.nameRequiredDescription,
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -217,6 +227,7 @@ export default function TFAForm() {
           title: language === 'en' ? "Role required" : "Rol requerido",
           description: language === 'en' ? "Please provide your role or title" : "Por favor proporcione su rol o título",
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -233,6 +244,7 @@ export default function TFAForm() {
           ? 'Please complete the introduction section first.' 
           : 'Por favor complete la sección de introducción primero.',
         variant: "destructive",
+        duration: 5000,
       });
       setCurrentSection(0); // Force back to intro
       return;
@@ -250,6 +262,7 @@ export default function TFAForm() {
           title: t.requiredQuestions,
           description: t.requiredQuestionsDescription.replace('{count}', missingSectionAnswers.length.toString()),
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
@@ -270,6 +283,7 @@ export default function TFAForm() {
           title: t.gapDetailsRequired,
           description: t.gapDetailsRequiredDescription,
           variant: "destructive",
+        duration: 5000,
         });
         return;
       }
