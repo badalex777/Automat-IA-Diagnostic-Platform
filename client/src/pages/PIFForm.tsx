@@ -580,7 +580,10 @@ export default function PIFForm() {
                                   {departmentName}
                                 </div>
                               )}
-                              <div className="flex items-start space-x-2">
+                              <div 
+                                className="flex items-start space-x-2 p-3 rounded-md border border-transparent hover:bg-muted/50 cursor-pointer transition-colors"
+                                onClick={() => setAnswers(prev => ({ ...prev, [question.id.toString()]: option.value.toString() }))}
+                              >
                                 <RadioGroupItem 
                                   value={option.value.toString()} 
                                   id={`q${question.id}-${option.value}`}

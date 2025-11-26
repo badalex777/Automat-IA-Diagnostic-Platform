@@ -37,11 +37,12 @@ export default function TFAQuestionCard({
         {options.map((option) => (
           <div
             key={option.value}
-            className={`flex items-start space-x-3 p-4 rounded-md border transition-all ${
+            className={`flex items-start space-x-3 p-4 rounded-md border transition-all cursor-pointer ${
               value === option.value
                 ? "border-primary bg-primary/5"
                 : "border-border hover-elevate"
             }`}
+            onClick={() => onChange(option.value)}
           >
             <RadioGroupItem 
               value={option.value} 

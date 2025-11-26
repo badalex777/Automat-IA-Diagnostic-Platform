@@ -252,10 +252,15 @@ export default function PeopleAndCostForm({ data, onChange, showManualRequiredBa
             type="text"
             inputMode="decimal"
             pattern="[0-9]*\.?[0-9]*"
-            value={data.overheadMultiplier || ''}
+            value={data.overheadMultiplier ?? ''}
             onChange={(e) => {
               const filtered = e.target.value.replace(/[^0-9.]/g, '');
-              const val = filtered === '' ? 1.0 : parseFloat(filtered);
+              // Keep as string during editing to allow typing decimals like "1."
+              handleChange('overheadMultiplier', filtered);
+            }}
+            onBlur={(e) => {
+              // Convert to number on blur for final storage
+              const val = e.target.value === '' ? 1.0 : parseFloat(e.target.value);
               handleChange('overheadMultiplier', isNaN(val) ? 1.0 : val);
             }}
             placeholder="1.0"
