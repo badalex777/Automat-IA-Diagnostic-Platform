@@ -930,13 +930,11 @@ E.1 Core Financial Formulas
 
 **Components:**
 
-**Net Benefit =** Total Annual Benefits − Total Annual Costs
+● **Net Benefit =** Total Annual Benefits − Total Annual Costs
 
-**Total Costs =** Implementation + Software + Training + Change Management
+● **Total Costs =** Implementation + Software + Training + Change Management
 
-**Interpretation:**
-ROI expresses the steady-state annual financial return after the automation is fully operational.
-A positive ROI indicates that annualized benefits exceed total costs.
+**Interpretation:** ROI expresses the steady-state annual financial return after the automation is fully operational. A positive ROI indicates that annualized benefits exceed total costs.
 
 **Payback Period (Months)**
 
@@ -944,10 +942,7 @@ A positive ROI indicates that annualized benefits exceed total costs.
 
 **Monthly Net Benefit =** (Annual Benefits − Recurring Costs) / 12
 
-**Interpretation:**
-Measures how many months are required for cumulative net benefits to recover initial
-investment, including a Year-1 ramp-up factor to reflect progressive adoption rather than instant
-realization.
+**Interpretation:** Measures how many months are required for cumulative net benefits to recover initial investment, including a Year-1 ramp-up factor to reflect progressive adoption rather than instant realization.
 
 E.2 Net Benefit Formulas
 `;

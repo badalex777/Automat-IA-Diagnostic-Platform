@@ -947,12 +947,12 @@ E.1 Fórmulas Financieras Centrales
 **ROI (%)** = (Beneficio Neto / Costos Totales) × 100
 
 **Componentes:**
-**Beneficio Neto** = Beneficios Anuales Totales − Costos Anuales Totales
-**Costos Totales** = Implementación + Software + Capacitación + Gestión del Cambio
 
-**Interpretación:**
-El ROI expresa el retorno financiero anual de estado estable después de que la automatización está 
-completamente operacional. Un ROI positivo indica que los beneficios anualizados exceden los costos totales.
+● **Beneficio Neto** = Beneficios Anuales Totales − Costos Anuales Totales
+
+● **Costos Totales** = Implementación + Software + Capacitación + Gestión del Cambio
+
+**Interpretación:** El ROI expresa el retorno financiero anual de estado estable después de que la automatización está completamente operacional. Un ROI positivo indica que los beneficios anualizados exceden los costos totales.
 
 **Período de Retorno (Meses)**
 
@@ -960,10 +960,7 @@ completamente operacional. Un ROI positivo indica que los beneficios anualizados
 
 **Beneficio Neto Mensual** = (Beneficios Anuales − Costos Recurrentes) / 12
 
-**Interpretación:**
-Mide cuántos meses se requieren para que los beneficios netos acumulativos recuperen la inversión inicial, 
-incluyendo un factor de arranque de Año-1 para reflejar adopción progresiva en lugar de realización 
-instantánea.
+**Interpretación:** Mide cuántos meses se requieren para que los beneficios netos acumulativos recuperen la inversión inicial, incluyendo un factor de arranque de Año-1 para reflejar adopción progresiva en lugar de realización instantánea.
 
 E.2 Fórmulas de Beneficio Neto
 `;
