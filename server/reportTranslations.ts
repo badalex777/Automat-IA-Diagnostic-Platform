@@ -435,7 +435,7 @@ export interface ReportTranslations {
     roiInsightsHeading: string; // "D.{0} ROI Insights — {1} / {2}"
     monthsAbbrev: string; // "mo"
     hoursPerYear: string; // "hours/year"
-    consolidatedOpportunitiesHeading: string; // "D.0 Consolidated Opportunities"
+    consolidatedOpportunitiesHeading: string; // "D.3 Consolidated Opportunities"
   };
   
   // Key conclusions bullets and content
