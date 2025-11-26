@@ -935,23 +935,23 @@ E.1 Fórmulas Financieras Centrales
 
 **Retorno de Inversión (ROI)**
 
-**ROI (%)** = (Beneficio Neto / Costos Totales) × 100
+● **ROI (%)** = (Beneficio Neto / Costos Totales) × 100
 
 **Componentes:**
 
-● **Beneficio Neto** = Beneficios Anuales Totales − Costos Anuales Totales
+  ● **Beneficio Neto** = Beneficios Anuales Totales − Costos Anuales Totales
 
-● **Costos Totales** = Implementación + Software + Capacitación + Gestión del Cambio
+  ● **Costos Totales** = Implementación + Software + Capacitación + Gestión del Cambio
 
-**Interpretación:** El ROI expresa el retorno financiero anual de estado estable después de que la automatización está completamente operacional. Un ROI positivo indica que los beneficios anualizados exceden los costos totales.
+● **Interpretación:** El ROI expresa el retorno financiero anual de estado estable después de que la automatización está completamente operacional. Un ROI positivo indica que los beneficios anualizados exceden los costos totales.
 
 **Período de Retorno (Meses)**
 
-**Retorno** = Inversión Total / Beneficio Neto Mensual
+● **Retorno** = Inversión Total / Beneficio Neto Mensual
 
-**Beneficio Neto Mensual** = (Beneficios Anuales − Costos Recurrentes) / 12
+● **Beneficio Neto Mensual** = (Beneficios Anuales − Costos Recurrentes) / 12
 
-**Interpretación:** Mide cuántos meses se requieren para que los beneficios netos acumulativos recuperen la inversión inicial, incluyendo un factor de arranque de Año-1 para reflejar adopción progresiva en lugar de realización instantánea.
+● **Interpretación:** Mide cuántos meses se requieren para que los beneficios netos acumulativos recuperen la inversión inicial, incluyendo un factor de arranque de Año-1 para reflejar adopción progresiva en lugar de realización instantánea.
 
 E.2 Fórmulas de Beneficio Neto
 `;
@@ -965,11 +965,11 @@ E.3 Conversiones de FTE y Horas
 
 ● **Año de Trabajo Estándar:** Horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar
 
-**Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo utilizando horas de trabajo específicas de la empresa en lugar de una suposición genérica de la industria. Esto fundamenta las proyecciones en el contexto operacional real del cliente. Los FTE fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
+● **Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo utilizando horas de trabajo específicas de la empresa en lugar de una suposición genérica de la industria. Esto fundamenta las proyecciones en el contexto operacional real del cliente. Los FTE fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
 
 E.4 Desglose de Beneficio Anual
 
-**Beneficios Anuales Totales** = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + Beneficios de Incremento de Ingresos
+● **Beneficios Anuales Totales** = Beneficios de Ahorro de Tiempo + Beneficios de Reducción de Errores + Beneficios de Incremento de Ingresos
 `;
 
 export const APPENDIX_E_PART3 = `
