@@ -271,14 +271,14 @@ y pueden estar sujetas a cambios si {{company_name}} decide proceder con la impl
 
 Fase 9: Priorización de Matriz de Oportunidades
 
-7.1 Descripción General
+9.1 Descripción General
 
 La Matriz de Oportunidades es un modelo de apoyo a la toma de decisiones utilizado para priorizar 
 iniciativas de automatización basadas en perspectivas tanto empresariales como técnicas. Visualiza cada 
 oportunidad en un marco unificado que compara la creación de valor esperado contra la factibilidad de 
 implementación, permitiendo priorización basada en datos en lugar de clasificación subjetiva.
 
-7.2 Ejes de la Matriz
+9.2 Ejes de la Matriz
 
 La matriz traza dos dimensiones principales:
 
@@ -288,7 +288,7 @@ La matriz traza dos dimensiones principales:
 
 Este enfoque de dos ejes destaca qué oportunidades entregan el mayor retorno por el menor esfuerzo relativo.
 
-7.3 Cuadrantes de la Matriz
+9.3 Cuadrantes de la Matriz
 
 La matriz se divide en cuatro cuadrantes que guían la priorización:
 
@@ -302,7 +302,7 @@ La matriz se divide en cuatro cuadrantes que guían la priorización:
 
 Este modelo de cuadrantes asegura que las decisiones de automatización equilibren el valor a corto plazo con la escalabilidad a largo plazo.
 
-7.4 Matriz de Oportunidades Estándar vs. Mejorada
+9.4 Matriz de Oportunidades Estándar vs. Mejorada
 
 Automat-IA aplica un Marco de Dos Matrices:
 

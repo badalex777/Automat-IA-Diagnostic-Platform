@@ -267,14 +267,14 @@ to change if {{company_name}} decides to proceed with implementation.
 
 Phase 9: Opportunity Matrix Prioritization
 
-7.1 General Overview
+9.1 General Overview
 
 The Opportunity Matrix is a decision-support model used to prioritize automation initiatives
 based on both business and technical perspectives. It visualizes every opportunity in a unified
 framework that compares expected value creation against implementation feasibility, enabling
 data-driven prioritization rather than subjective ranking.
 
-7.2 Matrix Axes
+9.2 Matrix Axes
 
 The matrix plots two core dimensions:
 
@@ -284,7 +284,7 @@ The matrix plots two core dimensions:
 
 This two-axis approach highlights which opportunities deliver the highest return for the lowest relative effort.
 
-7.3 Matrix Quadrants
+9.3 Matrix Quadrants
 
 The matrix is divided into four quadrants that guide prioritization:
 
@@ -298,7 +298,7 @@ The matrix is divided into four quadrants that guide prioritization:
 
 This quadrant model ensures that automation decisions balance short-term value with long-term scalability.
 
-7.4 Standard vs. Enhanced Opportunity Matrix
+9.4 Standard vs. Enhanced Opportunity Matrix
 
 Automat-IA applies a Two-Matrix Framework:
 
