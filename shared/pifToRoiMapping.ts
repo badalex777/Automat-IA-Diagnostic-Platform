@@ -457,6 +457,6 @@ export function generateROICalculatorState(
     qualityImpact: mapQualityImpact(pifResponse), // Q21 controls enabled flag
     revenueUplift: mapRevenueUplift(pifResponse),
     costsAndRampup: mapCostsAndRampup(),
-    selectedScenario: 'base', // Default to base case scenario
+    selectedScenario: 'conservative', // Default to conservative scenario
   };
 }

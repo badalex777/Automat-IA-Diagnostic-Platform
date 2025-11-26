@@ -40,7 +40,7 @@ export default function ROIDetailsDialog({
   isOpen,
   onClose,
 }: ROIDetailsDialogProps) {
-  const [selectedScenario, setSelectedScenario] = useState<ScenarioType>('base');
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioType>('conservative');
 
   const { data: opportunity, isLoading } = useQuery<ImplementationOpportunity>({
     queryKey: [`/api/opportunities/${opportunityId}`],

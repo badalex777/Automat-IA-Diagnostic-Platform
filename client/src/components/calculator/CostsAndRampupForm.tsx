@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,8 +14,18 @@ interface CostsAndRampupFormProps {
 }
 
 export default function CostsAndRampupForm({ data, onChange, showManualRequiredBadge = true }: CostsAndRampupFormProps) {
+  const [efficiencyInput, setEfficiencyInput] = useState<string>(String(data.rampUpEfficiencyPercent || 100));
+  
+  useEffect(() => {
+    setEfficiencyInput(String(data.rampUpEfficiencyPercent || 100));
+  }, [data.rampUpEfficiencyPercent]);
+  
   const handleChange = (field: keyof CostsAndRampup, value: string | number) => {
     onChange({ ...data, [field]: value });
+  };
+  
+  const handleBatchChange = (updates: Partial<CostsAndRampup>) => {
+    onChange({ ...data, ...updates });
   };
 
   return (
@@ -192,16 +203,30 @@ export default function CostsAndRampupForm({ data, onChange, showManualRequiredB
               </Label>
               <Input
                 id="rampUpEfficiency"
-                type="number"
-                min="20"
-                max="150"
-                value={data.rampUpEfficiencyPercent || 100}
+                type="text"
+                inputMode="numeric"
+                value={efficiencyInput}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  if (!isNaN(val)) {
-                    handleChange('rampUpEfficiencyPercent', Math.max(20, Math.min(150, val)));
+                  const filtered = e.target.value.replace(/[^0-9]/g, '');
+                  setEfficiencyInput(filtered);
+                }}
+                onBlur={() => {
+                  if (efficiencyInput === '') {
+                    setEfficiencyInput('100');
+                    handleChange('rampUpEfficiencyPercent', 100);
+                  } else {
+                    const val = parseInt(efficiencyInput, 10);
+                    if (!isNaN(val)) {
+                      const clamped = Math.max(20, Math.min(150, val));
+                      setEfficiencyInput(String(clamped));
+                      handleChange('rampUpEfficiencyPercent', clamped);
+                    } else {
+                      setEfficiencyInput('100');
+                      handleChange('rampUpEfficiencyPercent', 100);
+                    }
                   }
                 }}
+                placeholder="100"
                 data-testid="input-rampup-efficiency"
               />
               <p className="text-xs text-muted-foreground">
@@ -211,18 +236,21 @@ export default function CostsAndRampupForm({ data, onChange, showManualRequiredB
           ) : (
             <RampUpEfficiencyRubric
               value={data.rampUpEfficiencyPercent || 100}
-              onChange={(val) => handleChange('rampUpEfficiencyPercent', val)}
               rubricAnswers={{
                 complexity: data.rubricComplexity || 'moderate',
                 digitalComfort: data.rubricDigitalComfort || 'neutral',
                 rolloutApproach: data.rubricRolloutApproach || 'phased',
                 supportStructure: data.rubricSupportStructure || 'basic'
-              }}
-              onRubricChange={(answers) => {
-                handleChange('rubricComplexity', answers.complexity);
-                handleChange('rubricDigitalComfort', answers.digitalComfort);
-                handleChange('rubricRolloutApproach', answers.rolloutApproach);
-                handleChange('rubricSupportStructure', answers.supportStructure);
+              } as { complexity: string; digitalComfort: string; rolloutApproach: string; supportStructure: string }}
+              onRubricChange={(answers, newEfficiencyValue) => {
+                setEfficiencyInput(String(newEfficiencyValue));
+                handleBatchChange({
+                  rubricComplexity: answers.complexity as CostsAndRampup['rubricComplexity'],
+                  rubricDigitalComfort: answers.digitalComfort as CostsAndRampup['rubricDigitalComfort'],
+                  rubricRolloutApproach: answers.rolloutApproach as CostsAndRampup['rubricRolloutApproach'],
+                  rubricSupportStructure: answers.supportStructure as CostsAndRampup['rubricSupportStructure'],
+                  rampUpEfficiencyPercent: newEfficiencyValue
+                });
               }}
             />
           )}

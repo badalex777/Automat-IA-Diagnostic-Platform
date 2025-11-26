@@ -389,7 +389,7 @@ export const roiCalculationSchema = z.object({
   qualityImpact: qualityImpactSchema,
   revenueUplift: revenueUpliftSchema,
   costsAndRampup: costsAndRampupSchema,
-  selectedScenario: scenarioType.default("base"),
+  selectedScenario: scenarioType.default("conservative"),
 });
 
 export const scenarioMultipliers = {

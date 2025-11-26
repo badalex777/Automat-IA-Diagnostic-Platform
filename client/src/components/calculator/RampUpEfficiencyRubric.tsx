@@ -12,26 +12,23 @@ interface RubricAnswers {
 
 interface RampUpEfficiencyRubricProps {
   value: number;
-  onChange: (value: number) => void;
   rubricAnswers: RubricAnswers;
-  onRubricChange: (answers: RubricAnswers) => void;
+  onRubricChange: (answers: RubricAnswers, newEfficiencyValue: number) => void;
 }
 
 export default function RampUpEfficiencyRubric({ 
   value, 
-  onChange, 
   rubricAnswers, 
   onRubricChange 
 }: RampUpEfficiencyRubricProps) {
   const handleAnswerChange = (field: keyof RubricAnswers, answer: string) => {
     const newAnswers = { ...rubricAnswers, [field]: answer };
-    onRubricChange(newAnswers);
     
     const scores = {
-      complexity: { simple: 20, moderate: 0, complex: -20 },
-      digitalComfort: { high: 20, neutral: 0, low: -20 },
-      rolloutApproach: { allAtOnce: 15, phased: 0, pilot: -10 },
-      supportStructure: { dedicated: 15, basic: 0, minimal: -15 }
+      complexity: { low: 20, moderate: 0, high: -15, very_high: -20 },
+      digitalComfort: { very_comfortable: 20, comfortable: 10, neutral: 0, somewhat_uncomfortable: -10, very_uncomfortable: -20 },
+      rolloutApproach: { bigbang: 15, parallel: 10, phased: 0, pilot_first: -10 },
+      supportStructure: { strong: 15, basic: 0, minimal: -15 }
     };
     
     const totalAdjustment = 
@@ -40,8 +37,9 @@ export default function RampUpEfficiencyRubric({
       (scores.rolloutApproach[newAnswers.rolloutApproach as keyof typeof scores.rolloutApproach] || 0) +
       (scores.supportStructure[newAnswers.supportStructure as keyof typeof scores.supportStructure] || 0);
     
-    const newValue = Math.max(20, Math.min(150, 100 + totalAdjustment));
-    onChange(newValue);
+    const newEfficiencyValue = Math.max(20, Math.min(150, 100 + totalAdjustment));
+    
+    onRubricChange(newAnswers, newEfficiencyValue);
   };
 
   return (
@@ -62,16 +60,20 @@ export default function RampUpEfficiencyRubric({
             onValueChange={(val) => handleAnswerChange('complexity', val)}
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="simple" id="complexity-simple" data-testid="radio-complexity-simple" />
-              <Label htmlFor="complexity-simple" className="font-normal">Simple (+20%)</Label>
+              <RadioGroupItem value="low" id="complexity-low" data-testid="radio-complexity-low" />
+              <Label htmlFor="complexity-low" className="font-normal">Low (+20%)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="moderate" id="complexity-moderate" data-testid="radio-complexity-moderate" />
               <Label htmlFor="complexity-moderate" className="font-normal">Moderate (0%)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="complex" id="complexity-complex" data-testid="radio-complexity-complex" />
-              <Label htmlFor="complexity-complex" className="font-normal">Complex (-20%)</Label>
+              <RadioGroupItem value="high" id="complexity-high" data-testid="radio-complexity-high" />
+              <Label htmlFor="complexity-high" className="font-normal">High (-15%)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="very_high" id="complexity-very-high" data-testid="radio-complexity-very-high" />
+              <Label htmlFor="complexity-very-high" className="font-normal">Very High (-20%)</Label>
             </div>
           </RadioGroup>
         </div>
@@ -83,16 +85,24 @@ export default function RampUpEfficiencyRubric({
             onValueChange={(val) => handleAnswerChange('digitalComfort', val)}
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="high" id="comfort-high" data-testid="radio-comfort-high" />
-              <Label htmlFor="comfort-high" className="font-normal">High (+20%)</Label>
+              <RadioGroupItem value="very_comfortable" id="comfort-very-comfortable" data-testid="radio-comfort-very-comfortable" />
+              <Label htmlFor="comfort-very-comfortable" className="font-normal">Very Comfortable (+20%)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="comfortable" id="comfort-comfortable" data-testid="radio-comfort-comfortable" />
+              <Label htmlFor="comfort-comfortable" className="font-normal">Comfortable (+10%)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="neutral" id="comfort-neutral" data-testid="radio-comfort-neutral" />
               <Label htmlFor="comfort-neutral" className="font-normal">Neutral (0%)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="low" id="comfort-low" data-testid="radio-comfort-low" />
-              <Label htmlFor="comfort-low" className="font-normal">Low (-20%)</Label>
+              <RadioGroupItem value="somewhat_uncomfortable" id="comfort-somewhat-uncomfortable" data-testid="radio-comfort-somewhat-uncomfortable" />
+              <Label htmlFor="comfort-somewhat-uncomfortable" className="font-normal">Somewhat Uncomfortable (-10%)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="very_uncomfortable" id="comfort-very-uncomfortable" data-testid="radio-comfort-very-uncomfortable" />
+              <Label htmlFor="comfort-very-uncomfortable" className="font-normal">Very Uncomfortable (-20%)</Label>
             </div>
           </RadioGroup>
         </div>
@@ -104,15 +114,19 @@ export default function RampUpEfficiencyRubric({
             onValueChange={(val) => handleAnswerChange('rolloutApproach', val)}
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="allAtOnce" id="rollout-all" data-testid="radio-rollout-all" />
-              <Label htmlFor="rollout-all" className="font-normal">All at Once (+15%)</Label>
+              <RadioGroupItem value="bigbang" id="rollout-bigbang" data-testid="radio-rollout-bigbang" />
+              <Label htmlFor="rollout-bigbang" className="font-normal">Big Bang (+15%)</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="parallel" id="rollout-parallel" data-testid="radio-rollout-parallel" />
+              <Label htmlFor="rollout-parallel" className="font-normal">Parallel (+10%)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="phased" id="rollout-phased" data-testid="radio-rollout-phased" />
               <Label htmlFor="rollout-phased" className="font-normal">Phased (0%)</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="pilot" id="rollout-pilot" data-testid="radio-rollout-pilot" />
+              <RadioGroupItem value="pilot_first" id="rollout-pilot" data-testid="radio-rollout-pilot" />
               <Label htmlFor="rollout-pilot" className="font-normal">Pilot First (-10%)</Label>
             </div>
           </RadioGroup>
@@ -125,12 +139,12 @@ export default function RampUpEfficiencyRubric({
             onValueChange={(val) => handleAnswerChange('supportStructure', val)}
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="dedicated" id="support-dedicated" data-testid="radio-support-dedicated" />
-              <Label htmlFor="support-dedicated" className="font-normal">Dedicated Team (+15%)</Label>
+              <RadioGroupItem value="strong" id="support-strong" data-testid="radio-support-strong" />
+              <Label htmlFor="support-strong" className="font-normal">Strong (+15%)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="basic" id="support-basic" data-testid="radio-support-basic" />
-              <Label htmlFor="support-basic" className="font-normal">Basic Support (0%)</Label>
+              <Label htmlFor="support-basic" className="font-normal">Basic (0%)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="minimal" id="support-minimal" data-testid="radio-support-minimal" />
