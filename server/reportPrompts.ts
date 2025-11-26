@@ -950,11 +950,11 @@ E.2 Net Benefit Formulas
 export const APPENDIX_E_PART2 = `
 E.3 FTE and Hours Conversions
 
-**FTE Saved =** Annual Hours Saved / Company-Specific Annual FTE Hours
+● **FTE Saved =** Annual Hours Saved / Company-Specific Annual FTE Hours
 
-**Annual Hours Saved =** (Weekly Process Hours × Employees Involved × Time Savings %) × 52
+● **Annual Hours Saved =** (Weekly Process Hours × Employees Involved × Time Savings %) × 52
 
-**Standard Work Year:** Company-specific annual FTE hours collected during Preliminary Data Collection
+● **Standard Work Year:** Company-specific annual FTE hours collected during Preliminary Data Collection
 
 **Interpretation:** Converts time saved into full-time-equivalent capacity using company-specific work hours rather than a generic industry assumption. This grounds projections in the client's actual operational context. Fractional FTEs indicate redeployable time rather than headcount reduction.
 

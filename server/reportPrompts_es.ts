@@ -968,11 +968,11 @@ E.2 Fórmulas de Beneficio Neto
 export const APPENDIX_E_PART2 = `
 E.3 Conversiones de FTE y Horas
 
-**FTE Ahorrados** = Horas Anuales Ahorradas / Horas Anuales de ETC Específicas de la Empresa
+● **FTE Ahorrados** = Horas Anuales Ahorradas / Horas Anuales de ETC Específicas de la Empresa
 
-**Horas Anuales Ahorradas** = (Horas de Proceso Semanales × Empleados Involucrados × % de Ahorro de Tiempo) × 52
+● **Horas Anuales Ahorradas** = (Horas de Proceso Semanales × Empleados Involucrados × % de Ahorro de Tiempo) × 52
 
-**Año de Trabajo Estándar:** Horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar
+● **Año de Trabajo Estándar:** Horas anuales de ETC específicas de la empresa recopiladas durante la Recopilación de Datos Preliminar
 
 **Interpretación:** Convierte el tiempo ahorrado en capacidad equivalente de tiempo completo utilizando horas de trabajo específicas de la empresa en lugar de una suposición genérica de la industria. Esto fundamenta las proyecciones en el contexto operacional real del cliente. Los FTE fraccionarios indican tiempo redesplegable en lugar de reducción de plantilla.
 
