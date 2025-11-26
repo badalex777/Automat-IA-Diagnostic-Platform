@@ -781,7 +781,7 @@ A.5 Implementation Effort Scoring Methodology
 
 Implementation Effort represents the vertical axis of the Opportunity Matrix and measures the complexity and resource requirements for bringing an automation opportunity to production. Lower scores indicate easier implementation.
 
-**Formula and weights.**
+**Formula and weights:**
 
 Implementation Effort is calculated as a weighted composite of four factors:
 
@@ -800,7 +800,7 @@ readiness at 50 percent ensures that ground-truth client data anchors the effort
 while still allowing differentiation between opportunities within the same workflow based on
 their specific implementation characteristics.
 
-**Example calculation.**
+**Example calculation:**
 
 Opportunity with 38 percent readiness, 12-month ramp-up, 18-month payback, 15 hours training:
 
@@ -819,7 +819,7 @@ implementation complexity.
 
 A.6 ROI Modeling Methodology
 
-**Double-layer conservatism.**
+**Double-layer conservatism:**
 
 ● **Layer 1: Rubric-based base estimation.** Structured rubrics convert PIF inputs into base percentages for time savings, quality improvement, and revenue reallocation, considering process type, complexity, repetition, and data structure.
 

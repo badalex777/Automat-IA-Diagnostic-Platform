@@ -799,7 +799,7 @@ A.5 Metodología de Puntuación de Esfuerzo de Implementación
 
 El Esfuerzo de Implementación representa el eje vertical de la Matriz de Oportunidades y mide la complejidad y requisitos de recursos para llevar una oportunidad de automatización a producción. Puntuaciones más bajas indican implementación más fácil.
 
-**Fórmula y pesos.**
+**Fórmula y pesos:**
 
 El Esfuerzo de Implementación se calcula como un compuesto ponderado de cuatro factores:
 
@@ -818,7 +818,7 @@ alcance. Ponderar la preparación en 50 por ciento asegura que los datos reales 
 cálculo de esfuerzo, mientras aún permite diferenciación entre oportunidades dentro del mismo flujo de 
 trabajo según sus características específicas de implementación.
 
-**Ejemplo de cálculo.**
+**Ejemplo de cálculo:**
 
 Oportunidad con 38 por ciento de preparación, arranque de 12 meses, retorno de 18 meses, 15 horas de 
 capacitación:
@@ -838,7 +838,7 @@ de implementación.
 
 A.6 Metodología de Modelado de ROI
 
-**Conservadurismo de doble capa.**
+**Conservadurismo de doble capa:**
 
 ● **Capa 1: Estimación base basada en rúbrica.** Rúbricas estructuradas convierten entradas PIF en porcentajes base para ahorro de tiempo, mejora de calidad y reasignación de ingresos, considerando tipo de proceso, complejidad, repetición y estructura de datos.
 
