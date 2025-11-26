@@ -783,7 +783,7 @@ A.4 Metodología de Puntuación de Impacto Empresarial
 
 El Impacto Empresarial expresa el valor esperado relativo a la escala de la empresa para comparación justa entre clientes.
 
-**Componentes de Impacto Base y normalización.**
+**Componentes de Impacto Base y normalización:**
 
 ● **Puntuación de ROI:** (ROI de tasa de ejecución anual ÷ Ingresos anuales de la empresa) × 1000, con tope en 100.
 

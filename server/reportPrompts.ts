@@ -765,7 +765,7 @@ A.4 Business Impact Scoring Methodology
 
 Business Impact expresses expected value relative to company scale for fair comparison across clients.
 
-**Base Impact components and normalization.**
+**Base Impact components and normalization:**
 
 ● **ROI Score:** (Annual run-rate ROI ÷ Company annual revenue) × 1000, capped at 100.
 
