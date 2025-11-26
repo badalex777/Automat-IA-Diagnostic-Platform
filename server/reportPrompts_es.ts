@@ -899,19 +899,13 @@ La secuenciación también considera dependencias técnicas, temporización de r
 
 A.9 Limitaciones Metodológicas
 
-Este diagnóstico es una evaluación puntual de preparación y valor potencial, no un plan de implementación 
-detallado.
+Este diagnóstico es una evaluación puntual de preparación y valor potencial, no un plan de implementación detallado.
 
-**Dependencia de datos del cliente:** Los TFA, PIF y entrevistas son autoreportados. Las inexactitudes u 
-omisiones pueden afectar la precisión. Las reglas de punto medio y seguimientos mitigan pero no eliminan 
-este riesgo.
+● **Dependencia de datos del cliente:** Los TFA, PIF y entrevistas son autoreportados. Las inexactitudes u omisiones pueden afectar la precisión. Las reglas de punto medio y seguimientos mitigan pero no eliminan este riesgo.
 
-**Límite de alcance:** Los hallazgos se enfocan en factibilidad, madurez e impacto a profundidad de diagnóstico. 
-El diseño de solución, validación de integración y selección de proveedores ocurren en fases subsiguientes.
+● **Límite de alcance:** Los hallazgos se enfocan en factibilidad, madurez e impacto a profundidad de diagnóstico. El diseño de solución, validación de integración y selección de proveedores ocurren en fases subsiguientes.
 
-**Incertidumbre y cambio:** Los cambios de sistema, cambios de política o condiciones de mercado pueden alterar 
-la factibilidad y los beneficios. Se usa modelado conservador y normalización para evitar sobreestimar el 
-impacto.
+● **Incertidumbre y cambio:** Los cambios de sistema, cambios de política o condiciones de mercado pueden alterar la factibilidad y los beneficios. Se usa modelado conservador y normalización para evitar sobreestimar el impacto.
 `;
 
 export const APPENDIX_D_INTRO = `

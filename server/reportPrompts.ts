@@ -880,19 +880,13 @@ Sequencing also considers technical dependencies, value realization timing, reso
 
 A.9 Methodological Limitations
 
-This diagnostic is a point-in-time assessment of readiness and potential value, not a detailed
-implementation plan.
+This diagnostic is a point-in-time assessment of readiness and potential value, not a detailed implementation plan.
 
-**Reliance on client data:** TFAs, PIFs, and interviews are self-reported. Inaccuracies or
-omissions may affect precision. Midpoint rules and follow-ups mitigate but do not eliminate this
-risk.
+● **Reliance on client data:** TFAs, PIFs, and interviews are self-reported. Inaccuracies or omissions may affect precision. Midpoint rules and follow-ups mitigate but do not eliminate this risk.
 
-**Scope boundary:** Findings focus on feasibility, maturity, and impact at diagnostic depth.
-Solution design, integration validation, and vendor selection occur in subsequent phases.
+● **Scope boundary:** Findings focus on feasibility, maturity, and impact at diagnostic depth. Solution design, integration validation, and vendor selection occur in subsequent phases.
 
-**Uncertainty and change:** System changes, policy shifts, or market conditions may alter
-feasibility and benefits. Conservative modeling and normalization are used to avoid overstating
-impact.
+● **Uncertainty and change:** System changes, policy shifts, or market conditions may alter feasibility and benefits. Conservative modeling and normalization are used to avoid overstating impact.
 `;
 
 export const APPENDIX_D_INTRO = `
