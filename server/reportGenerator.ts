@@ -1902,9 +1902,6 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       sections.push(createTableCaption(`D.2.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
-      // Dominant component paragraph
-      sections.push(createBodyParagraph(ctx.t.appendixNarratives.impactMajorityParagraph));
-      
       sections.push(createHorizontalSeparator());
       oppCounter++;
     });
