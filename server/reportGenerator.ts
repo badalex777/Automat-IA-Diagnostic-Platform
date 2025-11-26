@@ -794,7 +794,7 @@ function validateTemplateVars(vars: Record<string, string>): { valid: boolean; e
 }
 
 /**
- * Build consolidated opportunity summary table (Appendix D.3a)
+ * Build consolidated opportunity summary table (Appendix D.2a)
  */
 function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
   const sections: Paragraph[] = [];
@@ -824,14 +824,14 @@ function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: an
       ]);
     });
   
-  sections.push(createTableCaption("D.3a", (ctx.t.tableCaptions as any)["D.3a"], ctx.t.labels.table));
+  sections.push(createTableCaption("D.2a", (ctx.t.tableCaptions as any)["D.2a"], ctx.t.labels.table));
   sections.push(createTable(consolidationHeaders, consolidationRows, [18, 22, 10, 12, 10, 10, 18]));
   
   return sections;
 }
 
 /**
- * Build consolidation constituent mapping table (Appendix D.3b)
+ * Build consolidation constituent mapping table (Appendix D.2b)
  */
 function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
   const sections: Paragraph[] = [];
@@ -858,7 +858,7 @@ function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: a
     });
   });
   
-  sections.push(createTableCaption("D.3b", (ctx.t.tableCaptions as any)["D.3b"], ctx.t.labels.table));
+  sections.push(createTableCaption("D.2b", (ctx.t.tableCaptions as any)["D.2b"], ctx.t.labels.table));
   sections.push(createTable(constituentHeaders, constituentRows, [20, 20, 25, 10, 25]));
   
   return sections;
@@ -1819,7 +1819,16 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   // Store consolidations for rendering at end
   const allConsolidations = data.workflows.flatMap(w => w.consolidations || []);
   
-  // D.1 Portfolio Summary Table (moved to top)
+  // D.1 Opportunity Summary section
+  sections.push(
+    new Paragraph({
+      text: ctx.t.formatStrings.opportunitySummaryHeading,
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 240, after: 120 },
+    })
+  );
+  
+  // Table D.1 - Portfolio Overview
   const portfolioHeaders = [ctx.t.headers.workflow, ctx.t.headers.opportunity, ctx.t.headers.annualBenefit, ctx.t.headers.estCost, ctx.t.headers.fteSaved, ctx.t.headers.payback, ctx.t.metricLabels.weeklyHoursSaved];
   const portfolioRows: string[][] = [];
   data.workflows.forEach(w => {
@@ -1846,7 +1855,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   ));
   sections.push(createHorizontalSeparator());
   
-  // D.2.X sections - ONE PER OPPORTUNITY
+  // D.1.X sections - ONE PER OPPORTUNITY (nested under D.1)
   let oppCounter = 1;
   data.workflows.forEach(w => {
     w.opportunities.forEach(opp => {
@@ -1887,7 +1896,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         [ctx.t.metricLabels.annualHoursSaved, ctx.fmt.number(annualHours, 0)],
         [ctx.t.metricLabels.weeklyHoursSaved, ctx.fmt.number(weeklyHours, 1)],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}a`, ctx.t.tableDescriptions.keyFinancialMetrics, ctx.t.labels.table));
+      sections.push(createTableCaption(`D.1.${oppCounter}a`, ctx.t.tableDescriptions.keyFinancialMetrics, ctx.t.labels.table));
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
       sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
       
@@ -1899,7 +1908,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         [ctx.t.metricLabels.revenueUplift, ctx.t.metricLabels.toBeValidated, ctx.t.metricLabels.capacityReallocation],
         [ctx.t.metricLabels.rampUpPeriod, ctx.t.metricLabels.threeMonths, ctx.t.metricLabels.timeToSteadyState],
       ];
-      sections.push(createTableCaption(`D.2.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
+      sections.push(createTableCaption(`D.1.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
       sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
       
       sections.push(createHorizontalSeparator());
@@ -1907,7 +1916,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     });
   });
   
-  // D.3 Consolidated Opportunities (conditional, before Modeling Notes)
+  // D.2 Consolidated Opportunities (conditional, before Modeling Notes)
   if (allConsolidations.length > 0) {
     sections.push(
       new Paragraph({
@@ -1919,17 +1928,17 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     
     sections.push(createBodyParagraph(ctx.t.appendixIntros.consolidatedOpportunities));
     
-    // D.3a - Consolidated Opportunity Summary
+    // D.2a - Consolidated Opportunity Summary
     sections.push(...buildConsolidatedSummaryTable(ctx, allConsolidations));
     
-    // D.3b - Consolidation Constituent Mapping
+    // D.2b - Consolidation Constituent Mapping
     sections.push(...buildConsolidationMappingTable(ctx, allConsolidations));
     
     sections.push(createBodyParagraph(ctx.t.appendixNarratives.consolidationRepresentsParagraph));
     sections.push(createHorizontalSeparator());
   }
   
-  // D.4 Modeling Notes (moved to end)
+  // D.3 Modeling Notes (moved to end)
   sections.push(...createTextParagraphs(APPENDIX_D_MODELING_NOTES, numberingRegistry, 'appendix-d-modeling'));
   
   sections.push(new Paragraph({ children: [new PageBreak()] }));

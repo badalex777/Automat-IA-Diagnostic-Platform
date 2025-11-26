@@ -112,8 +112,8 @@ export interface ReportTranslations {
     "6.4": string;
     "B.1": string;
     "D.1": string;
-    "D.3a": string;
-    "D.3b": string;
+    "D.2a": string;
+    "D.2b": string;
     "E.2": string;
     "E.4": string;
     "E.5": string;
@@ -432,10 +432,11 @@ export interface ReportTranslations {
   // Format strings and templates
   formatStrings: {
     stepFormat: string; // "Step {0} — {1}"
-    roiInsightsHeading: string; // "D.{0} ROI Insights — {1} / {2}"
+    roiInsightsHeading: string; // "D.1.{0} ROI Insights — {1} / {2}"
     monthsAbbrev: string; // "mo"
     hoursPerYear: string; // "hours/year"
-    consolidatedOpportunitiesHeading: string; // "D.3 Consolidated Opportunities"
+    opportunitySummaryHeading: string; // "D.1 Opportunity Summary"
+    consolidatedOpportunitiesHeading: string; // "D.2 Consolidated Opportunities"
   };
   
   // Key conclusions bullets and content
@@ -605,8 +606,8 @@ export const en: ReportTranslations = {
     "6.4": "18-Month Implementation Timeline",
     "B.1": "Readiness Score Component Weighting",
     "D.1": "Portfolio Overview — All Opportunities",
-    "D.3a": "Consolidated Opportunity Summary",
-    "D.3b": "Consolidation Constituent Mapping",
+    "D.2a": "Consolidated Opportunity Summary",
+    "D.2b": "Consolidation Constituent Mapping",
     "E.2": "Net Benefit Formulas",
     "E.4": "Annual Benefit Breakdown",
     "E.5": "Scenario Adjustment Framework",
@@ -909,10 +910,11 @@ export const en: ReportTranslations = {
   
   formatStrings: {
     stepFormat: "Step {0} — {1}",
-    roiInsightsHeading: "D.{0} ROI Insights — {1} / {2}",
+    roiInsightsHeading: "D.1.{0} ROI Insights — {1} / {2}",
     monthsAbbrev: "mo",
     hoursPerYear: "hours/year",
-    consolidatedOpportunitiesHeading: "D.3 Consolidated Opportunities",
+    opportunitySummaryHeading: "D.1 Opportunity Summary",
+    consolidatedOpportunitiesHeading: "D.2 Consolidated Opportunities",
   },
   
   keyConclusionsBullets: {
@@ -1081,8 +1083,8 @@ export const es: ReportTranslations = {
     "6.4": "Cronograma de Implementación de 18 Meses",
     "B.1": "Ponderación de Componentes de Puntuación de Preparación",
     "D.1": "Visión General del Portafolio — Todas las Oportunidades",
-    "D.3a": "Resumen de Oportunidades Consolidadas",
-    "D.3b": "Mapeo de Constituyentes de Consolidación",
+    "D.2a": "Resumen de Oportunidades Consolidadas",
+    "D.2b": "Mapeo de Constituyentes de Consolidación",
     "E.2": "Fórmulas de Beneficio Neto",
     "E.4": "Desglose de Beneficio Anual",
     "E.5": "Marco de Ajuste de Escenarios",
@@ -1385,10 +1387,11 @@ export const es: ReportTranslations = {
   
   formatStrings: {
     stepFormat: "Paso {0} — {1}",
-    roiInsightsHeading: "D.{0} Hallazgos de ROI — {1} / {2}",
+    roiInsightsHeading: "D.1.{0} Hallazgos de ROI — {1} / {2}",
     monthsAbbrev: "meses",
     hoursPerYear: "horas/año",
-    consolidatedOpportunitiesHeading: "D.3 Oportunidades Consolidadas",
+    opportunitySummaryHeading: "D.1 Resumen de Oportunidades",
+    consolidatedOpportunitiesHeading: "D.2 Oportunidades Consolidadas",
   },
   
   keyConclusionsBullets: {
