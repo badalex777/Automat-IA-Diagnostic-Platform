@@ -29,7 +29,7 @@ type WorkflowStatus = "tfa_only" | "tfa_readiness" | "complete";
 interface WorkflowListItemProps {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   status: WorkflowStatus;
   tfaScore?: number;
   annualBenefits?: number;
@@ -105,15 +105,19 @@ export default function WorkflowListItem({
 
   return (
     <>
-      <div className="border-b border-border last:border-0 py-4" data-testid={`row-workflow-${id}`}>
+      <div 
+        className="border-b border-border last:border-0 py-4" 
+        data-testid={`row-workflow-${id}`}
+      >
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
+          <Link 
+            href={`/company/${companyId}/workflow/${id}`}
+            className="flex-1 min-w-0 block cursor-pointer hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors rounded-md -ml-2 pl-2 -mr-2 pr-2 -my-2 py-2"
+          >
             <div className="flex items-center gap-3 mb-2">
-              <Link href={`/company/${companyId}/workflow/${id}`}>
-                <h3 className="font-semibold text-base hover:text-primary transition-colors cursor-pointer" data-testid={`text-workflow-name-${id}`}>
-                  {name}
-                </h3>
-              </Link>
+              <h3 className="font-semibold text-base" data-testid={`text-workflow-name-${id}`}>
+                {name}
+              </h3>
               <Badge variant={statusInfo.variant} className="gap-1" data-testid={`badge-status-${id}`}>
                 <StatusIcon className="h-3 w-3" />
                 {statusInfo.label}
@@ -138,7 +142,7 @@ export default function WorkflowListItem({
                 )}
               </div>
             )}
-          </div>
+          </Link>
 
           <div className="flex items-center gap-4 flex-shrink-0">
             {tfaScore !== undefined && (

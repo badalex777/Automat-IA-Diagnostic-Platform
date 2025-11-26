@@ -728,57 +728,55 @@ export default function WorkflowDetail() {
                     // No need to calculate it here
 
                     return (
-                      <Card key={step.id} className="hover-elevate" data-testid={`card-step-${step.id}`}>
-                        <div className="p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 mb-2">
-                                <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                                  Step {step.stepOrder !== null && step.stepOrder !== undefined ? step.stepOrder : index + 1}
-                                </span>
-                                <h4 className="font-semibold text-base truncate" data-testid={`text-step-name-${step.id}`}>
-                                  {step.stepName}
-                                </h4>
-                              </div>
-                              
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                                <div>
-                                  <span className="text-muted-foreground">Participant:</span>
-                                  <span className="ml-2 font-medium" data-testid={`text-participant-${step.id}`}>
-                                    {step.participantName || 'Not specified'}
+                      <Link 
+                        key={step.id} 
+                        href={`/company/${companyId}/workflow/${workflowId}/step/${step.id}`}
+                        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg"
+                      >
+                        <Card 
+                          className="hover-elevate cursor-pointer" 
+                          data-testid={`card-step-${step.id}`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <span className="text-sm font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                                    Step {step.stepOrder !== null && step.stepOrder !== undefined ? step.stepOrder : index + 1}
                                   </span>
+                                  <h4 className="font-semibold text-base truncate" data-testid={`text-step-name-${step.id}`}>
+                                    {step.stepName}
+                                  </h4>
                                 </div>
-                                {step.participantRole && (
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                                   <div>
-                                    <span className="text-muted-foreground">Role:</span>
-                                    <span className="ml-2 font-medium" data-testid={`text-role-${step.id}`}>
-                                      {step.participantRole}
+                                    <span className="text-muted-foreground">Participant:</span>
+                                    <span className="ml-2 font-medium" data-testid={`text-participant-${step.id}`}>
+                                      {step.participantName || 'Not specified'}
                                     </span>
                                   </div>
+                                  {step.participantRole && (
+                                    <div>
+                                      <span className="text-muted-foreground">Role:</span>
+                                      <span className="ml-2 font-medium" data-testid={`text-role-${step.id}`}>
+                                        {step.participantRole}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {step.stepDescription && (
+                                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2" data-testid={`text-description-${step.id}`}>
+                                    {step.stepDescription}
+                                  </p>
                                 )}
                               </div>
                               
-                              {step.stepDescription && (
-                                <p className="text-sm text-muted-foreground mt-2 line-clamp-2" data-testid={`text-description-${step.id}`}>
-                                  {step.stepDescription}
-                                </p>
-                              )}
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <Link href={`/company/${companyId}/workflow/${workflowId}/step/${step.id}`}>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  data-testid={`button-view-step-${step.id}`}
-                                >
-                                  View Details
-                                </Button>
-                              </Link>
                             </div>
                           </div>
-                        </div>
-                      </Card>
+                        </Card>
+                      </Link>
                     );
                   })}
                 </div>

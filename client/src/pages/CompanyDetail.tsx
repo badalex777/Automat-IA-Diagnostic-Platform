@@ -660,7 +660,12 @@ export default function CompanyDetail() {
                 <p className="text-muted-foreground text-center py-4">No workflows match your search.</p>
               ) : (
                 filteredWorkflows.map((workflow) => (
-                  <WorkflowListItem key={workflow.id} {...workflow} companyId={companyId} />
+                  <WorkflowListItem 
+                    key={workflow.id} 
+                    {...workflow}
+                    status={workflow.status as "tfa_only" | "tfa_readiness" | "complete"}
+                    companyId={companyId}
+                  />
                 ))
               )}
             </div>
