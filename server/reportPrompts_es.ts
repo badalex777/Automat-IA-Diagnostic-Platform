@@ -869,8 +869,6 @@ La Matriz de Oportunidades convierte preparación e impacto empresarial en un mo
 
   ● **Bonificación de Incremento de Ingresos:** Hasta 25 puntos adicionales basados en reasignación de capacidad validada hacia actividades generadoras de ingresos.
 
-Impacto Mejorado = Impacto Base + Bonificación de Errores + Bonificación de Ingresos. Mejorado es siempre mayor o igual a Base. Esta vista resalta oportunidades donde mejoras de calidad o potencial de ingresos aumentan significativamente el valor estratégico.
-
 **Ejes:**
 
 ● **Eje X:** Impacto Empresarial (Base o Mejorado, dependiendo de la vista presentada).

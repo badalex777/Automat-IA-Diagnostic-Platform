@@ -850,8 +850,6 @@ The Opportunity Matrix converts readiness and business impact into a transparent
 
   ● **Revenue Uplift Bonus:** Up to 25 additional points based on validated capacity reallocation toward revenue-generating activities.
 
-Enhanced Impact = Base Impact + Error Bonus + Revenue Bonus. Enhanced is always greater than or equal to Base. This view surfaces opportunities where quality improvements or revenue potential significantly increase strategic value.
-
 **Axes:**
 
 ● **X-axis:** Business Impact (Base or Enhanced, depending on the view presented).
