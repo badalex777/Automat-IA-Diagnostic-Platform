@@ -31,10 +31,16 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 - **TFA Survey & Analysis**: Workflow-level technical feasibility assessment with gap detection and scores.
 - **Step-Level PIF Survey**: Granular, step-level Process Insight Forms for operational realities and ROI inputs.
 - **Step-Level Readiness Rubric**: Combines TFA and PIF scores (60% TFA + 40% PIF) per step, including SWOT analysis.
+- **ROI Calculator Dialog**: Unified create/edit interface for implementation opportunities. Creates opportunities from PIF data with scenario-based projections. Edit mode loads existing roiCalculationData and uses normalizeROICalculation to coerce database strings to numbers. Supports both POST (create) and PATCH (update) operations.
 - **Opportunity Matrix**: A 2D scatter plot visualizing implementation opportunities by Business Impact and Implementation Effort.
 - **Executive Diagnostic Report**: Generates comprehensive, branded .docx documents with executive summaries, methodology, findings, roadmaps, and technical appendices. Features 12-phase methodology with opportunity quadrant sections (Quick Wins, Strategic Bets, Nice-to-Have, Deprioritize), categorized foundational gaps analysis, and analyst commentary placeholders.
 - **Workflow-Level Consolidation System**: Bundles multiple step-level opportunities into strategic consolidation packages with distinct calculation logic for business impact, payback period, readiness score, and implementation effort. These are visually differentiated on the Opportunity Matrix and detailed in the EDR.
 - **Unified Security Model**: Both TFA and PIF forms use identical security architecture where an intro/disclaimer page is public, but verification code + respondent info are required to access actual form questions.
+
+**Recent Changes (November 2025):**
+- Fixed payback period calculation: Uses steady-state annual benefits (not Year 1 ramped-down values) for accurate simple payback calculation
+- Unified opportunity editing: Edit button now opens ROICalculatorDialog instead of legacy OpportunityForm, preserving all calculated fields
+- Added normalizeROICalculation helper: Coerces database decimal strings to numbers when loading opportunities for editing
 
 ### External Dependencies
 
