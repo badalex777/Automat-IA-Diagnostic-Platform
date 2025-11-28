@@ -1,0 +1,250 @@
+You are integrating with an ROI calculator. Use this specification to ensure your calculations match exactly. Pay close attention to:
+1. The order of operations in formulas
+2. Capping/bounding rules for percentages
+3. How scenario multipliers are applied
+4. The difference between Year 1 Actual ROI (with ramp-up) and Annual Run-Rate ROI (steady-state)
+If your outputs don't match, check: (1) Are you applying scenario multipliers correctly? (2) Are you capping percentages within bounds? (3) Are you using the correct ramp-up formula?
+
+1. CORE INPUTS & DEFAULTS
+People & Cost Inputs
+Field	Default	Description
+employees	3	Number of employees doing this work
+hoursPerWeekPerEmployee	20	Hours per week per employee on this task
+averageAnnualSalary	55,000	Annual salary per employee
+annualWorkingHours	1,920	Working hours per year (valid: 1500-2200)
+overheadMultiplier	1.2	Overhead on top of salary (1.2 = 20% overhead)
+Time Savings Inputs
+Field	Default	Description
+enabled	true	Whether to calculate time savings
+percentTimeSaved	60	Percentage of time saved (0-100)
+Quality Impact Inputs
+Field	Default	Description
+enabled	true	Whether to calculate quality impact
+calculationMethod	"manual"	"manual" or "rubric"
+transactionsPerWeek	150	Number of transactions per week
+currentErrorRate	5	Current error rate (%)
+postAIErrorRate	1	Expected post-AI error rate (%)
+financialCostPerError	25	Direct cost per error ($)
+reworkMinutesPerError	120	Minutes to fix each error
+percentQualityImprovement	0	Rubric-calculated quality % (if using rubric method)
+Revenue Uplift Inputs
+Field	Default	Description
+enabled	true	Whether to calculate revenue uplift
+percentReallocated	40	% of saved time that can generate revenue
+revenueValuePerHour	85	Revenue value per reallocated hour
+Costs & Ramp-up Inputs
+Field	Default	Description
+implementationCost	25,000	One-time implementation cost
+annualSoftwareCost	12,000	Annual software/license cost
+trainingHoursPerEmployee	8	Training hours per employee
+changeMgmtCosts	5,000	Change management costs
+rampUpMonths	6	Ramp-up period in months
+rampUpEfficiencyPercent	100	Efficiency factor (20-150%)
+2. SCENARIO MULTIPLIERS
+Scenario	timeSavings	errorReduction	reallocation	costOverrun	rampUpEfficiency
+Best	1.15	1.20	1.00	0.95	1.15
+Base	1.00	1.00	0.70	1.00	1.00
+Conservative	0.70	0.70	0.40	1.10	0.80
+Worst	0.40	0.50	0.00	1.20	0.70
+3. CORE CALCULATION FORMULAS
+Step 1: Effective Hourly Rate
+effectiveHourlyRate = (averageAnnualSalary / annualWorkingHours) * overheadMultiplier
+
+Example: (55000 / 1920) * 1.2 = $34.375/hour
+
+Step 2: Time Savings Benefits
+totalHoursPerWeek = employees * hoursPerWeekPerEmployee
+adjustedTimeSavingsPercent = MIN(percentTimeSaved * scenario.timeSavingsMultiplier, 100)
+hoursSavedWeekly = totalHoursPerWeek * (adjustedTimeSavingsPercent / 100)
+timeSavingsAnnual = hoursSavedWeekly * 52 * effectiveHourlyRate
+
+Example (Base scenario):
+
+totalHoursPerWeek = 3 * 20 = 60 hours
+adjustedTimeSavingsPercent = MIN(60 * 1.0, 100) = 60%
+hoursSavedWeekly = 60 * 0.60 = 36 hours
+timeSavingsAnnual = 36 * 52 * $34.375 = $64,350
+Step 3: Quality Impact Benefits
+If calculationMethod = "manual":
+
+rawErrorReduction = currentErrorRate - postAIErrorRate
+errorRateReduction = MIN(rawErrorReduction * scenario.errorReductionMultiplier, currentErrorRate)
+calculatedPostAIErrorRate = currentErrorRate - errorRateReduction
+
+If calculationMethod = "rubric":
+
+adjustedQualityImprovement = MIN(percentQualityImprovement * scenario.errorReductionMultiplier, 100)
+errorRateReduction = currentErrorRate * (adjustedQualityImprovement / 100)
+calculatedPostAIErrorRate = currentErrorRate - errorRateReduction
+
+Then for both methods:
+
+errorsAvoidedAnnually = errorRateReduction * transactionsPerWeek * 52 / 100
+reworkHours = reworkMinutesPerError / 60
+qualitySavingsAnnual = errorsAvoidedAnnually * (reworkHours * effectiveHourlyRate + financialCostPerError)
+
+Example (manual method, Base scenario):
+
+rawErrorReduction = 5 - 1 = 4%
+errorRateReduction = MIN(4 * 1.0, 5) = 4%
+errorsAvoidedAnnually = 4 * 150 * 52 / 100 = 312 errors
+reworkHours = 120 / 60 = 2 hours
+qualitySavingsAnnual = 312 * (2 * $34.375 + $25) = $29,250
+Step 4: Revenue Uplift Benefits
+adjustedReallocationPercent = MIN(percentReallocated * scenario.reallocationMultiplier, 100)
+hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100)
+revenueSavingsAnnual = hoursReallocatedAnnually * revenueValuePerHour
+
+Example (Base scenario):
+
+adjustedReallocationPercent = MIN(40 * 0.7, 100) = 28%
+hoursReallocatedAnnually = 36 * 52 * 0.28 = 524.16 hours
+revenueSavingsAnnual = 524.16 * $85 = $44,554
+Step 5: Total Benefits and Costs
+annualBenefits = timeSavingsAnnual + qualitySavingsAnnual + revenueSavingsAnnual
+trainingCosts = employees * trainingHoursPerEmployee * effectiveHourlyRate
+annualCosts = (implementationCost + annualSoftwareCost + trainingCosts + changeMgmtCosts) * scenario.costOverrunMultiplier
+
+Example (Base scenario):
+
+annualBenefits = $64,350 + $29,250 + $44,554 = $138,154
+trainingCosts = 3 * 8 * $34.375 = $825
+annualCosts = (25000 + 12000 + 825 + 5000) * 1.0 = $42,825
+4. ROI CALCULATIONS
+Annual Run-Rate ROI (Steady-State)
+netBenefit = annualBenefits - annualCosts
+runRateROI = (netBenefit / annualCosts) * 100
+
+Example: (($138,154 - $42,825) / $42,825) * 100 = 222.6%
+
+Year 1 Actual ROI (With Ramp-Up)
+// Step 1: Base ramp factor from months
+baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12
+// Step 2: Get efficiency percentage (default 100)
+baseEfficiency = rampUpEfficiencyPercent (or 100 if not set)
+// Step 3: Apply scenario multiplier, cap 20-150%
+scenarioAdjustedEfficiency = MAX(20, MIN(150, baseEfficiency * scenario.rampUpEfficiencyMultiplier))
+// Step 4: Combine
+year1RampFactor = baseRampFactor * (scenarioAdjustedEfficiency / 100)
+// Step 5: Calculate Year 1 ROI
+year1Benefits = annualBenefits * year1RampFactor
+year1NetBenefit = year1Benefits - annualCosts
+year1ActualROI = (year1NetBenefit / annualCosts) * 100
+
+Example (6-month ramp-up, 100% efficiency, Base scenario):
+
+baseRampFactor = (12 - 6 + 3) / 12 = 0.75
+scenarioAdjustedEfficiency = MAX(20, MIN(150, 100 * 1.0)) = 100
+year1RampFactor = 0.75 * 1.0 = 0.75
+year1Benefits = $138,154 * 0.75 = $103,616
+year1ActualROI = (($103,616 - $42,825) / $42,825) * 100 = 142.0%
+Payback Period
+paybackMonths = annualCosts / (annualBenefits / 12)
+
+Example: $42,825 / ($138,154 / 12) = $42,825 / $11,513 = 3.7 months
+
+5. RUBRIC CALCULATION LOGIC
+Time Savings Rubric (4 Questions)
+Formula: finalPercent = basePercent × complexity × repetition × structure
+
+Question	Options & Weights
+Q1: Role Type	Sets base percentage (see Role Profiles table)
+Q2: Complexity	Simple=1.3, Moderate=1.0, Complex=0.7
+Q3: Repetition	Daily=1.2, Weekly=1.0, Monthly=0.8
+Q4: Data Structure	Highly structured=1.3, Semi-structured=1.0, Unstructured=0.7
+Capping: Result is capped within the role's timeSavingsRange
+
+Quality Impact Rubric (6 Questions)
+Formula: combinedMultiplier = AVERAGE(5 weights) then finalPercent = basePercent × combinedMultiplier
+
+Question	Options & Weights
+Q1: Role Type	Sets base percentage
+Q2: Error Frequency	Very frequent=1.3, Frequent=1.15, Occasional=1.0, Rare=0.8
+Q3: Error Cause	Manual/repetitive=1.3, Info gaps=1.15, Inconsistent standards=1.15, External factors=0.9, Complex judgment=0.7
+Q4: Detection Timing	(weights vary 0.8-1.3)
+Q5: Standardization	(weights vary 0.8-1.3)
+Q6: AI Suitability	Rule-based=1.3, Pattern recognition=1.15, Contextual=1.0, Highly subjective=0.8
+Capping: Result is capped within the role's qualityImpactRange
+
+Revenue Uplift Rubric (3 Questions)
+Formula: finalPercent = basePercent × capacityDemand × revenueProcess
+
+Question	Options & Weights
+Q1: Role Type	Sets base percentage
+Q2: Capacity/Demand	High demand=1.4, Strong pipeline=1.2, Moderate=0.9, Limited=0.4
+Q3: Revenue Process	Direct predictable=1.2, Somewhat=1.0, Indirect=0.7, Limited=0.4
+Capping: Result is capped at 60% maximum
+
+Ramp-Up Efficiency Rubric (4 Questions)
+Formula: efficiency = 100 × complexity × digitalComfort × rolloutApproach × supportStructure
+
+Question	Options & Weights
+Q1: Complexity	Low=1.1, Moderate=1.0, High=0.85, Very High=0.7
+Q2: Digital Comfort	Very uncomfortable=0.7, Somewhat=0.85, Neutral=1.0, Comfortable=1.1, Very comfortable=1.2
+Q3: Rollout Approach	Pilot first=1.1, Phased=1.0, Parallel=0.9, Big bang=0.8
+Q4: Support Structure	Strong=1.1, Basic=0.95, Minimal=0.8
+Capping: Result is capped 20-150%
+
+6. ROLE PROFILES (16 Roles)
+Role ID	Time Base	Time Range	Quality Base	Quality Range	Revenue Base	Revenue Range
+data_entry_admin	70%	40-90%	60%	35-85%	5%	0-15%
+accounts_payable_receivable	65%	35-85%	70%	45-90%	10%	0-25%
+payroll_specialist	60%	30-85%	75%	50-95%	5%	0-15%
+customer_support_t1	65%	35-85%	50%	25-70%	35%	10-60%
+sales_ops_crm	60%	30-85%	55%	30-75%	60%	20-60%
+procurement_purchasing	55%	30-80%	60%	35-80%	20%	5-40%
+hr_coordinator	55%	30-80%	50%	25-70%	10%	0-25%
+it_support_helpdesk	60%	30-85%	55%	30-75%	15%	0-30%
+operations_coordinator	50%	25-75%	45%	20-65%	25%	5-45%
+marketing_ops	55%	30-80%	50%	25-70%	45%	15-60%
+financial_analyst	45%	25-70%	55%	30-75%	30%	10-50%
+customer_success	40%	20-65%	45%	20-65%	55%	20-60%
+executive_assistant	50%	25-75%	40%	20-60%	5%	0-15%
+compliance_qa_audit	45%	25-70%	65%	40-85%	10%	0-25%
+legal_contract_admin	40%	20-65%	60%	35-80%	15%	0-30%
+other	30%	10-60%	30%	10-60%	0%	0-20%
+7. MULTI-YEAR PROJECTION RULES
+Ramp-Up Business Rules
+During ramp-up months: 50% average efficiency
+After ramp-up completes: 100% efficiency
+Year-by-Year Benefit Multiplier
+function calculateYearBenefitMultiplier(year, rampUpMonths) {
+  if (rampUpMonths <= 12) {
+    // Ramp-up completes within Year 1
+    if (year === 1) {
+      return (12 - rampUpMonths + (rampUpMonths * 0.5)) / 12;
+    }
+    return 1.0; // Years 2+ get full benefits
+  } else {
+    // Ramp-up extends beyond Year 1
+    const yearStartMonth = (year - 1) * 12 + 1;
+    const yearEndMonth = year * 12;
+    
+    if (yearStartMonth > rampUpMonths) {
+      return 1.0; // Full benefits after ramp-up
+    }
+    
+    const monthsStillRamping = Math.min(12, Math.max(0, rampUpMonths - yearStartMonth + 1));
+    const monthsAtFullCapacity = 12 - monthsStillRamping;
+    
+    if (monthsAtFullCapacity === 0) {
+      return 0.5; // Entire year in ramp-up
+    }
+    
+    return (monthsStillRamping * 0.5 + monthsAtFullCapacity * 1.0) / 12;
+  }
+}
+
+Cost Distribution
+Year 1: Implementation + Annual Software + Training + Change Management
+Years 2-5: Annual Software only (recurring)
+Payback Calculation Logic
+If cumulative net benefit turns positive in Year 1: paybackMonths = Year1Costs / (Year1Benefits / 12)
+If it turns positive in later years: Use weighted monthly progression
+If never positive within 5 years: Report as "Beyond 5 years" (>60 months)
+8. EDGE CASES & ROUNDING
+Division by zero: Any division by zero returns 0
+NaN/Infinity: Invalid numbers are replaced with 0
+Percentage capping: All percentages capped at stated bounds (never negative, never above max)
+Rounding: Math.round() used for final percentages, no rounding on intermediate calculations
+Revenue per hour fallback: If revenueValuePerHour is 0 or not set, falls back to effectiveHourlyRate
