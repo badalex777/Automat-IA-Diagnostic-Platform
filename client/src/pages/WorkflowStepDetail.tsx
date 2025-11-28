@@ -48,7 +48,7 @@ export default function WorkflowStepDetail() {
   const { toast } = useToast();
   const [isOpportunityDialogOpen, setIsOpportunityDialogOpen] = useState(false);
   const [isROICalculatorOpen, setIsROICalculatorOpen] = useState(false);
-  const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [editOpportunityInCalculator, setEditOpportunityInCalculator] = useState<ImplementationOpportunity | null>(null);
   const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string | null>(null);
 
@@ -502,7 +502,17 @@ export default function WorkflowStepDetail() {
                             size="icon"
                             variant="ghost"
                             className="h-7 w-7"
-                            onClick={() => setEditOpportunity(opp)}
+                            onClick={() => {
+                              if (opp.roiCalculationData) {
+                                setEditOpportunityInCalculator(opp);
+                              } else {
+                                toast({
+                                  variant: "destructive",
+                                  title: "Cannot edit",
+                                  description: "This opportunity was created manually and cannot be edited in the ROI Calculator. Please delete and recreate it.",
+                                });
+                              }
+                            }}
                             data-testid={`button-edit-opportunity-${opp.id}`}
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -581,46 +591,6 @@ export default function WorkflowStepDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Opportunity Dialog */}
-      <Dialog open={!!editOpportunity} onOpenChange={(open) => !open && setEditOpportunity(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit-opportunity">
-          <DialogHeader>
-            <DialogTitle>Edit Opportunity</DialogTitle>
-          </DialogHeader>
-          {editOpportunity && (
-            <OpportunityForm
-              workflowId={workflowId}
-              stepId={stepId}
-              initialData={{
-                ...editOpportunity,
-                annualRoi: editOpportunity.annualRoi ? parseFloat(editOpportunity.annualRoi.toString()) : undefined,
-                implementationCost: editOpportunity.implementationCost ? parseFloat(editOpportunity.implementationCost.toString()) : undefined,
-                annualRunRateRoi: editOpportunity.annualRunRateRoi ? parseFloat(editOpportunity.annualRunRateRoi.toString()) : undefined,
-                cumulativeNetBenefit3Year: editOpportunity.cumulativeNetBenefit3Year ? parseFloat(editOpportunity.cumulativeNetBenefit3Year.toString()) : undefined,
-                cumulativeNetBenefit5Year: editOpportunity.cumulativeNetBenefit5Year ? parseFloat(editOpportunity.cumulativeNetBenefit5Year.toString()) : undefined,
-                hoursSavedPerWeek: editOpportunity.hoursSavedPerWeek ? parseFloat(editOpportunity.hoursSavedPerWeek.toString()) : undefined,
-                annualHoursSaved: editOpportunity.annualHoursSaved ? parseFloat(editOpportunity.annualHoursSaved.toString()) : undefined,
-                fteSavings: editOpportunity.fteSavings ? parseFloat(editOpportunity.fteSavings.toString()) : undefined,
-                errorReductionPct: editOpportunity.errorReductionPct ? parseFloat(editOpportunity.errorReductionPct.toString()) : undefined,
-                hoursReallocatedToRevenue: editOpportunity.hoursReallocatedToRevenue ? parseFloat(editOpportunity.hoursReallocatedToRevenue.toString()) : undefined,
-                revenueUpliftAnnual: editOpportunity.revenueUpliftAnnual ? parseFloat(editOpportunity.revenueUpliftAnnual.toString()) : undefined,
-                rampupPeriodMonths: editOpportunity.rampupPeriodMonths ? parseFloat(editOpportunity.rampupPeriodMonths.toString()) : undefined,
-                paybackPeriodMonths: editOpportunity.paybackPeriodMonths ? parseFloat(editOpportunity.paybackPeriodMonths.toString()) : undefined,
-                trainingHoursPerEmployee: editOpportunity.trainingHoursPerEmployee ? parseFloat(editOpportunity.trainingHoursPerEmployee.toString()) : undefined,
-                errorsAvoidedAnnually: editOpportunity.errorsAvoidedAnnually ?? undefined,
-              }}
-              onSubmit={(data) => {
-                updateOpportunityMutation.mutate({
-                  opportunityId: editOpportunity.id,
-                  updates: data,
-                });
-              }}
-              onCancel={() => setEditOpportunity(null)}
-              isLoading={updateOpportunityMutation.isPending}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Opportunity Confirmation Dialog */}
       <AlertDialog open={!!deleteOpportunity} onOpenChange={(open) => !open && setDeleteOpportunity(null)}>
@@ -648,19 +618,30 @@ export default function WorkflowStepDetail() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* ROI Calculator Dialog */}
-      {step && workflow && company && stepPIFs[0] && (
+      {/* ROI Calculator Dialog - for both create and edit */}
+      {step && workflow && company && (stepPIFs[0] || editOpportunityInCalculator) && (
         <ROICalculatorDialog
           stepId={stepId}
           stepName={step.stepName}
           workflowId={workflowId}
           workflowName={workflow.name}
           companyId={companyId}
-          isOpen={isROICalculatorOpen}
-          onClose={() => setIsROICalculatorOpen(false)}
+          isOpen={isROICalculatorOpen || !!editOpportunityInCalculator}
+          onClose={() => {
+            setIsROICalculatorOpen(false);
+            setEditOpportunityInCalculator(null);
+          }}
           onSave={async (data) => {
             await createOpportunityMutation.mutateAsync(data);
             setIsROICalculatorOpen(false);
+          }}
+          editOpportunity={editOpportunityInCalculator}
+          onUpdate={async (opportunityId, updates) => {
+            await updateOpportunityMutation.mutateAsync({
+              opportunityId,
+              updates,
+            });
+            setEditOpportunityInCalculator(null);
           }}
         />
       )}

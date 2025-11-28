@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Save, AlertCircle } from 'lucide-react';
+import { Loader2, Save, AlertCircle, Pencil } from 'lucide-react';
 import ProcessInfoForm from './ProcessInfoForm';
 import PeopleAndCostForm from './PeopleAndCostForm';
 import OptionalModulesForm from './OptionalModulesForm';
@@ -18,6 +18,7 @@ import {
   ScenarioType, 
   scenarioMultipliers,
   InsertImplementationOpportunity,
+  ImplementationOpportunity,
   PIFResponse,
   ProcessInfo,
   PeopleAndCost,
@@ -36,6 +37,8 @@ interface ROICalculatorDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (opportunity: InsertImplementationOpportunity & { roiCalculationData: ROICalculation }) => Promise<void>;
+  editOpportunity?: ImplementationOpportunity | null;
+  onUpdate?: (opportunityId: string, updates: InsertImplementationOpportunity & { roiCalculationData: ROICalculation }) => Promise<void>;
 }
 
 interface AllData {
@@ -56,7 +59,11 @@ export default function ROICalculatorDialog({
   isOpen,
   onClose,
   onSave,
+  editOpportunity,
+  onUpdate,
 }: ROICalculatorDialogProps) {
+  const isEditMode = !!editOpportunity;
+  
   // Fetch PIF responses for this workflow
   const { data: pifListData, isLoading: isPifLoading } = useQuery<{ responses: PIFResponse[] }>({
     queryKey: [`/api/workflows/${workflowId}/pif`],
@@ -70,29 +77,35 @@ export default function ROICalculatorDialog({
   const [calculatorState, setCalculatorState] = useState<ROICalculation | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Auto-populate from PIF response when dialog opens
-  // Always regenerate fresh state from latest PIF data when dialog opens
+  // Auto-populate from PIF response when dialog opens (create mode)
+  // Or load existing roiCalculationData when editing
   useEffect(() => {
-    if (pifResponse && isOpen) {
-      const initialState = generateROICalculatorState(stepName, workflowName, pifResponse);
-      setCalculatorState(initialState);
-    } else if (!isOpen) {
+    if (isOpen) {
+      if (isEditMode && editOpportunity.roiCalculationData) {
+        // Edit mode: Load existing ROI calculation data
+        setCalculatorState(editOpportunity.roiCalculationData as ROICalculation);
+      } else if (pifResponse) {
+        // Create mode: Generate fresh state from PIF data
+        const initialState = generateROICalculatorState(stepName, workflowName, pifResponse);
+        setCalculatorState(initialState);
+      }
+    } else {
       // Reset state when dialog closes (after delay to avoid race with save)
       const timeoutId = setTimeout(() => setCalculatorState(null), 300);
       return () => clearTimeout(timeoutId);
     }
-  }, [pifResponse, stepName, workflowName, isOpen]);
+  }, [pifResponse, stepName, workflowName, isOpen, isEditMode, editOpportunity]);
 
   // Calculate current results
   const results = calculatorState ? calculateROI(calculatorState, calculatorState.selectedScenario) : null;
 
-  // Handle save
+  // Handle save (both create and update)
   const handleSave = async () => {
     if (!calculatorState || !results) return;
 
     setIsSaving(true);
     try {
-      const opportunity: InsertImplementationOpportunity & { roiCalculationData: ROICalculation } = {
+      const opportunityData: InsertImplementationOpportunity & { roiCalculationData: ROICalculation } = {
         workflowId,
         stepId,
         name: calculatorState.processInfo.processName,
@@ -117,7 +130,13 @@ export default function ROICalculatorDialog({
         roiCalculationData: calculatorState,
       };
 
-      await onSave(opportunity);
+      if (isEditMode && onUpdate && editOpportunity) {
+        // Update existing opportunity
+        await onUpdate(editOpportunity.id, opportunityData);
+      } else {
+        // Create new opportunity
+        await onSave(opportunityData);
+      }
       onClose();
     } catch (error) {
       console.error('Failed to save opportunity:', error);
@@ -173,17 +192,23 @@ export default function ROICalculatorDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl h-[90vh] p-0">
         <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <DialogTitle className="text-2xl">ROI Calculator - {stepName}</DialogTitle>
+          <DialogTitle className="text-2xl flex items-center gap-2">
+            {isEditMode && <Pencil className="h-5 w-5" />}
+            {isEditMode ? 'Edit Opportunity' : 'ROI Calculator'} - {stepName}
+          </DialogTitle>
           <DialogDescription>
-            Calculate the financial impact and ROI for implementing AI automation in this workflow step
+            {isEditMode 
+              ? 'Modify the ROI inputs and recalculate financial projections for this opportunity'
+              : 'Calculate the financial impact and ROI for implementing AI automation in this workflow step'
+            }
           </DialogDescription>
         </DialogHeader>
 
-        {isPifLoading ? (
+        {isPifLoading && !isEditMode ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : !pifResponse ? (
+        ) : !pifResponse && !isEditMode ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground">
             <AlertCircle className="h-12 w-12" />
             <p>No PIF response found for this step. Please complete the PIF first.</p>
@@ -277,17 +302,17 @@ export default function ROICalculatorDialog({
                   <Button
                     onClick={handleSave}
                     disabled={!canSave || isSaving}
-                    data-testid="button-save-opportunity"
+                    data-testid={isEditMode ? "button-update-opportunity" : "button-save-opportunity"}
                   >
                     {isSaving ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
+                        {isEditMode ? 'Updating...' : 'Saving...'}
                       </>
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        Save Opportunity
+                        {isEditMode ? 'Update Opportunity' : 'Save Opportunity'}
                       </>
                     )}
                   </Button>
