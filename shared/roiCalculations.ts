@@ -1,8 +1,6 @@
 import { ROICalculation, ScenarioType, scenarioMultipliers } from './schema';
 import { calculateMultiYearROI, MultiYearResults } from './multiYearCalculations';
 
-const DEFAULT_REVENUE_VALUE_PER_HOUR = 85;
-
 export interface ROIResults {
   roiPercentage: number;
   runRateROI: number;
@@ -154,10 +152,10 @@ export function calculateROI(
     );
     hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100);
     
-    // Per spec: revenueValuePerHour defaults to $85 (not effectiveHourlyRate)
+    // Per spec: revenueValuePerHour falls back to effectiveHourlyRate if not set
     const revenuePerHour = revenueUplift.revenueValuePerHour > 0 
       ? revenueUplift.revenueValuePerHour 
-      : DEFAULT_REVENUE_VALUE_PER_HOUR;
+      : effectiveHourlyRate;
     
     revenueSavingsAmount = hoursReallocatedAnnually * revenuePerHour;
   }
