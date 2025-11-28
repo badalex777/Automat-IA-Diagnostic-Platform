@@ -131,7 +131,8 @@ export default function OptionalModulesForm({
                 onChange={(e) => {
                   const filtered = e.target.value.replace(/[^0-9.]/g, '');
                   const val = filtered === '' ? 0 : parseFloat(filtered);
-                  onTimeSavingsChange({ ...timeSavings, percentTimeSaved: isNaN(val) ? 0 : val });
+                  const capped = isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
+                  onTimeSavingsChange({ ...timeSavings, percentTimeSaved: capped });
                 }}
                 data-testid="input-percent-time-saved"
               />
@@ -243,7 +244,8 @@ export default function OptionalModulesForm({
                     onChange={(e) => {
                       const filtered = e.target.value.replace(/[^0-9.]/g, '');
                       const val = filtered === '' ? 0 : parseFloat(filtered);
-                      onQualityImpactChange({ ...qualityImpact, currentErrorRate: isNaN(val) ? 0 : val });
+                      const capped = isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
+                      onQualityImpactChange({ ...qualityImpact, currentErrorRate: capped });
                     }}
                     data-testid="input-current-error-rate"
                   />
@@ -339,7 +341,8 @@ export default function OptionalModulesForm({
                   onChange={(e) => {
                     const filtered = e.target.value.replace(/[^0-9.]/g, '');
                     const val = filtered === '' ? 0 : parseFloat(filtered);
-                    onQualityImpactChange({ ...qualityImpact, postAIErrorRate: isNaN(val) ? 0 : val });
+                    const capped = isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
+                    onQualityImpactChange({ ...qualityImpact, postAIErrorRate: capped });
                   }}
                   data-testid="input-post-ai-error-rate"
                 />
@@ -465,7 +468,8 @@ export default function OptionalModulesForm({
                   onChange={(e) => {
                     const filtered = e.target.value.replace(/[^0-9.]/g, '');
                     const val = filtered === '' ? 0 : parseFloat(filtered);
-                    onRevenueUpliftChange({ ...revenueUplift, percentReallocated: isNaN(val) ? 0 : val });
+                    const capped = isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
+                    onRevenueUpliftChange({ ...revenueUplift, percentReallocated: capped });
                   }}
                   placeholder="40"
                   data-testid="input-percent-reallocated"

@@ -39,17 +39,21 @@ export default function PeopleAndCostForm({ data, onChange, showManualRequiredBa
     return true;
   };
 
-  const calculateHoursFromProcesses = () => {
-    if (!data.processesPerPeriod || !data.timePerProcessMinutes) {
+  const calculateHoursFromProcesses = (
+    processesPerPeriod: number,
+    timePerProcessMinutes: number,
+    processFrequency: string
+  ): number => {
+    if (!processesPerPeriod || !timePerProcessMinutes) {
       return 0;
     }
     
-    const hoursPerProcess = data.timePerProcessMinutes / 60;
-    const totalHoursPerPeriod = data.processesPerPeriod * hoursPerProcess;
+    const hoursPerProcess = timePerProcessMinutes / 60;
+    const totalHoursPerPeriod = processesPerPeriod * hoursPerProcess;
     
-    if (data.processFrequency === 'daily') {
+    if (processFrequency === 'daily') {
       return totalHoursPerPeriod * 5;
-    } else if (data.processFrequency === 'weekly') {
+    } else if (processFrequency === 'weekly') {
       return totalHoursPerPeriod;
     } else {
       return totalHoursPerPeriod / 4.33;
@@ -57,11 +61,15 @@ export default function PeopleAndCostForm({ data, onChange, showManualRequiredBa
   };
 
   useEffect(() => {
-    const calculatedHours = calculateHoursFromProcesses();
+    const calculatedHours = calculateHoursFromProcesses(
+      data.processesPerPeriod,
+      data.timePerProcessMinutes,
+      data.processFrequency
+    );
     if (calculatedHours !== data.hoursPerWeekPerEmployee) {
-      handleChange('hoursPerWeekPerEmployee', calculatedHours);
+      onChange({ ...data, hoursPerWeekPerEmployee: calculatedHours });
     }
-  }, [data.processesPerPeriod, data.timePerProcessMinutes, data.processFrequency]);
+  }, [data.processesPerPeriod, data.timePerProcessMinutes, data.processFrequency, data.hoursPerWeekPerEmployee, onChange, data]);
 
   return (
     <Card>
@@ -170,7 +178,7 @@ export default function PeopleAndCostForm({ data, onChange, showManualRequiredBa
             <Calculator className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">Calculated Hours per Week:</span>
             <Badge variant="secondary" data-testid="badge-calculated-hours">
-              {calculateHoursFromProcesses().toFixed(1)} hours/week
+              {calculateHoursFromProcesses(data.processesPerPeriod, data.timePerProcessMinutes, data.processFrequency).toFixed(1)} hours/week
             </Badge>
           </div>
         )}
