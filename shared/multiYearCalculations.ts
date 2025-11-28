@@ -56,32 +56,34 @@ export function calculateYear1RampFactor(
 }
 
 /**
- * Calculate payback period accounting for Year 1 ramp-up
- * @param implementationCost - One-time implementation cost
- * @param year1Benefits - Year 1 benefits (with ramp-up applied)
- * @param annualRunRateBenefits - Annual steady-state benefits (Years 2+)
- * @param annualRecurringCosts - Annual recurring costs (software, etc.)
+ * Calculate payback period using simple payback method
+ * Payback = Total one-time costs / Monthly gross benefits
+ * 
+ * This gives a clear answer to "How long until the implementation pays for itself?"
+ * using steady-state monthly benefits (not reduced by Year 1 ramp-up)
+ * 
+ * @param implementationCost - One-time implementation cost (includes training, change mgmt)
+ * @param annualRunRateBenefits - Annual steady-state benefits (what you get after ramp-up)
  * @returns Payback period in months
  */
 export function calculatePaybackPeriod(
   implementationCost: number,
-  year1Benefits: number,
+  year1Benefits: number, // kept for backwards compatibility but not used
   annualRunRateBenefits: number,
-  annualRecurringCosts: number
+  annualRecurringCosts: number // kept for backwards compatibility but not used
 ): number {
-  const year1NetBenefit = year1Benefits - annualRecurringCosts;
-  const annualRunRateNetBenefit = annualRunRateBenefits - annualRecurringCosts;
+  // Simple payback: implementation cost / monthly steady-state benefits
+  // This answers "When do cumulative benefits exceed initial investment?"
+  const monthlyBenefits = annualRunRateBenefits / 12;
   
-  // If Year 1 net benefit covers implementation cost
-  if (year1NetBenefit >= implementationCost) {
-    return (implementationCost / year1NetBenefit) * 12;
+  if (monthlyBenefits <= 0) {
+    return 999; // Effectively never if no benefits
   }
   
-  // Otherwise, Year 1 partially pays, then Year 2+ pays remainder
-  const remainingAfterYear1 = implementationCost - year1NetBenefit;
-  const monthsInYear2Plus = (remainingAfterYear1 / annualRunRateNetBenefit) * 12;
+  const paybackMonths = implementationCost / monthlyBenefits;
   
-  return 12 + monthsInYear2Plus;
+  // Cap at 60 months (5 years) for practical purposes
+  return Math.min(paybackMonths, 60);
 }
 
 /**
