@@ -1,0 +1,61 @@
+Please update the ROI Calculator integration to match the following exact specifications:
+
+1. Scenario Multipliers (4 Scenarios)
+Scenario        | Time Savings | Error Reduction | Reallocation | Cost Overrun | Ramp-Up Efficiency
+----------------|--------------|-----------------|--------------|--------------|-------------------
+Best Case       | 1.15         | 1.20            | 1.00         | 0.95         | 1.15
+Base Case       | 1.00         | 1.00            | 0.70         | 1.00         | 1.00
+Conservative    | 0.70         | 0.70            | 0.40         | 1.10         | 0.80
+Worst Case      | 0.40         | 0.50            | 0.00         | 1.20         | 0.70
+
+Note: Base Case reallocation is intentionally 0.70 (not 1.00) as a "double layer of conservatism" design choice.
+
+2. Quality Impact Calculation (Manual Mode)
+Use this formula for adjusting error reduction based on scenario:
+
+rawErrorReduction = currentErrorRate - postAIErrorRate
+errorReduction = rawErrorReduction × scenario.errorReductionMultiplier
+errorReduction = MIN(errorReduction, currentErrorRate)  // Cap at current rate
+adjustedPostAIErrorRate = currentErrorRate - errorReduction
+errorsAvoidedAnnually = (errorReduction / 100) × transactionsPerWeek × 52
+
+DO NOT use: postAIErrorRate × (2 - multiplier)
+
+3. Revenue Uplift Default
+When revenueValuePerHour is 0 or not set, fall back to effectiveHourlyRate (calculated from salary), NOT a fixed $85:
+
+revenuePerHour = (revenueValuePerHour > 0) ? revenueValuePerHour : effectiveHourlyRate
+
+4. Payback Period Calculation
+Use steady-state annual benefits (not ramp-adjusted Year 1 benefits):
+
+paybackMonths = year1Costs / (annualBenefits / 12)
+
+Where:
+
+year1Costs = total Year 1 costs (implementation + software + training + change mgmt) × costOverrunMultiplier
+annualBenefits = steady-state annual benefits at 100% capacity (no ramp-up applied)
+5. Year 1 Ramp Factor Formula
+baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12
+scenarioAdjustedEfficiency = MAX(20, MIN(150, rampUpEfficiencyPercent × scenario.rampUpEfficiencyMultiplier))
+year1RampFactor = baseRampFactor × (scenarioAdjustedEfficiency / 100)
+year1Benefits = annualBenefits × year1RampFactor
+
+6. Verification Test Case (Base Scenario)
+Inputs:
+
+Employees: 3, Hours/Week: 20, Salary: $55,000, Working Hours: 1,920, Overhead: 1.2
+Time Savings: 60%
+Quality: Enabled, 150 tx/week, 5% current error, 1% post-AI, $25/error, 120 min rework
+Revenue: Enabled, 40% reallocation, $85/hour
+Costs: $25,000 implementation, $12,000 software, 8 hrs training, $5,000 change mgmt
+Ramp-up: 6 months, 100% efficiency
+Expected with Base Scenario (reallocation = 0.70):
+
+Effective Hourly Rate: $34.375
+Time Savings: $64,350
+Quality Savings: $29,250
+Revenue Savings: $31,188 (40% × 0.70 = 28% reallocation applied)
+Annual Benefits: $124,788
+Run-Rate ROI: ~191%
+Year 1 Ramp Factor: 0.75
