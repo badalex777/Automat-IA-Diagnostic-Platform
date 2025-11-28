@@ -39,7 +39,7 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 
 **Recent Changes (November 2025):**
 - Fixed payback period calculation: Uses steady-state annual benefits (not Year 1 ramped-down values) for accurate simple payback calculation
-- Unified opportunity editing: Edit button now opens ROICalculatorDialog instead of legacy OpportunityForm, preserving all calculated fields
+- Unified opportunity editing across all pages: Both WorkflowStepDetail and WorkflowDetail pages now use ROICalculatorDialog for editing opportunities instead of the legacy OpportunityForm, preserving all calculated fields and providing consistent UX
 - Added normalizeROICalculation helper: Coerces database decimal strings to numbers when loading opportunities for editing
 
 ### External Dependencies
