@@ -31,8 +31,8 @@ import ShareableLinkCard from "@/components/ShareableLinkCard";
 import BusinessImpactForm from "@/components/BusinessImpactForm";
 import KnowledgeGapWarning from "@/components/KnowledgeGapWarning";
 import ResponseSourcesDisclaimer from "@/components/ResponseSourcesDisclaimer";
-import { OpportunityForm } from "@/components/OpportunityForm";
 import { ConsolidationDialog } from "@/components/ConsolidationDialog";
+import ROICalculatorDialog from "@/components/calculator/ROICalculatorDialog";
 import OpportunityMatrix from "@/components/OpportunityMatrix";
 import OpportunitiesTable from "@/components/OpportunitiesTable";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -76,7 +76,7 @@ export default function WorkflowDetail() {
   const [stepDescription, setStepDescription] = useState("");
   const [participantName, setParticipantName] = useState("");
   const [participantRole, setParticipantRole] = useState("");
-  const [editOpportunity, setEditOpportunity] = useState<ImplementationOpportunity | null>(null);
+  const [editOpportunityInCalculator, setEditOpportunityInCalculator] = useState<ImplementationOpportunity | null>(null);
   const [deleteOpportunity, setDeleteOpportunity] = useState<ImplementationOpportunity | null>(null);
   const [oppSortBy, setOppSortBy] = useState<'impact-high' | 'impact-low' | 'effort-high' | 'effort-low' | 'name' | 'roadmap'>('roadmap');
   const [isConsolidationDialogOpen, setIsConsolidationDialogOpen] = useState(false);
@@ -292,7 +292,7 @@ export default function WorkflowDetail() {
         title: "Opportunity updated",
         description: "Opportunity has been updated successfully.",
       });
-      setEditOpportunity(null);
+      setEditOpportunityInCalculator(null);
     },
     onError: (error: Error) => {
       toast({
@@ -995,7 +995,7 @@ export default function WorkflowDetail() {
                                     size="icon"
                                     variant="ghost"
                                     className="h-7 w-7"
-                                    onClick={() => setEditOpportunity(opportunity)}
+                                    onClick={() => setEditOpportunityInCalculator(opportunity)}
                                     data-testid={`button-edit-opportunity-${opportunity.id}`}
                                   >
                                     <Pencil className="h-3.5 w-3.5" />
@@ -1572,45 +1572,27 @@ export default function WorkflowDetail() {
           </DialogContent>
         </Dialog>
 
-        {/* Edit Opportunity Dialog */}
-        <Dialog open={!!editOpportunity} onOpenChange={(open) => !open && setEditOpportunity(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-edit-opportunity">
-            <DialogHeader>
-              <DialogTitle>Edit Opportunity</DialogTitle>
-            </DialogHeader>
-            {editOpportunity && (
-              <OpportunityForm
-                workflowId={workflowId}
-                initialData={{
-                  ...editOpportunity,
-                  annualRoi: editOpportunity.annualRoi ? parseFloat(editOpportunity.annualRoi.toString()) : undefined,
-                  implementationCost: editOpportunity.implementationCost ? parseFloat(editOpportunity.implementationCost.toString()) : undefined,
-                  annualRunRateRoi: editOpportunity.annualRunRateRoi ? parseFloat(editOpportunity.annualRunRateRoi.toString()) : undefined,
-                  cumulativeNetBenefit3Year: editOpportunity.cumulativeNetBenefit3Year ? parseFloat(editOpportunity.cumulativeNetBenefit3Year.toString()) : undefined,
-                  cumulativeNetBenefit5Year: editOpportunity.cumulativeNetBenefit5Year ? parseFloat(editOpportunity.cumulativeNetBenefit5Year.toString()) : undefined,
-                  hoursSavedPerWeek: editOpportunity.hoursSavedPerWeek ? parseFloat(editOpportunity.hoursSavedPerWeek.toString()) : undefined,
-                  annualHoursSaved: editOpportunity.annualHoursSaved ? parseFloat(editOpportunity.annualHoursSaved.toString()) : undefined,
-                  fteSavings: editOpportunity.fteSavings ? parseFloat(editOpportunity.fteSavings.toString()) : undefined,
-                  errorReductionPct: editOpportunity.errorReductionPct ? parseFloat(editOpportunity.errorReductionPct.toString()) : undefined,
-                  hoursReallocatedToRevenue: editOpportunity.hoursReallocatedToRevenue ? parseFloat(editOpportunity.hoursReallocatedToRevenue.toString()) : undefined,
-                  revenueUpliftAnnual: editOpportunity.revenueUpliftAnnual ? parseFloat(editOpportunity.revenueUpliftAnnual.toString()) : undefined,
-                  rampupPeriodMonths: editOpportunity.rampupPeriodMonths ? parseFloat(editOpportunity.rampupPeriodMonths.toString()) : undefined,
-                  paybackPeriodMonths: editOpportunity.paybackPeriodMonths ? parseFloat(editOpportunity.paybackPeriodMonths.toString()) : undefined,
-                  trainingHoursPerEmployee: editOpportunity.trainingHoursPerEmployee ? parseFloat(editOpportunity.trainingHoursPerEmployee.toString()) : undefined,
-                  errorsAvoidedAnnually: editOpportunity.errorsAvoidedAnnually ?? undefined,
-                }}
-                onSubmit={(data) => {
-                  updateOpportunityMutation.mutate({
-                    opportunityId: editOpportunity.id,
-                    updates: data,
-                  });
-                }}
-                onCancel={() => setEditOpportunity(null)}
-                isLoading={updateOpportunityMutation.isPending}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+        {/* ROI Calculator Dialog for editing opportunities */}
+        {editOpportunityInCalculator && workflow && (
+          <ROICalculatorDialog
+            stepId={editOpportunityInCalculator.stepId || ''}
+            stepName={workflowSteps.find(s => s.id === editOpportunityInCalculator.stepId)?.stepName || editOpportunityInCalculator.name}
+            workflowId={workflowId}
+            workflowName={workflow.name}
+            companyId={companyId}
+            isOpen={!!editOpportunityInCalculator}
+            onClose={() => setEditOpportunityInCalculator(null)}
+            onSave={async () => {}}
+            editOpportunity={editOpportunityInCalculator}
+            onUpdate={async (opportunityId, updates) => {
+              await updateOpportunityMutation.mutateAsync({
+                opportunityId,
+                updates,
+              });
+              setEditOpportunityInCalculator(null);
+            }}
+          />
+        )}
 
         {/* Delete Opportunity Confirmation Dialog */}
         <AlertDialog open={!!deleteOpportunity} onOpenChange={(open) => !open && setDeleteOpportunity(null)}>
