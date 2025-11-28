@@ -50,6 +50,79 @@ interface AllData {
   costsAndRampup: CostsAndRampup;
 }
 
+// Helper to coerce numeric fields from string to number (database returns decimals as strings)
+function normalizeROICalculation(data: any): ROICalculation {
+  const toNumber = (val: any, defaultVal: number = 0): number => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') {
+      const parsed = parseFloat(val);
+      return isNaN(parsed) ? defaultVal : parsed;
+    }
+    return defaultVal;
+  };
+  
+  const toString = (val: any, defaultVal: string = ''): string => {
+    return typeof val === 'string' ? val : defaultVal;
+  };
+  
+  return {
+    processInfo: {
+      processName: toString(data.processInfo?.processName),
+      businessUnit: toString(data.processInfo?.businessUnit),
+      dataSource: toString(data.processInfo?.dataSource),
+    },
+    peopleAndCost: {
+      employees: toNumber(data.peopleAndCost?.employees, 1),
+      hoursPerWeekPerEmployee: toNumber(data.peopleAndCost?.hoursPerWeekPerEmployee, 1),
+      averageAnnualSalary: toNumber(data.peopleAndCost?.averageAnnualSalary, 50000),
+      annualWorkingHours: toNumber(data.peopleAndCost?.annualWorkingHours, 2080),
+      overheadMultiplier: toNumber(data.peopleAndCost?.overheadMultiplier, 1.0),
+      source: toString(data.peopleAndCost?.source, 'PIF Data'),
+      useProcessBasedCalculation: !!data.peopleAndCost?.useProcessBasedCalculation,
+      processesPerPeriod: toNumber(data.peopleAndCost?.processesPerPeriod),
+      timePerProcessMinutes: toNumber(data.peopleAndCost?.timePerProcessMinutes),
+      processFrequency: data.peopleAndCost?.processFrequency || 'daily',
+    },
+    timeSavings: {
+      enabled: !!data.timeSavings?.enabled,
+      percentTimeSaved: toNumber(data.timeSavings?.percentTimeSaved),
+      source: toString(data.timeSavings?.source, 'PIF Data'),
+    },
+    qualityImpact: {
+      enabled: !!data.qualityImpact?.enabled,
+      calculationMethod: data.qualityImpact?.calculationMethod || 'manual',
+      transactionsPerWeek: toNumber(data.qualityImpact?.transactionsPerWeek),
+      currentErrorRate: toNumber(data.qualityImpact?.currentErrorRate),
+      postAIErrorRate: toNumber(data.qualityImpact?.postAIErrorRate),
+      financialCostPerError: toNumber(data.qualityImpact?.financialCostPerError),
+      reworkMinutesPerError: toNumber(data.qualityImpact?.reworkMinutesPerError),
+      percentQualityImprovement: toNumber(data.qualityImpact?.percentQualityImprovement),
+      source: toString(data.qualityImpact?.source, 'PIF Data'),
+    },
+    revenueUplift: {
+      enabled: !!data.revenueUplift?.enabled,
+      percentReallocated: toNumber(data.revenueUplift?.percentReallocated, 40),
+      revenueValuePerHour: toNumber(data.revenueUplift?.revenueValuePerHour),
+      source: toString(data.revenueUplift?.source, 'PIF Data'),
+    },
+    costsAndRampup: {
+      implementationCost: toNumber(data.costsAndRampup?.implementationCost),
+      annualSoftwareCost: toNumber(data.costsAndRampup?.annualSoftwareCost),
+      trainingHoursPerEmployee: toNumber(data.costsAndRampup?.trainingHoursPerEmployee),
+      changeMgmtCosts: toNumber(data.costsAndRampup?.changeMgmtCosts),
+      rampUpMonths: toNumber(data.costsAndRampup?.rampUpMonths, 6),
+      rampUpCalculationMethod: data.costsAndRampup?.rampUpCalculationMethod || 'manual',
+      rampUpEfficiencyPercent: toNumber(data.costsAndRampup?.rampUpEfficiencyPercent, 100),
+      rubricComplexity: data.costsAndRampup?.rubricComplexity || 'moderate',
+      rubricDigitalComfort: data.costsAndRampup?.rubricDigitalComfort || 'neutral',
+      rubricRolloutApproach: data.costsAndRampup?.rubricRolloutApproach || 'phased',
+      rubricSupportStructure: data.costsAndRampup?.rubricSupportStructure || 'basic',
+      source: toString(data.costsAndRampup?.source, 'Manual Entry'),
+    },
+    selectedScenario: (data.selectedScenario as ScenarioType) || 'conservative',
+  };
+}
+
 export default function ROICalculatorDialog({
   stepId,
   stepName,
@@ -82,8 +155,9 @@ export default function ROICalculatorDialog({
   useEffect(() => {
     if (isOpen) {
       if (isEditMode && editOpportunity.roiCalculationData) {
-        // Edit mode: Load existing ROI calculation data
-        setCalculatorState(editOpportunity.roiCalculationData as ROICalculation);
+        // Edit mode: Load existing ROI calculation data and normalize numeric fields
+        // Database returns decimal columns as strings, so we need to coerce them
+        setCalculatorState(normalizeROICalculation(editOpportunity.roiCalculationData));
       } else if (pifResponse) {
         // Create mode: Generate fresh state from PIF data
         const initialState = generateROICalculatorState(stepName, workflowName, pifResponse);

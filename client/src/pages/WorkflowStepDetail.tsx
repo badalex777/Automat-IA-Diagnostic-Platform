@@ -119,7 +119,7 @@ export default function WorkflowStepDetail() {
         title: "Opportunity updated",
         description: "Opportunity has been updated successfully.",
       });
-      setEditOpportunity(null);
+      setEditOpportunityInCalculator(null);
     },
     onError: (error: Error) => {
       toast({
