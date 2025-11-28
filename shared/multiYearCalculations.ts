@@ -1,6 +1,11 @@
 /**
  * Multi-Year ROI Projection Calculations
  * Calculates ROI projections across 1, 3, and 5 year periods with Year 1 ramp-up modeling
+ * 
+ * Per specification formulas:
+ * - baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12
+ * - scenarioAdjustedEfficiency = MAX(20, MIN(150, baseEfficiency * scenario.rampUpEfficiencyMultiplier))
+ * - year1RampFactor = baseRampFactor * (scenarioAdjustedEfficiency / 100)
  */
 
 export interface YearlyProjection {
@@ -29,6 +34,13 @@ export interface MultiYearResults extends SingleYearResults {
 
 /**
  * Calculate ramp-up factor for Year 1 based on implementation period
+ * 
+ * Per spec formula:
+ * Step 1: baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12
+ * Step 2: baseEfficiency = rampUpEfficiencyPercent (or 100 if not set)
+ * Step 3: scenarioAdjustedEfficiency = MAX(20, MIN(150, baseEfficiency * scenario.rampUpEfficiencyMultiplier))
+ * Step 4: year1RampFactor = baseRampFactor * (scenarioAdjustedEfficiency / 100)
+ * 
  * @param rampUpMonths - Implementation ramp-up period (1-12 months)
  * @param rampUpEfficiencyPercent - Efficiency percentage (20-150%, default 100%)
  * @param scenarioRampUpMultiplier - Scenario-specific ramp-up multiplier
@@ -39,48 +51,56 @@ export function calculateYear1RampFactor(
   rampUpEfficiencyPercent: number = 100,
   scenarioRampUpMultiplier: number = 1.0
 ): number {
-  // Base ramp-up factor calculation
-  // Linear ramp: 1 month = 96% (11/12), 6 months = 75% (9/12), 12 months = 54% (6.5/12)
-  const monthsAtFullCapacity = Math.max(0, 12 - (rampUpMonths / 2));
-  let baseFactor = monthsAtFullCapacity / 12;
+  // Step 1: Base ramp factor from months
+  // Per spec: baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12
+  // This simplifies to: (12 - rampUpMonths/2) / 12
+  const baseRampFactor = (12 - rampUpMonths + (rampUpMonths / 2)) / 12;
   
-  // Apply efficiency modifier (100% = normal, 150% = 1.5x faster, 20% = 5x slower)
-  const efficiencyMultiplier = rampUpEfficiencyPercent / 100;
-  baseFactor = baseFactor * efficiencyMultiplier;
+  // Step 2: Get efficiency percentage (default 100)
+  const baseEfficiency = rampUpEfficiencyPercent || 100;
   
-  // Apply scenario-specific multiplier
-  baseFactor = baseFactor * scenarioRampUpMultiplier;
+  // Step 3: Apply scenario multiplier, then cap between 20-150%
+  const scenarioAdjustedEfficiency = Math.max(20, Math.min(150, 
+    baseEfficiency * scenarioRampUpMultiplier
+  ));
   
-  // Clamp between 20% (worst case delayed rollout) and 100% (immediate full benefits)
-  return Math.max(0.2, Math.min(1.0, baseFactor));
+  // Step 4: Combine base factor with efficiency
+  const year1RampFactor = baseRampFactor * (scenarioAdjustedEfficiency / 100);
+  
+  // Final capping - factor should be between 0 and 1
+  return Math.max(0, Math.min(1.0, year1RampFactor));
 }
 
 /**
- * Calculate payback period using simple payback method
- * Payback = Total one-time costs / Monthly gross benefits
+ * Calculate payback period
  * 
- * This gives a clear answer to "How long until the implementation pays for itself?"
- * using steady-state monthly benefits (not reduced by Year 1 ramp-up)
+ * Per spec (line 141-144): paybackMonths = annualCosts / (annualBenefits / 12)
+ * Example: $42,825 / ($138,154 / 12) = $42,825 / $11,513 = 3.7 months
  * 
- * @param implementationCost - One-time implementation cost (includes training, change mgmt)
- * @param annualRunRateBenefits - Annual steady-state benefits (what you get after ramp-up)
+ * where:
+ * - annualCosts = total Year 1 costs (implementation + software + training + change mgmt)
+ * - annualBenefits = STEADY-STATE annual benefits (NOT Year 1 ramped benefits)
+ * 
+ * @param year1Costs - Total Year 1 costs (one-time + recurring)
+ * @param year1Benefits - Year 1 benefits (with ramp-up applied) - not used for payback
+ * @param annualRunRateBenefits - Steady-state annual benefits (100% capacity)
  * @returns Payback period in months
  */
 export function calculatePaybackPeriod(
-  implementationCost: number,
-  year1Benefits: number, // kept for backwards compatibility but not used
+  year1Costs: number,
+  year1Benefits: number, // NOT used - kept for backwards compatibility
   annualRunRateBenefits: number,
-  annualRecurringCosts: number // kept for backwards compatibility but not used
+  annualRecurringCosts: number = 0 // kept for backwards compatibility
 ): number {
-  // Simple payback: implementation cost / monthly steady-state benefits
-  // This answers "When do cumulative benefits exceed initial investment?"
+  // Per spec: paybackMonths = annualCosts / (annualBenefits / 12)
+  // Must use STEADY-STATE annual benefits (annualRunRateBenefits), never Year 1 ramped benefits
   const monthlyBenefits = annualRunRateBenefits / 12;
   
   if (monthlyBenefits <= 0) {
     return 999; // Effectively never if no benefits
   }
   
-  const paybackMonths = implementationCost / monthlyBenefits;
+  const paybackMonths = year1Costs / monthlyBenefits;
   
   // Cap at 60 months (5 years) for practical purposes
   return Math.min(paybackMonths, 60);
@@ -90,9 +110,9 @@ export function calculatePaybackPeriod(
  * Format payback period for display
  */
 export function formatPaybackPeriod(months: number): string {
-  if (months < 0) return 'Never';
+  if (months < 0 || months >= 999) return 'Never';
   if (months < 1) return '< 1 month';
-  if (months <= 12) return `${months.toFixed(1)} months`;
+  if (months <= 12) return `${Math.round(months)} months`;
   
   const years = Math.floor(months / 12);
   const remainingMonths = Math.round(months % 12);
@@ -103,16 +123,20 @@ export function formatPaybackPeriod(months: number): string {
 
 /**
  * Calculate multi-year ROI projections with Year 1 ramp-up modeling
+ * 
+ * Cost Distribution (per spec):
+ * - Year 1: Implementation + Annual Software + Training + Change Management
+ * - Years 2-5: Annual Software only (recurring)
  */
 export function calculateMultiYearROI(
   annualBenefits: number, // Steady-state annual benefits (100% capacity)
-  implementationCost: number,
-  annualRecurringCosts: number, // Annual software, subscription costs
+  implementationCost: number, // One-time costs (implementation + training + change mgmt, already multiplied)
+  annualRecurringCosts: number, // Annual software/subscription costs (already multiplied by costOverrunMultiplier)
   rampUpMonths: number,
   rampUpEfficiencyPercent: number = 100,
   scenarioRampUpMultiplier: number = 1.0
 ): MultiYearResults {
-  // Calculate Year 1 ramp-up factor
+  // Calculate Year 1 ramp-up factor using spec formula
   const year1RampFactor = calculateYear1RampFactor(
     rampUpMonths,
     rampUpEfficiencyPercent,
@@ -120,9 +144,17 @@ export function calculateMultiYearROI(
   );
   
   // Year 1 calculations (with ramp-up applied)
+  // Per spec: year1Benefits = annualBenefits * year1RampFactor
   const year1Benefits = annualBenefits * year1RampFactor;
+  
+  // Per spec: Year 1 costs = Implementation + Annual Software + Training + Change Management
+  // (implementation cost already includes training and change mgmt multiplied)
   const year1Costs = implementationCost + annualRecurringCosts;
+  
+  // year1NetBenefit = year1Benefits - year1Costs
   const year1NetBenefit = year1Benefits - year1Costs;
+  
+  // year1ActualROI = ((year1Benefits - year1Costs) / year1Costs) * 100
   const year1ActualROI = year1Costs > 0 ? ((year1Benefits - year1Costs) / year1Costs) * 100 : 0;
   
   // Yearly projections
@@ -166,9 +198,9 @@ export function calculateMultiYearROI(
     });
   }
   
-  // Calculate payback period
+  // Calculate payback period using Year 1 costs and Year 1 benefits
   const paybackMonths = calculatePaybackPeriod(
-    implementationCost,
+    year1Costs,
     year1Benefits,
     annualBenefits,
     annualRecurringCosts

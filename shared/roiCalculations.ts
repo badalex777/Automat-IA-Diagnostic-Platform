@@ -1,6 +1,8 @@
 import { ROICalculation, ScenarioType, scenarioMultipliers } from './schema';
 import { calculateMultiYearROI, MultiYearResults } from './multiYearCalculations';
 
+const DEFAULT_REVENUE_VALUE_PER_HOUR = 85;
+
 export interface ROIResults {
   roiPercentage: number;
   runRateROI: number;
@@ -31,7 +33,7 @@ export interface ROIResults {
 
 /**
  * Calculate ROI results from calculator state and scenario
- * Used by both ROICalculatorDialog (live calculations) and ROIDetailsDialog (historical view)
+ * Uses specification formulas with proper capping and multiplier application
  */
 export function calculateROI(
   state: ROICalculation,
@@ -45,8 +47,9 @@ export function calculateROI(
   // Calculate annual working hours per employee
   const annualWorkingHours = peopleAndCost.annualWorkingHours || 2080;
   
-  // Calculate hourly cost (salary + overhead)
-  const hourlyCost = annualWorkingHours > 0 
+  // Step 1: Effective Hourly Rate (per spec)
+  // effectiveHourlyRate = (averageAnnualSalary / annualWorkingHours) * overheadMultiplier
+  const effectiveHourlyRate = annualWorkingHours > 0 
     ? (peopleAndCost.averageAnnualSalary / annualWorkingHours) * peopleAndCost.overheadMultiplier
     : 0;
 
@@ -68,105 +71,144 @@ export function calculateROI(
     }
   }
   
+  // Step 2: Time Savings Benefits (per spec)
+  // totalHoursPerWeek = employees * hoursPerWeekPerEmployee
+  // adjustedTimeSavingsPercent = MIN(percentTimeSaved * scenario.timeSavingsMultiplier, 100)
+  // hoursSavedWeekly = totalHoursPerWeek * (adjustedTimeSavingsPercent / 100)
+  // timeSavingsAnnual = hoursSavedWeekly * 52 * effectiveHourlyRate
   const totalWeeklyHours = hoursPerWeekPerEmployee * peopleAndCost.employees;
-  const annualHours = totalWeeklyHours * 52;
 
-  // === TIME SAVINGS MODULE ===
   let timeSavingsAmount = 0;
   let hoursSavedAnnually = 0;
   let adjustedTimeSavingsPercent = 0;
+  let hoursSavedWeekly = 0;
 
   if (timeSavings.enabled) {
-    adjustedTimeSavingsPercent = timeSavings.percentTimeSaved * multipliers.timeSavingsMultiplier;
-    hoursSavedAnnually = (annualHours * adjustedTimeSavingsPercent) / 100;
-    timeSavingsAmount = hoursSavedAnnually * hourlyCost;
+    adjustedTimeSavingsPercent = Math.min(
+      timeSavings.percentTimeSaved * multipliers.timeSavingsMultiplier, 
+      100
+    );
+    hoursSavedWeekly = totalWeeklyHours * (adjustedTimeSavingsPercent / 100);
+    hoursSavedAnnually = hoursSavedWeekly * 52;
+    timeSavingsAmount = hoursSavedAnnually * effectiveHourlyRate;
   }
 
-  const hoursSavedWeekly = hoursSavedAnnually / 52;
   const ftesSaved = annualWorkingHours > 0 ? hoursSavedAnnually / annualWorkingHours : 0;
 
-  // === QUALITY IMPACT MODULE ===
+  // Step 3: Quality Impact Benefits (per spec)
+  // If calculationMethod = "manual":
+  //   rawErrorReduction = currentErrorRate - postAIErrorRate
+  //   errorRateReduction = MIN(rawErrorReduction * scenario.errorReductionMultiplier, currentErrorRate)
+  //   calculatedPostAIErrorRate = currentErrorRate - errorRateReduction
+  // errorsAvoidedAnnually = errorRateReduction * transactionsPerWeek * 52 / 100
+  // qualitySavingsAnnual = errorsAvoidedAnnually * (reworkHours * effectiveHourlyRate + financialCostPerError)
   let qualitySavingsAmount = 0;
   let errorsAvoidedAnnually = 0;
-  let adjustedErrorReductionPercent = 0;
+  let errorRateReduction = 0;
   let adjustedPostAIErrorRate = qualityImpact.postAIErrorRate;
 
   if (qualityImpact.enabled) {
-    const errorReductionPercent = 
-      ((qualityImpact.currentErrorRate - qualityImpact.postAIErrorRate) / qualityImpact.currentErrorRate) * 100;
+    if (qualityImpact.calculationMethod === 'rubric') {
+      // Rubric method: adjustedQualityImprovement = MIN(percentQualityImprovement * multiplier, 100)
+      const adjustedQualityImprovement = Math.min(
+        qualityImpact.percentQualityImprovement * multipliers.errorReductionMultiplier,
+        100
+      );
+      errorRateReduction = qualityImpact.currentErrorRate * (adjustedQualityImprovement / 100);
+    } else {
+      // Manual method: rawErrorReduction = currentErrorRate - postAIErrorRate
+      const rawErrorReduction = qualityImpact.currentErrorRate - qualityImpact.postAIErrorRate;
+      errorRateReduction = Math.min(
+        rawErrorReduction * multipliers.errorReductionMultiplier,
+        qualityImpact.currentErrorRate
+      );
+    }
     
-    adjustedErrorReductionPercent = errorReductionPercent * multipliers.errorReductionMultiplier;
+    adjustedPostAIErrorRate = qualityImpact.currentErrorRate - errorRateReduction;
     
-    // Recalculate post-AI error rate with scenario adjustment
-    const adjustedReductionFactor = adjustedErrorReductionPercent / 100;
-    adjustedPostAIErrorRate = qualityImpact.currentErrorRate * (1 - adjustedReductionFactor);
+    // errorsAvoidedAnnually = errorRateReduction * transactionsPerWeek * 52 / 100
+    errorsAvoidedAnnually = Math.round(
+      errorRateReduction * qualityImpact.transactionsPerWeek * 52 / 100
+    );
 
-    // Calculate transactions per year
-    const transactionsPerYear = qualityImpact.transactionsPerWeek * 52;
-    
-    // Errors avoided
-    const currentErrors = (transactionsPerYear * qualityImpact.currentErrorRate) / 100;
-    const postAIErrors = (transactionsPerYear * adjustedPostAIErrorRate) / 100;
-    errorsAvoidedAnnually = Math.round(currentErrors - postAIErrors);
-
-    // Financial impact from avoided errors
-    const reworkHoursSaved = errorsAvoidedAnnually * (qualityImpact.reworkMinutesPerError / 60);
-    const reworkCostSaved = reworkHoursSaved * hourlyCost;
-    const financialCostSaved = errorsAvoidedAnnually * qualityImpact.financialCostPerError;
-    
-    qualitySavingsAmount = reworkCostSaved + financialCostSaved;
+    // qualitySavingsAnnual = errorsAvoidedAnnually * (reworkHours * effectiveHourlyRate + financialCostPerError)
+    const reworkHours = qualityImpact.reworkMinutesPerError / 60;
+    qualitySavingsAmount = errorsAvoidedAnnually * (
+      reworkHours * effectiveHourlyRate + qualityImpact.financialCostPerError
+    );
   }
 
-  // === REVENUE UPLIFT MODULE ===
+  // Step 4: Revenue Uplift Benefits (per spec)
+  // adjustedReallocationPercent = MIN(percentReallocated * scenario.reallocationMultiplier, 100)
+  // hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100)
+  // revenueSavingsAnnual = hoursReallocatedAnnually * revenueValuePerHour
+  // Note: revenueValuePerHour defaults to $85 if not set (spec default)
   let revenueSavingsAmount = 0;
   let hoursReallocatedAnnually = 0;
   let adjustedReallocationPercent = 0;
 
   if (revenueUplift.enabled && timeSavings.enabled) {
-    adjustedReallocationPercent = revenueUplift.percentReallocated * multipliers.reallocationMultiplier;
-    hoursReallocatedAnnually = (hoursSavedAnnually * adjustedReallocationPercent) / 100;
+    adjustedReallocationPercent = Math.min(
+      revenueUplift.percentReallocated * multipliers.reallocationMultiplier,
+      100
+    );
+    hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100);
     
-    // Use revenue value per hour (calculated from salary + overhead)
+    // Per spec: revenueValuePerHour defaults to $85 (not effectiveHourlyRate)
     const revenuePerHour = revenueUplift.revenueValuePerHour > 0 
       ? revenueUplift.revenueValuePerHour 
-      : hourlyCost;
+      : DEFAULT_REVENUE_VALUE_PER_HOUR;
     
     revenueSavingsAmount = hoursReallocatedAnnually * revenuePerHour;
   }
 
-  // === TOTAL BENEFITS ===
+  // Step 5: Total Benefits and Costs (per spec)
+  // annualBenefits = timeSavingsAnnual + qualitySavingsAnnual + revenueSavingsAnnual
+  // trainingCosts = employees * trainingHoursPerEmployee * effectiveHourlyRate
+  // annualCosts = (implementationCost + annualSoftwareCost + trainingCosts + changeMgmtCosts) * scenario.costOverrunMultiplier
   const annualBenefits = timeSavingsAmount + qualitySavingsAmount + revenueSavingsAmount;
 
-  // === COSTS ===
-  const trainingCost = costsAndRampup.trainingHoursPerEmployee * peopleAndCost.employees * hourlyCost;
-  const implementationCost = 
-    (costsAndRampup.implementationCost + trainingCost + costsAndRampup.changeMgmtCosts) * 
-    multipliers.costOverrunMultiplier;
+  const trainingCost = costsAndRampup.trainingHoursPerEmployee * peopleAndCost.employees * effectiveHourlyRate;
   
-  const annualRecurringCosts = costsAndRampup.annualSoftwareCost;
+  // Per spec: costOverrunMultiplier applies to ALL costs including annualSoftwareCost
+  const totalOneTimeCosts = (
+    costsAndRampup.implementationCost + 
+    trainingCost + 
+    costsAndRampup.changeMgmtCosts
+  ) * multipliers.costOverrunMultiplier;
+  
+  const annualRecurringCosts = costsAndRampup.annualSoftwareCost * multipliers.costOverrunMultiplier;
 
-  // === MULTI-YEAR CALCULATIONS ===
+  // Multi-year calculations with spec-compliant formulas
   const multiYear = calculateMultiYearROI(
     annualBenefits,
-    implementationCost,
+    totalOneTimeCosts,
     annualRecurringCosts,
     costsAndRampup.rampUpMonths,
     costsAndRampup.rampUpEfficiencyPercent,
     multipliers.rampUpEfficiencyMultiplier
   );
 
-  // === ROI METRICS ===
-  const year1Costs = multiYear.year1Costs;
+  // ROI Metrics from multi-year calculations
   const year1NetBenefit = multiYear.year1NetBenefit;
   const year1ActualROI = multiYear.year1ActualROI;
 
-  // Run-rate ROI (steady state, Years 2+)
-  const annualCosts = annualRecurringCosts;
+  // Run-rate ROI (Steady-State) - per spec lines 114-118:
+  // netBenefit = annualBenefits - annualCosts
+  // runRateROI = (netBenefit / annualCosts) * 100
+  // where annualCosts = Year 1 total costs (implementation + software + training + change mgmt) × costOverrun
+  // Example: (($138,154 - $42,825) / $42,825) * 100 = 222.6%
+  const annualCosts = totalOneTimeCosts + annualRecurringCosts;
   const netBenefit = annualBenefits - annualCosts;
-  const runRateROI = annualCosts > 0 ? ((annualBenefits - annualCosts) / annualCosts) * 100 : 0;
+  const runRateROI = annualCosts > 0 ? (netBenefit / annualCosts) * 100 : 0;
 
   // Overall ROI percentage (Year 1)
   const roiPercentage = year1ActualROI;
+
+  // Calculate error reduction percent for display
+  const adjustedErrorReductionPercent = qualityImpact.currentErrorRate > 0
+    ? (errorRateReduction / qualityImpact.currentErrorRate) * 100
+    : 0;
 
   return {
     roiPercentage,

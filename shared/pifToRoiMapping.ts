@@ -14,6 +14,150 @@
  * - Q21-29 → Quality Impact rubric percentage + error metrics
  */
 
+/**
+ * Role Profiles - 16 roles per spec with base percentages and ranges
+ * 
+ * Per specification section 6. ROLE PROFILES:
+ * Role ID                    Time Base   Time Range      Quality Base  Quality Range   Revenue Base  Revenue Range
+ */
+export const roleProfiles: Record<string, {
+  timeSavingsBase: number;
+  timeSavingsRange: [number, number];
+  qualityImpactBase: number;
+  qualityImpactRange: [number, number];
+  revenueUpliftBase: number;
+  revenueUpliftRange: [number, number];
+}> = {
+  data_entry_admin: {
+    timeSavingsBase: 70,
+    timeSavingsRange: [40, 90],
+    qualityImpactBase: 60,
+    qualityImpactRange: [35, 85],
+    revenueUpliftBase: 5,
+    revenueUpliftRange: [0, 15],
+  },
+  accounts_payable_receivable: {
+    timeSavingsBase: 65,
+    timeSavingsRange: [35, 85],
+    qualityImpactBase: 70,
+    qualityImpactRange: [45, 90],
+    revenueUpliftBase: 10,
+    revenueUpliftRange: [0, 25],
+  },
+  payroll_specialist: {
+    timeSavingsBase: 60,
+    timeSavingsRange: [30, 85],
+    qualityImpactBase: 75,
+    qualityImpactRange: [50, 95],
+    revenueUpliftBase: 5,
+    revenueUpliftRange: [0, 15],
+  },
+  customer_support_t1: {
+    timeSavingsBase: 65,
+    timeSavingsRange: [35, 85],
+    qualityImpactBase: 50,
+    qualityImpactRange: [25, 70],
+    revenueUpliftBase: 35,
+    revenueUpliftRange: [10, 60],
+  },
+  sales_ops_crm: {
+    timeSavingsBase: 60,
+    timeSavingsRange: [30, 85],
+    qualityImpactBase: 55,
+    qualityImpactRange: [30, 75],
+    revenueUpliftBase: 60,
+    revenueUpliftRange: [20, 60],
+  },
+  procurement_purchasing: {
+    timeSavingsBase: 55,
+    timeSavingsRange: [30, 80],
+    qualityImpactBase: 60,
+    qualityImpactRange: [35, 80],
+    revenueUpliftBase: 20,
+    revenueUpliftRange: [5, 40],
+  },
+  hr_coordinator: {
+    timeSavingsBase: 55,
+    timeSavingsRange: [30, 80],
+    qualityImpactBase: 50,
+    qualityImpactRange: [25, 70],
+    revenueUpliftBase: 10,
+    revenueUpliftRange: [0, 25],
+  },
+  it_support_helpdesk: {
+    timeSavingsBase: 60,
+    timeSavingsRange: [30, 85],
+    qualityImpactBase: 55,
+    qualityImpactRange: [30, 75],
+    revenueUpliftBase: 15,
+    revenueUpliftRange: [0, 30],
+  },
+  operations_coordinator: {
+    timeSavingsBase: 50,
+    timeSavingsRange: [25, 75],
+    qualityImpactBase: 45,
+    qualityImpactRange: [20, 65],
+    revenueUpliftBase: 25,
+    revenueUpliftRange: [5, 45],
+  },
+  marketing_ops: {
+    timeSavingsBase: 55,
+    timeSavingsRange: [30, 80],
+    qualityImpactBase: 50,
+    qualityImpactRange: [25, 70],
+    revenueUpliftBase: 45,
+    revenueUpliftRange: [15, 60],
+  },
+  financial_analyst: {
+    timeSavingsBase: 45,
+    timeSavingsRange: [25, 70],
+    qualityImpactBase: 55,
+    qualityImpactRange: [30, 75],
+    revenueUpliftBase: 30,
+    revenueUpliftRange: [10, 50],
+  },
+  customer_success: {
+    timeSavingsBase: 40,
+    timeSavingsRange: [20, 65],
+    qualityImpactBase: 45,
+    qualityImpactRange: [20, 65],
+    revenueUpliftBase: 55,
+    revenueUpliftRange: [20, 60],
+  },
+  executive_assistant: {
+    timeSavingsBase: 50,
+    timeSavingsRange: [25, 75],
+    qualityImpactBase: 40,
+    qualityImpactRange: [20, 60],
+    revenueUpliftBase: 5,
+    revenueUpliftRange: [0, 15],
+  },
+  compliance_qa_audit: {
+    timeSavingsBase: 45,
+    timeSavingsRange: [25, 70],
+    qualityImpactBase: 65,
+    qualityImpactRange: [40, 85],
+    revenueUpliftBase: 10,
+    revenueUpliftRange: [0, 25],
+  },
+  legal_contract_admin: {
+    timeSavingsBase: 40,
+    timeSavingsRange: [20, 65],
+    qualityImpactBase: 60,
+    qualityImpactRange: [35, 80],
+    revenueUpliftBase: 15,
+    revenueUpliftRange: [0, 30],
+  },
+  other: {
+    timeSavingsBase: 30,
+    timeSavingsRange: [10, 60],
+    qualityImpactBase: 30,
+    qualityImpactRange: [10, 60],
+    revenueUpliftBase: 0,
+    revenueUpliftRange: [0, 20],
+  },
+};
+
 import { 
   ProcessInfo, 
   PeopleAndCost, 
@@ -102,68 +246,58 @@ export function mapPeopleAndCost(pifResponse: PIFResponse): PeopleAndCost {
 }
 
 /**
- * Calculate Time Savings rubric percentage from PIF Q11-13, Q18
+ * Calculate Time Savings rubric percentage from PIF Q11-13
  * 
- * Mapping Logic (per ROI Calculator handbook):
- * - Q11 (Work Type) → Base percentage (Data Entry 60%, Document Processing 45%, etc.)
- * - Q12 (Complexity) → Multiplier (simple: 1.2x, moderate: 1.0x, complex: 0.7x)
- * - Q13 (Data Structure) → Multiplier (structured: 1.2x, semi: 1.0x, unstructured: 0.8x)
- * - Q18 (Frequency) → Multiplier (daily: 1.1x, weekly: 1.0x, monthly: 0.9x)
+ * Per spec section 5. RUBRIC CALCULATION LOGIC:
+ * Formula: finalPercent = basePercent × complexity × repetition × structure
  * 
- * Final % = base × complexity × data structure × frequency
+ * Q1: Role Type → Sets base percentage (from roleProfiles table)
+ * Q2: Complexity → Simple=1.3, Moderate=1.0, Complex=0.7
+ * Q3: Repetition → Daily=1.2, Weekly=1.0, Monthly=0.8
+ * Q4: Data Structure → Highly structured=1.3, Semi-structured=1.0, Unstructured=0.7
+ * 
+ * Capping: Result is capped within the role's timeSavingsRange
  */
 export function calculateTimeSavingsRubric(pifResponse: PIFResponse): number {
-  // Base percentages by work type (Q11) - aligned with ROI Calculator handbook
-  const workTypeBasePercentages: Record<string, number> = {
-    financial: 45,
-    finance_ops: 60, // Data Entry / Document Processing roles
-    sales_ops: 50,
-    account_manager: 40,
-    customer_success: 35,
-    data_analyst: 55,
-    hr_ops: 50,
-    it_support: 45,
-    procurement: 55,
-    legal: 30,
-    marketing: 40,
-    operations: 50,
-  };
+  // Q11 (Role Type) → Get base percentage and range from role profiles
+  const roleType = getResponse(pifResponse, 11);
+  const roleProfile = roleProfiles[roleType] || roleProfiles.other;
+  const basePercentage = roleProfile.timeSavingsBase;
+  const [minRange, maxRange] = roleProfile.timeSavingsRange;
   
-  const workType = getResponse(pifResponse, 11);
-  const basePercentage = workTypeBasePercentages[workType] || 50;
-  
-  // Complexity multiplier (Q12)
+  // Per spec: Complexity multipliers (Q12)
   const complexityMultipliers: Record<string, number> = {
-    simple: 1.2,
+    simple: 1.3,
     moderate: 1.0,
     complex: 0.7,
   };
   const complexity = getResponse(pifResponse, 12);
   const complexityMultiplier = complexityMultipliers[complexity] || 1.0;
   
-  // Data structure multiplier (Q13)
+  // Per spec: Repetition/Frequency multipliers
+  const frequencyMultipliers: Record<string, number> = {
+    daily: 1.2,
+    weekly: 1.0,
+    monthly: 0.8,
+  };
+  const frequency = getResponse(pifResponse, 18) || getRoiInputs(pifResponse).frequency || 'weekly';
+  const frequencyMultiplier = frequencyMultipliers[frequency] || 1.0;
+  
+  // Per spec: Data structure multipliers (Q13)
   const dataStructureMultipliers: Record<string, number> = {
-    structured: 1.2,
+    structured: 1.3,
+    highly_structured: 1.3,
     semi_structured: 1.0,
-    unstructured: 0.8,
+    unstructured: 0.7,
   };
   const dataStructure = getResponse(pifResponse, 13);
   const dataStructureMultiplier = dataStructureMultipliers[dataStructure] || 1.0;
   
-  // Frequency multiplier (Q18) - required by rubric spec
-  const frequencyMultipliers: Record<string, number> = {
-    daily: 1.1,
-    weekly: 1.0,
-    monthly: 0.9,
-  };
-  const frequency = getResponse(pifResponse, 18);
-  const frequencyMultiplier = frequencyMultipliers[frequency] || 1.0;
+  // Per spec: finalPercent = basePercent × complexity × repetition × structure
+  const rawPercentage = basePercentage * complexityMultiplier * frequencyMultiplier * dataStructureMultiplier;
   
-  // Calculate final percentage: base × complexity × data structure × frequency
-  const finalPercentage = basePercentage * complexityMultiplier * dataStructureMultiplier * frequencyMultiplier;
-  
-  // Clamp between 10% and 90%
-  return Math.max(10, Math.min(90, Math.round(finalPercentage)));
+  // Per spec: Result is capped within the role's timeSavingsRange
+  return Math.round(Math.max(minRange, Math.min(maxRange, rawPercentage)));
 }
 
 /**
@@ -183,105 +317,89 @@ export function mapTimeSavings(pifResponse: PIFResponse): TimeSavings {
 /**
  * Calculate Quality Impact rubric percentage from PIF Q21-27
  * 
- * Only enabled if Q21 = 'yes'
+ * Per spec section 5. RUBRIC CALCULATION LOGIC - Quality Impact Rubric (6 Questions):
+ * Formula: combinedMultiplier = AVERAGE(5 weights) then finalPercent = basePercent × combinedMultiplier
  * 
- * Mapping Logic (per ROI Calculator handbook - requires 5 multipliers):
- * - Q22 (Process Category) → Base percentage
- * - Q23 (Rework Impact) → Multiplier
- * - Q24 (Current Accuracy) → Multiplier
- * - Q25 (Decision Consistency) → Multiplier
- * - Q26 (Work Type) → Multiplier
- * - Q27 (Error Rate) → Error severity multiplier based on magnitude
+ * Q1: Role Type → Sets base percentage (from roleProfiles)
+ * Q2: Error Frequency → Very frequent=1.3, Frequent=1.15, Occasional=1.0, Rare=0.8
+ * Q3: Error Cause → Manual/repetitive=1.3, Info gaps=1.15, Inconsistent standards=1.15, External factors=0.9, Complex judgment=0.7
+ * Q4: Detection Timing → (weights vary 0.8-1.3)
+ * Q5: Standardization → (weights vary 0.8-1.3)
+ * Q6: AI Suitability → Rule-based=1.3, Pattern recognition=1.15, Contextual=1.0, Highly subjective=0.8
  * 
- * Final percentage = base × average of 5 question multipliers
+ * Capping: Result is capped within the role's qualityImpactRange
  */
 export function calculateQualityImpactRubric(pifResponse: PIFResponse): number {
-  // If Q21 = 'no', return 0 (module disabled)
   if (getResponse(pifResponse, 21) !== 'yes') {
     return 0;
   }
   
-  // Process category base percentages (Q22)
-  const processCategoryBase: Record<string, number> = {
-    data_entry: 60,
-    document_processing: 55,
-    customer_service: 40,
-    analysis: 45,
-    compliance: 50,
-  };
-  const processCategory = getResponse(pifResponse, 22);
-  const basePercentage = processCategoryBase[processCategory] || 45;
+  const roleType = getResponse(pifResponse, 11);
+  const roleProfile = roleProfiles[roleType] || roleProfiles.other;
+  const basePercentage = roleProfile.qualityImpactBase;
+  const [minRange, maxRange] = roleProfile.qualityImpactRange;
   
-  // Rework impact multiplier (Q23)
   const reworkImpactMultipliers: Record<string, number> = {
     critical: 1.3,
-    significant: 1.1,
+    very_frequent: 1.3,
+    significant: 1.15,
+    frequent: 1.15,
     moderate: 1.0,
+    occasional: 1.0,
     minimal: 0.8,
+    rare: 0.8,
   };
   const reworkImpact = getResponse(pifResponse, 23);
   const reworkMultiplier = reworkImpactMultipliers[reworkImpact] || 1.0;
   
-  // Current accuracy multiplier (Q24)
-  const accuracyMultipliers: Record<string, number> = {
-    below_80: 1.4,
-    80_90: 1.2,
-    90_95: 1.0,
-    95_99: 0.7,
-    above_99: 0.4,
+  const errorCauseMultipliers: Record<string, number> = {
+    manual_repetitive: 1.3,
+    info_gaps: 1.15,
+    inconsistent_standards: 1.15,
+    external_factors: 0.9,
+    complex_judgment: 0.7,
   };
-  const accuracy = getResponse(pifResponse, 24);
-  const accuracyMultiplier = accuracyMultipliers[accuracy] || 1.0;
+  const errorCause = getResponse(pifResponse, 24);
+  const errorCauseMultiplier = errorCauseMultipliers[errorCause] || 1.0;
   
-  // Decision consistency multiplier (Q25)
-  const consistencyMultipliers: Record<string, number> = {
-    variable: 1.3,
-    guidelines: 1.1,
-    standardized: 1.0,
-    automated: 0.6,
+  const detectionMultipliers: Record<string, number> = {
+    immediate: 0.8,
+    same_day: 1.0,
+    next_day: 1.15,
+    delayed: 1.3,
   };
-  const consistency = getResponse(pifResponse, 25);
-  const consistencyMultiplier = consistencyMultipliers[consistency] || 1.0;
+  const detection = getResponse(pifResponse, 25);
+  const detectionMultiplier = detectionMultipliers[detection] || 1.0;
   
-  // Work type multiplier (Q26)
-  const workTypeMultipliers: Record<string, number> = {
+  const standardizationMultipliers: Record<string, number> = {
+    highly_standardized: 1.3,
+    standardized: 1.15,
+    some_guidelines: 1.0,
+    minimal_guidelines: 0.8,
+  };
+  const standardization = getResponse(pifResponse, 26);
+  const standardizationMultiplier = standardizationMultipliers[standardization] || 1.0;
+  
+  const aiSuitabilityMultipliers: Record<string, number> = {
     rule_based: 1.3,
-    pattern: 1.2,
-    calculation: 1.1,
-    judgment: 0.8,
+    pattern_recognition: 1.15,
+    contextual: 1.0,
+    highly_subjective: 0.8,
   };
-  const workType = getResponse(pifResponse, 26);
-  const workTypeMultiplier = workTypeMultipliers[workType] || 1.0;
+  const aiSuitability = getResponse(pifResponse, 27);
+  const aiSuitabilityMultiplier = aiSuitabilityMultipliers[aiSuitability] || 1.0;
   
-  // Error rate severity multiplier (Q27) - 5th required multiplier
-  const roiInputs = getRoiInputs(pifResponse);
-  const errorRate = roiInputs.errorRate || 0;
-  let errorSeverityMultiplier = 1.0;
-  if (errorRate >= 20) {
-    errorSeverityMultiplier = 1.3; // Very high error rate
-  } else if (errorRate >= 10) {
-    errorSeverityMultiplier = 1.2; // High error rate
-  } else if (errorRate >= 5) {
-    errorSeverityMultiplier = 1.0; // Moderate error rate
-  } else if (errorRate >= 2) {
-    errorSeverityMultiplier = 0.9; // Low error rate
-  } else {
-    errorSeverityMultiplier = 0.7; // Very low error rate
-  }
-  
-  // Average all 5 multipliers (per rubric spec)
   const avgMultiplier = (
     reworkMultiplier + 
-    accuracyMultiplier + 
-    consistencyMultiplier + 
-    workTypeMultiplier +
-    errorSeverityMultiplier
+    errorCauseMultiplier + 
+    detectionMultiplier + 
+    standardizationMultiplier +
+    aiSuitabilityMultiplier
   ) / 5;
   
-  const finalPercentage = basePercentage * avgMultiplier;
+  const rawPercentage = basePercentage * avgMultiplier;
   
-  // Clamp between 5% and 80%
-  return Math.max(5, Math.min(80, Math.round(finalPercentage)));
+  return Math.round(Math.max(minRange, Math.min(maxRange, rawPercentage)));
 }
 
 /**
@@ -350,54 +468,46 @@ export function mapQualityImpact(pifResponse: PIFResponse): QualityImpact {
 /**
  * Calculate Revenue Uplift rubric percentage from PIF Q11, Q14-15
  * 
- * Mapping Logic:
- * - Q11 (Role Profile) → Base percentage
- * - Q14 (Capacity vs Demand) → Multiplier
- * - Q15 (Revenue Conversion) → Multiplier
+ * Per spec section 5. RUBRIC CALCULATION LOGIC - Revenue Uplift Rubric (3 Questions):
+ * Formula: finalPercent = basePercent × capacityDemand × revenueProcess
+ * 
+ * Q1: Role Type → Sets base percentage (from roleProfiles)
+ * Q2: Capacity/Demand → High demand=1.4, Strong pipeline=1.2, Moderate=0.9, Limited=0.4
+ * Q3: Revenue Process → Direct predictable=1.2, Somewhat=1.0, Indirect=0.7, Limited=0.4
+ * 
+ * Capping: Result is capped at 60% maximum (per spec line 176)
  */
 export function calculateRevenueUpliftRubric(pifResponse: PIFResponse): number {
-  // Role profile base percentages (Q11)
-  const roleProfileBase: Record<string, number> = {
-    financial: 30,
-    finance_ops: 10,
-    sales_ops: 60,
-    account_manager: 70,
-    customer_success: 50,
-    data_analyst: 25,
-    hr_ops: 15,
-    it_support: 20,
-    procurement: 15,
-    legal: 40,
-    marketing: 45,
-    operations: 35,
-  };
-  const workType = getResponse(pifResponse, 11);
-  const basePercentage = roleProfileBase[workType] || 30;
+  const roleType = getResponse(pifResponse, 11);
+  const roleProfile = roleProfiles[roleType] || roleProfiles.other;
+  const basePercentage = roleProfile.revenueUpliftBase;
   
-  // Capacity multiplier (Q14)
+  // Q2: Capacity/Demand multipliers (per spec line 174)
   const capacityMultipliers: Record<string, number> = {
-    high_demand: 1.5,
+    high_demand: 1.4,
     strong_pipeline: 1.2,
-    moderate: 1.0,
-    limited: 0.5,
+    moderate: 0.9,
+    limited: 0.4,
   };
   const capacity = getResponse(pifResponse, 14);
-  const capacityMultiplier = capacityMultipliers[capacity] || 1.0;
+  const capacityMultiplier = capacityMultipliers[capacity] || 0.9;
   
-  // Revenue conversion multiplier (Q15)
+  // Q3: Revenue Process multipliers (per spec line 175)
   const conversionMultipliers: Record<string, number> = {
-    direct: 1.3,
+    direct: 1.2,
+    direct_predictable: 1.2,
     somewhat: 1.0,
     indirect: 0.7,
-    limited: 0.3,
+    limited: 0.4,
   };
   const conversion = getResponse(pifResponse, 15);
   const conversionMultiplier = conversionMultipliers[conversion] || 1.0;
   
-  const finalPercentage = basePercentage * capacityMultiplier * conversionMultiplier;
+  // Per spec: finalPercent = basePercent × capacityDemand × revenueProcess
+  const rawPercentage = basePercentage * capacityMultiplier * conversionMultiplier;
   
-  // Clamp between 0% and 200% (revenue uplift can exceed 100%)
-  return Math.max(0, Math.min(200, Math.round(finalPercentage)));
+  // Per spec line 176: Capping at 60% maximum
+  return Math.round(Math.max(0, Math.min(60, rawPercentage)));
 }
 
 /**
