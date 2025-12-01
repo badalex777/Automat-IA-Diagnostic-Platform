@@ -37,6 +37,22 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 - **Workflow-Level Consolidation System**: Bundles multiple step-level opportunities into strategic consolidation packages with distinct calculation logic for business impact, payback period, readiness score, and implementation effort. These are visually differentiated on the Opportunity Matrix and detailed in the EDR.
 - **Unified Security Model**: Both TFA and PIF forms use identical security architecture where an intro/disclaimer page is public, but verification code + respondent info are required to access actual form questions.
 
+**ROI Calculation Methodology (Authoritative: validation spec supersedes older handbook notes):**
+- **ALL Rubrics use MULTIPLICATION, never averaging**: Time Savings, Quality Impact, Revenue Uplift, and Ramp-Up Efficiency rubrics multiply all question multipliers together
+- **Effective Hourly Rate**: Always calculated as `(annualSalary / annualWorkingHours) × overheadMultiplier` - never use hardcoded values like $85
+- **Payback Period**: Month-by-month tracking with 50% efficiency during ramp-up months, 100% after. Formula: `monthEfficiency = (month <= rampUpMonths) ? 0.5 : 1.0`
+- **Year 1 Ramp Factor**: `(rampUpMonths × 0.5 + (12 - rampUpMonths) × 1.0) / 12`
+- **Revenue Uplift**: Scenario multiplier applied to reallocation percentage only, NOT to the final dollar amount (prevents double multiplication)
+- **annualRoi Field**: Stores Year 1 ramped dollar benefits (year1Benefits), allowing downstream to subtract implementation cost for net calculations
+- **Scenario Multipliers**: Applied after rubric calculations per spec (Time Savings, Error Reduction, Reallocation, Cost Overrun, Ramp-Up)
+
+**Recent Changes (December 2025):**
+- Fixed annualRoi storage: Now stores year1Benefits (dollar amount) instead of year1ActualROI (percentage)
+- Fixed Revenue Uplift: Removed double reallocation multiplier application
+- Fixed Quality Impact rubric: Changed from AVERAGING to MULTIPLICATION of 5 multipliers
+- Fixed Payback calculation: Implemented month-by-month tracking with 50% efficiency during ramp-up
+- Added missing "Very High 1.3×" option to Time Savings repetition multipliers
+
 **Recent Changes (November 2025):**
 - Fixed payback period calculation: Uses steady-state annual benefits (not Year 1 ramped-down values) for accurate simple payback calculation
 - Unified opportunity editing across all pages: Both WorkflowStepDetail and WorkflowDetail pages now use ROICalculatorDialog for editing opportunities instead of the legacy OpportunityForm, preserving all calculated fields and providing consistent UX
