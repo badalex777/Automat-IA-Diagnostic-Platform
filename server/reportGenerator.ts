@@ -144,7 +144,7 @@ function createBodyParagraph(text: string, options: {spacing?: any} = {}): Parag
 function createBulletParagraph(text: string): Paragraph {
   return new Paragraph({
     children: buildTextRunsFromInlineMarkup(text),
-    alignment: AlignmentType.LEFT,
+    alignment: AlignmentType.BOTH,
     bullet: { level: 0 },
     spacing: { after: 60 },
   });
@@ -166,7 +166,7 @@ function createNumberedParagraph(
 ): Paragraph {
   return new Paragraph({
     children: buildTextRunsFromInlineMarkup(text),
-    alignment: AlignmentType.LEFT, // Left-align numbered lists to avoid awkward word spacing
+    alignment: AlignmentType.BOTH,
     numbering: {
       reference: "decimal-numbering",
       level: level,
@@ -363,14 +363,14 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
         if (currentListType === 'bullet') {
           paragraphs.push(new Paragraph({
             children: buildTextRunsWithLineBreaks(text),
-            alignment: AlignmentType.LEFT, // Left-align bullets to avoid awkward word spacing
+            alignment: AlignmentType.BOTH,
             bullet: { level: 0 },
             spacing: { after: 60 },
           }));
         } else if (currentListType === 'numbered') {
           paragraphs.push(new Paragraph({
             children: buildTextRunsWithLineBreaks(text),
-            alignment: AlignmentType.LEFT, // Left-align numbered lists to avoid awkward word spacing
+            alignment: AlignmentType.BOTH,
             numbering: {
               reference: "decimal-numbering",
               level: 0,
