@@ -45,6 +45,7 @@ import { aggregateWorkflowSWOT, aggregateExecutiveSummaries, generateSWOTAnalysi
 import type { ReadinessRubricScore, AggregatedPIFScores, SWOTAnalysis } from "@shared/pifCalculations";
 import { calculateImplementationEffort, calculateBaseImpact } from "@shared/opportunityCalculations";
 import type { CompanyContext } from "@shared/opportunityCalculations";
+import { formatPaybackPeriod } from "@shared/multiYearCalculations";
 import {
   Dialog,
   DialogContent,
@@ -1051,7 +1052,7 @@ export default function WorkflowDetail() {
                                   {opportunity.paybackPeriodMonths && (
                                     <div>
                                       <div className="text-xs text-muted-foreground">Payback Period</div>
-                                      <div className="font-semibold">{parseFloat(opportunity.paybackPeriodMonths).toFixed(1)} months</div>
+                                      <div className="font-semibold">{formatPaybackPeriod(parseFloat(opportunity.paybackPeriodMonths))}</div>
                                     </div>
                                   )}
                                   {opportunity.trainingHoursPerEmployee && (

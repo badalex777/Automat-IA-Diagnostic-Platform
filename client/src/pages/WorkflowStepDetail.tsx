@@ -40,6 +40,7 @@ import type { WorkflowStep, Workflow, Company, TFAAssessment, PIFResponse, Inser
 import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
+import { formatPaybackPeriod } from "@shared/multiYearCalculations";
 export default function WorkflowStepDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId/step/:stepId");
   const companyId = params?.companyId || '';
@@ -548,7 +549,7 @@ export default function WorkflowStepDetail() {
                       <div>
                         <div className="text-muted-foreground">Payback Period</div>
                         <div className="font-medium">
-                          {Number(opp.paybackPeriodMonths || 0)} months
+                          {formatPaybackPeriod(Number(opp.paybackPeriodMonths || 0))}
                         </div>
                       </div>
                       <div>

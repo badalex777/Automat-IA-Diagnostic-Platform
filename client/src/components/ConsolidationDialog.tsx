@@ -27,6 +27,7 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { ImplementationOpportunity, WorkflowStep, InsertWorkflowConsolidation } from "@shared/schema";
 import { calculateConsolidatedMetrics, getConsolidationSummary } from "@shared/consolidationCalculations";
+import { formatPaybackPeriod } from "@shared/multiYearCalculations";
 import { ArrowUpCircle, Clock, Wallet, TrendingUp, Users } from "lucide-react";
 
 const consolidationFormSchema = z.object({
@@ -331,7 +332,9 @@ export function ConsolidationDialog({
                           Avg. Payback Period
                         </span>
                         <span className="font-medium" data-testid="text-preview-payback">
-                          {formatNumber(aggregatedMetrics.weightedAvgPaybackPeriodMonths)} months
+                          {aggregatedMetrics.weightedAvgPaybackPeriodMonths > 0 
+                            ? formatPaybackPeriod(aggregatedMetrics.weightedAvgPaybackPeriodMonths)
+                            : "0 months"}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground pl-4">
