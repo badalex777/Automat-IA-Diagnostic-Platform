@@ -1,0 +1,102 @@
+Validate that your ROI calculator implementation matches the Automat-IA Company Handbook methodology. Both calculators must produce identical outputs given identical inputs.
+═══════════════════════════════════════════════════════════════════════════════
+SCENARIO MULTIPLIERS (applied after rubric calculations)
+═══════════════════════════════════════════════════════════════════════════════
+| Scenario     | Time Savings | Error Reduction | Reallocation | Cost Overrun | Ramp-Up |
+|--------------|--------------|-----------------|--------------|--------------|---------|
+| Best Case    | 1.15×        | 1.2×            | 1.0×         | 0.95×        | 1.15×   |
+| Base Case    | 1.0×         | 1.0×            | 0.7×         | 1.0×         | 1.0×    |
+| Conservative | 0.7×         | 0.7×            | 0.4×         | 1.1×         | 0.8×    |
+| Worst Case   | 0.4×         | 0.5×            | 0.0×         | 1.2×         | 0.7×    |
+Note: Base Case reallocation multiplier of 0.7× is intentional "double layer conservatism."
+═══════════════════════════════════════════════════════════════════════════════
+RUBRIC CALCULATIONS (ALL use MULTIPLICATION, never averaging)
+═══════════════════════════════════════════════════════════════════════════════
+1. TIME SAVINGS RUBRIC (4 questions):
+   Formula: basePercent × complexityMultiplier × repetitionMultiplier × dataStructureMultiplier
+   
+   Question weights:
+   - Process Type: 12 categories with base percentages (Data Entry 60%, Document Processing 55%, etc.)
+   - Complexity: Simple 1.3×, Moderate 1.0×, Complex 0.7×
+   - Repetition: Very High 1.3×, Daily 1.2×, Weekly 1.0×, Monthly 0.8×
+   - Data Structure: Highly Structured 1.3×, Semi-Structured 1.0×, Unstructured 0.7×
+   
+   Range: 10-90% (capped per category-specific bounds)
+2. QUALITY IMPACT RUBRIC (6 questions):
+   Formula: basePercent × errorFreqMultiplier × errorCauseMultiplier × detectionMultiplier × standardizationMultiplier × aiSuitabilityMultiplier
+   
+   Question weights:
+   - Process Type: 12 categories (Data Entry 70%, Document Processing 60%, Financial 65%, etc.)
+   - Error Frequency: Very Frequent 1.3×, Frequent 1.15×, Occasional 1.0×, Rare 0.8×
+   - Error Cause: Manual/Repetitive 1.3×, Information Gaps 1.15×, Inconsistent 1.15×, Complexity 0.8×, Communication 1.0×
+   - Detection Timing: Post-Delivery 1.3×, End of Process 1.15×, Mid-Process 1.0×, Early 0.8×
+   - Standardization: Strict Standards 1.3×, Documented 1.15×, Some Guidelines 1.0×, Highly Variable 0.8×
+   - AI Suitability: Rule-Based 1.3×, Pattern Recognition 1.15×, Contextual 1.0×, Highly Subjective 0.8×
+   
+   Range: 5-95% (capped per category-specific bounds)
+3. REVENUE UPLIFT RUBRIC (3 questions):
+   Formula: basePercent × capacityDemandMultiplier × revenueProcessMultiplier
+   
+   Question weights:
+   - Role Profile: Sales Ops 50%, Customer Success 45%, Financial Analyst 35%, Customer Support 40%, Procurement 25%, HR Ops 20%, General Admin 15%, Legal/Compliance 10%, Other 5%
+   - Capacity/Demand: High Demand at Capacity 1.4×, Strong Pipeline 1.2×, Moderate 0.9×, Limited 0.4×
+   - Revenue Process: Direct/Predictable 1.2×, Somewhat Predictable 1.0×, Indirect/Complex 0.7×, Limited Factors 0.4×
+   
+   Range: 0-60% (hard cap)
+4. RAMP-UP EFFICIENCY RUBRIC (4 questions):
+   Formula: complexityMultiplier × digitalComfortMultiplier × rolloutMultiplier × supportMultiplier × 100
+   
+   Question weights:
+   - Implementation Complexity: Low 1.1×, Moderate 1.0×, High 0.85×, Very High 0.7×
+   - Digital Adoption: Very Comfortable 1.2×, Comfortable 1.1×, Neutral 1.0×, Uncomfortable 0.85×, Very Uncomfortable 0.7×
+   - Rollout Approach: Pilot First 1.1×, Phased 1.0×, Parallel 0.9×, Big Bang 0.8×
+   - Support Structure: Strong 1.1×, Basic 0.95×, Minimal 0.8×
+   
+   Range: 20-150%
+═══════════════════════════════════════════════════════════════════════════════
+CORE FINANCIAL CALCULATIONS
+═══════════════════════════════════════════════════════════════════════════════
+EFFECTIVE HOURLY RATE (never use hardcoded values like $85):
+effectiveHourlyRate = (annualSalary / annualWorkingHours) × overheadMultiplier
+ANNUAL TIME SAVINGS:
+timeSavingsAnnual = employeeCount × hoursPerWeekPerEmployee × weeksPerYear × (timeSavingsPercent / 100) × effectiveHourlyRate
+QUALITY SAVINGS:
+qualitySavings = (currentErrorRate / 100) × (qualityImprovementPercent / 100) × (reworkMinutes / 60) × annualProcessVolume × effectiveHourlyRate + annualFinancialImpact × (qualityImprovementPercent / 100)
+REVENUE UPLIFT:
+revenueUplift = hoursSavedAnnually × (revenueReallocationPercent / 100) × effectiveHourlyRate × scenarioReallocationMultiplier
+═══════════════════════════════════════════════════════════════════════════════
+YEAR 1 RAMP-UP CALCULATIONS
+═══════════════════════════════════════════════════════════════════════════════
+YEAR 1 RAMP FACTOR (for ramp-up periods ≤12 months):
+year1RampFactor = (rampUpMonths × 0.5 + (12 - rampUpMonths) × 1.0) / 12
+Business rule: During ramp-up months, assume 50% average efficiency. After ramp-up, assume 100%.
+PAYBACK PERIOD (month-by-month tracking):
+For each month 1-12:
+  monthEfficiency = (month <= rampUpMonths) ? 0.5 : 1.0
+  monthlyBenefit = (annualBenefits / 12) × monthEfficiency
+  cumulativeBenefits += monthlyBenefit
+  if (cumulativeBenefits >= year1TotalCosts) → paybackMonth found
+═══════════════════════════════════════════════════════════════════════════════
+ROI METRICS
+═══════════════════════════════════════════════════════════════════════════════
+YEAR 1 ACTUAL ROI (with ramp-up):
+year1ActualROI = ((year1Benefits - year1Costs) / year1Costs) × 100
+where year1Benefits = runRateBenefits × year1RampFactor
+ANNUAL RUN-RATE ROI (steady-state, no ramp-up):
+runRateROI = ((annualBenefits - annualCosts) / annualCosts) × 100
+═══════════════════════════════════════════════════════════════════════════════
+VALIDATION TEST CASES
+═══════════════════════════════════════════════════════════════════════════════
+Test Case 1 - Effective Hourly Rate:
+  Input: Salary $55,000, Hours 1,920, Overhead 1.2×
+  Expected: $34.38 (55000 / 1920 × 1.2)
+Test Case 2 - Year 1 Ramp Factor:
+  Input: 6-month ramp-up
+  Expected: 75% ((6 × 0.5 + 6 × 1.0) / 12 = 0.75)
+Test Case 3 - Time Savings Rubric:
+  Input: Data Entry (60% base) × Simple (1.3×) × Daily (1.2×) × Highly Structured (1.3×)
+  Expected: 122% → capped to category max (e.g., 80% for Data Entry)
+Test Case 4 - Quality Impact Rubric:
+  Input: Financial Processing (65% base) × Very Frequent (1.3×) × Manual (1.3×) × Mid-Process (1.0×) × Documented (1.15×) × Rule-Based (1.3×)
+  Expected: 164% → capped to category max (e.g., 85% for Financial Processing)
+Both calculators must produce identical outputs for these test cases.
