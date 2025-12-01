@@ -72,38 +72,80 @@ export function calculateYear1RampFactor(
 }
 
 /**
- * Calculate payback period
+ * Calculate payback period using month-by-month tracking with ramp-up efficiency
  * 
- * Per spec (line 141-144): paybackMonths = annualCosts / (annualBenefits / 12)
- * Example: $42,825 / ($138,154 / 12) = $42,825 / $11,513 = 3.7 months
+ * Per validation spec:
+ * For each month 1-12:
+ *   monthEfficiency = (month <= rampUpMonths) ? 0.5 : 1.0
+ *   monthlyBenefit = (annualBenefits / 12) × monthEfficiency
+ *   cumulativeBenefits += monthlyBenefit
+ *   if (cumulativeBenefits >= year1TotalCosts) → paybackMonth found
  * 
- * where:
- * - annualCosts = total Year 1 costs (implementation + software + training + change mgmt)
- * - annualBenefits = STEADY-STATE annual benefits (NOT Year 1 ramped benefits)
+ * This provides accurate cash-flow payback accounting for reduced efficiency during ramp-up.
  * 
  * @param year1Costs - Total Year 1 costs (one-time + recurring)
  * @param year1Benefits - Year 1 benefits (with ramp-up applied) - not used for payback
  * @param annualRunRateBenefits - Steady-state annual benefits (100% capacity)
+ * @param annualRecurringCosts - Recurring costs for Years 2+ (not used in Year 1 payback calc)
+ * @param rampUpMonths - Number of months in ramp-up period (default 6)
  * @returns Payback period in months
  */
 export function calculatePaybackPeriod(
   year1Costs: number,
   year1Benefits: number, // NOT used - kept for backwards compatibility
   annualRunRateBenefits: number,
-  annualRecurringCosts: number = 0 // kept for backwards compatibility
+  annualRecurringCosts: number = 0, // kept for backwards compatibility
+  rampUpMonths: number = 6
 ): number {
-  // Per spec: paybackMonths = annualCosts / (annualBenefits / 12)
-  // Must use STEADY-STATE annual benefits (annualRunRateBenefits), never Year 1 ramped benefits
-  const monthlyBenefits = annualRunRateBenefits / 12;
+  const monthlyRunRateBenefit = annualRunRateBenefits / 12;
   
-  if (monthlyBenefits <= 0) {
+  if (monthlyRunRateBenefit <= 0) {
     return 999; // Effectively never if no benefits
   }
   
-  const paybackMonths = year1Costs / monthlyBenefits;
+  // Month-by-month tracking with 50% efficiency during ramp-up
+  let cumulativeBenefits = 0;
   
-  // Cap at 60 months (5 years) for practical purposes
-  return Math.min(paybackMonths, 60);
+  // Check Year 1 (months 1-12)
+  for (let month = 1; month <= 12; month++) {
+    const monthEfficiency = month <= rampUpMonths ? 0.5 : 1.0;
+    const monthlyBenefit = monthlyRunRateBenefit * monthEfficiency;
+    cumulativeBenefits += monthlyBenefit;
+    
+    if (cumulativeBenefits >= year1Costs) {
+      // Interpolate to find exact payback month
+      const prevCumulative = cumulativeBenefits - monthlyBenefit;
+      const remainingCost = year1Costs - prevCumulative;
+      const fractionOfMonth = remainingCost / monthlyBenefit;
+      return month - 1 + fractionOfMonth;
+    }
+  }
+  
+  // If not paid back in Year 1, continue into Years 2-5 at full efficiency
+  // Years 2+ only have recurring costs, so net benefit per month is higher
+  const monthlyNetBenefitYears2Plus = monthlyRunRateBenefit - (annualRecurringCosts / 12);
+  
+  if (monthlyNetBenefitYears2Plus <= 0) {
+    return 999; // Never pays back if recurring costs exceed benefits
+  }
+  
+  // Continue from month 13
+  let cumulativeNetFromYear2 = cumulativeBenefits - year1Costs; // Deficit carried from Year 1
+  
+  for (let month = 13; month <= 60; month++) {
+    cumulativeNetFromYear2 += monthlyNetBenefitYears2Plus;
+    
+    if (cumulativeNetFromYear2 >= 0) {
+      // Found payback in Years 2-5
+      const prevNet = cumulativeNetFromYear2 - monthlyNetBenefitYears2Plus;
+      const remainingDeficit = Math.abs(prevNet);
+      const fractionOfMonth = remainingDeficit / monthlyNetBenefitYears2Plus;
+      return month - 1 + fractionOfMonth;
+    }
+  }
+  
+  // Cap at 60 months (5 years)
+  return 60;
 }
 
 /**
@@ -198,12 +240,13 @@ export function calculateMultiYearROI(
     });
   }
   
-  // Calculate payback period using Year 1 costs and Year 1 benefits
+  // Calculate payback period using month-by-month tracking with ramp-up efficiency
   const paybackMonths = calculatePaybackPeriod(
     year1Costs,
     year1Benefits,
     annualBenefits,
-    annualRecurringCosts
+    annualRecurringCosts,
+    rampUpMonths
   );
   
   return {

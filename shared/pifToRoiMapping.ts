@@ -275,7 +275,9 @@ export function calculateTimeSavingsRubric(pifResponse: PIFResponse): number {
   const complexityMultiplier = complexityMultipliers[complexity] || 1.0;
   
   // Per spec: Repetition/Frequency multipliers
+  // Very High 1.3×, Daily 1.2×, Weekly 1.0×, Monthly 0.8×
   const frequencyMultipliers: Record<string, number> = {
+    very_high: 1.3,
     daily: 1.2,
     weekly: 1.0,
     monthly: 0.8,
@@ -317,8 +319,8 @@ export function mapTimeSavings(pifResponse: PIFResponse): TimeSavings {
 /**
  * Calculate Quality Impact rubric percentage from PIF Q21-27
  * 
- * Per spec section 5. RUBRIC CALCULATION LOGIC - Quality Impact Rubric (6 Questions):
- * Formula: combinedMultiplier = AVERAGE(5 weights) then finalPercent = basePercent × combinedMultiplier
+ * Per spec: ALL rubrics use MULTIPLICATION, never averaging
+ * Formula: basePercent × errorFreqMultiplier × errorCauseMultiplier × detectionMultiplier × standardizationMultiplier × aiSuitabilityMultiplier
  * 
  * Q1: Role Type → Sets base percentage (from roleProfiles)
  * Q2: Error Frequency → Very frequent=1.3, Frequent=1.15, Occasional=1.0, Rare=0.8
@@ -389,15 +391,9 @@ export function calculateQualityImpactRubric(pifResponse: PIFResponse): number {
   const aiSuitability = getResponse(pifResponse, 27);
   const aiSuitabilityMultiplier = aiSuitabilityMultipliers[aiSuitability] || 1.0;
   
-  const avgMultiplier = (
-    reworkMultiplier + 
-    errorCauseMultiplier + 
-    detectionMultiplier + 
-    standardizationMultiplier +
-    aiSuitabilityMultiplier
-  ) / 5;
-  
-  const rawPercentage = basePercentage * avgMultiplier;
+  // Per spec: ALL rubrics use MULTIPLICATION, never averaging
+  // Formula: basePercent × errorFreqMultiplier × errorCauseMultiplier × detectionMultiplier × standardizationMultiplier × aiSuitabilityMultiplier
+  const rawPercentage = basePercentage * reworkMultiplier * errorCauseMultiplier * detectionMultiplier * standardizationMultiplier * aiSuitabilityMultiplier;
   
   return Math.round(Math.max(minRange, Math.min(maxRange, rawPercentage)));
 }

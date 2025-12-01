@@ -184,7 +184,7 @@ export default function ROICalculatorDialog({
         stepId,
         name: calculatorState.processInfo.processName,
         description: `${calculatorState.processInfo.businessUnit} - ${calculatorState.processInfo.dataSource}`,
-        annualRoi: results.year1ActualROI,
+        annualRoi: results.year1NetBenefit,
         implementationCost: calculatorState.costsAndRampup.implementationCost,
         annualRunRateRoi: results.runRateROI,
         cumulativeNetBenefit3Year: results.multiYear?.yearlyProjections[2]?.cumulativeNetBenefit || 0,

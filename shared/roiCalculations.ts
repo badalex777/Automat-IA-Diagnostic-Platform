@@ -140,7 +140,7 @@ export function calculateROI(
   // adjustedReallocationPercent = MIN(percentReallocated * scenario.reallocationMultiplier, 100)
   // hoursReallocatedAnnually = hoursSavedWeekly * 52 * (adjustedReallocationPercent / 100)
   // revenueSavingsAnnual = hoursReallocatedAnnually * revenueValuePerHour
-  // Note: revenueValuePerHour defaults to $85 if not set (spec default)
+  // Note: revenueValuePerHour falls back to effectiveHourlyRate if not set
   let revenueSavingsAmount = 0;
   let hoursReallocatedAnnually = 0;
   let adjustedReallocationPercent = 0;
@@ -158,9 +158,9 @@ export function calculateROI(
       ? revenueUplift.revenueValuePerHour 
       : effectiveHourlyRate;
     
-    // Step 2: Apply reallocation multiplier to final revenue ("double layer of conservatism")
-    // This accounts for real-world friction in converting saved time to revenue
-    revenueSavingsAmount = hoursReallocatedAnnually * revenuePerHour * multipliers.reallocationMultiplier;
+    // Per handbook Section 3.3: Revenue Uplift = Revenue Hours × Effective Hourly Rate
+    // Multiplier is already applied to the percentage (line 151), NOT to the dollar amount
+    revenueSavingsAmount = hoursReallocatedAnnually * revenuePerHour;
   }
 
   // Step 5: Total Benefits and Costs (per spec)
