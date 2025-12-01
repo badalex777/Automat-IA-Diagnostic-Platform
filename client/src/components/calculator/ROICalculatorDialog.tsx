@@ -4,7 +4,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Save, AlertCircle, Pencil } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, Save, AlertCircle, Pencil, Tag } from 'lucide-react';
 import ProcessInfoForm from './ProcessInfoForm';
 import PeopleAndCostForm from './PeopleAndCostForm';
 import OptionalModulesForm from './OptionalModulesForm';
@@ -66,6 +70,8 @@ function normalizeROICalculation(data: any): ROICalculation {
   };
   
   return {
+    opportunityName: toString(data.opportunityName),
+    opportunityDescription: toString(data.opportunityDescription),
     processInfo: {
       processName: toString(data.processInfo?.processName),
       businessUnit: toString(data.processInfo?.businessUnit),
@@ -179,11 +185,16 @@ export default function ROICalculatorDialog({
 
     setIsSaving(true);
     try {
+      // Use dedicated opportunity name/description fields, or fallback to process info for backwards compatibility
+      const opportunityName = calculatorState.opportunityName?.trim() || calculatorState.processInfo.processName;
+      const opportunityDescription = calculatorState.opportunityDescription?.trim() || 
+        `${calculatorState.processInfo.businessUnit} - ${calculatorState.processInfo.dataSource}`;
+      
       const opportunityData: InsertImplementationOpportunity & { roiCalculationData: ROICalculation } = {
         workflowId,
         stepId,
-        name: calculatorState.processInfo.processName,
-        description: `${calculatorState.processInfo.businessUnit} - ${calculatorState.processInfo.dataSource}`,
+        name: opportunityName,
+        description: opportunityDescription,
         annualRoi: results.year1Benefits,
         implementationCost: calculatorState.costsAndRampup.implementationCost,
         annualRunRateRoi: results.runRateROI,
@@ -255,6 +266,16 @@ export default function ROICalculatorDialog({
     setCalculatorState({ ...calculatorState, selectedScenario: scenario });
   };
 
+  const handleOpportunityNameChange = (value: string) => {
+    if (!calculatorState) return;
+    setCalculatorState({ ...calculatorState, opportunityName: value });
+  };
+
+  const handleOpportunityDescriptionChange = (value: string) => {
+    if (!calculatorState) return;
+    setCalculatorState({ ...calculatorState, opportunityDescription: value });
+  };
+
   // Validation: Check if required manual fields are filled
   const canSave = calculatorState && 
     calculatorState.peopleAndCost.averageAnnualSalary > 0 &&
@@ -295,6 +316,48 @@ export default function ROICalculatorDialog({
           <div className="flex flex-col h-full">
             <ScrollArea className="flex-1 px-6 max-h-[calc(90vh-180px)]">
               <div className="space-y-6 pb-6">
+                {/* Opportunity Identity */}
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Tag className="h-5 w-5" />
+                      Opportunity Identity
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="opportunityName">Opportunity Name</Label>
+                        <Input
+                          id="opportunityName"
+                          placeholder={calculatorState.processInfo.processName || "Enter opportunity name"}
+                          value={calculatorState.opportunityName || ''}
+                          onChange={(e) => handleOpportunityNameChange(e.target.value)}
+                          data-testid="input-opportunity-name"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          A unique name for this automation opportunity. If empty, the process name will be used.
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="opportunityDescription">Description</Label>
+                        <Textarea
+                          id="opportunityDescription"
+                          placeholder="Brief description of this opportunity..."
+                          value={calculatorState.opportunityDescription || ''}
+                          onChange={(e) => handleOpportunityDescriptionChange(e.target.value)}
+                          className="resize-none"
+                          rows={2}
+                          data-testid="input-opportunity-description"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Optional description for reports and the Opportunity Matrix.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Step 1: Process Information */}
                 <ProcessInfoForm
                   data={calculatorState.processInfo}

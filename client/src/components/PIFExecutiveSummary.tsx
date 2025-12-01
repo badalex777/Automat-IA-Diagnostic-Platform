@@ -224,8 +224,12 @@ export default function PIFExecutiveSummary({ aggregatedScores, stepName }: PIFE
   const concerns = insights.filter(i => i.category === 'concern' || i.category === 'critical');
   const moderate = insights.filter(i => i.category === 'moderate');
 
-  // Calculate average score
-  const avgScore = insights.reduce((sum, i) => sum + i.score, 0) / insights.length;
+  // Calculate weighted operational score using same weights as pifCalculations.ts
+  // Weights within PIF: Process Clarity 37.5%, Change Magnitude 37.5%, Workflow Brittleness 25%
+  const avgScore = 
+    (aggregatedScores.processClarity.average * 0.375) +
+    (aggregatedScores.changeMagnitude.average * 0.375) +
+    (aggregatedScores.workflowBrittleness.average * 0.25);
 
   return (
     <Card className="p-6 border-2" data-testid="card-pif-executive-summary">

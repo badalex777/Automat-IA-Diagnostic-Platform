@@ -557,6 +557,8 @@ export function generateROICalculatorState(
   pifResponse: PIFResponse
 ): ROICalculation {
   return {
+    opportunityName: undefined, // User-provided opportunity name (distinct from process name)
+    opportunityDescription: undefined, // User-provided opportunity description
     processInfo: mapProcessInfo(stepName, workflowName, pifResponse),
     peopleAndCost: mapPeopleAndCost(pifResponse),
     timeSavings: mapTimeSavings(pifResponse),

@@ -514,6 +514,8 @@ export interface ConsolidationData {
 
 export interface ReadinessData {
   totalScore: number;
+  tfaScore: number;
+  pifScore: number;
   feasibilityBand: 'Very High' | 'High' | 'Moderate' | 'Low' | 'Very Low';
   recommendation: string;
   componentScores: {
@@ -699,6 +701,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
 
       readinessData = {
         totalScore: rubric.totalScore,
+        tfaScore: rubric.tfaScore,
+        pifScore: rubric.pifScore,
         feasibilityBand: rubric.feasibilityBand,
         recommendation: rubric.recommendation,
         componentScores: rubric.componentScores,
@@ -993,6 +997,8 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         // Generate SWOT for this step
         const stepSWOT = generateSWOT({
           totalScore: stepReadiness.totalScore,
+          tfaScore: stepReadiness.tfaScore,
+          pifScore: stepReadiness.pifScore,
           feasibilityBand: stepReadiness.feasibilityBand,
           recommendation: stepReadiness.recommendation,
           componentScores: stepReadiness.componentScores,

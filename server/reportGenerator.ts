@@ -139,11 +139,12 @@ function createBodyParagraph(text: string, options: {spacing?: any} = {}): Parag
 /**
  * Create a bulleted paragraph with proper docx bullets
  * Supports inline **bold** markdown syntax
+ * Uses left alignment to avoid awkward word spacing in wrapped lines (especially in Spanish)
  */
 function createBulletParagraph(text: string): Paragraph {
   return new Paragraph({
     children: buildTextRunsFromInlineMarkup(text),
-    alignment: AlignmentType.BOTH,
+    alignment: AlignmentType.LEFT,
     bullet: { level: 0 },
     spacing: { after: 60 },
   });
@@ -165,7 +166,7 @@ function createNumberedParagraph(
 ): Paragraph {
   return new Paragraph({
     children: buildTextRunsFromInlineMarkup(text),
-    alignment: AlignmentType.BOTH,
+    alignment: AlignmentType.LEFT, // Left-align numbered lists to avoid awkward word spacing
     numbering: {
       reference: "decimal-numbering",
       level: level,
@@ -362,14 +363,14 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
         if (currentListType === 'bullet') {
           paragraphs.push(new Paragraph({
             children: buildTextRunsWithLineBreaks(text),
-            alignment: AlignmentType.BOTH,
+            alignment: AlignmentType.LEFT, // Left-align bullets to avoid awkward word spacing
             bullet: { level: 0 },
             spacing: { after: 60 },
           }));
         } else if (currentListType === 'numbered') {
           paragraphs.push(new Paragraph({
             children: buildTextRunsWithLineBreaks(text),
-            alignment: AlignmentType.BOTH,
+            alignment: AlignmentType.LEFT, // Left-align numbered lists to avoid awkward word spacing
             numbering: {
               reference: "decimal-numbering",
               level: 0,
@@ -1378,16 +1379,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   data.workflows.forEach(w => {
     if (w.readiness && w.readiness.componentScores && !workflowMap.has(w.workflow.name)) {
       const readiness = w.readiness;
-      const avgPIFScore = Math.round(
-        (readiness.componentScores.processClarity + 
-         readiness.componentScores.changeMagnitude + 
-         readiness.componentScores.workflowBrittleness) / 3
-      );
+      // Use pre-calculated pifScore from readiness rubric (already uses weighted average 37.5%/37.5%/25%)
+      // This ensures consistency with the platform display
+      const pifScore = readiness.pifScore;
       
       workflowMap.set(w.workflow.name, {
         name: w.workflow.name,
         tfaScore: Math.round(w.tfa?.score || 0),
-        pifScore: avgPIFScore,
+        pifScore: pifScore,
         readiness: Math.round(readiness.totalScore),
         band: readiness.feasibilityBand,
       });

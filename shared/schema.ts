@@ -383,6 +383,8 @@ export const costsAndRampupSchema = z.object({
 export const scenarioType = z.enum(["best", "base", "conservative", "worst"]);
 
 export const roiCalculationSchema = z.object({
+  opportunityName: z.string().optional(),
+  opportunityDescription: z.string().optional(),
   processInfo: processInfoSchema,
   peopleAndCost: peopleAndCostSchema,
   timeSavings: timeSavingsSchema,
