@@ -49,7 +49,7 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 **Recent Changes (December 2025):**
 - Fixed PIF Operational Readiness score: Changed from simple average to weighted average using 37.5%/37.5%/25% weights for Process Clarity/Change Magnitude/Workflow Brittleness
 - Added Opportunity Identity section to ROI Calculator: Separate opportunityName and opportunityDescription fields (distinct from process/step names) displayed throughout EDR
-- Fixed Spanish EDR bullet point spacing: Changed list alignment from BOTH (justified) to LEFT in all bullet and numbered list helpers
+- Fixed Spanish EDR word spacing: Removed unwanted mid-sentence line breaks in reportPrompts_es.ts (Section 9.4 item 2, Section 4.1 Preparación Organizacional, Section 4.12 Reevaluar puntuaciones) that caused awkward word stretching in justified text
 - Updated ReadinessData interface: Added tfaScore and pifScore fields for proper data flow from calculateReadinessRubric to EDR Table 5.1
 - Fixed annualRoi storage: Now stores year1Benefits (dollar amount) instead of year1ActualROI (percentage)
 - Fixed Revenue Uplift: Removed double reallocation multiplier application
