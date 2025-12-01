@@ -46,6 +46,8 @@ import type { ReadinessRubricScore, AggregatedPIFScores, SWOTAnalysis } from "@s
 import { calculateImplementationEffort, calculateBaseImpact } from "@shared/opportunityCalculations";
 import type { CompanyContext } from "@shared/opportunityCalculations";
 import { formatPaybackPeriod } from "@shared/multiYearCalculations";
+import { calculateROI } from "@shared/roiCalculations";
+import type { ROICalculation, ScenarioType } from "@shared/schema";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +64,35 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+/**
+ * Recalculate payback period from stored roiCalculationData using the corrected calculation logic.
+ * This ensures displayed payback reflects the latest formula with scenario-adjusted ramp efficiency.
+ * Falls back to stored value for legacy data without roiCalculationData.
+ */
+function getRecalculatedPaybackMonths(opportunity: ImplementationOpportunity): number {
+  const roiData = opportunity.roiCalculationData as ROICalculation | null;
+  
+  // Check if roiCalculationData exists and has required fields for recalculation
+  if (!roiData || !roiData.costsAndRampup || !roiData.peopleAndCost) {
+    // Fallback to stored value for legacy/manual opportunities
+    const stored = opportunity.paybackPeriodMonths;
+    if (!stored) return 12; // Default to 12 months if no data
+    return parseFloat(stored);
+  }
+  
+  const scenario = (roiData.selectedScenario || "conservative") as ScenarioType;
+  const results = calculateROI(roiData, scenario);
+  
+  if (!results || results.paybackMonths === undefined) {
+    // Fallback to stored value if recalculation fails
+    const stored = opportunity.paybackPeriodMonths;
+    if (!stored) return 12;
+    return parseFloat(stored);
+  }
+  
+  return results.paybackMonths;
+}
 
 export default function WorkflowDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId");
@@ -1052,7 +1083,7 @@ export default function WorkflowDetail() {
                                   {opportunity.paybackPeriodMonths && (
                                     <div>
                                       <div className="text-xs text-muted-foreground">Payback Period</div>
-                                      <div className="font-semibold">{formatPaybackPeriod(parseFloat(opportunity.paybackPeriodMonths))}</div>
+                                      <div className="font-semibold">{formatPaybackPeriod(getRecalculatedPaybackMonths(opportunity))}</div>
                                     </div>
                                   )}
                                   {opportunity.trainingHoursPerEmployee && (

@@ -41,6 +41,38 @@ import type { AggregatedPIFScores } from "@shared/pifCalculations";
 import { calculateReadinessRubric, calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { tfaSections as allSections } from "@shared/tfaQuestions";
 import { formatPaybackPeriod } from "@shared/multiYearCalculations";
+import { calculateROI } from "@shared/roiCalculations";
+import type { ROICalculation, ScenarioType } from "@shared/schema";
+
+/**
+ * Recalculate payback period from stored roiCalculationData using the corrected calculation logic.
+ * This ensures displayed payback reflects the latest formula with scenario-adjusted ramp efficiency.
+ * Falls back to stored value for legacy data without roiCalculationData.
+ */
+function getRecalculatedPaybackMonths(opportunity: ImplementationOpportunity): number {
+  const roiData = opportunity.roiCalculationData as ROICalculation | null;
+  
+  // Check if roiCalculationData exists and has required fields for recalculation
+  if (!roiData || !roiData.costsAndRampup || !roiData.peopleAndCost) {
+    // Fallback to stored value for legacy/manual opportunities
+    const stored = opportunity.paybackPeriodMonths;
+    if (!stored) return 12; // Default to 12 months if no data
+    return parseFloat(stored);
+  }
+  
+  const scenario = (roiData.selectedScenario || "conservative") as ScenarioType;
+  const results = calculateROI(roiData, scenario);
+  
+  if (!results || results.paybackMonths === undefined) {
+    // Fallback to stored value if recalculation fails
+    const stored = opportunity.paybackPeriodMonths;
+    if (!stored) return 12;
+    return parseFloat(stored);
+  }
+  
+  return results.paybackMonths;
+}
+
 export default function WorkflowStepDetail() {
   const [, params] = useRoute("/company/:companyId/workflow/:workflowId/step/:stepId");
   const companyId = params?.companyId || '';
@@ -549,7 +581,7 @@ export default function WorkflowStepDetail() {
                       <div>
                         <div className="text-muted-foreground">Payback Period</div>
                         <div className="font-medium">
-                          {formatPaybackPeriod(Number(opp.paybackPeriodMonths || 0))}
+                          {formatPaybackPeriod(getRecalculatedPaybackMonths(opp))}
                         </div>
                       </div>
                       <div>
