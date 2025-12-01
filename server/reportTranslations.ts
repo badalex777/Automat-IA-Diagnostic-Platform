@@ -427,17 +427,35 @@ export interface ReportTranslations {
     modeledConservativeFramework: string;
     timeToRecoverCost: string;
     fteHoursFreed: string;
-    // Adaptive Key Business Metrics
+    // Adaptive Key Business Metrics - Individual row labels for Table D.1.1b
     timeEfficiencySection: string;
     timeSavingsPercent: string;
     costSavings: string;
-    revenueGenerationSection: string;
+    revenueUpliftSection: string;  // Changed from revenueGenerationSection
     hoursReallocatedToRevenue: string;
     revenueReallocationPercent: string;
     qualityImpactSection: string;
     errorReductionPercent: string;
     errorCostSavings: string;
     transactionsPerWeek: string;
+    // Individual metric row labels
+    timeSavingsReductionRow: string;
+    timeSavingsWeeklyRow: string;
+    timeSavingsAnnualRow: string;
+    timeSavingsDollarRow: string;
+    timeSavingsReductionDesc: string;
+    timeSavingsWeeklyDesc: string;
+    timeSavingsAnnualDesc: string;
+    timeSavingsDollarDesc: string;
+    errorReductionPercentRow: string;
+    errorReductionDollarRow: string;
+    errorReductionPercentDesc: string;
+    errorReductionDollarDesc: string;
+    revenueUpliftReallocationRow: string;
+    revenueUpliftDollarRow: string;
+    revenueUpliftReallocationDesc: string;
+    revenueUpliftDollarDesc: string;
+    rampUpPeriodDesc: string;
   };
   
   // Format strings and templates
@@ -920,17 +938,35 @@ export const en: ReportTranslations = {
     modeledConservativeFramework: "Modeled under the Conservative Scenario Framework",
     timeToRecoverCost: "Time to recover implementation cost",
     fteHoursFreed: "Full-time equivalent hours freed for higher-value work",
-    // Adaptive Key Business Metrics
+    // Adaptive Key Business Metrics - Individual row labels for Table D.1.1b
     timeEfficiencySection: "Time Efficiency",
     timeSavingsPercent: "Time Savings %",
     costSavings: "Cost Savings",
-    revenueGenerationSection: "Revenue Generation",
+    revenueUpliftSection: "Revenue Uplift",  // Changed from Revenue Generation
     hoursReallocatedToRevenue: "Hours Reallocated to Revenue",
     revenueReallocationPercent: "Revenue Reallocation %",
     qualityImpactSection: "Quality Impact",
     errorReductionPercent: "Error Reduction %",
     errorCostSavings: "Error Cost Savings",
     transactionsPerWeek: "Transactions/Week",
+    // Individual metric row labels for Table D.1.1b
+    timeSavingsReductionRow: "Time Savings - Reduction",
+    timeSavingsWeeklyRow: "Time Savings - Weekly Hours",
+    timeSavingsAnnualRow: "Time Savings - Annual Hours",
+    timeSavingsDollarRow: "Time Savings - Dollar Value",
+    timeSavingsReductionDesc: "Percentage of time reduced per task execution",
+    timeSavingsWeeklyDesc: "Hours saved per week through automation",
+    timeSavingsAnnualDesc: "Total annual hours freed for higher-value work",
+    timeSavingsDollarDesc: "Annual dollar benefit from time savings",
+    errorReductionPercentRow: "Error Reduction - Improvement",
+    errorReductionDollarRow: "Error Reduction - Dollar Value",
+    errorReductionPercentDesc: "Percentage of errors eliminated through automation",
+    errorReductionDollarDesc: "Annual cost savings from reduced errors and rework",
+    revenueUpliftReallocationRow: "Revenue Uplift - Reallocation",
+    revenueUpliftDollarRow: "Revenue Uplift - Dollar Value",
+    revenueUpliftReallocationDesc: "Percentage of capacity reallocated to revenue activities",
+    revenueUpliftDollarDesc: "Incremental annual revenue from capacity reallocation",
+    rampUpPeriodDesc: "Time to reach steady-state performance after implementation",
   },
   
   formatStrings: {
@@ -1411,17 +1447,35 @@ export const es: ReportTranslations = {
     modeledConservativeFramework: "Modelado bajo el Marco de Escenario Conservador",
     timeToRecoverCost: "Tiempo para recuperar el costo de implementación",
     fteHoursFreed: "Horas equivalentes a tiempo completo liberadas para trabajo de mayor valor",
-    // Adaptive Key Business Metrics
+    // Adaptive Key Business Metrics - Individual row labels for Table D.1.1b
     timeEfficiencySection: "Eficiencia de Tiempo",
     timeSavingsPercent: "% Ahorro de Tiempo",
     costSavings: "Ahorro de Costos",
-    revenueGenerationSection: "Generación de Ingresos",
+    revenueUpliftSection: "Incremento de Ingresos",  // Changed from Generación de Ingresos
     hoursReallocatedToRevenue: "Horas Reasignadas a Ingresos",
     revenueReallocationPercent: "% Reasignación de Ingresos",
     qualityImpactSection: "Impacto en Calidad",
     errorReductionPercent: "% Reducción de Errores",
     errorCostSavings: "Ahorro por Reducción de Errores",
     transactionsPerWeek: "Transacciones/Semana",
+    // Individual metric row labels for Table D.1.1b
+    timeSavingsReductionRow: "Ahorro de Tiempo - Reducción",
+    timeSavingsWeeklyRow: "Ahorro de Tiempo - Horas Semanales",
+    timeSavingsAnnualRow: "Ahorro de Tiempo - Horas Anuales",
+    timeSavingsDollarRow: "Ahorro de Tiempo - Valor en Dólares",
+    timeSavingsReductionDesc: "Porcentaje de tiempo reducido por ejecución de tarea",
+    timeSavingsWeeklyDesc: "Horas ahorradas por semana mediante automatización",
+    timeSavingsAnnualDesc: "Total de horas anuales liberadas para trabajo de mayor valor",
+    timeSavingsDollarDesc: "Beneficio anual en dólares por ahorro de tiempo",
+    errorReductionPercentRow: "Reducción de Errores - Mejora",
+    errorReductionDollarRow: "Reducción de Errores - Valor en Dólares",
+    errorReductionPercentDesc: "Porcentaje de errores eliminados mediante automatización",
+    errorReductionDollarDesc: "Ahorro anual de costos por reducción de errores y retrabajo",
+    revenueUpliftReallocationRow: "Incremento de Ingresos - Reasignación",
+    revenueUpliftDollarRow: "Incremento de Ingresos - Valor en Dólares",
+    revenueUpliftReallocationDesc: "Porcentaje de capacidad reasignada a actividades de ingresos",
+    revenueUpliftDollarDesc: "Ingresos anuales incrementales por reasignación de capacidad",
+    rampUpPeriodDesc: "Tiempo para alcanzar rendimiento estable después de implementación",
   },
   
   formatStrings: {

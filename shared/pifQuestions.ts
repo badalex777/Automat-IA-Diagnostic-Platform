@@ -89,7 +89,7 @@ export const PIF_SECTIONS: PIFSection[] = [
     questions: [
       {
         id: 4,
-        question: "How often do the rules or requirements for this workflow change?",
+        question: "How often do the rules or requirements for this step change?",
         section: "Change Magnitude",
         type: "radio",
         weight: 1,
@@ -154,7 +154,7 @@ export const PIF_SECTIONS: PIFSection[] = [
       },
       {
         id: 8,
-        question: "How dependent is this workflow on manual workarounds (e.g., Excel files, copy-paste, manual rework)?",
+        question: "How dependent is this step on manual workarounds (e.g., Excel files, copy-paste, manual rework)?",
         section: "Workflow Brittleness",
         type: "radio",
         weight: 1,
@@ -342,7 +342,7 @@ export const PIF_SECTIONS: PIFSection[] = [
     questions: [
       {
         id: 21,
-        question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
+        question: "Does this step have measurable quality impact (errors that cost time or money)?",
         section: "Quality Improvement Potential",
         type: "radio",
         options: [

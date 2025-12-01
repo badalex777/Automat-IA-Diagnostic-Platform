@@ -1903,7 +1903,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
       
       // Business Impact Components Table - Adaptive based on enabled modules
-      // Table always renders with at least ramp-up row; module sections are conditional
+      // Each metric gets its own row with title, value, and description
       const roiData = opp.opportunity.roiCalculationData as any;
       const hasRoiData = roiData && typeof roiData === 'object' && Object.keys(roiData).length > 0;
       
@@ -1920,12 +1920,14 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       // Module checks: explicit enable OR legacy data fallback for time savings
       const timeSavingsEnabled = (hasRoiData && roiData.timeSavings?.enabled === true) || annualHours > 0;
       const qualityImpactEnabled = hasRoiData && roiData.qualityImpact?.enabled === true;
-      const revenueUpliftEnabled = hasRoiData && roiData.revenueUplift?.enabled === true;
+      // Check for revenue uplift data availability (not just toggle) - show if data exists
+      const revenueUpliftValue = opp.roiMetrics.revenueUpliftAnnual;
+      const revenueUpliftEnabled = (hasRoiData && roiData.revenueUplift?.enabled === true) || (revenueUpliftValue !== null && revenueUpliftValue > 0);
       
       const impactHeaders = [ctx.t.headers.impactArea, ctx.t.headers.keyMetrics, ctx.t.headers.description];
       const impactRows: string[][] = [];
       
-      // Time Efficiency section (if explicitly enabled OR has legacy hours data)
+      // Time Savings section - SEPARATE ROWS for each metric
       if (timeSavingsEnabled) {
         const avgSalary = safeParseNum(roiData?.peopleAndCost?.averageAnnualSalary);
         const workingHours = safeParseNum(roiData?.peopleAndCost?.annualWorkingHours);
@@ -1939,62 +1941,100 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
         const costSavings = effectiveHourlyRate !== null ? annualHours * effectiveHourlyRate : null;
         const timeSavingsPercent = safeParseNum(roiData?.timeSavings?.percentTimeSaved);
         
-        // Format with N/A fallbacks where data is missing
-        const pctDisplay = timeSavingsPercent !== null ? `${ctx.fmt.number(timeSavingsPercent, 1)}%` : ctx.t.fallback.na;
-        const weeklyDisplay = weeklyHours > 0 ? `${ctx.fmt.number(weeklyHours, 1)} hrs/wk` : ctx.t.fallback.na;
-        const annualDisplay = annualHours > 0 ? `${ctx.fmt.number(annualHours, 0)} hrs/yr` : ctx.t.fallback.na;
-        const costDisplay = costSavings !== null && costSavings > 0 ? ctx.fmt.currency(costSavings) : ctx.t.fallback.na;
+        // Row 1: Time Savings - Reduction %
+        if (timeSavingsPercent !== null) {
+          impactRows.push([
+            ctx.t.metricLabels.timeSavingsReductionRow,
+            `${ctx.fmt.number(timeSavingsPercent, 1)}%`,
+            ctx.t.metricLabels.timeSavingsReductionDesc
+          ]);
+        }
         
-        impactRows.push([
-          ctx.t.metricLabels.timeEfficiencySection,
-          `${pctDisplay} | ${weeklyDisplay} | ${annualDisplay} | ${costDisplay}`,
-          ctx.t.metricLabels.primaryEfficiencyGain
-        ]);
+        // Row 2: Time Savings - Weekly Hours
+        if (weeklyHours > 0) {
+          impactRows.push([
+            ctx.t.metricLabels.timeSavingsWeeklyRow,
+            `${ctx.fmt.number(weeklyHours, 1)} hrs/wk`,
+            ctx.t.metricLabels.timeSavingsWeeklyDesc
+          ]);
+        }
+        
+        // Row 3: Time Savings - Annual Hours
+        if (annualHours > 0) {
+          impactRows.push([
+            ctx.t.metricLabels.timeSavingsAnnualRow,
+            `${ctx.fmt.number(annualHours, 0)} hrs/yr`,
+            ctx.t.metricLabels.timeSavingsAnnualDesc
+          ]);
+        }
+        
+        // Row 4: Time Savings - Dollar Value
+        if (costSavings !== null && costSavings > 0) {
+          impactRows.push([
+            ctx.t.metricLabels.timeSavingsDollarRow,
+            ctx.fmt.currency(costSavings),
+            ctx.t.metricLabels.timeSavingsDollarDesc
+          ]);
+        }
       }
       
-      // Quality Impact section (only if qualityImpact is explicitly enabled)
+      // Error Reduction section - SEPARATE ROWS for each metric
       if (qualityImpactEnabled) {
         const errorReductionPercent = safeParseNum(roiData.qualityImpact?.errorReductionPercent);
-        const pctDisplay = errorReductionPercent !== null ? `${ctx.fmt.number(errorReductionPercent, 1)}%` : ctx.t.fallback.na;
-        const errorCostSavings = opp.roiMetrics.errorReductionPct 
-          ? ctx.fmt.currency((opp.roiMetrics.annualRoi * (opp.roiMetrics.errorReductionPct / 100))) 
-          : ctx.t.metricLabels.conservativeEstimate;
         
-        impactRows.push([
-          ctx.t.metricLabels.qualityImpactSection,
-          `${pctDisplay} | ${errorCostSavings}`,
-          ctx.t.metricLabels.errorReductionBenefits
-        ]);
+        // Row: Error Reduction - Improvement %
+        if (errorReductionPercent !== null) {
+          impactRows.push([
+            ctx.t.metricLabels.errorReductionPercentRow,
+            `${ctx.fmt.number(errorReductionPercent, 1)}%`,
+            ctx.t.metricLabels.errorReductionPercentDesc
+          ]);
+        }
+        
+        // Row: Error Reduction - Dollar Value
+        if (opp.roiMetrics.errorReductionPct) {
+          const errorCostSavings = opp.roiMetrics.annualRoi * (opp.roiMetrics.errorReductionPct / 100);
+          impactRows.push([
+            ctx.t.metricLabels.errorReductionDollarRow,
+            ctx.fmt.currency(errorCostSavings),
+            ctx.t.metricLabels.errorReductionDollarDesc
+          ]);
+        }
       }
       
-      // Revenue Generation section (only if revenueUplift is explicitly enabled)
+      // Revenue Uplift section - SEPARATE ROWS for each metric
       if (revenueUpliftEnabled) {
-        const reallocationPercent = safeParseNum(roiData.revenueUplift?.reallocationPercent);
-        const hoursReallocated = reallocationPercent !== null ? weeklyHours * 52 * (reallocationPercent / 100) : null;
-        const revenueUpliftValue = opp.roiMetrics.revenueUpliftAnnual 
-          ? ctx.fmt.currency(opp.roiMetrics.revenueUpliftAnnual)
-          : ctx.t.metricLabels.toBeValidated;
+        const reallocationPercent = safeParseNum(roiData?.revenueUplift?.reallocationPercent);
         
-        const hoursDisplay = hoursReallocated !== null && hoursReallocated > 0 ? `${ctx.fmt.number(hoursReallocated, 0)} hrs` : ctx.t.fallback.na;
-        const pctDisplay = reallocationPercent !== null ? `${ctx.fmt.number(reallocationPercent, 1)}%` : ctx.t.fallback.na;
+        // Row: Revenue Uplift - Reallocation %
+        if (reallocationPercent !== null && reallocationPercent > 0) {
+          impactRows.push([
+            ctx.t.metricLabels.revenueUpliftReallocationRow,
+            `${ctx.fmt.number(reallocationPercent, 1)}%`,
+            ctx.t.metricLabels.revenueUpliftReallocationDesc
+          ]);
+        }
         
-        impactRows.push([
-          ctx.t.metricLabels.revenueGenerationSection,
-          `${hoursDisplay} | ${pctDisplay} | ${revenueUpliftValue}`,
-          ctx.t.metricLabels.capacityReallocation
-        ]);
+        // Row: Revenue Uplift - Dollar Value
+        if (revenueUpliftValue !== null && revenueUpliftValue > 0) {
+          impactRows.push([
+            ctx.t.metricLabels.revenueUpliftDollarRow,
+            ctx.fmt.currency(revenueUpliftValue),
+            ctx.t.metricLabels.revenueUpliftDollarDesc
+          ]);
+        }
       }
       
-      // Ramp-Up Period (always included)
+      // Ramp-Up Period (always included as final row)
       const rampUpMonths = safeParseNum(roiData?.costsAndRampup?.rampUpMonths) ?? 3;
       impactRows.push([
         ctx.t.metricLabels.rampUpPeriod,
         `${rampUpMonths} ${ctx.t.formatStrings.monthsAbbrev}`,
-        ctx.t.metricLabels.timeToSteadyState
+        ctx.t.metricLabels.rampUpPeriodDesc
       ]);
       
       sections.push(createTableCaption(`D.1.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
-      sections.push(createTable(impactHeaders, impactRows, [25, 35, 40]));
+      sections.push(createTable(impactHeaders, impactRows, [30, 25, 45]));
       
       sections.push(createHorizontalSeparator());
       oppCounter++;

@@ -144,7 +144,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       4: {
-        question: "How often do the rules or requirements for this workflow change?",
+        question: "How often do the rules or requirements for this step change?",
         options: {
           "1": { label: "Weekly or more often" },
           "2": { label: "Monthly" },
@@ -184,7 +184,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       8: {
-        question: "How dependent is this workflow on manual workarounds (e.g., Excel files, copy-paste, manual rework)?",
+        question: "How dependent is this step on manual workarounds (e.g., Excel files, copy-paste, manual rework)?",
         options: {
           "1": { label: "Extremely dependent", description: "Cannot function without them" },
           "2": { label: "Very dependent", description: "Frequent workarounds needed" },
@@ -289,7 +289,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         placeholder: "Enter minutes per instance"
       },
       21: {
-        question: "Does this workflow have measurable quality impact (errors that cost time or money)?",
+        question: "Does this step have measurable quality impact (errors that cost time or money)?",
         options: {
           "no": { label: "No", description: "Quality impact is not a significant factor" },
           "yes": { label: "Yes", description: "We have measurable quality issues (errors, rework, defects)" }
@@ -548,7 +548,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       4: {
-        question: "¿Con qué frecuencia cambian las reglas o requisitos de este flujo de trabajo?",
+        question: "¿Con qué frecuencia cambian las reglas o requisitos de este paso?",
         options: {
           "1": { label: "Semanalmente o más frecuente" },
           "2": { label: "Mensualmente" },
@@ -588,7 +588,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         }
       },
       8: {
-        question: "¿Qué tan dependiente es este flujo de trabajo de soluciones manuales (ej. archivos Excel, copiar-pegar, retrabajo manual)?",
+        question: "¿Qué tan dependiente es este paso de soluciones manuales (ej. archivos Excel, copiar-pegar, retrabajo manual)?",
         options: {
           "1": { label: "Extremadamente dependiente", description: "No puede funcionar sin ellas" },
           "2": { label: "Muy dependiente", description: "Se necesitan soluciones frecuentes" },
@@ -693,7 +693,7 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
         placeholder: "Ingrese minutos por instancia"
       },
       21: {
-        question: "¿Este flujo de trabajo tiene un impacto medible en la calidad (errores que cuestan tiempo o dinero)?",
+        question: "¿Este paso tiene un impacto medible en la calidad (errores que cuestan tiempo o dinero)?",
         options: {
           "no": { label: "No", description: "El impacto en la calidad no es un factor significativo" },
           "yes": { label: "Sí", description: "Tenemos problemas de calidad medibles (errores, retrabajo, defectos)" }
