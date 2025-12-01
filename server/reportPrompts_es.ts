@@ -353,8 +353,7 @@ Cada flujo de trabajo fue evaluado en tres dimensiones:
 
 • **Factibilidad Técnica** – La capacidad de los sistemas actuales, estructuras de datos, rutas de integración y postura de seguridad para soportar la automatización de manera segura y confiable.
 
-• **Preparación Organizacional** – El grado de estandarización de procesos, consistencia de datos y adaptabilidad 
-al cambio dentro de la organización.
+• **Preparación Organizacional** – El grado de estandarización de procesos, consistencia de datos y adaptabilidad al cambio dentro de la organización.
 
 • **Impacto Empresarial** – ROI cuantificado, período de retorno, FTE ahorrados, potencial de beneficio anual, reducción de errores e incremento de ingresos, derivados de oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la Matriz de Impacto Base (ROI normalizado a una puntuación de 0-100 usando conversión de porcentaje-de-ingresos con multiplicador x1000, combinado con ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
 
@@ -505,8 +504,7 @@ automatización.
 
 ● Abordar brechas de preparación fundacional antes de iniciar iniciativas de alto esfuerzo.
 
-● Reevaluar puntuaciones de oportunidades después de cada ciclo de implementación para actualizar la Matriz 
-de Oportunidades dinámicamente.
+● Reevaluar puntuaciones de oportunidades después de cada ciclo de implementación para actualizar la Matriz de Oportunidades dinámicamente.
 
 ● Usar éxitos tempranos para fortalecer la defensa y competencia técnica para fases subsiguientes.
 `;
