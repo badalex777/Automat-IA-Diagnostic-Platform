@@ -47,6 +47,10 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 - **Scenario Multipliers**: Applied after rubric calculations per spec (Time Savings, Error Reduction, Reallocation, Cost Overrun, Ramp-Up)
 
 **Recent Changes (December 2025):**
+- Fixed PIF Operational Readiness score: Changed from simple average to weighted average using 37.5%/37.5%/25% weights for Process Clarity/Change Magnitude/Workflow Brittleness
+- Added Opportunity Identity section to ROI Calculator: Separate opportunityName and opportunityDescription fields (distinct from process/step names) displayed throughout EDR
+- Fixed Spanish EDR bullet point spacing: Changed list alignment from BOTH (justified) to LEFT in all bullet and numbered list helpers
+- Updated ReadinessData interface: Added tfaScore and pifScore fields for proper data flow from calculateReadinessRubric to EDR Table 5.1
 - Fixed annualRoi storage: Now stores year1Benefits (dollar amount) instead of year1ActualROI (percentage)
 - Fixed Revenue Uplift: Removed double reallocation multiplier application
 - Fixed Quality Impact rubric: Changed from AVERAGING to MULTIPLICATION of 5 multipliers
