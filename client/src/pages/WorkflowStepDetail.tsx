@@ -47,30 +47,46 @@ import type { ROICalculation, ScenarioType } from "@shared/schema";
 /**
  * Recalculate payback period from stored roiCalculationData using the corrected calculation logic.
  * This ensures displayed payback reflects the latest formula with scenario-adjusted ramp efficiency.
- * Falls back to stored value for legacy data without roiCalculationData.
+ * 
+ * Priority order:
+ * 1. Recalculate from roiCalculationData if complete and valid
+ * 2. Use stored paybackPeriodMonths if available
+ * 3. Return stored value even if recalculation fails (preserve legacy data)
  */
 function getRecalculatedPaybackMonths(opportunity: ImplementationOpportunity): number {
+  const stored = opportunity.paybackPeriodMonths;
+  const storedValue = stored ? parseFloat(stored) : 12; // Fallback to 12 if no stored value
+  
   const roiData = opportunity.roiCalculationData as ROICalculation | null;
   
-  // Check if roiCalculationData exists and has required fields for recalculation
-  if (!roiData || !roiData.costsAndRampup || !roiData.peopleAndCost) {
-    // Fallback to stored value for legacy/manual opportunities
-    const stored = opportunity.paybackPeriodMonths;
-    if (!stored) return 12; // Default to 12 months if no data
-    return parseFloat(stored);
+  // If no roiCalculationData, use stored value
+  if (!roiData) {
+    return storedValue;
   }
   
-  const scenario = (roiData.selectedScenario || "conservative") as ScenarioType;
-  const results = calculateROI(roiData, scenario);
-  
-  if (!results || results.paybackMonths === undefined) {
-    // Fallback to stored value if recalculation fails
-    const stored = opportunity.paybackPeriodMonths;
-    if (!stored) return 12;
-    return parseFloat(stored);
+  // Validate required fields exist for recalculation
+  if (!roiData.costsAndRampup || !roiData.peopleAndCost || !roiData.timeSavings) {
+    return storedValue;
   }
   
-  return results.paybackMonths;
+  // Ensure rampUpMonths exists (required for payback calculation)
+  if (roiData.costsAndRampup.rampUpMonths === undefined) {
+    return storedValue;
+  }
+  
+  try {
+    const scenario = (roiData.selectedScenario || "conservative") as ScenarioType;
+    const results = calculateROI(roiData, scenario);
+    
+    if (!results || results.paybackMonths === undefined || isNaN(results.paybackMonths)) {
+      return storedValue;
+    }
+    
+    return results.paybackMonths;
+  } catch {
+    // If recalculation throws, fall back to stored value
+    return storedValue;
+  }
 }
 
 export default function WorkflowStepDetail() {
