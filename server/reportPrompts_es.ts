@@ -307,11 +307,7 @@ Este modelo de cuadrantes asegura que las decisiones de automatización equilibr
 Automat-IA aplica un Marco de Dos Matrices:
 
 1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial normalizando el ROI Anual como porcentaje de los ingresos de la empresa, luego convirtiéndolo a una puntuación de 0-100 usando un multiplicador x1000 (por ejemplo, 5% de ingresos = 50 puntos). Esta Puntuación de ROI se pondera al 60% y se combina con una Puntuación de Horas (40%) derivada del ahorro de tiempo semanal. El resultado es una puntuación de impacto relativa a la empresa que permite comparación consistente entre oportunidades de diferentes escalas.
-2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto 
-Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a 
-través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones 
-de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de 
-ganancias a corto plazo y valor de automatización sostenible a largo plazo.
+2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de ganancias a corto plazo y valor de automatización sostenible a largo plazo.
 
 Fase 10: Sesión de Validación y Alineación de Partes Interesadas
 
