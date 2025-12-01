@@ -13,7 +13,9 @@ import {
   type WorkflowConsolidation,
   type Company,
   type Workflow,
-  type WorkflowStep
+  type WorkflowStep,
+  type ROICalculation,
+  type ScenarioType
 } from "@shared/schema";
 import { eq, and, isNotNull, or, isNull } from "drizzle-orm";
 import { asc } from "drizzle-orm";
@@ -22,6 +24,53 @@ import { calculateOpportunityScore } from "@shared/opportunityCalculations";
 import { calculateSectionScores, TFA_QUESTIONS } from "@shared/tfaQuestions";
 import { ALL_PIF_QUESTIONS } from "@shared/pifQuestions";
 import { calculateConsolidatedMetrics, calculateConsolidationBusinessImpact } from "@shared/consolidationCalculations";
+import { calculateROI } from "@shared/roiCalculations";
+
+/**
+ * Recalculate payback period from stored roiCalculationData using the corrected calculation logic.
+ * This ensures EDR payback reflects the latest formula with scenario-adjusted ramp efficiency.
+ * Mirrors the getRecalculatedPaybackMonths function used in the UI components.
+ * 
+ * Priority order:
+ * 1. Recalculate from roiCalculationData if complete and valid
+ * 2. Use stored paybackPeriodMonths if available
+ * 3. Return stored value even if recalculation fails (preserve legacy data)
+ */
+function getRecalculatedPaybackMonths(opportunity: ImplementationOpportunity): number {
+  const stored = opportunity.paybackPeriodMonths;
+  const storedValue = stored ? parseFloat(stored.toString()) : 12; // Fallback to 12 if no stored value
+  
+  const roiData = opportunity.roiCalculationData as ROICalculation | null;
+  
+  // If no roiCalculationData, use stored value
+  if (!roiData) {
+    return storedValue;
+  }
+  
+  // Validate required fields exist for recalculation
+  if (!roiData.costsAndRampup || !roiData.peopleAndCost || !roiData.timeSavings) {
+    return storedValue;
+  }
+  
+  // Ensure rampUpMonths exists (required for payback calculation)
+  if (roiData.costsAndRampup.rampUpMonths === undefined) {
+    return storedValue;
+  }
+  
+  try {
+    const scenario = (roiData.selectedScenario || "conservative") as ScenarioType;
+    const results = calculateROI(roiData, scenario);
+    
+    if (!results || results.paybackMonths === undefined || isNaN(results.paybackMonths)) {
+      return storedValue;
+    }
+    
+    return results.paybackMonths;
+  } catch {
+    // If recalculation throws, fall back to stored value
+    return storedValue;
+  }
+}
 
 /**
  * Remediation recommendations based on section and score level
@@ -735,7 +784,7 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         roiMetrics: {
           annualRoi: parseFloat(opp.annualRoi || "0"),
           fteSavings: parseFloat(opp.fteSavings || "0"),
-          paybackMonths: parseFloat(opp.paybackPeriodMonths || "0"),
+          paybackMonths: getRecalculatedPaybackMonths(opp), // Recalculate from roiCalculationData for accurate value
           hoursSavedPerWeek: parseFloat(opp.hoursSavedPerWeek || "0"),
           annualHoursSaved: parseFloat(opp.annualHoursSaved || "0"),
           errorReductionPct: opp.errorReductionPct ? parseFloat(opp.errorReductionPct.toString()) : null,
@@ -773,8 +822,15 @@ export async function aggregateCompanyDiagnosticData(companyId: string): Promise
         .map(oppId => opps.find(o => o.id === oppId))
         .filter((opp): opp is NonNullable<typeof opp> => opp !== null);
       
-      // Calculate aggregated metrics using centralized logic
-      const metrics = calculateConsolidatedMetrics(constituentOppRecords);
+      // Create opportunity copies with recalculated payback periods
+      // This ensures calculateConsolidatedMetrics uses fresh values instead of stale DB values
+      const oppsWithRecalculatedPayback = constituentOppRecords.map(opp => ({
+        ...opp,
+        paybackPeriodMonths: getRecalculatedPaybackMonths(opp).toString(),
+      }));
+      
+      // Calculate aggregated metrics using centralized logic with recalculated payback
+      const metrics = calculateConsolidatedMetrics(oppsWithRecalculatedPayback);
       
       // Calculate step readiness scores for implementation effort
       const stepReadinessScores: Record<string, number> = {};

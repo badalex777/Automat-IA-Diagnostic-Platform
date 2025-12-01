@@ -47,6 +47,7 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 - **Scenario Multipliers**: Applied after rubric calculations per spec (Time Savings, Error Reduction, Reallocation, Cost Overrun, Ramp-Up)
 
 **Recent Changes (December 2025):**
+- Fixed EDR payback period display: Added getRecalculatedPaybackMonths() helper in reportDataAggregator.ts that recalculates payback from roiCalculationData (instead of reading stale database values) to match UI behavior. Also applied to consolidated opportunity metrics.
 - Fixed PIF Operational Readiness score: Changed from simple average to weighted average using 37.5%/37.5%/25% weights for Process Clarity/Change Magnitude/Workflow Brittleness
 - Added Opportunity Identity section to ROI Calculator: Separate opportunityName and opportunityDescription fields (distinct from process/step names) displayed throughout EDR
 - Fixed Spanish EDR word spacing: Removed unwanted mid-sentence line breaks in reportPrompts_es.ts (Section 9.4 item 2, Section 4.1 Preparación Organizacional, Section 4.12 Reevaluar puntuaciones) that caused awkward word stretching in justified text
