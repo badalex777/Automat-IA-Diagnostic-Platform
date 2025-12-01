@@ -427,6 +427,17 @@ export interface ReportTranslations {
     modeledConservativeFramework: string;
     timeToRecoverCost: string;
     fteHoursFreed: string;
+    // Adaptive Key Business Metrics
+    timeEfficiencySection: string;
+    timeSavingsPercent: string;
+    costSavings: string;
+    revenueGenerationSection: string;
+    hoursReallocatedToRevenue: string;
+    revenueReallocationPercent: string;
+    qualityImpactSection: string;
+    errorReductionPercent: string;
+    errorCostSavings: string;
+    transactionsPerWeek: string;
   };
   
   // Format strings and templates
@@ -467,12 +478,15 @@ export interface ReportTranslations {
     timeSavingsBenefits: string;
     errorReductionBenefitsLabel: string;
     revenueUpliftBenefits: string;
+    costSavingsLabel: string;
     timeSavingsFormula: string;
     errorReductionFormula: string;
     revenueUpliftFormula: string;
+    costSavingsFormula: string;
     timeSavingsPurpose: string;
     errorReductionPurpose: string;
     revenueUpliftPurpose: string;
+    costSavingsPurpose: string;
     timeSavingsAdjustment: string;
     errorReductionAdjustment: string;
     revenueReallocationAdjustment: string;
@@ -906,6 +920,17 @@ export const en: ReportTranslations = {
     modeledConservativeFramework: "Modeled under the Conservative Scenario Framework",
     timeToRecoverCost: "Time to recover implementation cost",
     fteHoursFreed: "Full-time equivalent hours freed for higher-value work",
+    // Adaptive Key Business Metrics
+    timeEfficiencySection: "Time Efficiency",
+    timeSavingsPercent: "Time Savings %",
+    costSavings: "Cost Savings",
+    revenueGenerationSection: "Revenue Generation",
+    hoursReallocatedToRevenue: "Hours Reallocated to Revenue",
+    revenueReallocationPercent: "Revenue Reallocation %",
+    qualityImpactSection: "Quality Impact",
+    errorReductionPercent: "Error Reduction %",
+    errorCostSavings: "Error Cost Savings",
+    transactionsPerWeek: "Transactions/Week",
   },
   
   formatStrings: {
@@ -944,12 +969,15 @@ export const en: ReportTranslations = {
     timeSavingsBenefits: "Time Savings Benefits",
     errorReductionBenefitsLabel: "Error Reduction Benefits",
     revenueUpliftBenefits: "Revenue Uplift Benefits",
+    costSavingsLabel: "Cost Savings",
     timeSavingsFormula: "Hours Saved × Effective Hourly Rate × Adoption %",
     errorReductionFormula: "Error Rate × Rework Cost × Volume × Improvement %",
     revenueUpliftFormula: "Capacity Reallocation × Revenue per Hour × Realization %",
+    costSavingsFormula: "Annual Hours Saved × Effective Hourly Rate",
     timeSavingsPurpose: "Value of time freed for higher-priority work",
     errorReductionPurpose: "Value of quality improvements and rework avoided",
     revenueUpliftPurpose: "Value from redirecting capacity to revenue-generating activities",
+    costSavingsPurpose: "Dollar value of labor hours reclaimed through automation",
     timeSavingsAdjustment: "Time Savings Adjustment",
     errorReductionAdjustment: "Error Reduction Adjustment",
     revenueReallocationAdjustment: "Revenue Reallocation Adjustment",
@@ -1383,6 +1411,17 @@ export const es: ReportTranslations = {
     modeledConservativeFramework: "Modelado bajo el Marco de Escenario Conservador",
     timeToRecoverCost: "Tiempo para recuperar el costo de implementación",
     fteHoursFreed: "Horas equivalentes a tiempo completo liberadas para trabajo de mayor valor",
+    // Adaptive Key Business Metrics
+    timeEfficiencySection: "Eficiencia de Tiempo",
+    timeSavingsPercent: "% Ahorro de Tiempo",
+    costSavings: "Ahorro de Costos",
+    revenueGenerationSection: "Generación de Ingresos",
+    hoursReallocatedToRevenue: "Horas Reasignadas a Ingresos",
+    revenueReallocationPercent: "% Reasignación de Ingresos",
+    qualityImpactSection: "Impacto en Calidad",
+    errorReductionPercent: "% Reducción de Errores",
+    errorCostSavings: "Ahorro por Reducción de Errores",
+    transactionsPerWeek: "Transacciones/Semana",
   },
   
   formatStrings: {
@@ -1421,12 +1460,15 @@ export const es: ReportTranslations = {
     timeSavingsBenefits: "Beneficios de Ahorro de Tiempo",
     errorReductionBenefitsLabel: "Beneficios de Reducción de Errores",
     revenueUpliftBenefits: "Beneficios de Incremento de Ingresos",
+    costSavingsLabel: "Ahorro de Costos",
     timeSavingsFormula: "Horas Ahorradas × Tarifa por Hora Efectiva × % de Adopción",
     errorReductionFormula: "Tasa de Error × Costo de Retrabajo × Volumen × % de Mejora",
     revenueUpliftFormula: "Reasignación de Capacidad × Ingresos por Hora × % de Realización",
+    costSavingsFormula: "Horas Anuales Ahorradas × Tarifa por Hora Efectiva",
     timeSavingsPurpose: "Valor del tiempo liberado para trabajo de mayor prioridad",
     errorReductionPurpose: "Valor de mejoras de calidad y retrabajo evitado",
     revenueUpliftPurpose: "Valor de redirigir capacidad a actividades generadoras de ingresos",
+    costSavingsPurpose: "Valor en dólares de las horas de trabajo recuperadas mediante automatización",
     timeSavingsAdjustment: "Ajuste de Ahorro de Tiempo",
     errorReductionAdjustment: "Ajuste de Reducción de Errores",
     revenueReallocationAdjustment: "Ajuste de Reasignación de Ingresos",

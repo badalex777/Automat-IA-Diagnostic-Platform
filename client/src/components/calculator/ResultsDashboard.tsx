@@ -466,7 +466,7 @@ export default function ResultsDashboard({ results, selectedScenario, allData }:
             {allData.timeSavings.enabled && (
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm">Time Efficiency</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Time Savings</p>
                     <p className="text-lg font-bold" data-testid="text-time-saved-percent">
@@ -474,11 +474,16 @@ export default function ResultsDashboard({ results, selectedScenario, allData }:
                     </p>
                   </div>
                   <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">Hours Saved per week</p>
+                    <p className="text-lg font-bold" data-testid="text-weekly-hours-saved">
+                      {results.hoursSavedWeekly.toFixed(1)}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Annual Hours Saved</p>
-                    <p className="text-lg font-bold" data-testid="text-annual-hours-saved">
+                    <p className="text-lg font-bold text-green-600" data-testid="text-annual-hours-saved">
                       {results.hoursSavedAnnually.toFixed(0)}
                     </p>
-                    <p className="text-xs text-muted-foreground">hours/year</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Cost Savings</p>

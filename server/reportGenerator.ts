@@ -44,6 +44,7 @@ const COLORS = {
   MEDIUM_GRAY: "6b7280",
   LIGHT_GRAY: "d1d5db",
   WHITE: "FFFFFF",
+  BORDER_COLOR: "9ca3af",
 };
 
 // ===== HELPER FUNCTIONS =====
@@ -181,9 +182,11 @@ function createNumberedParagraph(
  * @returns Formatted string
  */
 function formatTemplate(template: string, ...values: (string | number)[]): string {
-  return values.reduce((str, value, index) => {
-    return str.replace(new RegExp(`\\{${index}\\}`, 'g'), String(value));
-  }, template);
+  let result = template;
+  values.forEach((value, index) => {
+    result = result.replace(new RegExp(`\\{${index}\\}`, 'g'), String(value));
+  });
+  return result;
 }
 
 /**
@@ -796,8 +799,8 @@ function validateTemplateVars(vars: Record<string, string>): { valid: boolean; e
 /**
  * Build consolidated opportunity summary table (Appendix D.2a)
  */
-function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
-  const sections: Paragraph[] = [];
+function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: any[]): (Paragraph | Table)[] {
+  const sections: (Paragraph | Table)[] = [];
   
   const consolidationHeaders = [
     ctx.t.headers.workflow,
@@ -833,8 +836,8 @@ function buildConsolidatedSummaryTable(ctx: ReportContext, allConsolidations: an
 /**
  * Build consolidation constituent mapping table (Appendix D.2b)
  */
-function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: any[]): Paragraph[] {
-  const sections: Paragraph[] = [];
+function buildConsolidationMappingTable(ctx: ReportContext, allConsolidations: any[]): (Paragraph | Table)[] {
+  const sections: (Paragraph | Table)[] = [];
   
   const constituentHeaders = [
     ctx.t.headers.workflow,
@@ -1900,16 +1903,99 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
       sections.push(createTable(keyMetricsHeaders, keyMetricsRows, [50, 50]));
       sections.push(createBodyParagraph(ctx.t.appendixNarratives.allValuesModeledConservative));
       
-      // Business Impact Components Table
+      // Business Impact Components Table - Adaptive based on enabled modules
+      // Table always renders with at least ramp-up row; module sections are conditional
+      const roiData = opp.opportunity.roiCalculationData as any;
+      const hasRoiData = roiData && typeof roiData === 'object' && Object.keys(roiData).length > 0;
+      
+      // Helper function for safe numeric parsing - returns null if invalid for N/A display
+      const safeParseNum = (val: unknown): number | null => {
+        if (typeof val === 'number' && isFinite(val)) return val;
+        if (typeof val === 'string') {
+          const parsed = parseFloat(val);
+          return isFinite(parsed) ? parsed : null;
+        }
+        return null;
+      };
+      
+      // Module checks: explicit enable OR legacy data fallback for time savings
+      const timeSavingsEnabled = (hasRoiData && roiData.timeSavings?.enabled === true) || annualHours > 0;
+      const qualityImpactEnabled = hasRoiData && roiData.qualityImpact?.enabled === true;
+      const revenueUpliftEnabled = hasRoiData && roiData.revenueUplift?.enabled === true;
+      
       const impactHeaders = [ctx.t.headers.impactArea, ctx.t.headers.keyMetrics, ctx.t.headers.description];
-      const impactRows = [
-        [ctx.t.metricLabels.timeSavings, `${ctx.fmt.number(annualHours, 0)} ${ctx.t.formatStrings.hoursPerYear}`, ctx.t.metricLabels.primaryEfficiencyGain],
-        [ctx.t.metricLabels.qualityImpact, ctx.t.metricLabels.conservativeEstimate, ctx.t.metricLabels.errorReductionBenefits],
-        [ctx.t.metricLabels.revenueUplift, ctx.t.metricLabels.toBeValidated, ctx.t.metricLabels.capacityReallocation],
-        [ctx.t.metricLabels.rampUpPeriod, ctx.t.metricLabels.threeMonths, ctx.t.metricLabels.timeToSteadyState],
-      ];
+      const impactRows: string[][] = [];
+      
+      // Time Efficiency section (if explicitly enabled OR has legacy hours data)
+      if (timeSavingsEnabled) {
+        const avgSalary = safeParseNum(roiData?.peopleAndCost?.averageAnnualSalary);
+        const workingHours = safeParseNum(roiData?.peopleAndCost?.annualWorkingHours);
+        const overheadMult = safeParseNum(roiData?.peopleAndCost?.overheadMultiplier) ?? 1;
+        
+        // Calculate effective hourly rate with guards
+        const effectiveHourlyRate = (avgSalary !== null && workingHours !== null && workingHours > 0)
+          ? (avgSalary / workingHours) * overheadMult
+          : null;
+        
+        const costSavings = effectiveHourlyRate !== null ? annualHours * effectiveHourlyRate : null;
+        const timeSavingsPercent = safeParseNum(roiData?.timeSavings?.percentTimeSaved);
+        
+        // Format with N/A fallbacks where data is missing
+        const pctDisplay = timeSavingsPercent !== null ? `${ctx.fmt.number(timeSavingsPercent, 1)}%` : ctx.t.fallback.na;
+        const weeklyDisplay = weeklyHours > 0 ? `${ctx.fmt.number(weeklyHours, 1)} hrs/wk` : ctx.t.fallback.na;
+        const annualDisplay = annualHours > 0 ? `${ctx.fmt.number(annualHours, 0)} hrs/yr` : ctx.t.fallback.na;
+        const costDisplay = costSavings !== null && costSavings > 0 ? ctx.fmt.currency(costSavings) : ctx.t.fallback.na;
+        
+        impactRows.push([
+          ctx.t.metricLabels.timeEfficiencySection,
+          `${pctDisplay} | ${weeklyDisplay} | ${annualDisplay} | ${costDisplay}`,
+          ctx.t.metricLabels.primaryEfficiencyGain
+        ]);
+      }
+      
+      // Quality Impact section (only if qualityImpact is explicitly enabled)
+      if (qualityImpactEnabled) {
+        const errorReductionPercent = safeParseNum(roiData.qualityImpact?.errorReductionPercent);
+        const pctDisplay = errorReductionPercent !== null ? `${ctx.fmt.number(errorReductionPercent, 1)}%` : ctx.t.fallback.na;
+        const errorCostSavings = opp.roiMetrics.errorReductionPct 
+          ? ctx.fmt.currency((opp.roiMetrics.annualRoi * (opp.roiMetrics.errorReductionPct / 100))) 
+          : ctx.t.metricLabels.conservativeEstimate;
+        
+        impactRows.push([
+          ctx.t.metricLabels.qualityImpactSection,
+          `${pctDisplay} | ${errorCostSavings}`,
+          ctx.t.metricLabels.errorReductionBenefits
+        ]);
+      }
+      
+      // Revenue Generation section (only if revenueUplift is explicitly enabled)
+      if (revenueUpliftEnabled) {
+        const reallocationPercent = safeParseNum(roiData.revenueUplift?.reallocationPercent);
+        const hoursReallocated = reallocationPercent !== null ? weeklyHours * 52 * (reallocationPercent / 100) : null;
+        const revenueUpliftValue = opp.roiMetrics.revenueUpliftAnnual 
+          ? ctx.fmt.currency(opp.roiMetrics.revenueUpliftAnnual)
+          : ctx.t.metricLabels.toBeValidated;
+        
+        const hoursDisplay = hoursReallocated !== null && hoursReallocated > 0 ? `${ctx.fmt.number(hoursReallocated, 0)} hrs` : ctx.t.fallback.na;
+        const pctDisplay = reallocationPercent !== null ? `${ctx.fmt.number(reallocationPercent, 1)}%` : ctx.t.fallback.na;
+        
+        impactRows.push([
+          ctx.t.metricLabels.revenueGenerationSection,
+          `${hoursDisplay} | ${pctDisplay} | ${revenueUpliftValue}`,
+          ctx.t.metricLabels.capacityReallocation
+        ]);
+      }
+      
+      // Ramp-Up Period (always included)
+      const rampUpMonths = safeParseNum(roiData?.costsAndRampup?.rampUpMonths) ?? 3;
+      impactRows.push([
+        ctx.t.metricLabels.rampUpPeriod,
+        `${rampUpMonths} ${ctx.t.formatStrings.monthsAbbrev}`,
+        ctx.t.metricLabels.timeToSteadyState
+      ]);
+      
       sections.push(createTableCaption(`D.1.${oppCounter}b`, ctx.t.tableDescriptions.businessImpactComponents, ctx.t.labels.table));
-      sections.push(createTable(impactHeaders, impactRows, [25, 25, 50]));
+      sections.push(createTable(impactHeaders, impactRows, [25, 35, 40]));
       
       sections.push(createHorizontalSeparator());
       oppCounter++;
@@ -1966,6 +2052,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
   const benefitHeaders = [ctx.t.appendixETables.componentHeader, ctx.t.appendixETables.formulaHeader, ctx.t.appendixETables.descriptionHeader];
   const benefitRows = [
     [ctx.t.appendixETables.timeSavingsBenefits, ctx.t.appendixETables.timeSavingsFormula, ctx.t.appendixETables.timeSavingsPurpose],
+    [ctx.t.appendixETables.costSavingsLabel, ctx.t.appendixETables.costSavingsFormula, ctx.t.appendixETables.costSavingsPurpose],
     [ctx.t.appendixETables.errorReductionBenefitsLabel, ctx.t.appendixETables.errorReductionFormula, ctx.t.appendixETables.errorReductionPurpose],
     [ctx.t.appendixETables.revenueUpliftBenefits, ctx.t.appendixETables.revenueUpliftFormula, ctx.t.appendixETables.revenueUpliftPurpose],
   ];
