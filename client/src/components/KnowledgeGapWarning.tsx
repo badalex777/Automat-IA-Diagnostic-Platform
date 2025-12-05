@@ -74,6 +74,7 @@ export default function KnowledgeGapWarning({
           answeredBy: metadata.whoMightKnow || '', // Pre-fill with whoMightKnow
           answeredByRole: '',
           reason: metadata.why || '', // We'll show this as read-only
+          isKnowledgeGap: false, // Explicitly set to false for filled answers
         };
       }
     });
@@ -142,7 +143,7 @@ export default function KnowledgeGapWarning({
 
   const handleGapUpdate = (questionId: string, field: keyof GapFormData, value: string | boolean) => {
     setGapResponses(prev => {
-      const currentData = prev[questionId] || { value: '', answeredBy: '', answeredByRole: '', reason: '' };
+      const currentData = prev[questionId] || { value: '', answeredBy: '', answeredByRole: '', reason: '', isKnowledgeGap: false };
       return {
         ...prev,
         [questionId]: {
