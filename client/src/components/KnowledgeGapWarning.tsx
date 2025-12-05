@@ -12,7 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertTriangle, User, FileQuestion } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, User, FileQuestion, RotateCcw, CheckCircle2, HelpCircle } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -47,6 +57,10 @@ export default function KnowledgeGapWarning({
   responseSources = {}
 }: KnowledgeGapWarningProps) {
   const { toast } = useToast();
+  
+  // State for reset confirmation dialog
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [questionToReset, setQuestionToReset] = useState<string | null>(null);
   
   // Initialize gapResponses with whoMightKnow from gapMetadata as answeredBy
   const [gapResponses, setGapResponses] = useState<Record<string, GapFormData>>(() => {
@@ -96,19 +110,35 @@ export default function KnowledgeGapWarning({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/workflows/${workflowId}/tfa`] });
+      setResetDialogOpen(false);
+      setQuestionToReset(null);
       toast({
-        title: "Knowledge gap unmarked",
-        description: "The question has been restored to 'Don't Know' status.",
+        title: "Response reset",
+        description: "The question has been restored to 'Don't Know' status and can be filled again.",
       });
     },
     onError: (error: Error) => {
+      setResetDialogOpen(false);
+      setQuestionToReset(null);
       toast({
-        title: "Error unmarking gap",
+        title: "Error resetting response",
         description: error.message,
         variant: "destructive",
       });
     },
   });
+
+  // Handle reset confirmation
+  const handleResetClick = (questionId: string) => {
+    setQuestionToReset(questionId);
+    setResetDialogOpen(true);
+  };
+
+  const handleConfirmReset = () => {
+    if (questionToReset) {
+      unmarkGapMutation.mutate(questionToReset);
+    }
+  };
 
   const handleGapUpdate = (questionId: string, field: keyof GapFormData, value: string | boolean) => {
     setGapResponses(prev => {
@@ -214,35 +244,72 @@ export default function KnowledgeGapWarning({
           For each unanswered question below, please provide the correct answer along with who provided it and why the original respondent couldn't answer.
         </p>
 
-        {/* Show already-marked knowledge gaps from server */}
-        {Object.entries(responseSources).some(([_, data]) => data && data.isKnowledgeGap === true) && (
+        {/* Show all resolved "Don't Know" responses (both knowledge gaps and filled answers) */}
+        {Object.entries(responseSources).length > 0 && (
           <div className="mb-8">
-            <h4 className="font-medium text-sm text-amber-600 dark:text-amber-400 mb-4">Marked Knowledge Gaps (Saved)</h4>
-            <div className="space-y-4">
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">Previously Resolved (Originally "Don't Know")</h4>
+            <p className="text-xs text-muted-foreground mb-4">
+              These questions were originally marked as "Don't Know" and have been resolved. You can reset them back to "Don't Know" if needed.
+            </p>
+            <div className="space-y-3">
               {Object.entries(responseSources)
-                .filter(([_, data]) => data && data.isKnowledgeGap === true)
                 .map(([questionId, data]) => {
                   const question = TFA_QUESTIONS.find(q => q.id.toString() === questionId);
                   if (!question) return null;
+                  const isKnowledgeGap = data?.isKnowledgeGap === true;
+                  
                   return (
-                    <Card key={questionId} className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
-                      <div className="flex items-start justify-between">
+                    <Card 
+                      key={questionId} 
+                      className={`p-4 ${
+                        isKnowledgeGap 
+                          ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800' 
+                          : 'bg-green-50/50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {isKnowledgeGap ? (
+                              <HelpCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                            ) : (
+                              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            )}
+                            <span className={`text-xs font-medium ${
+                              isKnowledgeGap 
+                                ? 'text-amber-600 dark:text-amber-400' 
+                                : 'text-green-600 dark:text-green-400'
+                            }`}>
+                              {isKnowledgeGap ? 'Marked as Knowledge Gap' : 'Resolved with Answer'}
+                            </span>
+                          </div>
                           <p className="text-sm font-medium mb-2">{question.question}</p>
-                          <div className="text-xs text-muted-foreground">
-                            <p>Score: 3/5 (auto-assigned)</p>
-                            {data.reason && <p className="mt-1">{data.reason}</p>}
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            {isKnowledgeGap ? (
+                              <p>Score: 3/5 (auto-assigned)</p>
+                            ) : (
+                              <>
+                                {data.answeredBy && <p>Answered by: {data.answeredBy}{data.answeredByRole ? ` (${data.answeredByRole})` : ''}</p>}
+                              </>
+                            )}
+                            {data.reason && <p>{data.reason}</p>}
+                            {data.answeredAt && (
+                              <p className="text-muted-foreground/70">
+                                Resolved: {new Date(data.answeredAt).toLocaleDateString()}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => unmarkGapMutation.mutate(questionId)}
+                          onClick={() => handleResetClick(questionId)}
                           disabled={unmarkGapMutation.isPending}
-                          data-testid={`button-unmark-saved-gap-${questionId}`}
-                          className="ml-4"
+                          data-testid={`button-reset-response-${questionId}`}
+                          className="ml-4 gap-1"
                         >
-                          {unmarkGapMutation.isPending ? 'Unmarking...' : 'Unmark & Restore'}
+                          <RotateCcw className="h-3 w-3" />
+                          Reset
                         </Button>
                       </div>
                     </Card>
@@ -402,6 +469,28 @@ export default function KnowledgeGapWarning({
           </Button>
         </div>
       </Card>
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset Response?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will restore the question to "Don't Know" status. The current answer will be removed and you'll need to fill it again. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-reset">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmReset}
+              disabled={unmarkGapMutation.isPending}
+              data-testid="button-confirm-reset"
+            >
+              {unmarkGapMutation.isPending ? 'Resetting...' : 'Reset'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
