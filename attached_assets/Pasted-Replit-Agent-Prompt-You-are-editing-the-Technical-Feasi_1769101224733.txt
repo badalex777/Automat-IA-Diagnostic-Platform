@@ -1,0 +1,168 @@
+Replit Agent Prompt
+
+You are editing the Technical Feasibility Assessment (TFA) and all dependent systems that reference it (including scoring logic, workflow readiness models, and the Executive Diagnostic Report).
+
+Your task is to update the entire TFA framework based on the instructions below.
+These instructions apply to all language versions (English and Spanish).
+The Spanish versions must be updated to match the English exactly in meaning, numbering, and scoring.
+
+1. Remove Question 13 completely
+
+The question titled:
+
+“Q13. System compatibility: Are the systems compatible with modern integration platforms? (Zapier, MuleSoft, custom middleware)”
+
+must be fully removed from:
+
+The TFA survey
+
+All scoring logic
+
+All workflow readiness calculations
+
+All internal data models
+
+All references in the Executive Diagnostic Report (EDR)
+
+After removing it:
+
+Renumber all following questions so numbering is continuous
+(Q14 → Q13, Q15 → Q14, etc.)
+
+The TFA must now contain 20 questions instead of 21
+
+This must be reflected everywhere (survey, backend, EDR, scoring, exports, dashboards).
+
+Apply this in English and Spanish.
+
+2. Recalculate and audit all backend scoring
+
+Because the TFA now has 20 questions instead of 21, you must:
+
+Recalculate all total score formulas
+
+Recalculate all normalization, weighting, and readiness indexes
+
+Recalculate all automation feasibility and workflow readiness scores
+
+Recalculate any percentage-based outputs
+
+Recalculate any threshold logic (e.g. Low / Medium / High readiness)
+
+Perform an internal consistency audit so that:
+
+No calculation assumes 21 questions
+
+No weighting is distorted by the removed question
+
+All category scores still make mathematical sense
+
+Fix any broken formulas caused by the removal.
+
+3. Update all EDR references
+
+In the Executive Diagnostic Report:
+
+Replace any mention of “21 TFA questions” with “20 TFA questions”
+
+Update any tables, formulas, or descriptions that reference the old question count
+
+Ensure all visuals, charts, and readiness summaries are consistent with 20 questions
+
+Apply this in English and Spanish.
+
+4. Update Question 18 (Data Sensitivity)
+
+Replace Q18 with the following meaning:
+
+Q18. Data sensitivity: What type of data does this workflow process?
+
+(1) Highly regulated data
+Health data, credit card data, government IDs, or any data covered by laws like HIPAA or PCI
+
+(2) Sensitive business or personal data
+Customer names, emails, addresses, financial records, contracts, internal company data
+
+(3) Moderately sensitive internal data
+Operational data, internal metrics, non confidential customer references
+
+(4) Low sensitivity data
+General business data, product catalogs, internal documentation
+
+(5) Public or non sensitive data
+Marketing content, public information, published materials
+
+(0) Don’t know
+
+Translate this meaning faithfully into Spanish.
+
+5. Rewrite the following question texts only
+
+Do not change scoring scales or numeric meanings.
+Only replace the question text.
+
+Apply these changes in English and Spanish.
+
+Q2
+
+“Can these systems send and receive data automatically with other software?”
+
+(Helper text allowed: via APIs, webhooks, or similar interfaces)
+
+Q3
+
+“Can bots or automation connect to these systems without someone logging in manually?”
+
+Q4
+
+“How fast and reliable are these systems in day-to-day use?”
+
+Q5
+
+“If something breaks in an automated process, will we know and be alerted?”
+
+Q6
+
+“How quickly can these systems be restored if something goes wrong?”
+
+Q9
+
+“Is there enough past data to train automation or AI to work reliably?”
+
+Q12
+
+“How many different systems are involved in this workflow? (More systems = harder to automate)”
+
+6. Do not change anything else
+
+Do NOT:
+
+Modify scoring values
+
+Modify any other questions
+
+Simplify answer options
+
+Alter category definitions
+
+Only the changes explicitly listed above are allowed.
+
+7. Final validation checklist
+
+Before finishing, verify:
+
+TFA has exactly 20 questions
+
+Numbering is continuous
+
+English and Spanish match perfectly
+
+No Q13 references remain
+
+All backend formulas work with 20 questions
+
+All EDR references reflect 20 questions
+
+No scoring or readiness metrics are broken
+
+Return the updated system once validated.
