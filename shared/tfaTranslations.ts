@@ -93,7 +93,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       2: {
-        question: "API availability: Do the systems expose REST/SOAP APIs or webhooks for data exchange?",
+        question: "Can these systems send and receive data automatically with other software? (via APIs, webhooks, or similar interfaces)",
         options: {
           "1": { label: "No APIs available", description: "Manual exports only, screen scraping required" },
           "2": { label: "Limited or legacy APIs", description: "Old SOAP endpoints, limited documentation" },
@@ -104,7 +104,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       3: {
-        question: "System access: Can automation tools access these systems programmatically (without human login)?",
+        question: "Can bots or automation connect to these systems without someone logging in manually?",
         options: {
           "1": { label: "No programmatic access", description: "UI-only, requires manual interaction" },
           "2": { label: "Very limited access", description: "Database-level access only, no application APIs" },
@@ -115,7 +115,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       4: {
-        question: "System performance: What is the typical response time and reliability of the systems involved?",
+        question: "How fast and reliable are these systems in day-to-day use?",
         options: {
           "1": { label: "Frequent failures or timeouts", description: "Systems often down, >10 second response times" },
           "2": { label: "Below average performance", description: "Regular slowdowns, 5-10 second responses, occasional outages" },
@@ -126,7 +126,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       5: {
-        question: "Monitoring capabilities: Are there monitoring/logging tools to track automation performance and errors?",
+        question: "If something breaks in an automated process, will we know and be alerted?",
         options: {
           "1": { label: "No monitoring", description: "No logs, no visibility into system operations" },
           "2": { label: "Basic logging only", description: "System logs exist but hard to access or search" },
@@ -137,7 +137,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       6: {
-        question: "Backup and disaster recovery: What backup and recovery capabilities exist for the systems involved?",
+        question: "How quickly can these systems be restored if something goes wrong?",
         options: {
           "1": { label: "No backup strategy", description: "No backups, data loss would be catastrophic" },
           "2": { label: "Minimal backups", description: "Irregular backups, long recovery time (days)" },
@@ -170,7 +170,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       9: {
-        question: "Data availability: Is sufficient historical/training data available for AI to learn patterns?",
+        question: "Is there enough past data to train automation or AI to work reliably?",
         options: {
           "1": { label: "No historical data", description: "New process, less than 100 records" },
           "2": { label: "Very limited data", description: "100-1,000 records, insufficient for training" },
@@ -203,7 +203,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       12: {
-        question: "Integration complexity: How many different systems need to be integrated for this workflow?",
+        question: "How many different systems are involved in this workflow? (More systems = harder to automate)",
         options: {
           "1": { label: "10+ systems", description: "Highly complex integration landscape" },
           "2": { label: "6-9 systems", description: "Multiple touchpoints across departments" },
@@ -214,17 +214,6 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       13: {
-        question: "System compatibility: Are the systems compatible with modern integration platforms? (Zapier, MuleSoft, custom middleware)",
-        options: {
-          "1": { label: "No compatibility", description: "Proprietary/legacy systems with no connectors" },
-          "2": { label: "Poor compatibility", description: "Custom coding required for all integrations" },
-          "3": { label: "Moderate compatibility", description: "Some pre-built connectors, custom work needed" },
-          "4": { label: "Good compatibility", description: "Most systems have standard connectors" },
-          "5": { label: "Excellent compatibility", description: "Native integrations, Zapier/Make.com ready" },
-          "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
-        }
-      },
-      14: {
         question: "Authentication: How complex is the authentication/authorization setup for system access?",
         options: {
           "1": { label: "Very complex or custom", description: "Proprietary auth, multiple MFA layers, manual approvals" },
@@ -235,7 +224,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      15: {
+      14: {
         question: "API rate limits: Are there rate limiting or throttling restrictions that could impact automation throughput?",
         options: {
           "1": { label: "Severe restrictions", description: "Very low limits (10-50 requests/hour), strict throttling" },
@@ -246,7 +235,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      16: {
+      15: {
         question: "Error handling: How robust are the existing integration error handling and retry mechanisms?",
         options: {
           "1": { label: "No error handling", description: "Failures cause complete stops, manual intervention required" },
@@ -257,7 +246,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      17: {
+      16: {
         question: "API versioning and stability: How stable are the APIs, and how are version changes managed?",
         options: {
           "1": { label: "Unstable, frequent breaking changes", description: "APIs change without notice, no versioning strategy" },
@@ -268,18 +257,18 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      18: {
+      17: {
         question: "Data sensitivity: What type of data does this workflow process?",
         options: {
-          "1": { label: "Highly sensitive regulated data", description: "Healthcare (PHI/HIPAA), financial (PCI), personal identifiable info" },
-          "2": { label: "Sensitive business data", description: "Customer data, financials, confidential contracts" },
-          "3": { label: "Moderately sensitive", description: "Internal operations data, some customer info" },
-          "4": { label: "Low sensitivity", description: "General business data, public information" },
-          "5": { label: "Non-sensitive public data", description: "Marketing content, public documentation" },
+          "1": { label: "Highly regulated data", description: "Health data, credit card data, government IDs, or any data covered by laws like HIPAA or PCI" },
+          "2": { label: "Sensitive business or personal data", description: "Customer names, emails, addresses, financial records, contracts, internal company data" },
+          "3": { label: "Moderately sensitive internal data", description: "Operational data, internal metrics, non-confidential customer references" },
+          "4": { label: "Low sensitivity data", description: "General business data, product catalogs, internal documentation" },
+          "5": { label: "Public or non-sensitive data", description: "Marketing content, public information, published materials" },
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      19: {
+      18: {
         question: "Compliance requirements: What compliance standards or regulations apply to this workflow?",
         options: {
           "1": { label: "Strict regulatory compliance", description: "HIPAA, SOC 2, PCI-DSS, GDPR with heavy auditing" },
@@ -290,7 +279,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      20: {
+      19: {
         question: "Security approval: How long does security/compliance approval typically take for new tools?",
         options: {
           "1": { label: "6+ months", description: "Extensive review, penetration testing, legal review" },
@@ -301,7 +290,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer" }
         }
       },
-      21: {
+      20: {
         question: "Data retention: What are the data retention and archival requirements for this workflow?",
         options: {
           "1": { label: "Complex long-term retention", description: "10+ years, strict legal requirements, complex archival" },
@@ -388,7 +377,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       2: {
-        question: "Disponibilidad de API: ¿Los sistemas exponen APIs REST/SOAP o webhooks para el intercambio de datos?",
+        question: "¿Pueden estos sistemas enviar y recibir datos automáticamente con otro software? (a través de APIs, webhooks o interfaces similares)",
         options: {
           "1": { label: "No hay APIs disponibles", description: "Solo exportaciones manuales, se requiere web scraping" },
           "2": { label: "APIs limitadas o heredadas", description: "Endpoints SOAP antiguos, documentación limitada" },
@@ -399,7 +388,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       3: {
-        question: "Acceso al sistema: ¿Pueden las herramientas de automatización acceder a estos sistemas de forma programática (sin inicio de sesión humano)?",
+        question: "¿Pueden los bots o la automatización conectarse a estos sistemas sin que alguien inicie sesión manualmente?",
         options: {
           "1": { label: "Sin acceso programático", description: "Solo interfaz de usuario, requiere interacción manual" },
           "2": { label: "Acceso muy limitado", description: "Solo acceso a nivel de base de datos, sin APIs de aplicación" },
@@ -410,7 +399,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       4: {
-        question: "Rendimiento del sistema: ¿Cuál es el tiempo de respuesta típico y la confiabilidad de los sistemas involucrados?",
+        question: "¿Qué tan rápidos y confiables son estos sistemas en el uso diario?",
         options: {
           "1": { label: "Fallos frecuentes o tiempos de espera", description: "Sistemas frecuentemente caídos, tiempos de respuesta >10 segundos" },
           "2": { label: "Rendimiento por debajo del promedio", description: "Ralentizaciones regulares, respuestas de 5-10 segundos, interrupciones ocasionales" },
@@ -421,7 +410,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       5: {
-        question: "Capacidades de monitoreo: ¿Hay herramientas de monitoreo/registro para rastrear el rendimiento de la automatización y errores?",
+        question: "Si algo falla en un proceso automatizado, ¿lo sabremos y seremos alertados?",
         options: {
           "1": { label: "Sin monitoreo", description: "Sin registros, sin visibilidad de las operaciones del sistema" },
           "2": { label: "Solo registro básico", description: "Los registros del sistema existen pero son difíciles de acceder o buscar" },
@@ -432,7 +421,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       6: {
-        question: "Respaldo y recuperación ante desastres: ¿Qué capacidades de respaldo y recuperación existen para los sistemas involucrados?",
+        question: "¿Qué tan rápido pueden restaurarse estos sistemas si algo sale mal?",
         options: {
           "1": { label: "Sin estrategia de respaldo", description: "Sin respaldos, la pérdida de datos sería catastrófica" },
           "2": { label: "Respaldos mínimos", description: "Respaldos irregulares, tiempo de recuperación largo (días)" },
@@ -465,7 +454,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       9: {
-        question: "Disponibilidad de datos: ¿Hay suficientes datos históricos/de entrenamiento disponibles para que la IA aprenda patrones?",
+        question: "¿Hay suficientes datos históricos para entrenar la automatización o IA para que funcione de manera confiable?",
         options: {
           "1": { label: "Sin datos históricos", description: "Proceso nuevo, menos de 100 registros" },
           "2": { label: "Datos muy limitados", description: "100-1,000 registros, insuficiente para entrenamiento" },
@@ -498,7 +487,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       12: {
-        question: "Complejidad de integración: ¿Cuántos sistemas diferentes necesitan integrarse para este flujo de trabajo?",
+        question: "¿Cuántos sistemas diferentes están involucrados en este flujo de trabajo? (Más sistemas = más difícil de automatizar)",
         options: {
           "1": { label: "10+ sistemas", description: "Panorama de integración altamente complejo" },
           "2": { label: "6-9 sistemas", description: "Múltiples puntos de contacto en departamentos" },
@@ -509,17 +498,6 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
         }
       },
       13: {
-        question: "Compatibilidad del sistema: ¿Son los sistemas compatibles con plataformas de integración modernas? (Zapier, MuleSoft, middleware personalizado)",
-        options: {
-          "1": { label: "Sin compatibilidad", description: "Sistemas propietarios/heredados sin conectores" },
-          "2": { label: "Mala compatibilidad", description: "Codificación personalizada requerida para todas las integraciones" },
-          "3": { label: "Compatibilidad moderada", description: "Algunos conectores preconstruidos, trabajo personalizado necesario" },
-          "4": { label: "Buena compatibilidad", description: "La mayoría de los sistemas tienen conectores estándar" },
-          "5": { label: "Compatibilidad excelente", description: "Integraciones nativas, listo para Zapier/Make.com" },
-          "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
-        }
-      },
-      14: {
         question: "Autenticación: ¿Qué tan compleja es la configuración de autenticación/autorización para el acceso al sistema?",
         options: {
           "1": { label: "Muy complejo o personalizado", description: "Autenticación propietaria, múltiples capas MFA, aprobaciones manuales" },
@@ -530,7 +508,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      15: {
+      14: {
         question: "Límites de tasa de API: ¿Hay restricciones de limitación de tasa o throttling que podrían afectar el rendimiento de la automatización?",
         options: {
           "1": { label: "Restricciones severas", description: "Límites muy bajos (10-50 solicitudes/hora), throttling estricto" },
@@ -541,7 +519,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      16: {
+      15: {
         question: "Manejo de errores: ¿Qué tan robustos son los mecanismos de manejo de errores y reintento de integración existentes?",
         options: {
           "1": { label: "Sin manejo de errores", description: "Los fallos causan paradas completas, intervención manual requerida" },
@@ -552,7 +530,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      17: {
+      16: {
         question: "Versionado y estabilidad de API: ¿Qué tan estables son las APIs y cómo se gestionan los cambios de versión?",
         options: {
           "1": { label: "Inestable, cambios disruptivos frecuentes", description: "Las APIs cambian sin aviso, sin estrategia de versionado" },
@@ -563,18 +541,18 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      18: {
+      17: {
         question: "Sensibilidad de datos: ¿Qué tipo de datos procesa este flujo de trabajo?",
         options: {
-          "1": { label: "Datos regulados altamente sensibles", description: "Salud (PHI/HIPAA), financieros (PCI), información personalmente identificable" },
-          "2": { label: "Datos empresariales sensibles", description: "Datos de clientes, financieros, contratos confidenciales" },
-          "3": { label: "Moderadamente sensible", description: "Datos de operaciones internas, alguna información de clientes" },
-          "4": { label: "Baja sensibilidad", description: "Datos empresariales generales, información pública" },
-          "5": { label: "Datos públicos no sensibles", description: "Contenido de marketing, documentación pública" },
+          "1": { label: "Datos altamente regulados", description: "Datos de salud, tarjetas de crédito, identificaciones gubernamentales, o cualquier dato cubierto por leyes como HIPAA o PCI" },
+          "2": { label: "Datos empresariales o personales sensibles", description: "Nombres de clientes, correos electrónicos, direcciones, registros financieros, contratos, datos internos de la empresa" },
+          "3": { label: "Datos internos moderadamente sensibles", description: "Datos operacionales, métricas internas, referencias de clientes no confidenciales" },
+          "4": { label: "Datos de baja sensibilidad", description: "Datos empresariales generales, catálogos de productos, documentación interna" },
+          "5": { label: "Datos públicos o no sensibles", description: "Contenido de marketing, información pública, materiales publicados" },
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      19: {
+      18: {
         question: "Requisitos de cumplimiento: ¿Qué estándares o regulaciones de cumplimiento se aplican a este flujo de trabajo?",
         options: {
           "1": { label: "Cumplimiento regulatorio estricto", description: "HIPAA, SOC 2, PCI-DSS, GDPR con auditoría pesada" },
@@ -585,7 +563,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      20: {
+      19: {
         question: "Aprobación de seguridad: ¿Cuánto tiempo toma típicamente la aprobación de seguridad/cumplimiento para nuevas herramientas?",
         options: {
           "1": { label: "6+ meses", description: "Revisión extensa, pruebas de penetración, revisión legal" },
@@ -596,7 +574,7 @@ export const tfaTranslations: { en: TFATranslations; es: TFATranslations } = {
           "0": { label: "No estoy seguro / No tengo esta información", description: "Seleccione esto si no está seguro o no tiene suficiente información para responder" }
         }
       },
-      21: {
+      20: {
         question: "Retención de datos: ¿Cuáles son los requisitos de retención y archivo de datos para este flujo de trabajo?",
         options: {
           "1": { label: "Retención compleja a largo plazo", description: "10+ años, requisitos legales estrictos, archivo complejo" },

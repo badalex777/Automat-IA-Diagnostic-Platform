@@ -77,7 +77,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 2,
     section: "System Environment",
-    question: "API availability: Do the systems expose REST/SOAP APIs or webhooks for data exchange?",
+    question: "Can these systems send and receive data automatically with other software? (via APIs, webhooks, or similar interfaces)",
     weight: 6,
     options: [
       { value: "1", label: "No APIs available", description: "Manual exports only, screen scraping required", score: 1 },
@@ -91,7 +91,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 3,
     section: "System Environment",
-    question: "System access: Can automation tools access these systems programmatically (without human login)?",
+    question: "Can bots or automation connect to these systems without someone logging in manually?",
     weight: 5,
     options: [
       { value: "1", label: "No programmatic access", description: "UI-only, requires manual interaction", score: 1 },
@@ -105,7 +105,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 4,
     section: "System Environment",
-    question: "System performance: What is the typical response time and reliability of the systems involved?",
+    question: "How fast and reliable are these systems in day-to-day use?",
     weight: 4,
     options: [
       { value: "1", label: "Frequent failures or timeouts", description: "Systems often down, >10 second response times", score: 1 },
@@ -119,7 +119,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 5,
     section: "System Environment",
-    question: "Monitoring capabilities: Are there monitoring/logging tools to track automation performance and errors?",
+    question: "If something breaks in an automated process, will we know and be alerted?",
     weight: 3,
     options: [
       { value: "1", label: "No monitoring", description: "No logs, no visibility into system operations", score: 1 },
@@ -133,7 +133,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 6,
     section: "System Environment",
-    question: "Backup and disaster recovery: What backup and recovery capabilities exist for the systems involved?",
+    question: "How quickly can these systems be restored if something goes wrong?",
     weight: 3,
     options: [
       { value: "1", label: "No backup strategy", description: "No backups, data loss would be catastrophic", score: 1 },
@@ -177,7 +177,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 9,
     section: "Data Quality",
-    question: "Data availability: Is sufficient historical/training data available for AI to learn patterns?",
+    question: "Is there enough past data to train automation or AI to work reliably?",
     weight: 6,
     options: [
       { value: "1", label: "No historical data", description: "New process, less than 100 records", score: 1 },
@@ -217,11 +217,11 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
 
-  // Integration Feasibility (30%) - 6 questions
+  // Integration Feasibility (30%) - 5 questions (was 6, removed System compatibility)
   {
     id: 12,
     section: "Integration Feasibility",
-    question: "Integration complexity: How many different systems need to be integrated for this workflow?",
+    question: "How many different systems are involved in this workflow? (More systems = harder to automate)",
     weight: 5,
     options: [
       { value: "1", label: "10+ systems", description: "Highly complex integration landscape", score: 1 },
@@ -235,20 +235,6 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
   {
     id: 13,
     section: "Integration Feasibility",
-    question: "System compatibility: Are the systems compatible with modern integration platforms? (Zapier, MuleSoft, custom middleware)",
-    weight: 6,
-    options: [
-      { value: "1", label: "No compatibility", description: "Proprietary/legacy systems with no connectors", score: 1 },
-      { value: "2", label: "Poor compatibility", description: "Custom coding required for all integrations", score: 2 },
-      { value: "3", label: "Moderate compatibility", description: "Some pre-built connectors, custom work needed", score: 3 },
-      { value: "4", label: "Good compatibility", description: "Most systems have standard connectors", score: 4 },
-      { value: "5", label: "Excellent compatibility", description: "Native integrations, Zapier/Make.com ready", score: 5 },
-      { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
-    ],
-  },
-  {
-    id: 14,
-    section: "Integration Feasibility",
     question: "Authentication: How complex is the authentication/authorization setup for system access?",
     weight: 5,
     options: [
@@ -261,7 +247,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 15,
+    id: 14,
     section: "Integration Feasibility",
     question: "API rate limits: Are there rate limiting or throttling restrictions that could impact automation throughput?",
     weight: 5,
@@ -275,7 +261,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 16,
+    id: 15,
     section: "Integration Feasibility",
     question: "Error handling: How robust are the existing integration error handling and retry mechanisms?",
     weight: 5,
@@ -289,7 +275,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 17,
+    id: 16,
     section: "Integration Feasibility",
     question: "API versioning and stability: How stable are the APIs, and how are version changes managed?",
     weight: 4,
@@ -305,21 +291,21 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
 
   // Security/Compliance (15%) - 4 questions
   {
-    id: 18,
+    id: 17,
     section: "Security/Compliance",
     question: "Data sensitivity: What type of data does this workflow process?",
     weight: 5,
     options: [
-      { value: "1", label: "Highly sensitive regulated data", description: "Healthcare (PHI/HIPAA), financial (PCI), personal identifiable info", score: 1 },
-      { value: "2", label: "Sensitive business data", description: "Customer data, financials, confidential contracts", score: 2 },
-      { value: "3", label: "Moderately sensitive", description: "Internal operations data, some customer info", score: 3 },
-      { value: "4", label: "Low sensitivity", description: "General business data, public information", score: 4 },
-      { value: "5", label: "Non-sensitive public data", description: "Marketing content, public documentation", score: 5 },
+      { value: "1", label: "Highly regulated data", description: "Health data, credit card data, government IDs, or any data covered by laws like HIPAA or PCI", score: 1 },
+      { value: "2", label: "Sensitive business or personal data", description: "Customer names, emails, addresses, financial records, contracts, internal company data", score: 2 },
+      { value: "3", label: "Moderately sensitive internal data", description: "Operational data, internal metrics, non-confidential customer references", score: 3 },
+      { value: "4", label: "Low sensitivity data", description: "General business data, product catalogs, internal documentation", score: 4 },
+      { value: "5", label: "Public or non-sensitive data", description: "Marketing content, public information, published materials", score: 5 },
       { value: "0", label: "Not sure / Don't have this information", description: "Select this if you're unsure or don't have enough information to answer", score: null },
     ],
   },
   {
-    id: 19,
+    id: 18,
     section: "Security/Compliance",
     question: "Compliance requirements: What compliance standards or regulations apply to this workflow?",
     weight: 4,
@@ -333,7 +319,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 20,
+    id: 19,
     section: "Security/Compliance",
     question: "Security approval: How long does security/compliance approval typically take for new tools?",
     weight: 3,
@@ -347,7 +333,7 @@ export const TFA_QUESTIONS: TFAQuestion[] = [
     ],
   },
   {
-    id: 21,
+    id: 20,
     section: "Security/Compliance",
     question: "Data retention: What are the data retention and archival requirements for this workflow?",
     weight: 3,
@@ -409,13 +395,35 @@ export function calculateSectionScores(responses: Record<string, string>): Array
     
     return {
       name: section.section,
-      score: parseFloat(score.toFixed(1)),
+      score: Math.round(score * 20), // Convert to 0-100 scale
       weight: section.weight,
     };
   });
 }
 
-// Score-specific recommendations for each question
+// Get questions grouped by section with respondent info
+export function getQuestionsWithResponses(
+  responses: Record<string, string>,
+  respondentName?: string
+): QuestionWithImpact[] {
+  return TFA_QUESTIONS.map(q => {
+    const response = responses[q.id.toString()];
+    const selectedOption = response ? q.options.find(opt => opt.value === response) : null;
+    const score = selectedOption?.score ?? 0;
+    const sectionWeight = getSectionWeight(q.section);
+    
+    return {
+      id: q.id,
+      question: q.question,
+      section: q.section,
+      sectionWeight,
+      score,
+      impactScore: calculateQuestionImpact(q.id, score, sectionWeight),
+      respondent: respondentName,
+    };
+  });
+}
+
 export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = {
   // Q1: Deployment model
   1: {
@@ -525,17 +533,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Single system minimizes integration risk. Recommendation: Leverage platform-native automation features. Focus on optimizing performance and user experience. Implement advanced platform-specific features. Build comprehensive test coverage."
   },
   
-  // Q13: System compatibility
+  // Q13: Authentication (was Q14)
   13: {
-    1: "CRITICAL: Proprietary systems require custom development. Recommendation: Budget 3-6 months for custom connector development. Evaluate specialist integration vendors. Consider replacing systems with modern alternatives. Build abstraction layer to isolate proprietary logic.",
-    2: "WARNING: Custom coding slows implementation significantly. Recommendation: Allocate development resources for integration layer. Consider iPaaS platforms with developer tools. Document all custom code thoroughly. Implement automated testing for custom integrations.",
-    3: "MODERATE: Mixed compatibility requires selective custom work. Recommendation: Use pre-built connectors where available. Develop custom adapters for unsupported systems. Implement standard integration patterns. Create reusable connector library.",
-    4: "GOOD: Standard connectors accelerate implementation. Recommendation: Leverage existing connectors and community libraries. Focus on configuration over customization. Implement connector health monitoring. Build connector governance and versioning.",
-    5: "EXCELLENT: Native integrations minimize development effort. Recommendation: Utilize drag-and-drop integration builders (Zapier, Make). Implement rapid prototyping. Focus on business logic over integration code. Leverage pre-built templates and workflows."
-  },
-  
-  // Q14: Authentication
-  14: {
     1: "CRITICAL: Complex auth is major implementation barrier. Recommendation: Engage security team early for auth strategy. Document complete authentication flow. Implement secure credential storage (vault). Consider RPA with credential management if APIs unavailable. Budget extra time for auth complexity.",
     2: "WARNING: Multi-factor auth complicates automation. Recommendation: Negotiate with security team for service account exemptions. Implement secure token refresh logic. Use certificate-based auth where possible. Create comprehensive auth failure handling.",
     3: "MODERATE: Standard SSO is manageable. Recommendation: Implement OAuth 2.0 client credentials flow. Use token caching to minimize auth calls. Create auth abstraction layer. Monitor token expiration and refresh proactively.",
@@ -543,8 +542,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Simple API keys accelerate implementation. Recommendation: Implement key rotation policies for security. Use environment variables and secret management. Create key usage monitoring. Focus on securing keys in deployment pipelines."
   },
   
-  // Q15: API rate limits
-  15: {
+  // Q14: API rate limits (was Q15)
+  14: {
     1: "CRITICAL: Severe limits block high-volume automation. Recommendation: Implement aggressive request queuing and throttling. Negotiate higher rate limits with vendors. Consider batch processing during off-peak hours. Evaluate alternative vendors with better limits. Use caching extensively.",
     2: "WARNING: Significant restrictions require careful management. Recommendation: Implement rate limit tracking and backoff logic. Use Redis for distributed rate limiting. Create request prioritization logic. Monitor usage to stay within limits. Consider upgrading to higher tiers.",
     3: "MODERATE: Standard limits are manageable with planning. Recommendation: Implement rate limit headers monitoring. Use adaptive throttling based on remaining quota. Create rate limit dashboard. Build request batching where possible.",
@@ -552,8 +551,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: No limits enable maximum throughput. Recommendation: Focus on optimizing request efficiency over rate limits. Implement parallel processing for performance. Monitor system capacity instead of rate limits. Design for future scalability."
   },
   
-  // Q16: Error handling
-  16: {
+  // Q15: Error handling (was Q16)
+  15: {
     1: "CRITICAL: No error handling guarantees failures. Recommendation: Immediately implement comprehensive try-catch blocks. Build error logging and alerting. Implement manual intervention queues. Create incident response procedures. This must be addressed before production.",
     2: "WARNING: Basic error handling is insufficient. Recommendation: Implement retry logic with exponential backoff. Add error categorization (transient, permanent). Create dead letter queues. Build error notification system. Develop comprehensive error recovery procedures.",
     3: "MODERATE: Some error handling exists, enhance it. Recommendation: Implement circuit breaker patterns to prevent cascade failures. Add error correlation and root cause analysis. Create automated recovery for common errors. Build error trends dashboard.",
@@ -561,8 +560,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Advanced error handling is production-grade. Recommendation: Leverage error patterns for proactive monitoring. Implement chaos engineering to test resilience. Use error data for system improvements. Focus on self-healing and autonomous recovery."
   },
   
-  // Q17: API versioning and stability
-  17: {
+  // Q16: API versioning and stability (was Q17)
+  16: {
     1: "CRITICAL: Unstable APIs create maintenance nightmare. Recommendation: Pin to specific API versions if available. Implement comprehensive integration tests to detect breaking changes. Create API change monitoring. Build abstraction layer to isolate API changes. Pressure vendors for stability commitment.",
     2: "WARNING: Poor version management requires defensive coding. Recommendation: Implement API version detection and adaptation logic. Build comprehensive regression testing. Create change notification monitoring. Negotiate better deprecation policies with vendors.",
     3: "MODERATE: Moderate stability requires monitoring. Recommendation: Subscribe to API change notifications. Implement version compatibility checks. Build automated testing for version changes. Create version migration procedures.",
@@ -570,8 +569,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Enterprise stability enables long-term planning. Recommendation: Leverage long-term support for stable implementations. Implement version governance and planning. Focus on feature optimization over compatibility. Use stable platform for innovation."
   },
   
-  // Q18: Data sensitivity
-  18: {
+  // Q17: Data sensitivity (was Q18)
+  17: {
     1: "CRITICAL: Highly sensitive data requires extensive security. Recommendation: Implement end-to-end encryption (at rest and in transit). Use data masking/tokenization for non-production environments. Conduct security audit before implementation. Ensure HIPAA/PCI compliance. Implement comprehensive audit logging.",
     2: "WARNING: Sensitive data needs strong security controls. Recommendation: Implement field-level encryption for PII. Use role-based access control (RBAC). Create data classification and handling procedures. Implement data loss prevention (DLP) tools. Regular security reviews required.",
     3: "MODERATE: Standard security measures required. Recommendation: Implement encryption in transit (TLS 1.2+). Use secure credential management. Implement access logging and monitoring. Create data retention policies. Conduct periodic security assessments.",
@@ -579,8 +578,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Public data minimizes security requirements. Recommendation: Implement basic authentication and access logging. Focus on availability over confidentiality. Use standard cloud security. Optimize for performance and cost over security overhead."
   },
   
-  // Q19: Compliance requirements
-  19: {
+  // Q18: Compliance requirements (was Q19)
+  18: {
     1: "CRITICAL: Strict compliance requires specialized expertise. Recommendation: Engage compliance/legal team immediately. Hire compliance consultant if needed. Implement BAA (Business Associate Agreement) for HIPAA. Use compliant cloud regions. Conduct regular compliance audits. Budget 6-12 months for compliance certification.",
     2: "WARNING: High compliance needs careful planning. Recommendation: Document compliance requirements and controls. Implement audit trails for all data access. Create compliance monitoring dashboard. Engage compliance team for review and approval. Plan for annual audits.",
     3: "MODERATE: Standard compliance is manageable. Recommendation: Implement GDPR-compliant data processing (consent, right to deletion). Create privacy policy and terms. Implement data subject request procedures. Conduct annual privacy review.",
@@ -588,8 +587,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Minimal compliance accelerates implementation. Recommendation: Implement business-standard security and privacy. Focus on operational efficiency. Document practices for governance. Maintain general best practices."
   },
   
-  // Q20: Security approval
-  20: {
+  // Q19: Security approval (was Q20)
+  19: {
     1: "CRITICAL: 6+ month approval delays implementation significantly. Recommendation: Start security review process immediately - this is on critical path. Prepare comprehensive security documentation. Consider POC in isolated environment while approval pending. Engage CISO office early. Budget timeline accordingly.",
     2: "WARNING: Long approval requires early planning. Recommendation: Initiate security review in parallel with development. Prepare vendor security assessments. Complete security questionnaires proactively. Schedule regular check-ins with security team. Plan for multiple review cycles.",
     3: "MODERATE: Standard review fits normal timelines. Recommendation: Submit security review request early in project. Prepare standard documentation (architecture diagram, data flow, security controls). Respond promptly to security questions. Build security review time into project plan.",
@@ -597,8 +596,8 @@ export const QUESTION_RECOMMENDATIONS: Record<number, Record<number, string>> = 
     5: "EXCELLENT: Fast approval enables rapid deployment. Recommendation: Leverage self-service approval processes. Use pre-approved vendors and platforms. Focus on delivery speed. Maintain compliance with security standards for continued self-service access."
   },
   
-  // Q21: Data retention
-  21: {
+  // Q20: Data retention (was Q21)
+  20: {
     1: "CRITICAL: Long-term retention adds complexity and cost. Recommendation: Implement compliant archival system (AWS Glacier, Azure Archive). Create automated retention policy enforcement. Implement legal hold capabilities. Plan for e-discovery requirements. Budget for long-term storage costs. Ensure tamper-proof audit logs.",
     2: "WARNING: Significant retention requires planning. Recommendation: Implement tiered storage strategy (hot/warm/cold). Create automated archival workflows. Document retention policy and procedures. Implement data lifecycle management. Plan for retrieval processes.",
     3: "MODERATE: Standard retention is manageable. Recommendation: Implement automated data retention policies. Create deletion workflows for expired data. Document retention periods by data type. Implement backup and archival strategy. Monitor storage costs.",

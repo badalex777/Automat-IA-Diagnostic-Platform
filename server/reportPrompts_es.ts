@@ -225,7 +225,7 @@ Fase 4: Evaluación de Factibilidad Técnica (TFA)
 
 El TFA se realiza a nivel de flujo de trabajo y se comparte en todos los pasos dentro de ese flujo. Cada 
 flujo de trabajo se evalúa en cuatro dimensiones ponderadas: Entorno del Sistema, Calidad de Datos, 
-Factibilidad de Integración y Seguridad y Cumplimiento, utilizando la rúbrica de 21 preguntas de Automat-IA. 
+Factibilidad de Integración y Seguridad y Cumplimiento, utilizando la rúbrica de 20 preguntas de Automat-IA. 
 Las respuestas generan una Calificación de Preparación Técnica (0 a 100), con brechas de conocimiento 
 registradas para aclaración para mantener la integridad de datos. Esta evaluación a nivel de flujo de trabajo 
 proporciona una base para comprender el entorno técnico que afecta todos los pasos dentro del proceso.
@@ -724,7 +724,7 @@ Automat-IA aplica un marco estructurado de múltiples capas que traduce entradas
 en indicadores medibles de preparación y rendimiento financiero.
 
 Evaluación de Factibilidad Técnica (TFA):
-21 preguntas ponderadas puntuadas de 1 a 5, con opción "No sé" para marcar brechas de conocimiento. **Pesos de sección:**
+20 preguntas ponderadas puntuadas de 1 a 5, con opción "No sé" para marcar brechas de conocimiento. **Pesos de sección:**
 
 ● Entorno del Sistema: 25 por ciento
 
@@ -981,7 +981,7 @@ E.7 Integridad de Fórmulas y Pista de Auditoría
 
 Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propietario de Automat-IA, un motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología prioriza la credibilidad sobre el optimismo a través de:
 
-● **Sistema de rúbrica de múltiples capas:** TFA (21 preguntas ponderadas en 4 dimensiones técnicas) y PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para evaluación de preparación precisa.
+● **Sistema de rúbrica de múltiples capas:** TFA (20 preguntas ponderadas en 4 dimensiones técnicas) y PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para evaluación de preparación precisa.
 
 ● **Pista de auditoría transparente:** Cada entrada está vinculada a su encuestado fuente, método de recopilación y fecha de validación, permitiendo trazabilidad completa desde datos brutos hasta proyecciones finales.
 

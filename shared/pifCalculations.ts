@@ -372,8 +372,8 @@ export function generateSWOTAnalysis(
   const componentMeta = {
     systemEnvironment: { label: 'System Environment', tfaQuestions: [1, 2, 3, 4, 5, 6] },
     dataQuality: { label: 'Data Quality', tfaQuestions: [7, 8, 9, 10, 11] },
-    integrationFeasibility: { label: 'Integration Feasibility', tfaQuestions: [12, 13, 14, 15, 16, 17] },
-    securityCompliance: { label: 'Security & Compliance', tfaQuestions: [18, 19, 20, 21] },
+    integrationFeasibility: { label: 'Integration Feasibility', tfaQuestions: [12, 13, 14, 15, 16] },
+    securityCompliance: { label: 'Security & Compliance', tfaQuestions: [17, 18, 19, 20] },
     processClarity: { label: 'Process Clarity', tfaQuestions: [] },
     changeMagnitude: { label: 'Change Readiness', tfaQuestions: [] },
     workflowBrittleness: { label: 'Process Stability', tfaQuestions: [] }

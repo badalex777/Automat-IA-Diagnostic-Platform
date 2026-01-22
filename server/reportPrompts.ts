@@ -222,7 +222,7 @@ Phase 4: Technical Feasibility Assessment (TFA)
 The TFA is conducted at the workflow level and shared across all steps within that workflow.
 Each workflow is evaluated across four weighted dimensions: System Environment, Data
 Quality, Integration Feasibility, and Security and Compliance, using Automat-IA's
-21-question rubric. Responses generate a Technical Readiness Rating (0 to 100), with
+20-question rubric. Responses generate a Technical Readiness Rating (0 to 100), with
 knowledge gaps recorded for clarification to maintain data integrity. This workflow-level
 assessment provides a foundation for understanding the technical environment that affects all
 steps within the process.
@@ -712,7 +712,7 @@ Automat-IA applies a structured, multi-layered framework that translates technic
 operational inputs into measurable readiness and financial performance indicators.
 
 Technical Feasibility Assessment (TFA):
-21 weighted questions scored 1 to 5, with a "Don't know" option to flag knowledge gaps. **Section weights:**
+20 weighted questions scored 1 to 5, with a "Don't know" option to flag knowledge gaps. **Section weights:**
 
 ● System Environment: 25 percent
 
@@ -978,7 +978,7 @@ E.7 Formula Integrity and Audit Trail
 
 All calculations are performed using Automat-IA's proprietary ROI Calculator Framework, a structured analytical engine built on the Conservative Scenario Framework. This methodology prioritizes credibility over optimism through:
 
-● **Multi-layered rubric system:** TFA (21 weighted questions across 4 technical dimensions) and PIF (29 questions across 8 operational dimensions) provide step-level granularity for precise readiness assessment.
+● **Multi-layered rubric system:** TFA (20 weighted questions across 4 technical dimensions) and PIF (29 questions across 8 operational dimensions) provide step-level granularity for precise readiness assessment.
 
 ● **Transparent audit trail:** Every input is linked to its source respondent, collection method, and validation date, enabling complete traceability from raw data to final projections.
 
