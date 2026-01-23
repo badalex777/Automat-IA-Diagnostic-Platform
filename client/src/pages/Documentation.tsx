@@ -103,7 +103,7 @@ export default function Documentation() {
 
   const handleDownload = () => {
     const doc = t.documentation;
-    const filename = 'Automat-IA_Platform_Handbook.html';
+    const filename = 'Athenia_Platform_Handbook.html';
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -170,7 +170,7 @@ export default function Documentation() {
   </style>
 </head>
 <body>
-  <h1>Automat-IA ${doc.title}</h1>
+  <h1>Athenia ${doc.title}</h1>
   
   <div class="toc">
     <h2>${doc.tableOfContents}</h2>

@@ -118,7 +118,7 @@ const emailTemplates = {
               <p style="word-break: break-all; color: #0f172a; font-size: 14px;">${getVerificationUrl(data)}</p>
             </div>
             <div class="footer">
-              <p>This is an automated message from the Automat-IA Diagnostic Platform.</p>
+              <p>This is an automated message from the Athenia Diagnostic Platform.</p>
               <p>Please do not reply to this email.</p>
             </div>
           </div>
@@ -139,7 +139,7 @@ IMPORTANT: Your responses will not be included in the final diagnostic report un
 If you did not submit this assessment, please disregard this email.
 
 ---
-This is an automated message from the Automat-IA Diagnostic Platform.
+This is an automated message from the Athenia Diagnostic Platform.
 Please do not reply to this email.
       `,
     },
@@ -188,7 +188,7 @@ Please do not reply to this email.
               <p style="word-break: break-all; color: #0f172a; font-size: 14px;">${getVerificationUrl(data)}</p>
             </div>
             <div class="footer">
-              <p>This is an automated message from the Automat-IA Diagnostic Platform.</p>
+              <p>This is an automated message from the Athenia Diagnostic Platform.</p>
               <p>Please do not reply to this email.</p>
             </div>
           </div>
@@ -209,7 +209,7 @@ IMPORTANT: Your responses will not be included in the final diagnostic report un
 If you did not submit this assessment, please disregard this email.
 
 ---
-This is an automated message from the Automat-IA Diagnostic Platform.
+This is an automated message from the Athenia Diagnostic Platform.
 Please do not reply to this email.
       `,
     },
@@ -260,7 +260,7 @@ Please do not reply to this email.
               <p style="word-break: break-all; color: #0f172a; font-size: 14px;">${getVerificationUrl(data)}</p>
             </div>
             <div class="footer">
-              <p>Este es un mensaje automático de la Plataforma de Diagnóstico Automat-IA.</p>
+              <p>Este es un mensaje automático de la Plataforma de Diagnóstico Athenia.</p>
               <p>Por favor, no responda a este correo electrónico.</p>
             </div>
           </div>
@@ -281,7 +281,7 @@ IMPORTANTE: Sus respuestas no se incluirán en el informe diagnóstico final has
 Si no envió esta evaluación, ignore este correo electrónico.
 
 ---
-Este es un mensaje automático de la Plataforma de Diagnóstico Automat-IA.
+Este es un mensaje automático de la Plataforma de Diagnóstico Athenia.
 Por favor, no responda a este correo electrónico.
       `,
     },
@@ -330,7 +330,7 @@ Por favor, no responda a este correo electrónico.
               <p style="word-break: break-all; color: #0f172a; font-size: 14px;">${getVerificationUrl(data)}</p>
             </div>
             <div class="footer">
-              <p>Este es un mensaje automático de la Plataforma de Diagnóstico Automat-IA.</p>
+              <p>Este es un mensaje automático de la Plataforma de Diagnóstico Athenia.</p>
               <p>Por favor, no responda a este correo electrónico.</p>
             </div>
           </div>
@@ -351,7 +351,7 @@ IMPORTANTE: Sus respuestas no se incluirán en el informe diagnóstico final has
 Si no envió esta evaluación, ignore este correo electrónico.
 
 ---
-Este es un mensaje automático de la Plataforma de Diagnóstico Automat-IA.
+Este es un mensaje automático de la Plataforma de Diagnóstico Athenia.
 Por favor, no responda a este correo electrónico.
       `,
     },

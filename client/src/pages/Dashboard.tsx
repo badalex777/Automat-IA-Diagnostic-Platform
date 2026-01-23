@@ -70,7 +70,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold" data-testid="text-page-title">Automat-IA Diagnostic Platform</h1>
+              <h1 className="text-2xl font-semibold" data-testid="text-page-title">Athenia Diagnostic Platform</h1>
               <p className="text-sm text-muted-foreground mt-1">Manage AI feasibility assessments for client companies</p>
             </div>
             <div className="flex items-center gap-3">

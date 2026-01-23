@@ -554,7 +554,7 @@ export const en: ReportTranslations = {
     preparedFor: "Prepared for",
     by: "by",
     confidential: "Confidential",
-    executiveDiagnosticReport: "Automat-IA Executive Diagnostic Report",
+    executiveDiagnosticReport: "Athenia Executive Diagnostic Report",
   },
   
   fallbackMessages: {
@@ -776,8 +776,8 @@ export const en: ReportTranslations = {
     gaps: "Gaps",
     consolidationName: "Consolidation Name",
     constituentOpportunity: "Constituent Opportunity",
-    allFiguresModeled: "All figures modeled under Automat-IA's Conservative Scenario Framework; rounded to the nearest hundred.",
-    allValuesModeled: "All values modeled under Automat-IA Conservative Scenario.",
+    allFiguresModeled: "All figures modeled under Athenia's Conservative Scenario Framework; rounded to the nearest hundred.",
+    allValuesModeled: "All values modeled under Athenia Conservative Scenario.",
     performanceSummary: "Performance Summary. Under the conservative scenario, estimated annual benefit is",
     equivalentTo: ", equivalent to",
     ftesOrApproximately: " FTEs or approximately",
@@ -896,7 +896,7 @@ export const en: ReportTranslations = {
   appendixIntros: {
     appendixB: "The Readiness Score is calculated as a weighted combination of the Technical Feasibility Assessment (TFA) and Process Insights Form (PIF). These weights reflect the relative importance of technical and operational factors in determining automation feasibility.",
     appendixC: "This appendix consolidates step-level SWOT analyses across all workflows, providing a comprehensive view of automation readiness at the process step level. Each workflow is presented with its constituent steps, followed by the Strengths, Weaknesses, Opportunities, and Threats identified through step-level readiness assessment.",
-    appendixD: "This appendix provides a validated financial view of each validated automation opportunity. Results are modeled using the Automat-IA Conservative Scenario Framework unless indicated otherwise. Financial figures are rounded to the nearest centenar.",
+    appendixD: "This appendix provides a validated financial view of each validated automation opportunity. Results are modeled using the Athenia Conservative Scenario Framework unless indicated otherwise. Financial figures are rounded to the nearest centenar.",
     consolidatedOpportunities: "When multiple automation opportunities exist across related process steps within a workflow, they may be consolidated into strategic implementation packages. Consolidations enable coordinated deployment that leverages shared resources, minimizes integration overhead, and achieves greater business impact through platform-level synergy. The tables below present consolidated opportunity summaries with aggregated financial metrics and constituent mappings for traceability.",
   },
   
@@ -906,7 +906,7 @@ export const en: ReportTranslations = {
     whyTheseWeightsBullet3: "Data Quality and Integration Feasibility receive the highest individual weights (18% each) as they are the primary determinants of automation viability.",
     whyTheseWeightsBullet4: "Combined, these seven components produce a holistic readiness score that balances technical feasibility with operational reality.",
     performanceSummaryTemplate: "**Performance Summary:** Under the conservative scenario, estimated annual benefit is {0}, equivalent to {1} FTEs or approximately {2} hours per year, with an expected payback of {3} months.",
-    allValuesModeledConservative: "All values modeled under Automat-IA Conservative Scenario.",
+    allValuesModeledConservative: "All values modeled under Athenia Conservative Scenario.",
     impactMajorityParagraph: "For this opportunity, the majority of measurable benefit is driven by time savings. Quality and revenue impacts are modeled conservatively or omitted where supporting data is insufficient. Ramp-up accounts for adoption and stabilization so Year-1 results reflect achievable performance.",
     portfolioSummaryParagraph: "Use the Portfolio Overview to compare opportunity scale, cost, and realization pace at a glance. {0}Detailed per-opportunity pages follow.",
     consolidationRepresentsParagraph: "Consolidations represent strategic groupings recommended for coordinated implementation. Individual constituent opportunities and their detailed financial analyses are presented in subsequent sections.",
@@ -1063,7 +1063,7 @@ export const es: ReportTranslations = {
     preparedFor: "Preparado para",
     by: "por",
     confidential: "Confidencial",
-    executiveDiagnosticReport: "Informe Ejecutivo de Diagnóstico de Automat-IA",
+    executiveDiagnosticReport: "Informe Ejecutivo de Diagnóstico de Athenia",
   },
   
   fallbackMessages: {
@@ -1285,8 +1285,8 @@ export const es: ReportTranslations = {
     gaps: "Brechas",
     consolidationName: "Nombre de Consolidación",
     constituentOpportunity: "Oportunidad Constituyente",
-    allFiguresModeled: "Todas las cifras modeladas bajo el Marco de Escenario Conservador de Automat-IA; redondeadas a la centena más cercana.",
-    allValuesModeled: "Todos los valores modelados bajo Escenario Conservador de Automat-IA.",
+    allFiguresModeled: "Todas las cifras modeladas bajo el Marco de Escenario Conservador de Athenia; redondeadas a la centena más cercana.",
+    allValuesModeled: "Todos los valores modelados bajo Escenario Conservador de Athenia.",
     performanceSummary: "Resumen de Rendimiento. Bajo el escenario conservador, el beneficio anual estimado es",
     equivalentTo: ", equivalente a",
     ftesOrApproximately: " FTE o aproximadamente",
@@ -1405,7 +1405,7 @@ export const es: ReportTranslations = {
   appendixIntros: {
     appendixB: "La Puntuación de Preparación se calcula como una combinación ponderada de la Evaluación de Factibilidad Técnica (TFA) y el Formulario de Perspectivas de Proceso (PIF). Estos pesos reflejan la importancia relativa de factores técnicos y operacionales en determinar la viabilidad de automatización.",
     appendixC: "Este apéndice consolida análisis FODA a nivel de paso en todos los flujos de trabajo, proporcionando una vista completa de preparación de automatización a nivel de paso de proceso. Cada flujo de trabajo se presenta con sus pasos constituyentes, seguido de las Fortalezas, Debilidades, Oportunidades y Amenazas identificadas a través de la evaluación de preparación a nivel de paso.",
-    appendixD: "Este apéndice proporciona una vista financiera validada de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Automat-IA a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.",
+    appendixD: "Este apéndice proporciona una vista financiera validada de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Athenia a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.",
     consolidatedOpportunities: "Cuando existen múltiples oportunidades de automatización en pasos de proceso relacionados dentro de un flujo de trabajo, pueden consolidarse en paquetes de implementación estratégica. Las consolidaciones permiten un despliegue coordinado que aprovecha recursos compartidos, minimiza sobrecarga de integración y logra mayor impacto empresarial a través de sinergia a nivel de plataforma. Las tablas a continuación presentan resúmenes de oportunidades consolidadas con métricas financieras agregadas y mapeos de constituyentes para trazabilidad.",
   },
   
@@ -1415,7 +1415,7 @@ export const es: ReportTranslations = {
     whyTheseWeightsBullet3: "Calidad de Datos y Viabilidad de Integración reciben los pesos individuales más altos (18% cada uno) ya que son los determinantes primarios de viabilidad de automatización.",
     whyTheseWeightsBullet4: "Combinados, estos siete componentes producen una puntuación de preparación holística que equilibra viabilidad técnica con realidad operacional.",
     performanceSummaryTemplate: "**Resumen de Rendimiento:** Bajo el escenario conservador, el beneficio anual estimado es {0}, equivalente a {1} FTEs o aproximadamente {2} horas por año, con un período de recuperación esperado de {3} meses.",
-    allValuesModeledConservative: "Todos los valores modelados bajo el Escenario Conservador de Automat-IA.",
+    allValuesModeledConservative: "Todos los valores modelados bajo el Escenario Conservador de Athenia.",
     impactMajorityParagraph: "Para esta oportunidad, la mayoría del beneficio medible proviene del ahorro de tiempo. Los impactos de calidad e ingresos se modelan de manera conservadora o se omiten cuando los datos de respaldo son insuficientes. El período de aceleración considera la adopción y estabilización para que los resultados del Año 1 reflejen un rendimiento alcanzable.",
     portfolioSummaryParagraph: "Utilice la Visión General del Portafolio para comparar la escala de oportunidad, costo y ritmo de realización de un vistazo. {0}Las páginas detalladas por oportunidad siguen a continuación.",
     consolidationRepresentsParagraph: "Las consolidaciones representan agrupaciones estratégicas recomendadas para implementación coordinada. Las oportunidades constituyentes individuales y sus análisis financieros detallados se presentan en secciones subsiguientes.",

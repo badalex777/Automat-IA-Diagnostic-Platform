@@ -1,4 +1,4 @@
-# Design Guidelines: Automat-IA Diagnostic Webapp
+# Design Guidelines: Athenia Diagnostic Webapp
 
 ## Design Approach: Professional Data Management System
 

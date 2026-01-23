@@ -398,7 +398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const locale = language === 'es' ? 'es-ES' : 'en-US';
       const diagnosticPeriod = diagnosticData.diagnosticPeriod.end.toLocaleDateString(locale, { month: 'short', year: 'numeric' }).replace(' ', '_');
       const langSuffix = language === 'es' ? '_ES' : '_EN';
-      const filename = `Automat-IA_Executive_Diagnostic_Report_${companyName}_${diagnosticPeriod}${langSuffix}.docx`;
+      const filename = `Athenia_Executive_Diagnostic_Report_${companyName}_${diagnosticPeriod}${langSuffix}.docx`;
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

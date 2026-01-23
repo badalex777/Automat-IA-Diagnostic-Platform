@@ -103,7 +103,7 @@ function createTransporter(): Transporter | null {
  */
 const emailTemplates = {
   en: {
-    subject: 'Your Verification Code - Automat-IA',
+    subject: 'Your Verification Code - Athenia',
     html: (code: string, formType: string) => `
       <!DOCTYPE html>
       <html>
@@ -121,7 +121,7 @@ const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Automat-IA</h1>
+            <h1>Athenia</h1>
           </div>
           <div class="content">
             <p>Your verification code for the ${formType === 'tfa' ? 'Technical Feasibility Assessment' : 'Process Insight Form'} is:</p>
@@ -131,7 +131,7 @@ const emailTemplates = {
             <p>If you didn't request this code, you can safely ignore this email.</p>
           </div>
           <div class="footer">
-            <p>This is an automated message from Automat-IA. Please do not reply to this email.</p>
+            <p>This is an automated message from Athenia. Please do not reply to this email.</p>
           </div>
         </div>
       </body>
@@ -139,7 +139,7 @@ const emailTemplates = {
     `,
   },
   es: {
-    subject: 'Tu Código de Verificación - Automat-IA',
+    subject: 'Tu Código de Verificación - Athenia',
     html: (code: string, formType: string) => `
       <!DOCTYPE html>
       <html>
@@ -157,7 +157,7 @@ const emailTemplates = {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Automat-IA</h1>
+            <h1>Athenia</h1>
           </div>
           <div class="content">
             <p>Tu código de verificación para ${formType === 'tfa' ? 'la Evaluación de Viabilidad Técnica' : 'el Formulario de Perspectivas del Proceso'} es:</p>
@@ -167,7 +167,7 @@ const emailTemplates = {
             <p>Si no solicitaste este código, puedes ignorar este correo de forma segura.</p>
           </div>
           <div class="footer">
-            <p>Este es un mensaje automatizado de Automat-IA. Por favor, no respondas a este correo.</p>
+            <p>Este es un mensaje automatizado de Athenia. Por favor, no respondas a este correo.</p>
           </div>
         </div>
       </body>

@@ -430,11 +430,11 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
     disclaimer: {
       title: "Welcome to the Process Insight Form",
       welcome: "Welcome to the Process Insight Form",
-      paragraph1: "This form is part of Automat-IA's diagnostic process for identifying workflows that can benefit from artificial intelligence (AI) implementations.",
+      paragraph1: "This form is part of Athenia's diagnostic process for identifying workflows that can benefit from artificial intelligence (AI) implementations.",
       paragraph2: "Its purpose is to collect your direct insights about how specific tasks are currently performed — including time spent, frequency, and common challenges — so we can model realistic improvements and prioritize solutions that truly make your work easier.",
-      paragraph3: "AI at Automat-IA is not about replacing people. It's about augmenting human work — reducing repetitive tasks, minimizing errors, and freeing time for higher-value activities.",
+      paragraph3: "AI at Athenia is not about replacing people. It's about augmenting human work — reducing repetitive tasks, minimizing errors, and freeing time for higher-value activities.",
       paragraph4: "Your input is essential to ensure any AI solution we propose genuinely supports you and your team.",
-      paragraph5: "All information you share will be treated as confidential, used only for analysis within the current project between Automat-IA and your company, and aggregated where possible before inclusion in any report. It will never be used to evaluate individual performance or shared outside this collaboration.",
+      paragraph5: "All information you share will be treated as confidential, used only for analysis within the current project between Athenia and your company, and aggregated where possible before inclusion in any report. It will never be used to evaluate individual performance or shared outside this collaboration.",
       paragraph6: "There are no right or wrong answers — we're looking for realism, not perfection.",
       checkboxLabel: "I understand and agree to proceed with the survey"
     },
@@ -834,11 +834,11 @@ export const pifTranslations: { en: PIFTranslations; es: PIFTranslations } = {
     disclaimer: {
       title: "Bienvenido al Formulario de Conocimientos del Proceso",
       welcome: "Bienvenido al Formulario de Conocimientos del Proceso",
-      paragraph1: "Este formulario es parte del proceso de diagnóstico de Automat-IA para identificar flujos de trabajo que pueden beneficiarse de implementaciones de inteligencia artificial (IA).",
+      paragraph1: "Este formulario es parte del proceso de diagnóstico de Athenia para identificar flujos de trabajo que pueden beneficiarse de implementaciones de inteligencia artificial (IA).",
       paragraph2: "Su propósito es recopilar sus conocimientos directos sobre cómo se realizan actualmente las tareas específicas, incluido el tiempo dedicado, la frecuencia y los desafíos comunes, para que podamos modelar mejoras realistas y priorizar soluciones que realmente faciliten su trabajo.",
-      paragraph3: "La IA en Automat-IA no se trata de reemplazar personas. Se trata de aumentar el trabajo humano: reducir tareas repetitivas, minimizar errores y liberar tiempo para actividades de mayor valor.",
+      paragraph3: "La IA en Athenia no se trata de reemplazar personas. Se trata de aumentar el trabajo humano: reducir tareas repetitivas, minimizar errores y liberar tiempo para actividades de mayor valor.",
       paragraph4: "Su aportación es esencial para garantizar que cualquier solución de IA que propongamos realmente lo apoye a usted y a su equipo.",
-      paragraph5: "Toda la información que comparta se tratará como confidencial, se utilizará solo para análisis dentro del proyecto actual entre Automat-IA y su empresa, y se agregará cuando sea posible antes de su inclusión en cualquier informe. Nunca se utilizará para evaluar el desempeño individual ni se compartirá fuera de esta colaboración.",
+      paragraph5: "Toda la información que comparta se tratará como confidencial, se utilizará solo para análisis dentro del proyecto actual entre Athenia y su empresa, y se agregará cuando sea posible antes de su inclusión en cualquier informe. Nunca se utilizará para evaluar el desempeño individual ni se compartirá fuera de esta colaboración.",
       paragraph6: "No hay respuestas correctas o incorrectas: buscamos realismo, no perfección.",
       checkboxLabel: "Entiendo y acepto continuar con la encuesta"
     },

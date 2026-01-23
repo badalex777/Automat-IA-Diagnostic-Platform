@@ -34,7 +34,7 @@ export class ReportValidationError extends Error {
   }
 }
 
-// Automat-IA Brand Colors
+// Athenia Brand Colors
 const COLORS = {
   PRIMARY_GREEN: "10b981",
   LIGHT_GREEN: "6ee7b7",
@@ -275,7 +275,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       'End-User Interviews',
       'Documentation Review',
       'Readiness Rubric',
-      'Automat-IA ROI Calculator',
+      'Athenia ROI Calculator',
       'Opportunity Matrix',
       // Spanish
       'Evaluaciones de Factibilidad Técnica',
@@ -286,7 +286,7 @@ function createTextParagraphs(text: string, registry: NumberingRegistry, listKey
       'Entrevistas con Usuarios Finales',
       'Revisión de Documentación',
       'Rúbrica de Preparación',
-      'Calculadora de ROI de Automat-IA',
+      'Calculadora de ROI de Athenia',
       'Matriz de Oportunidades'
     ];
     const trimmed = line.trim();
@@ -1245,7 +1245,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
     new Paragraph({
       children: [
         new TextRun({
-          text: "Automat-IA",
+          text: "Athenia",
           size: 32,
           bold: true,
           color: COLORS.PRIMARY_GREEN,
@@ -2268,7 +2268,7 @@ export async function generateExecutiveReport(data: DiagnosticData, language: 'e
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `${ctx.t.coverPage.preparedFor} ${data.company.name} ${ctx.t.coverPage.by} Automat-IA | ${ctx.t.coverPage.confidential}`,
+                    text: `${ctx.t.coverPage.preparedFor} ${data.company.name} ${ctx.t.coverPage.by} Athenia | ${ctx.t.coverPage.confidential}`,
                     size: 18,
                     color: COLORS.MEDIUM_GRAY,
                     font: "Roboto",

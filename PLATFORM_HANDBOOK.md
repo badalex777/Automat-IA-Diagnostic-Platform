@@ -1,8 +1,8 @@
-# Automat-IA Platform Handbook
+# Athenia Platform Handbook
 
 ## Overview
 
-The Automat-IA Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level.
+The Athenia Diagnostic Platform is a professional web application designed for consultants to manage AI implementation diagnostics for client companies. It specializes in Phase-1 diagnostics by assessing workflows at a granular, step-level.
 
 ## Core Concepts
 
@@ -193,4 +193,4 @@ The EDR generates a comprehensive .docx document that aggregates:
 ---
 
 **Document Version**: 1.0 (November 2025)
-**Platform**: Automat-IA Diagnostic Platform
+**Platform**: Athenia Diagnostic Platform

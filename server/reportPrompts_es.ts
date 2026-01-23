@@ -123,7 +123,7 @@ export function formatDiagnosticDate(date: Date): string {
  */
 
 export const EXECUTIVE_SUMMARY = `
-Automat-IA realizó un diagnóstico basado en datos para evaluar la preparación de {{company_name}} 
+Athenia realizó un diagnóstico basado en datos para evaluar la preparación de {{company_name}} 
 para la automatización de operaciones administrativas impulsada por IA y cuantificar el retorno 
 financiero de las implementaciones potenciales.
 El objetivo de este diagnóstico fue ayudar a {{company_name}} a identificar, priorizar y trazar 
@@ -134,7 +134,7 @@ El compromiso analizó {{total_workflows}} flujos de trabajo, identificando {{to
 oportunidades de automatización válidas con un beneficio anual total estimado de {{annual_benefit}}, 
 un retorno promedio de {{payback_period}} meses y un ROI promedio de {{roi_percent}}%.
 
-Cada flujo de trabajo fue evaluado utilizando la metodología de diagnóstico dual de Automat-IA, que 
+Cada flujo de trabajo fue evaluado utilizando la metodología de diagnóstico dual de Athenia, que 
 combina la Evaluación de Factibilidad Técnica (TFA) y el Formulario de Perspectivas de Proceso (PIF), 
 para establecer una puntuación de preparación integrada que captura tanto la viabilidad técnica como 
 la operacional.
@@ -160,16 +160,16 @@ IA de la empresa y la estrategia de priorización.]
 `;
 
 export const CONFIDENTIALITY_DISCLAIMER = `
-Este documento ha sido preparado exclusivamente para {{company_name}} por Automat-IA como parte de la 
+Este documento ha sido preparado exclusivamente para {{company_name}} por Athenia como parte de la 
 Evaluación de Preparación y Diagnóstico de Automatización de IA. Todos los análisis, modelos financieros 
 y evaluaciones de flujos de trabajo contenidos en este documento son confidenciales y están destinados 
 únicamente para el uso interno de los equipos ejecutivos y técnicos del cliente. Ninguna parte de este 
 informe puede ser reproducida, distribuida o divulgada a terceros sin el consentimiento previo por escrito 
-de Automat-IA.
+de Athenia.
 
 Todos los hallazgos, métricas y recomendaciones se basan en información proporcionada por el cliente a 
 través de entrevistas, encuestas(Evaluaciones de Factibilidad Técnica (TFA) y Formularios de Perspectivas 
-de Proceso (PIF)) y documentación relacionada. Automat-IA asume que esta información es precisa y completa 
+de Proceso (PIF)) y documentación relacionada. Athenia asume que esta información es precisa y completa 
 según el mejor conocimiento del cliente en el momento de la presentación. Cualquier omisión o inexactitud 
 puede afectar la validez de las conclusiones presentadas.
 
@@ -178,7 +178,7 @@ planificación. No constituye una garantía de resultados específicos ni un com
 soluciones propuestas. Todas las actividades de implementación requieren alcance y acuerdo contractual 
 por separado.
 
-Cuando los datos están incompletos o son inciertos, Automat-IA aplica parámetros de supuestos controlados 
+Cuando los datos están incompletos o son inciertos, Athenia aplica parámetros de supuestos controlados 
 para preservar la continuidad analítica sin distorsionar los resultados. Estos controles de supuestos siguen 
 una jerarquía estandarizada que incluye la aplicación de puntuación de punto medio a respuestas TFA no 
 resueltas y ponderación conservadora o exclusión de datos operacionales no verificados como tasas de error 
@@ -186,14 +186,14 @@ o incremento de ingresos.
 
 Todos los resultados cuantitativos, incluyendo puntuaciones de preparación, proyecciones de ROI, períodos 
 de retorno y estimaciones de beneficios, se modelan utilizando el Marco de Escenario Conservador de 
-Automat-IA. Este marco aplica supuestos ajustados por riesgo que reflejan condiciones realistas de adopción, 
+Athenia. Este marco aplica supuestos ajustados por riesgo que reflejan condiciones realistas de adopción, 
 integración y ejecución. Los resultados reales de implementación pueden variar dependiendo de factores como 
 el alcance final del proyecto y la arquitectura técnica, selección de proveedores, efectividad de la gestión 
 del cambio, adopción del usuario, integridad de datos, cumplimiento de procesos y rendimiento del sistema.
 
 Los análisis y estimaciones contenidos en este documento tienen como objetivo guiar la priorización, 
 presupuestación y toma de decisiones estratégicas en el contexto de la preparación para la automatización 
-de IA. Automat-IA recomienda que los clientes validen todos los supuestos durante la fase de implementación 
+de IA. Athenia recomienda que los clientes validen todos los supuestos durante la fase de implementación 
 y rastreen los beneficios realizados contra las proyecciones presentadas en este documento.
 `;
 
@@ -225,7 +225,7 @@ Fase 4: Evaluación de Factibilidad Técnica (TFA)
 
 El TFA se realiza a nivel de flujo de trabajo y se comparte en todos los pasos dentro de ese flujo. Cada 
 flujo de trabajo se evalúa en cuatro dimensiones ponderadas: Entorno del Sistema, Calidad de Datos, 
-Factibilidad de Integración y Seguridad y Cumplimiento, utilizando la rúbrica de 20 preguntas de Automat-IA. 
+Factibilidad de Integración y Seguridad y Cumplimiento, utilizando la rúbrica de 20 preguntas de Athenia. 
 Las respuestas generan una Calificación de Preparación Técnica (0 a 100), con brechas de conocimiento 
 registradas para aclaración para mantener la integridad de datos. Esta evaluación a nivel de flujo de trabajo 
 proporciona una base para comprender el entorno técnico que afecta todos los pasos dentro del proceso.
@@ -261,12 +261,12 @@ auditabilidad y atribución precisa de impacto.
 
 Fase 8: Modelado y Cuantificación de ROI
 
-Cada oportunidad validada se modela utilizando el Marco de Calculadora de ROI de Automat-IA para estimar 
+Cada oportunidad validada se modela utilizando el Marco de Calculadora de ROI de Athenia para estimar 
 el impacto financiero, incluyendo ahorro de tiempo, reducción de errores e incremento potencial de ingresos. 
 Los resultados incluyen beneficio anualizado, porcentaje de ROI y período de retorno, calculados a través 
 del Marco de Escenario Conservador para asegurar realismo y disciplina analítica. El modelado de ROI se 
 basa principalmente en datos de respuesta PIF, sin embargo, otras entradas de datos como costos de 
-implementación, horas de capacitación por empleado y período de adaptación son estimadas por Automat-IA 
+implementación, horas de capacitación por empleado y período de adaptación son estimadas por Athenia 
 y pueden estar sujetas a cambios si {{company_name}} decide proceder con la implementación.
 
 Fase 9: Priorización de Matriz de Oportunidades
@@ -304,7 +304,7 @@ Este modelo de cuadrantes asegura que las decisiones de automatización equilibr
 
 9.4 Matriz de Oportunidades Estándar vs. Mejorada
 
-Automat-IA aplica un Marco de Dos Matrices:
+Athenia aplica un Marco de Dos Matrices:
 
 1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial normalizando el ROI Anual como porcentaje de los ingresos de la empresa, luego convirtiéndolo a una puntuación de 0-100 usando un multiplicador x1000 (por ejemplo, 5% de ingresos = 50 puntos). Esta Puntuación de ROI se pondera al 60% y se combina con una Puntuación de Horas (40%) derivada del ahorro de tiempo semanal. El resultado es una puntuación de impacto relativa a la empresa que permite comparación consistente entre oportunidades de diferentes escalas.
 2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de ganancias a corto plazo y valor de automatización sostenible a largo plazo.
@@ -344,7 +344,7 @@ El proceso de diagnóstico concluye con la entrega de dos productos completos:
 export const DIAGNOSTIC_OVERVIEW_PART1 = `
 4.1 Alcance de la Evaluación
 
-Automat-IA realizó un diagnóstico completo de {{company_name}} para evaluar la preparación para la 
+Athenia realizó un diagnóstico completo de {{company_name}} para evaluar la preparación para la 
 automatización y cuantificar el impacto financiero de las mejoras de procesos impulsadas por IA. El 
 análisis cubrió {{workflow_count}} flujos de trabajo en funciones administrativas clave que incluyen 
 {{functions_list}}.
@@ -358,7 +358,7 @@ Cada flujo de trabajo fue evaluado en tres dimensiones:
 • **Impacto Empresarial** – ROI cuantificado, período de retorno, FTE ahorrados, potencial de beneficio anual, reducción de errores e incremento de ingresos, derivados de oportunidades de automatización modeladas. El Impacto Empresarial se calcula utilizando dos enfoques: la Matriz de Impacto Base (ROI normalizado a una puntuación de 0-100 usando conversión de porcentaje-de-ingresos con multiplicador x1000, combinado con ahorro de FTE) y la Matriz de Impacto Mejorada (Impacto Base + bonificaciones aditivas por reducción de errores e incremento de ingresos cuando sea aplicable).
 
 Todas las oportunidades de automatización fueron posicionadas dentro de la Matriz de Oportunidades de 
-Automat-IA, alineando la preparación técnica con el valor financiero. El objetivo fue identificar y 
+Athenia, alineando la preparación técnica con el valor financiero. El objetivo fue identificar y 
 priorizar automatizaciones que sean tanto técnicamente factibles como financieramente justificadas.
 
 4.2 Hallazgos Clave del Diagnóstico
@@ -534,7 +534,7 @@ export const FINDINGS_ANALYSIS_PART3 = `
 
 Esta sección resume los resultados cuantitativos del modelado de ROI realizado para las oportunidades de 
 automatización validadas. Todos los resultados financieros se derivan utilizando el Marco de Calculadora 
-de ROI de Automat-IA, que aplica supuestos conservadores basados en evidencia para estimar beneficios 
+de ROI de Athenia, que aplica supuestos conservadores basados en evidencia para estimar beneficios 
 operacionales.
 
 El beneficio anual de cada oportunidad representa el efecto combinado de ahorro de tiempo, reducción de 
@@ -684,7 +684,7 @@ fortalecen la infraestructura digital de la organización y las Implementaciones
 valor transformador y escalabilidad transfuncional.
 
 Cada fase está directamente informada por la evidencia de diagnóstico recopilada a través del marco de 
-Automat-IA. Esto asegura que las prioridades estén fundamentadas en preparación verificada, ROI y datos 
+Athenia. Esto asegura que las prioridades estén fundamentadas en preparación verificada, ROI y datos 
 de esfuerzo en lugar de juicio subjetivo. A medida que avanza la ejecución, la hoja de ruta debe 
 actualizarse continuamente para reflejar nuevas oportunidades, puntuaciones de preparación refinadas y 
 prioridades empresariales en evolución.
@@ -706,7 +706,7 @@ de trabajo.
 
 **Formularios de Perspectivas de Proceso (PIF):** Completados por empleados que realmente realizan los pasos del flujo de trabajo analizado (usuarios finales) para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas de error observadas. Adicionalmente, se recopila aquí información situacional sobre potencial de ahorro de tiempo, incremento de ingresos y factores de reducción de errores. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
 
-**Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales, propietarios de procesos y expertos en la materia ayudan a Automat-IA a identificar candidatos de automatización y establecer un entendimiento base de flujos de trabajo críticos, puntos de dolor y objetivos de automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados. El resultado de estas entrevistas es la identificación de los flujos de trabajo que serán analizados durante el diagnóstico.
+**Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales, propietarios de procesos y expertos en la materia ayudan a Athenia a identificar candidatos de automatización y establecer un entendimiento base de flujos de trabajo críticos, puntos de dolor y objetivos de automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados. El resultado de estas entrevistas es la identificación de los flujos de trabajo que serán analizados durante el diagnóstico.
 
 **Recopilación de Datos Preliminar:** Recopilación del contexto financiero y operacional específico de la empresa incluyendo Ingresos Anuales, Total de ETCs, e información de contacto para el encuestado de TFA (representante de TI o contacto técnico) y propietario de procesos de back-office. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
 
@@ -720,7 +720,7 @@ Para un registro completo de entradas de datos, vea el Apéndice F: Procedencia 
 
 A.2 Marcos de Diagnóstico
 
-Automat-IA aplica un marco estructurado de múltiples capas que traduce entradas técnicas y operacionales 
+Athenia aplica un marco estructurado de múltiples capas que traduce entradas técnicas y operacionales 
 en indicadores medibles de preparación y rendimiento financiero.
 
 Evaluación de Factibilidad Técnica (TFA):
@@ -745,7 +745,7 @@ PIF específico de paso (40%), normalizado de 0 a 100. Esta puntuación de prepa
 la entrada principal para el cálculo de Esfuerzo de Implementación en la Matriz de Oportunidades, como 
 se detalla en la Sección A.5.
 
-Calculadora de ROI de Automat-IA:
+Calculadora de ROI de Athenia:
 Cuantifica el impacto financiero usando datos operacionales PIF y supuestos de costos del diagnóstico. La 
 calculadora aplica un modelo de conservadurismo de doble capa, produciendo beneficio anual, período de 
 retorno y métricas empresariales relacionadas. Todos los cálculos son versionados y auditables.
@@ -759,7 +759,7 @@ Capa analítica final que unifica preparación y ROI en un marco único de prior
 
 A.3 Integridad de Datos y Manejo de Brechas de Conocimiento
 
-**Captura de brechas en TFA:** Cada pregunta soporta una respuesta "No sé" que registra razones y fuentes potenciales. Automat-IA luego:
+**Captura de brechas en TFA:** Cada pregunta soporta una respuesta "No sé" que registra razones y fuentes potenciales. Athenia luego:
 
 1. Extrae las brechas
 
@@ -903,7 +903,7 @@ Este diagnóstico es una evaluación puntual de preparación y valor potencial, 
 `;
 
 export const APPENDIX_D_INTRO = `
-Este apéndice proporciona una vista financiera auditable de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Automat-IA a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.
+Este apéndice proporciona una vista financiera auditable de cada oportunidad de automatización validada. Los resultados se modelan utilizando el Marco de Escenario Conservador de Athenia a menos que se indique lo contrario. Las cifras financieras se redondean al centenar más cercano.
 
 D.1 Tabla de Resumen de Portafolio
 `;
@@ -911,7 +911,7 @@ D.1 Tabla de Resumen de Portafolio
 export const APPENDIX_D_MODELING_NOTES = `
 D.3 Notas de Modelado y Trazabilidad
 
-● Los cálculos siguen la Calculadora de ROI de Automat-IA y el Marco de Escenario Conservador.
+● Los cálculos siguen la Calculadora de ROI de Athenia y el Marco de Escenario Conservador.
 
 ● Las entradas se originan de respuestas PIF validadas, entrevistas con partes interesadas y revisión de documentación; vea el Apéndice F: Procedencia de Datos y Pista de Auditoría para nombres de encuestados, roles, fechas y cualquier supuesto de punto medio.
 
@@ -923,7 +923,7 @@ D.3 Notas de Modelado y Trazabilidad
 `;
 
 export const APPENDIX_E_PART1 = `
-Este apéndice documenta la lógica financiera y controles de escenarios utilizados para generar las proyecciones de ROI, retorno y beneficios de Automat-IA. Todos los cálculos se realizan bajo el Marco de Escenario Conservador, asegurando que cada cifra en este informe sea realista, ajustada por riesgo y auditable.
+Este apéndice documenta la lógica financiera y controles de escenarios utilizados para generar las proyecciones de ROI, retorno y beneficios de Athenia. Todos los cálculos se realizan bajo el Marco de Escenario Conservador, asegurando que cada cifra en este informe sea realista, ajustada por riesgo y auditable.
 
 E.1 Fórmulas Financieras Centrales
 
@@ -969,7 +969,7 @@ E.4 Desglose de Beneficio Anual
 export const APPENDIX_E_PART3 = `
 E.5 Marco de Ajuste de Escenarios
 
-Para reflejar las realidades de ejecución del mundo real, Automat-IA aplica cinco capas de ajuste que moderan tanto las estimaciones de beneficios como de costos:
+Para reflejar las realidades de ejecución del mundo real, Athenia aplica cinco capas de ajuste que moderan tanto las estimaciones de beneficios como de costos:
 `;
 
 export const APPENDIX_E_PART4 = `
@@ -979,7 +979,7 @@ E.6 Supuestos Clave de Modelado
 export const APPENDIX_E_PART5 = `
 E.7 Integridad de Fórmulas y Pista de Auditoría
 
-Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propietario de Automat-IA, un motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología prioriza la credibilidad sobre el optimismo a través de:
+Todos los cálculos se realizan utilizando el Marco de Calculadora de ROI propietario de Athenia, un motor analítico estructurado construido sobre el Marco de Escenario Conservador. Esta metodología prioriza la credibilidad sobre el optimismo a través de:
 
 ● **Sistema de rúbrica de múltiples capas:** TFA (20 preguntas ponderadas en 4 dimensiones técnicas) y PIF (29 preguntas en 8 dimensiones operacionales) proporcionan granularidad a nivel de paso para evaluación de preparación precisa.
 
