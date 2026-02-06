@@ -28,7 +28,6 @@ import {
   type InsertWorkflowConsolidation,
 } from "@shared/schema";
 import type { IStorage } from "./storage";
-import { generateTFAVerificationCode, generatePIFVerificationCode } from "./verificationCodeGenerator";
 
 export class DbStorage implements IStorage {
   // Companies
@@ -159,16 +158,14 @@ export class DbStorage implements IStorage {
   }
 
   async createTFAAssessment(assessment: InsertTFAAssessment): Promise<TFAAssessment> {
-    // Generate unique shareable ID and verification code
     let shareableId = nanoid(10);
-    const verificationCode = generateTFAVerificationCode();
     let attempts = 0;
     const maxAttempts = 5;
 
     while (attempts < maxAttempts) {
       try {
         const [newAssessment] = await db.insert(tfaAssessments)
-          .values({ ...assessment, shareableId, verificationCode })
+          .values({ ...assessment, shareableId })
           .returning();
         return newAssessment;
       } catch (error: any) {
@@ -336,8 +333,7 @@ export class DbStorage implements IStorage {
 
   async createPIFResponse(response: InsertPIFResponse): Promise<PIFResponse> {
     const shareableId = nanoid(10);
-    const verificationCode = generatePIFVerificationCode();
-    const [newResponse] = await db.insert(pifResponses).values({ ...response, shareableId, verificationCode }).returning();
+    const [newResponse] = await db.insert(pifResponses).values({ ...response, shareableId }).returning();
     return newResponse;
   }
 

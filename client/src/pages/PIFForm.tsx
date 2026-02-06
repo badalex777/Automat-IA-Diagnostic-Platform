@@ -49,11 +49,8 @@ export default function PIFForm() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
   const [respondentResponsibilities, setRespondentResponsibilities] = useState("");
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
-  const [codeValidated, setCodeValidated] = useState(false);
-  const [isValidatingCode, setIsValidatingCode] = useState(false);
 
   // Fetch basic metadata (no code validation required)
   const { data: pifData, isLoading, error } = useQuery<PIFData>({
@@ -72,48 +69,11 @@ export default function PIFForm() {
     }
   }, [error, toast, t]);
 
-  // Function to validate access code
-  const validateAccessCode = async () => {
-    if (!verificationCode.trim()) {
-      toast({
-        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
-        description: language === 'en' 
-          ? 'Please enter the verification code to continue.' 
-          : 'Por favor ingrese el código de verificación para continuar.',
-        variant: "destructive",
-        duration: 5000,
-      });
-      return false;
-    }
-
-    setIsValidatingCode(true);
-    try {
-      await apiRequest('POST', `/api/pif/shareable/${shareableId}/validate-code`, {
-        verificationCode: verificationCode.trim()
-      });
-      setCodeValidated(true);
-      return true;
-    } catch (error: any) {
-      toast({
-        title: language === 'en' ? 'Invalid Verification Code' : 'Código de Verificación Inválido',
-        description: error.message || (language === 'en' 
-          ? 'The verification code you entered is incorrect. Please check and try again.' 
-          : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
-        variant: "destructive",
-        duration: 5000,
-      });
-      return false;
-    } finally {
-      setIsValidatingCode(false);
-    }
-  };
-
   const submitMutation = useMutation({
     mutationFn: async (data: { 
       respondentName: string;
       respondentRole: string;
       respondentResponsibilities?: string;
-      verificationCode: string;
       responses: Record<string, string>;
       stepId?: string;
       shareableId: string;
@@ -164,18 +124,6 @@ export default function PIFForm() {
       return;
     }
 
-    if (!verificationCode.trim()) {
-      toast({
-        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
-        description: language === 'en' 
-          ? 'Please enter the verification code provided by your consultant.' 
-          : 'Por favor ingrese el código de verificación proporcionado por su consultor.',
-        variant: "destructive",
-        duration: 5000,
-      });
-      return;
-    }
-
     // Check all required questions are answered
     const q21Answer = answers['21']; // Q21 is now the Quality Impact yes/no question
     const isErrorProne = q21Answer === 'yes';
@@ -204,10 +152,9 @@ export default function PIFForm() {
       respondentName: respondentName.trim(),
       respondentRole: respondentRole.trim(),
       respondentResponsibilities: respondentResponsibilities.trim(),
-      verificationCode: verificationCode.trim().toUpperCase(),
       shareableId,
       responses: answers,
-      stepId: pifData?.stepId, // Include stepId from metadata
+      stepId: pifData?.stepId,
     });
   };
 
@@ -271,36 +218,17 @@ export default function PIFForm() {
   }).length;
   const progress = requiredQuestionsCount > 0 ? (answeredCount / requiredQuestionsCount) * 100 : 0;
 
-  const handleNext = async () => {
-    // Block progression beyond disclaimer if code hasn't been validated
+  const handleNext = () => {
     if (currentSection === 0) {
-      // Disclaimer section - require disclaimer acceptance and validate code
       if (!disclaimerAccepted) {
         toast({
           title: t.ui.acceptanceRequired,
           description: t.ui.acceptanceRequiredDescription,
           variant: "destructive",
-        duration: 5000,
+          duration: 5000,
         });
         return;
       }
-      // Validate access code before allowing progression
-      const isValid = await validateAccessCode();
-      if (!isValid) {
-        return; // Stay on disclaimer section if code is invalid
-      }
-    } else if (!codeValidated) {
-      // Safety check: prevent navigation beyond disclaimer if code not validated
-      toast({
-        title: language === 'en' ? 'Access Restricted' : 'Acceso Restringido',
-        description: language === 'en' 
-          ? 'Please complete the disclaimer section first.' 
-          : 'Por favor complete la sección de descargo de responsabilidad primero.',
-        variant: "destructive",
-        duration: 5000,
-      });
-      setCurrentSection(0); // Force back to disclaimer
-      return;
     }
     
     if (currentSection === 1) {
@@ -406,32 +334,6 @@ export default function PIFForm() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {isDisclaimerSection ? (
           <div className="space-y-6">
-            {/* Verification Code Section */}
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
-              <h2 className="text-lg font-semibold mb-2">
-                {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                {language === 'en' 
-                  ? 'Enter the verification code provided with this survey link. This code was shared by your consultant.' 
-                  : 'Ingrese el código de verificación proporcionado con este enlace de encuesta. Este código fue compartido por su consultor.'}
-              </p>
-              <div className="max-w-md">
-                <Label htmlFor="verification-code">
-                  {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
-                </Label>
-                <Input
-                  id="verification-code"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
-                  placeholder={language === 'en' ? 'PIF-XXXXX' : 'PIF-XXXXX'}
-                  className="font-mono text-lg tracking-wider"
-                  data-testid="input-verification-code"
-                  maxLength={10}
-                />
-              </div>
-            </div>
-
             <div>
               <h2 className="text-xl font-semibold mb-4">{t.disclaimer.welcome}</h2>
               <div className="bg-muted/50 border rounded-lg p-6 space-y-4 text-sm">

@@ -19,7 +19,6 @@ interface ShareableLinkCardProps {
 
 interface PIFTemplate {
   shareableId: string;
-  verificationCode: string;
 }
 
 export default function ShareableLinkCard({
@@ -68,11 +67,10 @@ export default function ShareableLinkCard({
     onSuccess: (data) => {
       setPifTemplate({
         shareableId: data.shareableId,
-        verificationCode: data.verificationCode
       });
       toast({
         title: "PIF link generated",
-        description: "A new shareable link has been created with verification code.",
+        description: "A new shareable link has been created.",
       });
     },
     onError: (error: Error) => {
@@ -90,22 +88,13 @@ export default function ShareableLinkCard({
     ? `${window.location.origin}/tfa/${existingAssessment.shareableId}`
     : '';
 
-  const verificationCode = type === 'tfa' && existingAssessment 
-    ? existingAssessment.verificationCode 
-    : type === 'pif' && pifTemplate
-    ? pifTemplate.verificationCode
-    : null;
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareableUrl);
       setCopied(true);
-      const codeMessage = verificationCode 
-        ? `Verification code: ${verificationCode}`
-        : '';
       toast({
         title: "Link copied!",
-        description: codeMessage ? `${codeMessage}. Share both the link and code with the respondent.` : "The shareable link has been copied to your clipboard.",
+        description: "The shareable link has been copied to your clipboard.",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -130,7 +119,7 @@ export default function ShareableLinkCard({
             <h3 className="font-semibold text-base mb-1">{linkTitle}</h3>
             <p className="text-sm text-muted-foreground">
               {type === 'pif' 
-                ? 'Generate a unique link with verification code to share with end users and process owners for collecting operational insights.'
+                ? 'Generate a unique link to share with end users and process owners for collecting operational insights.'
                 : 'Generate a unique link to send to your technical contact for completing the assessment.'
               }
             </p>
@@ -193,20 +182,6 @@ export default function ShareableLinkCard({
             <ExternalLink className="h-4 w-4" />
           </Button>
         </div>
-
-        {verificationCode && (
-          <div className="bg-primary/10 border border-primary/20 rounded-md p-4 space-y-2">
-            <p className="font-semibold text-sm">Verification Code</p>
-            <div className="flex items-center gap-2">
-              <code className="text-2xl font-mono font-bold tracking-wider" data-testid="text-verification-code">
-                {verificationCode}
-              </code>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Share this code with the respondent. They must enter it on the {type === 'pif' ? 'disclaimer' : 'intro'} page to access the form.
-            </p>
-          </div>
-        )}
 
         <div className="bg-muted rounded-md p-3 text-sm space-y-1">
           <p className="font-medium">Pre-filled Information:</p>

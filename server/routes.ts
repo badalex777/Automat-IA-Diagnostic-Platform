@@ -25,254 +25,6 @@ import { ALL_PIF_QUESTIONS, calculatePIFScores, extractROIInputs, extractQualita
 import { calculateAggregatedPIFScores } from "@shared/pifCalculations";
 import { aggregateCompanyDiagnosticData } from "./reportDataAggregator";
 import { generateExecutiveReport, ReportValidationError } from "./reportGenerator";
-import { sendVerificationEmail, generateVerificationToken } from "./emailService";
-import { sendVerificationCode, verifyCode, consumeVerifiedEmail } from "./verificationCodeService";
-
-/**
- * Generate bilingual HTML page for successful email verification
- */
-function getVerificationSuccessHTML(language: 'en' | 'es', formType: 'tfa' | 'pif', alreadyVerified: boolean): string {
-  const content = {
-    en: {
-      title: alreadyVerified ? 'Already Verified' : 'Email Verified Successfully',
-      heading: alreadyVerified ? 'Already Verified' : 'Email Verified!',
-      message: alreadyVerified
-        ? `Your ${formType === 'tfa' ? 'Technical Feasibility Assessment' : 'Process Insight Form'} submission has already been verified.`
-        : `Thank you! Your ${formType === 'tfa' ? 'Technical Feasibility Assessment' : 'Process Insight Form'} submission has been successfully verified.`,
-      info: 'Your responses will be included in the diagnostic analysis and final report.',
-      closing: 'You may now close this window.',
-    },
-    es: {
-      title: alreadyVerified ? 'Ya Verificado' : 'Correo Verificado Exitosamente',
-      heading: alreadyVerified ? 'Ya Verificado' : '¡Correo Verificado!',
-      message: alreadyVerified
-        ? `Su envío de ${formType === 'tfa' ? 'Evaluación de Viabilidad Técnica' : 'Formulario de Información de Proceso'} ya ha sido verificado.`
-        : `¡Gracias! Su envío de ${formType === 'tfa' ? 'Evaluación de Viabilidad Técnica' : 'Formulario de Información de Proceso'} ha sido verificado exitosamente.`,
-      info: 'Sus respuestas se incluirán en el análisis diagnóstico y el informe final.',
-      closing: 'Ahora puede cerrar esta ventana.',
-    },
-  };
-
-  const text = content[language];
-
-  return `
-    <!DOCTYPE html>
-    <html lang="${language}">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${text.title}</title>
-      <style>
-        body {
-          font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          margin: 0;
-          padding: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-        }
-        .container {
-          background: #ffffff;
-          border-radius: 12px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-          max-width: 500px;
-          width: 90%;
-          padding: 48px 32px;
-          text-align: center;
-        }
-        .icon {
-          width: 80px;
-          height: 80px;
-          margin: 0 auto 24px;
-          background: ${alreadyVerified ? '#64748b' : '#10b981'};
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .checkmark {
-          color: white;
-          font-size: 48px;
-          font-weight: bold;
-        }
-        h1 {
-          color: #0f172a;
-          font-size: 28px;
-          font-weight: 600;
-          margin: 0 0 16px 0;
-        }
-        p {
-          color: #475569;
-          font-size: 16px;
-          line-height: 1.6;
-          margin: 0 0 12px 0;
-        }
-        .info {
-          background: #f1f5f9;
-          border-left: 4px solid ${alreadyVerified ? '#64748b' : '#10b981'};
-          padding: 16px;
-          margin: 24px 0;
-          text-align: left;
-          border-radius: 4px;
-        }
-        .closing {
-          color: #64748b;
-          font-size: 14px;
-          margin-top: 24px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">
-          <div class="checkmark">✓</div>
-        </div>
-        <h1>${text.heading}</h1>
-        <p>${text.message}</p>
-        <div class="info">
-          <p style="margin: 0;">${text.info}</p>
-        </div>
-        <p class="closing">${text.closing}</p>
-      </div>
-    </body>
-    </html>
-  `;
-}
-
-/**
- * Generate bilingual HTML page for email verification errors
- */
-function getVerificationErrorHTML(language: 'en' | 'es'): string {
-  const content = {
-    en: {
-      title: 'Verification Error',
-      heading: 'Verification Failed',
-      message: 'We were unable to verify your email address. This verification link may have expired or is invalid.',
-      suggestions: [
-        'The verification link may have been already used',
-        'The link may have expired (links are valid for 7 days)',
-        'The link may be incomplete or corrupted',
-      ],
-      contact: 'If you continue to experience issues, please contact your diagnostic coordinator.',
-    },
-    es: {
-      title: 'Error de Verificación',
-      heading: 'Verificación Fallida',
-      message: 'No pudimos verificar su dirección de correo electrónico. Este enlace de verificación puede haber expirado o no ser válido.',
-      suggestions: [
-        'El enlace de verificación puede haber sido utilizado anteriormente',
-        'El enlace puede haber expirado (los enlaces son válidos por 7 días)',
-        'El enlace puede estar incompleto o corrupto',
-      ],
-      contact: 'Si continúa experimentando problemas, comuníquese con su coordinador de diagnóstico.',
-    },
-  };
-
-  const text = content[language];
-
-  return `
-    <!DOCTYPE html>
-    <html lang="${language}">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${text.title}</title>
-      <style>
-        body {
-          font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          margin: 0;
-          padding: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 100vh;
-        }
-        .container {
-          background: #ffffff;
-          border-radius: 12px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-          max-width: 500px;
-          width: 90%;
-          padding: 48px 32px;
-          text-align: center;
-        }
-        .icon {
-          width: 80px;
-          height: 80px;
-          margin: 0 auto 24px;
-          background: #ef4444;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .error-mark {
-          color: white;
-          font-size: 48px;
-          font-weight: bold;
-        }
-        h1 {
-          color: #0f172a;
-          font-size: 28px;
-          font-weight: 600;
-          margin: 0 0 16px 0;
-        }
-        p {
-          color: #475569;
-          font-size: 16px;
-          line-height: 1.6;
-          margin: 0 0 12px 0;
-        }
-        .suggestions {
-          background: #fef2f2;
-          border-left: 4px solid #ef4444;
-          padding: 16px;
-          margin: 24px 0;
-          text-align: left;
-          border-radius: 4px;
-        }
-        .suggestions ul {
-          margin: 8px 0 0 0;
-          padding-left: 20px;
-          color: #475569;
-        }
-        .suggestions li {
-          margin-bottom: 8px;
-        }
-        .contact {
-          background: #f1f5f9;
-          padding: 16px;
-          border-radius: 4px;
-          margin-top: 24px;
-          font-size: 14px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="icon">
-          <div class="error-mark">✕</div>
-        </div>
-        <h1>${text.heading}</h1>
-        <p>${text.message}</p>
-        <div class="suggestions">
-          <p style="margin: 0 0 8px 0; font-weight: 600; color: #0f172a;">${language === 'en' ? 'Possible reasons:' : 'Posibles razones:'}</p>
-          <ul>
-            ${text.suggestions.map(s => `<li>${s}</li>`).join('')}
-          </ul>
-        </div>
-        <div class="contact">
-          <p style="margin: 0;">${text.contact}</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Companies
   app.get("/api/companies", async (req, res) => {
@@ -698,42 +450,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // New endpoint to validate TFA access code
-  app.post("/api/tfa/shareable/:shareableId/validate-code", async (req, res) => {
-    try {
-      const { verificationCode } = req.body;
-      
-      if (!verificationCode || !verificationCode.trim()) {
-        return res.status(400).json({ error: "Verification code is required" });
-      }
-
-      const assessment = await storage.getTFAByShareableId(req.params.shareableId);
-      if (!assessment) {
-        return res.status(404).json({ error: "Assessment not found" });
-      }
-
-      if (verificationCode.trim() !== assessment.verificationCode) {
-        console.log('[TFA Code Validation] Invalid code:', {
-          provided: verificationCode.trim(),
-          expected: assessment.verificationCode,
-        });
-        return res.status(403).json({ 
-          error: "Invalid verification code. Please check the code and try again." 
-        });
-      }
-
-      console.log('[TFA Code Validation] Code validated successfully');
-      
-      // Code is valid - return success
-      res.json({ 
-        valid: true,
-        message: "Access code validated successfully" 
-      });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   app.get("/api/workflows/:workflowId/tfa", async (req, res) => {
     try {
       const assessment = await storage.getTFAByWorkflowId(req.params.workflowId);
@@ -786,40 +502,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/tfa/shareable/:shareableId/submit", async (req, res) => {
     try {
       const validatedData = tfaResponsesSchema.parse(req.body);
-      const { responses, comments, initialRespondent, initialRespondentRole, gapMetadata, verificationCode } = validatedData;
+      const { responses, comments, initialRespondent, initialRespondentRole, gapMetadata } = validatedData;
 
       // Get assessment by shareableId
       const assessment = await storage.getTFAByShareableId(req.params.shareableId);
       if (!assessment) {
         return res.status(404).json({ error: "Assessment not found" });
       }
-
-      // Validate verification code (server-side security check)
-      console.log('[TFA Submit] Verification code validation:', {
-        providedCode: verificationCode,
-        providedCodeTrimmed: verificationCode?.trim(),
-        storedCode: assessment.verificationCode,
-        match: verificationCode?.trim() === assessment.verificationCode,
-        assessmentId: assessment.id,
-        shareableId: req.params.shareableId,
-        alreadyCompleted: !!assessment.completedAt,
-      });
-
-      if (!verificationCode || !verificationCode.trim()) {
-        console.log('[TFA Submit] Verification code missing');
-        return res.status(400).json({ 
-          error: "Verification code is required." 
-        });
-      }
-
-      if (verificationCode.trim() !== assessment.verificationCode) {
-        console.log('[TFA Submit] Verification code mismatch - rejecting submission');
-        return res.status(400).json({ 
-          error: "Invalid verification code. Please check the code provided with the assessment link." 
-        });
-      }
-
-      console.log('[TFA Submit] Verification code validated successfully');
 
       // Validate all questions are answered
       const allQuestionIds = TFA_QUESTIONS.map(q => q.id.toString());
@@ -1120,7 +809,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.status(201).json({ 
         shareableId: pifTemplate.shareableId,
-        verificationCode: pifTemplate.verificationCode,
         workflow,
         step: stepId ? await storage.getWorkflowStep(stepId) : null
       });
@@ -1162,18 +850,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extractedQualitative = extractQualitativeResponses(responses);
       const finalQualitative = qualitativeResponses || extractedQualitative;
 
-      // Validate email verification (server-side security check)
-      let isVerified = false;
-      if (email && email.trim().length > 0) {
-        isVerified = consumeVerifiedEmail(email);
-        if (!isVerified) {
-          return res.status(400).json({ 
-            error: "Email not verified. Please verify your email address before submitting." 
-          });
-        }
-      }
-
-      // Create PIF response with verified email
+      // Create PIF response
       const pifResponse = await storage.createPIFResponse({
         workflowId: req.params.workflowId,
         stepId: stepId || null,
@@ -1187,13 +864,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         roiInputs: finalROI,
         qualitativeResponses: finalQualitative,
         email: email || null,
-        verificationToken: null, // No verification token needed for new flow
-        verified: isVerified,
-        verifiedAt: isVerified ? new Date() : null,
+        verificationToken: null,
+        verified: true,
+        verifiedAt: new Date(),
         completedAt: new Date(),
       });
 
-      res.status(201).json({ ...pifResponse, emailVerified: isVerified });
+      res.status(201).json(pifResponse);
     } catch (error: any) {
       if (error.name === 'ZodError') {
         return res.status(400).json({ error: error.message });
@@ -1252,44 +929,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // New endpoint to validate access code
-  app.post("/api/pif/shareable/:shareableId/validate-code", async (req, res) => {
-    try {
-      const { verificationCode } = req.body;
-      
-      if (!verificationCode || !verificationCode.trim()) {
-        return res.status(400).json({ error: "Verification code is required" });
-      }
-
-      const templates = await storage.getPIFByShareableId(req.params.shareableId);
-      if (!templates || templates.length === 0) {
-        return res.status(404).json({ error: "Survey not found" });
-      }
-      
-      const template = templates[0];
-
-      if (verificationCode.trim() !== template.verificationCode) {
-        console.log('[PIF Code Validation] Invalid code:', {
-          provided: verificationCode.trim(),
-          expected: template.verificationCode,
-        });
-        return res.status(403).json({ 
-          error: "Invalid verification code. Please check the code and try again." 
-        });
-      }
-
-      console.log('[PIF Code Validation] Code validated successfully');
-      
-      // Code is valid - return success
-      res.json({ 
-        valid: true,
-        message: "Access code validated successfully" 
-      });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   app.post("/api/pif/shareable/:shareableId/submit", async (req, res) => {
     try {
       console.log('[PIF Shareable Submit] Received request:', {
@@ -1299,16 +938,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const validatedData = pifSubmitSchema.parse(req.body);
-      const { respondentName, respondentRole, respondentResponsibilities, verificationCode, shareableId, responses, stepId, email } = validatedData;
+      const { respondentName, respondentRole, respondentResponsibilities, shareableId, responses, stepId, email } = validatedData;
 
       console.log('[PIF Shareable Submit] Validated data:', {
         respondentName,
         respondentRole,
-        verificationCode,
         shareableId,
         email,
         responsesCount: Object.keys(responses).length,
-        responsesKeys: Object.keys(responses),
       });
 
       // Get PIF template by shareableId
@@ -1322,30 +959,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('[PIF Shareable Submit] Found template:', {
         templateId: template.id,
         templateShareableId: template.shareableId,
-        templateVerificationCode: template.verificationCode,
         templateWorkflowId: template.workflowId,
         templateStepId: template.stepId,
       });
-
-      // Validate verification code (server-side security check)
-      if (!verificationCode || !verificationCode.trim()) {
-        console.log('[PIF Shareable Submit] Verification code missing');
-        return res.status(400).json({ 
-          error: "Verification code is required." 
-        });
-      }
-
-      if (verificationCode.trim() !== template.verificationCode) {
-        console.log('[PIF Shareable Submit] Verification code mismatch:', {
-          provided: verificationCode.trim(),
-          expected: template.verificationCode,
-        });
-        return res.status(400).json({ 
-          error: "Invalid verification code. Please check the code provided with the survey link." 
-        });
-      }
-
-      console.log('[PIF Shareable Submit] Verification code validated successfully');
 
       // Calculate PIF scores from responses
       const pifScores = calculatePIFScores(responses);
@@ -1366,7 +982,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         respondentRole,
         respondentResponsibilities,
         email: email || null,
-        verificationCode,
         responses,
         processClarity: pifScores.processClarity,
         changeMagnitude: pifScores.changeMagnitude,
@@ -1670,114 +1285,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  // ===== NEW VERIFICATION CODE ENDPOINTS (Pre-submission verification) =====
-  
-  // Send verification code to email
-  app.post("/api/send-verification-code", async (req, res) => {
-    try {
-      const { email, formType, language } = req.body;
-      
-      if (!email || !formType) {
-        return res.status(400).json({ error: "Email and formType are required" });
-      }
-      
-      if (formType !== 'tfa' && formType !== 'pif') {
-        return res.status(400).json({ error: "Invalid formType. Must be 'tfa' or 'pif'" });
-      }
-      
-      const lang: 'en' | 'es' = language === 'es' ? 'es' : 'en';
-      
-      const result = await sendVerificationCode(email, formType, lang);
-      
-      if (result.success) {
-        return res.json({ success: true, message: result.message });
-      } else {
-        return res.status(500).json({ success: false, error: result.message });
-      }
-    } catch (error: any) {
-      console.error('[API] Error sending verification code:', error);
-      res.status(500).json({ error: "Failed to send verification code" });
-    }
-  });
-  
-  // Verify code
-  app.post("/api/verify-code", async (req, res) => {
-    try {
-      const { email, code } = req.body;
-      
-      if (!email || !code) {
-        return res.status(400).json({ error: "Email and code are required" });
-      }
-      
-      const result = verifyCode(email, code);
-      
-      if (result.success) {
-        return res.json({ success: true, message: result.message });
-      } else {
-        return res.status(400).json({ success: false, error: result.message });
-      }
-    } catch (error: any) {
-      console.error('[API] Error verifying code:', error);
-      res.status(500).json({ error: "Failed to verify code" });
-    }
-  });
-
-  // ===== OLD VERIFICATION ENDPOINTS (To be removed after frontend migration) =====
-  
-  // TFA Email Verification Endpoint
-  app.get("/api/tfa/verify/:token", async (req, res) => {
-    try {
-      const { token } = req.params;
-      
-      // Find TFA assessment by verification token
-      const assessment = await storage.getTFAByVerificationToken(token);
-      
-      if (!assessment) {
-        return res.status(404).send(getVerificationErrorHTML('en'));
-      }
-
-      // Check if already verified
-      if (assessment.verified) {
-        return res.send(getVerificationSuccessHTML('en', 'tfa', true));
-      }
-
-      // Verify the assessment
-      await storage.verifyTFA(token);
-      
-      res.send(getVerificationSuccessHTML('en', 'tfa', false));
-    } catch (error: any) {
-      console.error('[TFA Verification] Error:', error);
-      res.status(500).send(getVerificationErrorHTML('en'));
-    }
-  });
-
-  // PIF Email Verification Endpoint
-  app.get("/api/pif/verify/:token", async (req, res) => {
-    try {
-      const { token } = req.params;
-      
-      // Find PIF response by verification token
-      const pifResponse = await storage.getPIFByVerificationToken(token);
-      
-      if (!pifResponse) {
-        return res.status(404).send(getVerificationErrorHTML('en'));
-      }
-
-      // Check if already verified
-      if (pifResponse.verified) {
-        return res.send(getVerificationSuccessHTML('en', 'pif', true));
-      }
-
-      // Verify the PIF response
-      await storage.verifyPIF(token);
-      
-      res.send(getVerificationSuccessHTML('en', 'pif', false));
-    } catch (error: any) {
-      console.error('[PIF Verification] Error:', error);
-      res.status(500).send(getVerificationErrorHTML('en'));
     }
   });
 

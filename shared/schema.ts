@@ -184,7 +184,6 @@ export const tfaResponsesSchema = z.object({
   comments: z.string().optional(),
   initialRespondent: z.string().optional(),
   initialRespondentRole: z.string().optional(),
-  verificationCode: z.string(),
   gapMetadata: z.record(z.string(), z.object({
     why: z.string(),
     whoMightKnow: z.string(),
@@ -230,7 +229,6 @@ export const pifSubmitSchema = z.object({
   respondentName: z.string().min(1, "Name is required"),
   respondentRole: z.string().min(1, "Role is required"),
   respondentResponsibilities: z.string().min(1, "Responsibilities are required"),
-  verificationCode: z.string().min(1, "Verification code is required"),
   shareableId: z.string().min(1, "Shareable ID is required"),
   email: z.string().email("Please enter a valid email address").optional(),
   responses: z.record(z.string(), z.string()),

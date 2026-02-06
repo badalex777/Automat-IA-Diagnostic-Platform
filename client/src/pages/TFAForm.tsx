@@ -33,11 +33,8 @@ export default function TFAForm() {
   const [comments, setComments] = useState("");
   const [respondentName, setRespondentName] = useState("");
   const [respondentRole, setRespondentRole] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
   const [currentSection, setCurrentSection] = useState(0); // 0 = intro/welcome, 1+ = TFA sections
   const [gapDetails, setGapDetails] = useState<Record<string, { why: string; whoMightKnow: string }>>({});
-  const [codeValidated, setCodeValidated] = useState(false);
-  const [isValidatingCode, setIsValidatingCode] = useState(false);
   
   // TFA-specific language state (independent from admin UI)
   const [language, setLanguage] = useState<'en' | 'es'>(() => {
@@ -71,42 +68,6 @@ export default function TFAForm() {
     }
   }, [error, toast, t.errorLoadingAssessment]);
 
-  // Function to validate access code
-  const validateAccessCode = async () => {
-    if (!verificationCode.trim()) {
-      toast({
-        title: language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido',
-        description: language === 'en' 
-          ? 'Please enter the verification code to continue.' 
-          : 'Por favor ingrese el código de verificación para continuar.',
-        variant: "destructive",
-        duration: 5000,
-      });
-      return false;
-    }
-
-    setIsValidatingCode(true);
-    try {
-      await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/validate-code`, {
-        verificationCode: verificationCode.trim()
-      });
-      setCodeValidated(true);
-      return true;
-    } catch (error: any) {
-      toast({
-        title: language === 'en' ? 'Invalid Verification Code' : 'Código de Verificación Inválido',
-        description: error.message || (language === 'en' 
-          ? 'The verification code you entered is incorrect. Please check and try again.' 
-          : 'El código de verificación que ingresó es incorrecto. Por favor verifique e intente nuevamente.'),
-        variant: "destructive",
-        duration: 5000,
-      });
-      return false;
-    } finally {
-      setIsValidatingCode(false);
-    }
-  };
-
   const totalQuestions = tfaSections.reduce((acc, section) => acc + section.questions.length, 0);
   const answeredQuestions = Object.keys(answers).length;
   const progress = (answeredQuestions / totalQuestions) * 100;
@@ -117,7 +78,6 @@ export default function TFAForm() {
       comments?: string; 
       initialRespondent?: string;
       initialRespondentRole?: string;
-      verificationCode: string;
       gapMetadata?: Record<string, { why: string; whoMightKnow: string }>;
     }) => {
       return await apiRequest('POST', `/api/tfa/shareable/${shareableLink}/submit`, data);
@@ -136,15 +96,6 @@ export default function TFAForm() {
   });
 
   const handleSubmit = () => {
-    if (!verificationCode.trim()) {
-      toast({
-        title: language === 'en' ? "Verification code required" : "Código de verificación requerido",
-        description: language === 'en' ? "Please enter the verification code provided with the assessment link" : "Por favor ingrese el código de verificación proporcionado con el enlace de evaluación",
-        variant: "destructive",
-        duration: 5000,
-      });
-      return;
-    }
     if (!respondentName.trim()) {
       toast({
         title: t.nameRequired,
@@ -200,7 +151,6 @@ export default function TFAForm() {
       comments: comments || undefined,
       initialRespondent: respondentName.trim(),
       initialRespondentRole: respondentRole.trim(),
-      verificationCode: verificationCode.trim(),
       gapMetadata: gapsExist ? gapDetails : undefined,
     });
   };
@@ -210,8 +160,8 @@ export default function TFAForm() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNext = async () => {
-    // Section 0 = intro/welcome - validate code, name, and role
+  const handleNext = () => {
+    // Section 0 = intro/welcome - validate name and role
     if (currentSection === 0) {
       if (!respondentName.trim()) {
         toast({
@@ -231,23 +181,6 @@ export default function TFAForm() {
         });
         return;
       }
-      // Validate access code before allowing progression
-      const isValid = await validateAccessCode();
-      if (!isValid) {
-        return; // Stay on intro section if code is invalid
-      }
-    } else if (!codeValidated) {
-      // Safety check: prevent navigation beyond intro if code not validated
-      toast({
-        title: language === 'en' ? 'Access Restricted' : 'Acceso Restringido',
-        description: language === 'en' 
-          ? 'Please complete the introduction section first.' 
-          : 'Por favor complete la sección de introducción primero.',
-        variant: "destructive",
-        duration: 5000,
-      });
-      setCurrentSection(0); // Force back to intro
-      return;
     }
 
     // Validate required questions in current section before proceeding
@@ -372,34 +305,8 @@ export default function TFAForm() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {currentSection === 0 && !codeValidated && (
+        {currentSection === 0 && (
           <>
-            {/* Verification Code Section */}
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-6 mb-6">
-              <h2 className="text-lg font-semibold mb-2">
-                {language === 'en' ? 'Verification Code Required' : 'Código de Verificación Requerido'}
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                {language === 'en' 
-                  ? 'Enter the verification code provided with this assessment link. This code was shared by your consultant.' 
-                  : 'Ingrese el código de verificación proporcionado con este enlace de evaluación. Este código fue compartido por su consultor.'}
-              </p>
-              <div className="max-w-md">
-                <Label htmlFor="verification-code">
-                  {language === 'en' ? 'Verification Code' : 'Código de Verificación'}
-                </Label>
-                <Input
-                  id="verification-code"
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
-                  placeholder={language === 'en' ? 'TFA-XXXXX' : 'TFA-XXXXX'}
-                  className="font-mono text-lg tracking-wider"
-                  data-testid="input-verification-code"
-                  maxLength={9}
-                />
-              </div>
-            </div>
-
             {/* Respondent Info Section */}
             <div className="mb-8 p-4 bg-muted/50 rounded-lg border border-border space-y-4">
               <div>
@@ -582,7 +489,7 @@ export default function TFAForm() {
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-border">
           <Button 
             variant="outline" 
-            disabled={currentSection === 0 || (codeValidated && currentSection === 1)}
+            disabled={currentSection === 0}
             onClick={() => handleSectionChange(currentSection - 1)}
             data-testid="button-previous-section"
           >
