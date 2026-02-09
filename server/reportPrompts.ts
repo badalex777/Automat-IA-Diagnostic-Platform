@@ -165,11 +165,12 @@ evaluations contained herein are confidential and intended solely for the intern
 executive and technical teams. No portion of this report may be reproduced, distributed, or disclosed to
 third parties without prior written consent from Athenia.
 
-All findings, metrics, and recommendations are based on information provided by the client through
-interviews, surveys(Technical Feasibility Assessments (TFAs) & Process Insights Forms (PIFs)) and
-related documentation. Athenia assumes that this information is accurate and complete to the best of
-the client's knowledge at the time of submission. Any omissions or inaccuracies may affect the validity of
-the conclusions presented.
+All findings, metrics, and recommendations are based on information gathered through structured 
+interviews (including Technical Feasibility Assessment interviews with process owners and IT 
+representatives), end-user Process Insights Forms (PIFs), and related documentation provided by the 
+client. Athenia assumes that this information is accurate and complete to the best of the client's 
+knowledge at the time of collection. Any omissions or inaccuracies may affect the validity of the 
+conclusions presented.
 
 This report represents a diagnostic-stage evaluation prepared for strategic and planning purposes. It does
 not constitute a guarantee of specific results or a commitment to implement any proposed solutions. All
@@ -203,9 +204,9 @@ Phase 1: Preliminary Data Collection
 
 {{company_name}}'s Annual Revenue and Total number of FTE are gathered for company-specific, 
 realistic opportunity business impact calculations. Preliminary data collection also includes 
-providing names and contact info for TFA respondent (IT representative/technical contact 
-within the client organization) and back-office process owner contact info for later-stage 
-assessment distribution.
+identifying the process owner for each workflow and, where available, the IT department or 
+technical contact within the client organization who can provide system and infrastructure 
+context during the TFA interview process.
 
 Phase 2: Stakeholder Discovery and Context Definition
 
@@ -220,12 +221,16 @@ After stakeholder discovery and context definition, the interviewed stakeholders
 Phase 4: Technical Feasibility Assessment (TFA)
 
 The TFA is conducted at the workflow level and shared across all steps within that workflow.
-Each workflow is evaluated across four weighted dimensions: System Environment, Data
-Quality, Integration Feasibility, and Security and Compliance, using Athenia's
-20-question rubric. Responses generate a Technical Readiness Rating (0 to 100), with
-knowledge gaps recorded for clarification to maintain data integrity. This workflow-level
-assessment provides a foundation for understanding the technical environment that affects all
-steps within the process.
+Athenia's consultant conducts a structured interview with the process owner and, where 
+available, the IT department or technical representative within the client organization. Based 
+on the qualitative information gathered during this interview, the consultant interprets and 
+scores the TFA using Athenia's 20-question rubric across four weighted dimensions: System 
+Environment, Data Quality, Integration Feasibility, and Security and Compliance. This 
+consultant-driven approach ensures that technical nuances are captured through expert 
+interpretation rather than self-reported survey responses. Responses generate a Technical 
+Readiness Rating (0 to 100), with knowledge gaps recorded for clarification to maintain data 
+integrity. This workflow-level assessment provides a foundation for understanding the 
+technical environment that affects all steps within the process.
 
 Phase 5: Process Insights Form (PIF)
 
@@ -239,15 +244,14 @@ standardized operational readiness scores and accurate ROI modeling inputs at th
 enabling precise automation opportunity identification without relying on aggregated workflow
 averages.
 
-Phase 6: End-User Validation and Workflow Mapping
+Phase 6: Workflow Mapping and End-User Interviews
 
-Validation sessions with end users confirm PIF inputs and map each workflow in detail,
-identifying specific inefficiencies, repetitive tasks, bottlenecks, rework loops, error-prone
-activities, edge cases, and exceptions through structured interviews. These interviews gather the
-qualitative insights needed to understand workflow nuances, critical knowledge requirements, tool
-limitations, and process pain points. This ensures that technical assumptions align with real
-execution conditions and that automation strategies address the most impactful improvement
-opportunities.
+Structured interviews with end users map each workflow in detail, identifying specific 
+inefficiencies, repetitive tasks, bottlenecks, rework loops, error-prone activities, edge cases, 
+and exceptions. These interviews gather the qualitative insights needed to understand workflow 
+nuances, critical knowledge requirements, tool limitations, and process pain points. Combined 
+with PIF quantitative data, this ensures that technical assumptions align with real execution 
+conditions and that automation strategies address the most impactful improvement opportunities.
 
 Phase 7: Opportunity Identification
 
@@ -306,15 +310,15 @@ Athenia applies a Two-Matrix Framework:
 
 2. The Enhanced Opportunity Matrix extends the Base Matrix by adding quality and revenue bonuses to the Business Impact axis, expanding the scale from 0-100 to 0-150. Error Reduction Bonus (up to 25 points) rewards opportunities with documented error rates and rework reduction. Revenue Uplift Bonus (up to 25 points) rewards validated capacity reallocation toward revenue-generating activities. This refined matrix surfaces opportunities where impact extends beyond pure efficiency gains.
 
-Phase 10: Validation Session and Stakeholder Alignment
+Phase 10: Interim Deliverable and Stakeholder Alignment
 
-After the Opportunity Matrix is generated, a validation session is conducted with key
-stakeholders to confirm prioritization, address hidden risks, and align automation opportunities
-with organizational strategy. This collaborative review ensures that the roadmap reflects both
-analytical rigor and practical business considerations. Stakeholders provide input on
-implementation feasibility, resource availability, and strategic fit, allowing the team to adjust
-rankings and sequencing as needed. The validated Opportunity Matrix then feeds directly into
-the final automation roadmap and becomes the foundation for the Executive Diagnostic Report.
+At the midpoint of the diagnostic engagement (Week 4 of a 6-week process), Athenia delivers 
+a preliminary findings report to key stakeholders. This interim deliverable presents the principal 
+automation opportunities discovered, initial conclusions on which processes show the greatest 
+potential, risks detected that could hinder successful automation, and a validation of key 
+assumptions before proceeding to the final analysis. This collaborative checkpoint ensures that 
+stakeholders can review early findings, provide feedback on prioritization, and confirm strategic 
+alignment before the final Executive Diagnostic Report is completed in Week 6.
 
 Phase 11: Automation Roadmap Development
 
@@ -330,7 +334,11 @@ The roadmap acts as a structured execution plan, ensuring a logical transition f
 
 Phase 12: Final Deliverables
 
-The diagnostic process concludes with the delivery of two comprehensive outputs:
+The diagnostic engagement follows a structured 6-week timeline: Weeks 1 through 3 focus on 
+data collection, including TFA interviews, workflow mapping interviews, and PIF distribution to 
+end users. Week 4 delivers the interim findings report (Phase 10). Weeks 5 and 6 incorporate 
+stakeholder feedback and finalize the analysis, concluding with the delivery of two comprehensive 
+outputs:
 
 1. **Executive Diagnostic Report (EDR):** This document consolidates all findings, readiness assessments, SWOT analyses, ROI projections, opportunity matrices, and the 18-month automation roadmap. The EDR includes an Executive Summary, detailed methodology (Phases 1-12), diagnostic overview, findings and analysis, automation roadmap, Conclusions and Next Steps, and six comprehensive appendices (A: Detailed Methodology, B: Readiness Score Metric Weighting, C: Step-Level SWOT Analysis, D: ROI Detailed Overview, E: ROI Calculation Methodology, F: Data Provenance and Audit Trail). Designed for executive and technical stakeholders to guide strategic decision-making and implementation planning.
 
@@ -688,15 +696,18 @@ The diagnostic integrates quantitative and qualitative inputs from multiple orga
 to ensure analytical depth, data integrity, and traceability. Each stream captures a distinct
 dimension of the analyzed workflows.
 
-**Technical Feasibility Assessments (TFA):** Completed by IT and system owners to document
-system environment, data quality, integration feasibility, and security posture. TFAs establish the
-technical conditions that determine whether automation is feasible within each workflow.
+**Technical Feasibility Assessments (TFA):** Completed by the Athenia consultant based on 
+structured interviews with the process owner and, where available, the IT department or technical 
+representative within the client organization. The consultant interprets qualitative information 
+gathered during these interviews to score the TFA, documenting system environment, data quality, 
+integration feasibility, and security posture. TFAs establish the technical conditions that determine 
+whether automation is feasible within each workflow.
 
 **Process Insights Forms (PIF):** Completed by employees who are actually performing the analyzed workflow steps (end users) to capture operational realities. PIFs measure process clarity, change magnitude, and workflow brittleness, and collect metrics such as process volume, frequency, average duration, and observed error rates. Additionally, situational data covering potential time savings, revenue uplift, and error reduction factors is collected here. PIF inputs feed readiness scoring and ROI modeling.
 
 **Stakeholder Interviews:** Sessions with department leads, process owners, and subject-matter experts help Athenia identify automation candidates and establish a baseline understanding of critical workflows, pain points, and automation objectives. This ensures that the diagnostic scope and business priorities are aligned. The outcome of these interviews is the identification of the workflows that will be analyzed during the diagnosis.
 
-**Preliminary Data Collection:** Gathering of company-specific financial and operational context including Annual Revenue, Total FTEs, and contact information for the TFA respondent (IT representative or technical contact) and back-office process owner. This foundational data enables company-relative normalization of scores and ensures accurate ROI modeling from the outset.
+**Preliminary Data Collection:** Gathering of company-specific financial and operational context including Annual Revenue, Total FTEs, and identification of process owners and IT department contacts for TFA interview scheduling. This foundational data enables company-relative normalization of scores and ensures accurate ROI modeling from the outset.
 
 **End-User Interviews:** Discussions with those performing the work verify PIF inputs, enable detailed workflow mapping, surface edge cases, and isolate high-friction or error-prone stages.
 

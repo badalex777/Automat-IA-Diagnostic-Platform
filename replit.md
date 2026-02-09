@@ -28,14 +28,14 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 
 **Key Features:**
 - **Workflow Management**: Create and manage workflows broken into assignable process steps.
-- **TFA Survey & Analysis**: Workflow-level technical feasibility assessment with gap detection and scores.
-- **Step-Level PIF Survey**: Granular, step-level Process Insight Forms for operational realities and ROI inputs.
+- **TFA Interview & Analysis**: Workflow-level technical feasibility assessment conducted by Athenia consultant via structured interviews with process owners and IT representatives, with gap detection and scores.
+- **Step-Level PIF Survey**: Granular, step-level Process Insight Forms completed by end users for operational realities and ROI inputs.
 - **Step-Level Readiness Rubric**: Combines TFA and PIF scores (60% TFA + 40% PIF) per step, including SWOT analysis.
 - **ROI Calculator Dialog**: Unified create/edit interface for implementation opportunities. Creates opportunities from PIF data with scenario-based projections. Edit mode loads existing roiCalculationData and uses normalizeROICalculation to coerce database strings to numbers. Supports both POST (create) and PATCH (update) operations.
 - **Opportunity Matrix**: A 2D scatter plot visualizing implementation opportunities by Business Impact and Implementation Effort.
-- **Executive Diagnostic Report**: Generates comprehensive, branded .docx documents with executive summaries, methodology, findings, roadmaps, and technical appendices. Features 12-phase methodology with opportunity quadrant sections (Quick Wins, Strategic Bets, Nice-to-Have, Deprioritize), categorized foundational gaps analysis, and analyst commentary placeholders.
+- **Executive Diagnostic Report**: Generates comprehensive, branded .docx documents with executive summaries, methodology, findings, roadmaps, and technical appendices. Features 12-phase methodology (6-week timeline: Weeks 1-3 data collection, Week 4 interim deliverable, Week 6 final EDR) with opportunity quadrant sections (Quick Wins, Strategic Bets, Nice-to-Have, Deprioritize), categorized foundational gaps analysis, and analyst commentary placeholders.
 - **Workflow-Level Consolidation System**: Bundles multiple step-level opportunities into strategic consolidation packages with distinct calculation logic for business impact, payback period, readiness score, and implementation effort. These are visually differentiated on the Opportunity Matrix and detailed in the EDR.
-- **Unified Security Model**: Both TFA and PIF forms use identical security architecture where an intro/disclaimer page is public, but verification code + respondent info are required to access actual form questions.
+- **Form Access Model**: TFA and PIF forms use an intro/disclaimer page followed by respondent name/role collection before proceeding to questions (no verification codes required).
 
 **ROI Calculation Methodology (Authoritative: validation spec supersedes older handbook notes):**
 - **ALL Rubrics use MULTIPLICATION, never averaging**: Time Savings, Quality Impact, Revenue Uplift, and Ramp-Up Efficiency rubrics multiply all question multipliers together
@@ -45,6 +45,15 @@ Core entities include Companies, Workflows, Workflow Steps, TFA Assessments, PIF
 - **Revenue Uplift**: Scenario multiplier applied to reallocation percentage only, NOT to the final dollar amount (prevents double multiplication)
 - **annualRoi Field**: Stores Year 1 ramped dollar benefits (year1Benefits), allowing downstream to subtract implementation cost for net calculations
 - **Scenario Multipliers**: Applied after rubric calculations per spec (Time Savings, Error Reduction, Reallocation, Cost Overrun, Ramp-Up)
+
+**Recent Changes (February 2026):**
+- Restructured TFA methodology: Changed from end-user/IT self-reported surveys to consultant-led structured interviews with process owners and IT representatives. Consultant interprets qualitative information and scores the TFA.
+- Updated EDR 6-week timeline: Weeks 1-3 data collection (TFA interviews, workflow mapping, PIF distribution), Week 4 interim deliverable with key opportunities/risks/assumptions, Week 6 final EDR delivery
+- Renamed Phase 10 from "Validation Session" to "Interim Deliverable and Stakeholder Alignment"
+- Renamed Phase 6 from "End-User Validation and Workflow Mapping" to "Workflow Mapping and End-User Interviews"
+- Updated Phases 1, 4, 6, 10, 12 in both English and Spanish METHODOLOGY_OVERVIEW
+- Updated APPENDIX_A TFA descriptions, Preliminary Data Collection, and Confidentiality Disclaimer in both languages
+- Removed verification code functionality from TFA and PIF forms (previous work completed)
 
 **Recent Changes (December 2025):**
 - Fixed EDR payback period display: Added getRecalculatedPaybackMonths() helper in reportDataAggregator.ts that recalculates payback from roiCalculationData (instead of reading stale database values) to match UI behavior. Also applied to consolidated opportunity metrics.

@@ -167,11 +167,12 @@ y evaluaciones de flujos de trabajo contenidos en este documento son confidencia
 informe puede ser reproducida, distribuida o divulgada a terceros sin el consentimiento previo por escrito 
 de Athenia.
 
-Todos los hallazgos, métricas y recomendaciones se basan en información proporcionada por el cliente a 
-través de entrevistas, encuestas(Evaluaciones de Factibilidad Técnica (TFA) y Formularios de Perspectivas 
-de Proceso (PIF)) y documentación relacionada. Athenia asume que esta información es precisa y completa 
-según el mejor conocimiento del cliente en el momento de la presentación. Cualquier omisión o inexactitud 
-puede afectar la validez de las conclusiones presentadas.
+Todos los hallazgos, métricas y recomendaciones se basan en información recopilada a través de 
+entrevistas estructuradas (incluyendo entrevistas de Evaluación de Factibilidad Técnica con propietarios 
+de procesos y representantes de TI), Formularios de Perspectivas de Proceso (PIF) completados por 
+usuarios finales, y documentación relacionada proporcionada por el cliente. Athenia asume que esta 
+información es precisa y completa según el mejor conocimiento del cliente en el momento de la 
+recopilación. Cualquier omisión o inexactitud puede afectar la validez de las conclusiones presentadas.
 
 Este informe representa una evaluación en etapa de diagnóstico preparada con fines estratégicos y de 
 planificación. No constituye una garantía de resultados específicos ni un compromiso de implementar las 
@@ -207,9 +208,9 @@ Fase 1: Recopilación Preliminar de Datos
 
 Se recopilan los Ingresos Anuales y el Número Total de FTE de {{company_name}} para cálculos de 
 impacto empresarial de oportunidades específicos de la empresa y realistas. La recopilación preliminar 
-de datos también incluye proporcionar nombres e información de contacto para el encuestado del TFA 
-(representante de TI/contacto técnico dentro de la organización del cliente) e información de contacto 
-del propietario del proceso de back-office para la distribución de evaluaciones en etapas posteriores.
+de datos también incluye la identificación del propietario de proceso para cada flujo de trabajo y, 
+cuando esté disponible, el departamento de TI o contacto técnico dentro de la organización del cliente 
+que pueda proporcionar contexto de sistemas e infraestructura durante el proceso de entrevista del TFA.
 
 Fase 2: Descubrimiento de Partes Interesadas y Definición de Contexto
 
@@ -223,12 +224,17 @@ Después del descubrimiento de partes interesadas y definición de contexto, las
 
 Fase 4: Evaluación de Factibilidad Técnica (TFA)
 
-El TFA se realiza a nivel de flujo de trabajo y se comparte en todos los pasos dentro de ese flujo. Cada 
-flujo de trabajo se evalúa en cuatro dimensiones ponderadas: Entorno del Sistema, Calidad de Datos, 
-Factibilidad de Integración y Seguridad y Cumplimiento, utilizando la rúbrica de 20 preguntas de Athenia. 
-Las respuestas generan una Calificación de Preparación Técnica (0 a 100), con brechas de conocimiento 
-registradas para aclaración para mantener la integridad de datos. Esta evaluación a nivel de flujo de trabajo 
-proporciona una base para comprender el entorno técnico que afecta todos los pasos dentro del proceso.
+El TFA se realiza a nivel de flujo de trabajo y se comparte en todos los pasos dentro de ese flujo. 
+El consultor de Athenia conduce una entrevista estructurada con el propietario del proceso y, cuando 
+esté disponible, el departamento de TI o representante técnico dentro de la organización del cliente. 
+Con base en la información cualitativa recopilada durante esta entrevista, el consultor interpreta y 
+califica el TFA utilizando la rúbrica de 20 preguntas de Athenia en cuatro dimensiones ponderadas: 
+Entorno del Sistema, Calidad de Datos, Factibilidad de Integración y Seguridad y Cumplimiento. Este 
+enfoque dirigido por el consultor asegura que los matices técnicos sean capturados a través de 
+interpretación experta en lugar de respuestas de encuesta auto-reportadas. Las respuestas generan una 
+Calificación de Preparación Técnica (0 a 100), con brechas de conocimiento registradas para aclaración 
+para mantener la integridad de datos. Esta evaluación a nivel de flujo de trabajo proporciona una base 
+para comprender el entorno técnico que afecta todos los pasos dentro del proceso.
 
 Fase 5: Formulario de Perspectivas de Proceso (PIF)
 
@@ -242,14 +248,14 @@ de encuesta mientras captura puntuaciones de preparación operacional estandariz
 modelado de ROI a nivel de paso, permitiendo la identificación precisa de oportunidades de automatización sin 
 depender de promedios agregados de flujo de trabajo.
 
-Fase 6: Validación de Usuario Final y Mapeo de Flujo de Trabajo
+Fase 6: Mapeo de Flujo de Trabajo y Entrevistas con Usuarios Finales
 
-Las sesiones de validación con usuarios finales confirman entradas PIF y mapean cada flujo de trabajo en 
-detalle, identificando ineficiencias específicas, tareas repetitivas, cuellos de botella, bucles de 
-reelaboración, actividades propensas a errores, casos extremos y excepciones a través de entrevistas 
-estructuradas. Estas entrevistas recopilan las perspectivas cualitativas necesarias para comprender los 
-matices del flujo de trabajo, requisitos de conocimiento crítico, limitaciones de herramientas y puntos de 
-dolor del proceso. Esto asegura que los supuestos técnicos se alineen con las condiciones reales de 
+Entrevistas estructuradas con usuarios finales mapean cada flujo de trabajo en detalle, identificando 
+ineficiencias específicas, tareas repetitivas, cuellos de botella, bucles de reelaboración, actividades 
+propensas a errores, casos extremos y excepciones. Estas entrevistas recopilan las perspectivas 
+cualitativas necesarias para comprender los matices del flujo de trabajo, requisitos de conocimiento 
+crítico, limitaciones de herramientas y puntos de dolor del proceso. Combinadas con los datos 
+cuantitativos del PIF, esto asegura que los supuestos técnicos se alineen con las condiciones reales de 
 ejecución y que las estrategias de automatización aborden las oportunidades de mejora más impactantes.
 
 Fase 7: Identificación de Oportunidades
@@ -309,16 +315,16 @@ Athenia aplica un Marco de Dos Matrices:
 1. La Matriz de Oportunidades de Impacto Base calcula el Impacto Empresarial normalizando el ROI Anual como porcentaje de los ingresos de la empresa, luego convirtiéndolo a una puntuación de 0-100 usando un multiplicador x1000 (por ejemplo, 5% de ingresos = 50 puntos). Esta Puntuación de ROI se pondera al 60% y se combina con una Puntuación de Horas (40%) derivada del ahorro de tiempo semanal. El resultado es una puntuación de impacto relativa a la empresa que permite comparación consistente entre oportunidades de diferentes escalas.
 2. La Matriz de Oportunidades Mejorada aplica un modelo de bonificación aditiva solo al eje de Impacto Empresarial, expandiendo la escala de 0-100 a 0-150 para oportunidades que demuestran valor adicional a través de reducción de errores o incremento de ingresos. Esta matriz refinada ajusta las clasificaciones de oportunidades para reflejar interdependencias estratégicas, asegurando un portafolio equilibrado de ganancias a corto plazo y valor de automatización sostenible a largo plazo.
 
-Fase 10: Sesión de Validación y Alineación de Partes Interesadas
+Fase 10: Entregable Intermedio y Alineación de Partes Interesadas
 
-Después de que se genera la Matriz de Oportunidades, se realiza una sesión de validación con partes 
-interesadas clave para confirmar la priorización, abordar riesgos ocultos y alinear las oportunidades de 
-automatización con la estrategia y cultura organizacional. Esta revisión colaborativa asegura que la hoja 
-de ruta refleje tanto rigor analítico como consideraciones empresariales prácticas. Las partes interesadas 
-proporcionan información sobre factibilidad de implementación, disponibilidad de recursos y ajuste 
-estratégico, permitiendo al equipo ajustar clasificaciones y secuenciación según sea necesario. La Matriz 
-de Oportunidades validada luego alimenta directamente la hoja de ruta de automatización final y se convierte 
-en la base del Reporte Ejecutivo de Diagnóstico.
+En el punto medio del compromiso de diagnóstico (Semana 4 de un proceso de 6 semanas), Athenia entrega 
+un informe preliminar de hallazgos a las partes interesadas clave. Este entregable intermedio presenta 
+las principales oportunidades de automatización descubiertas, conclusiones iniciales sobre qué procesos 
+muestran el mayor potencial, riesgos detectados que podrían obstaculizar una automatización exitosa y una 
+validación de supuestos clave antes de proceder al análisis final. Este punto de control colaborativo 
+asegura que las partes interesadas puedan revisar hallazgos tempranos, proporcionar retroalimentación 
+sobre la priorización y confirmar la alineación estratégica antes de que el Reporte Ejecutivo de 
+Diagnóstico final se complete en la Semana 6.
 
 Fase 11: Desarrollo de Hoja de Ruta de Automatización
 
@@ -334,7 +340,11 @@ La hoja de ruta actúa como un plan de ejecución estructurado, asegurando una t
 
 Fase 12: Entregables Finales
 
-El proceso de diagnóstico concluye con la entrega de dos productos completos:
+El compromiso de diagnóstico sigue un cronograma estructurado de 6 semanas: las Semanas 1 a 3 se 
+enfocan en la recopilación de datos, incluyendo entrevistas de TFA, entrevistas de mapeo de flujo de 
+trabajo y distribución de PIF a usuarios finales. La Semana 4 entrega el informe intermedio de hallazgos 
+(Fase 10). Las Semanas 5 y 6 incorporan la retroalimentación de las partes interesadas y finalizan el 
+análisis, concluyendo con la entrega de dos productos completos:
 
 1. **Reporte Ejecutivo de Diagnóstico (EDR):** Este documento consolida todos los hallazgos, evaluaciones de preparación, análisis FODA, proyecciones de ROI, matrices de oportunidades y la hoja de ruta de automatización de 18 meses. El EDR incluye un Resumen Ejecutivo, metodología detallada (Fases 1-12), descripción general del diagnóstico, hallazgos y análisis, hoja de ruta de automatización, Conclusiones y Próximos Pasos, y seis apéndices completos (A: Metodología Detallada, B: Ponderación de Métricas de Puntuación de Preparación, C: Análisis FODA a Nivel de Paso, D: Descripción Detallada de ROI, E: Metodología de Cálculo de ROI, F: Procedencia de Datos y Pista de Auditoría). Diseñado para partes interesadas ejecutivas y técnicas para guiar la toma de decisiones estratégicas y planificación de implementación.
 
@@ -699,16 +709,18 @@ El diagnóstico integra entradas cuantitativas y cualitativas de múltiples capa
 asegurar profundidad analítica, integridad de datos y trazabilidad. Cada flujo captura una dimensión 
 distinta de los flujos de trabajo analizados.
 
-**Evaluaciones de Factibilidad Técnica (TFA):** Completadas por propietarios de TI y sistemas para documentar 
-el entorno del sistema, calidad de datos, factibilidad de integración y postura de seguridad. Los TFA 
-establecen las condiciones técnicas que determinan si la automatización es factible dentro de cada flujo 
-de trabajo.
+**Evaluaciones de Factibilidad Técnica (TFA):** Completadas por el consultor de Athenia con base en 
+entrevistas estructuradas con el propietario del proceso y, cuando esté disponible, el departamento de 
+TI o representante técnico dentro de la organización del cliente. El consultor interpreta la información 
+cualitativa recopilada durante estas entrevistas para calificar el TFA, documentando el entorno del 
+sistema, calidad de datos, factibilidad de integración y postura de seguridad. Los TFA establecen las 
+condiciones técnicas que determinan si la automatización es factible dentro de cada flujo de trabajo.
 
 **Formularios de Perspectivas de Proceso (PIF):** Completados por empleados que realmente realizan los pasos del flujo de trabajo analizado (usuarios finales) para capturar realidades operacionales. Los PIF miden claridad de proceso, magnitud de cambio y fragilidad de flujo de trabajo, y recopilan métricas como volumen de proceso, frecuencia, duración promedio y tasas de error observadas. Adicionalmente, se recopila aquí información situacional sobre potencial de ahorro de tiempo, incremento de ingresos y factores de reducción de errores. Las entradas PIF alimentan la puntuación de preparación y el modelado de ROI.
 
 **Entrevistas con Partes Interesadas:** Sesiones con líderes departamentales, propietarios de procesos y expertos en la materia ayudan a Athenia a identificar candidatos de automatización y establecer un entendimiento base de flujos de trabajo críticos, puntos de dolor y objetivos de automatización. Esto asegura que el alcance del diagnóstico y las prioridades empresariales estén alineados. El resultado de estas entrevistas es la identificación de los flujos de trabajo que serán analizados durante el diagnóstico.
 
-**Recopilación de Datos Preliminar:** Recopilación del contexto financiero y operacional específico de la empresa incluyendo Ingresos Anuales, Total de ETCs, e información de contacto para el encuestado de TFA (representante de TI o contacto técnico) y propietario de procesos de back-office. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
+**Recopilación de Datos Preliminar:** Recopilación del contexto financiero y operacional específico de la empresa incluyendo Ingresos Anuales, Total de ETCs, e identificación de propietarios de procesos y contactos del departamento de TI para la programación de entrevistas de TFA. Estos datos fundamentales permiten la normalización de puntuaciones relativas a la empresa y aseguran un modelado de ROI preciso desde el inicio.
 
 **Entrevistas con Usuarios Finales:** Discusiones con quienes realizan el trabajo verifican entradas PIF, permiten mapeo detallado de flujos de trabajo, identifican casos extremos y aíslan etapas de alta fricción o propensas a errores.
 
