@@ -1,0 +1,209 @@
+0. Apertura (5 min)
+
+Objetivo: contexto, confianza, expectativas.
+
+“Gracias por el tiempo.
+Esta conversación no es técnica ni un examen.
+Mi objetivo es entender cómo funcionan hoy sus sistemas y procesos para evaluar qué tan viable es automatizar este flujo sin generar riesgos.”
+
+Aclaraciones clave:
+
+No se están evaluando personas
+
+No se están tomando decisiones aún
+
+No se necesita saber “la respuesta correcta”
+
+Tú traducirás esto internamente a un diagnóstico técnico
+
+Bloque 1 – Sistemas y arquitectura actual (15–20 min)
+
+(Cubre Q1, Q2, Q3, Q4, Q12, Q14)
+
+Pregunta ancla
+
+“Cuéntame qué sistemas participan hoy en este flujo de trabajo, desde que empieza hasta que termina.”
+
+Déjalos hablar. No interrumpas.
+
+Follow-ups guiados (usa solo los necesarios)
+
+Arquitectura / deployment
+
+¿Estos sistemas están en la nube, en servidores propios, o una mezcla?
+
+¿Algún sistema es especialmente viejo o crítico?
+
+Conectividad
+
+¿Hoy estos sistemas se hablan entre sí automáticamente?
+
+¿O hay pasos manuales para pasar información?
+
+Acceso
+
+Para que algo funcione, ¿alguien tiene que entrar con usuario y contraseña?
+
+¿Existen usuarios “técnicos” o accesos para integraciones?
+
+Performance
+
+En el día a día, ¿algún sistema es lento o se cae?
+
+¿Hay horas pico donde todo se vuelve más lento?
+
+Complejidad
+
+En total, ¿cuántos sistemas dirías que toca una sola instancia de este proceso?
+
+Restricciones
+
+¿Algún proveedor pone límites al número de llamadas o transacciones?
+
+¿Alguna vez han tenido problemas por “exceso de uso”?
+
+📝 Aquí tú infieres:
+deployment, APIs, acceso programático, performance, complejidad, rate limits.
+
+Bloque 2 – Control operativo y resiliencia (15–20 min)
+
+(Cubre Q5, Q6, Q15, Q16)
+
+Pregunta ancla
+
+“Cuando algo falla en este proceso, ¿cómo se enteran y qué pasa después?”
+
+Follow-ups
+
+Visibilidad
+
+¿Se dan cuenta de inmediato o después?
+
+¿Hay alertas o alguien revisa manualmente?
+
+Errores
+
+¿Qué suele fallar más seguido?
+
+¿El proceso se detiene o sigue con errores?
+
+Recuperación
+
+Si un sistema se cae, ¿cuánto tiempo toma volver a operar?
+
+¿Han perdido información alguna vez?
+
+Cambios
+
+¿Alguna integración se ha roto por una actualización?
+
+¿Los cambios vienen avisados o son sorpresivos?
+
+📝 Aquí tú infieres:
+monitoring, backup, error handling, estabilidad de APIs.
+
+Bloque 3 – Datos reales (20–25 min)
+
+(Cubre Q7, Q8, Q9, Q10, Q11)
+
+Pregunta ancla
+
+“Si quisiéramos automatizar este proceso mañana, ¿qué tan ‘limpios’ están los datos hoy?”
+
+Follow-ups
+
+Origen
+
+¿De dónde vienen los datos?
+
+¿Siempre llegan igual?
+
+Formato
+
+¿Llegan en formularios, Excel, correos, PDFs?
+
+¿Cambian mucho de formato?
+
+Calidad
+
+¿Qué suele venir mal o incompleto?
+
+¿Qué corrigen manualmente hoy?
+
+Validación
+
+¿Hay reglas que bloqueen datos incorrectos?
+
+¿O los errores se descubren después?
+
+Histórico
+
+¿Desde hace cuánto existe este proceso?
+
+¿De cuántos casos estamos hablando, más o menos?
+
+📝 Aquí tú infieres:
+estructura, calidad, volumen histórico, consistencia, validación.
+
+Bloque 4 – Seguridad, compliance y fricción organizacional (10–15 min)
+
+(Cubre Q17, Q18, Q19, Q20)
+
+Pregunta ancla
+
+“Desde el punto de vista de riesgo y compliance, ¿qué tan sensible es este proceso?”
+
+Follow-ups
+
+Datos
+
+¿Qué tipo de información toca este flujo?
+
+¿Clientes, pagos, salud, contratos?
+
+Regulación
+
+¿Están sujetos a alguna normativa fuerte?
+
+¿Auditorías, certificaciones, reguladores?
+
+Aprobaciones
+
+Para usar una nueva herramienta, ¿qué tan largo es el proceso?
+
+¿Quién tiene que aprobar?
+
+Retención
+
+¿Cuánto tiempo deben guardar esta información?
+
+¿Hay reglas claras o es flexible?
+
+📝 Aquí tú infieres:
+sensibilidad, compliance, tiempos de aprobación, retención.
+
+Cierre (5 min)
+
+“Con esto tengo lo necesario para traducir esta conversación en un diagnóstico técnico y operativo.
+El siguiente paso será cruzar esto con la información de los end users y devolverles un diagnóstico claro:
+qué se puede automatizar, qué no, y por qué.”
+
+Alinea expectativas:
+
+No prometer automatización total
+
+Reforzar enfoque de riesgo + ROI
+
+Confirmar si se necesita follow-up técnico corto
+
+Notas clave para ti (muy importante)
+
+Nunca leas las preguntas del TFA
+
+Tú interpretas y puntúas
+
+Pide siempre ejemplos reales (“la última vez que pasó…”)
+
+Si algo suena muy optimista → marca mentalmente “validar”
+
+El valor está en tu criterio, no en el formulario
