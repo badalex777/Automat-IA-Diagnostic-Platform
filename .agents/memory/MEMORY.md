@@ -1,0 +1,1 @@
+- [Managed database overrides](managed-database-overrides.md) — A legacy Neon DATABASE_URL can hide Replit's managed DB; check existing rows before assuming a fresh database.
